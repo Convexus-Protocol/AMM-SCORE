@@ -18,12 +18,12 @@ package exchange.switchy.pool;
 
 import java.math.BigInteger;
 
+import exchange.switchy.common.SwitchyPoolDeployerParameters;
 import exchange.switchy.librairies.LiquidityMath;
 import exchange.switchy.librairies.Oracle;
 import exchange.switchy.librairies.Position;
 import exchange.switchy.librairies.Positions;
 import exchange.switchy.librairies.SqrtPriceMath;
-import exchange.switchy.librairies.SwitchyPoolDeployerParameters;
 import exchange.switchy.librairies.Tick;
 import exchange.switchy.librairies.TickBitmap;
 import exchange.switchy.librairies.TickMath;
