@@ -1,0 +1,8 @@
+rootProject.name = 'Switchy'
+include (
+    'Switchy-Pool',
+    'Switchy-Pool-Test',
+    'Switchy-Tests',
+    'Switchy-Utils',
+    'javaee-tokens',
+    'unittest')
