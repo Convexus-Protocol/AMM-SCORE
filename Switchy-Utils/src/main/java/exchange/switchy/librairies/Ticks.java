@@ -162,4 +162,32 @@ public class Ticks {
   public void clear(int tick) {
     this.ticks.set(tick, null);
   }
+
+  /**
+   * @notice Transitions to next tick as needed by price movement
+   * @param tick The destination tick of the transition
+   * @param feeGrowthGlobal0X128 The all-time global fee growth, per unit of liquidity, in token0
+   * @param feeGrowthGlobal1X128 The all-time global fee growth, per unit of liquidity, in token1
+   * @param secondsPerLiquidityCumulativeX128 The current seconds per liquidity
+   * @param tickCumulative The tick * time elapsed since the pool was first initialized
+   * @param time The current block.timestamp
+   * @return liquidityNet The amount of liquidity added (subtracted) when tick is crossed from left to right (right to left)
+   */
+  public BigInteger cross(
+    int tick, 
+    BigInteger feeGrowthGlobal0X128, 
+    BigInteger feeGrowthGlobal1X128, 
+    BigInteger secondsPerLiquidityCumulativeX128,
+    BigInteger tickCumulative, 
+    BigInteger time
+  ) {
+    Tick.Info info = this.get(tick);
+    info.feeGrowthOutside0X128 = feeGrowthGlobal0X128.subtract(info.feeGrowthOutside0X128);
+    info.feeGrowthOutside1X128 = feeGrowthGlobal1X128.subtract(info.feeGrowthOutside1X128);
+    info.secondsPerLiquidityOutsideX128 = secondsPerLiquidityCumulativeX128.subtract(info.secondsPerLiquidityOutsideX128);
+    info.tickCumulativeOutside = tickCumulative.subtract(info.tickCumulativeOutside);
+    info.secondsOutside = time.subtract(info.secondsOutside);
+    this.set(tick, info);
+    return info.liquidityNet;
+  }
 }

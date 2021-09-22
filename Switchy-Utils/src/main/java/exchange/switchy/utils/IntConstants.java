@@ -19,5 +19,10 @@ package exchange.switchy.utils;
 import java.math.BigInteger;
 
 public class IntConstants {
+  public final static BigInteger MAX_UINT8   = new BigInteger("0xff");
+  public final static BigInteger MAX_UINT16  = new BigInteger("0xffff");
+  public final static BigInteger MAX_UINT32  = new BigInteger("0xffffffff");
+  public final static BigInteger MAX_UINT64  = new BigInteger("0xffffffffffffffff");
+  public final static BigInteger MAX_UINT128 = new BigInteger("0xffffffffffffffffffffffffffffffff");
   public final static BigInteger MAX_UINT256 = new BigInteger("0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
 }

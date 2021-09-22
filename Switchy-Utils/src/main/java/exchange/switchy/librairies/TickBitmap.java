@@ -18,6 +18,7 @@ package exchange.switchy.librairies;
 
 import java.math.BigInteger;
 
+import exchange.switchy.utils.IntConstants;
 import score.Context;
 import score.DictDB;
 
@@ -38,7 +39,6 @@ public class TickBitmap {
   // ================================================
   // Methods 
   // ================================================
-  
   public class PositionResult {
     public int wordPos;
     public int bitPos;
@@ -79,5 +79,55 @@ public class TickBitmap {
       BigInteger packedTick = this.tickBitmap.get(wordPos);
 
       this.tickBitmap.set(wordPos, packedTick.xor(mask));
+  }
+
+  public class NextInitializedTickWithinOneWordResult {
+    public int tickNext;
+    public boolean initialized;
+  }
+  public NextInitializedTickWithinOneWordResult nextInitializedTickWithinOneWord(
+    int tick, 
+    int tickSpacing, 
+    boolean lte
+  ) {
+    NextInitializedTickWithinOneWordResult result = new NextInitializedTickWithinOneWordResult();
+
+    int compressed = tick / tickSpacing;
+    if (tick < 0 && tick % tickSpacing != 0) {
+      compressed--; // round towards negative infinity
+    }
+
+    if (lte) {
+        var position = position(compressed);
+        int wordPos = position.wordPos;
+        int bitPos  = position.bitPos;
+        // all the 1s at or to the right of the current bitPos
+        BigInteger mask = BigInteger.valueOf((1 << bitPos) - 1 + (1 << bitPos));
+        BigInteger masked = this.tickBitmap.get(wordPos).and(mask);
+
+        // if there are no initialized ticks to the right of or at the current tick, return rightmost in the word
+        result.initialized = !masked.equals(BigInteger.ZERO);
+        // overflow/underflow is possible, but prevented externally by limiting both tickSpacing and tick
+        result.tickNext = result.initialized
+            ? (compressed - (bitPos - BitMath.mostSignificantBit(masked))) * tickSpacing
+            : (compressed - bitPos) * tickSpacing;
+    } else {
+        // start from the word of the next tick, since the current tick state doesn't matter
+        var position = position(compressed + 1);
+        int wordPos = position.wordPos;
+        int bitPos  = position.bitPos;
+        // all the 1s at or to the left of the bitPos
+        BigInteger mask = BigInteger.valueOf(~((1 << bitPos) - 1));
+        BigInteger masked = this.tickBitmap.get(wordPos).and(mask);
+
+        // if there are no initialized ticks to the left of the current tick, return leftmost in the word
+        result.initialized = !masked.equals(BigInteger.ZERO);
+        // overflow/underflow is possible, but prevented externally by limiting both tickSpacing and tick
+        result.tickNext = result.initialized
+            ? (compressed + 1 + BitMath.leastSignificantBit(masked) - bitPos) * tickSpacing
+            : (compressed + 1 + IntConstants.MAX_UINT8.intValue() - bitPos) * tickSpacing;
+    }
+
+    return result;
   }
 }

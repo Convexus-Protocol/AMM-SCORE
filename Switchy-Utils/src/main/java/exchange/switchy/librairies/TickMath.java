@@ -35,9 +35,9 @@ public class TickMath {
   public final static int MAX_TICK = -MIN_TICK;
   
   // @dev The minimum value that can be returned from #getSqrtRatioAtTick. Equivalent to getSqrtRatioAtTick(MIN_TICK)
-  private final static BigInteger MIN_SQRT_RATIO = new BigInteger("4295128739");
+  public final static BigInteger MIN_SQRT_RATIO = new BigInteger("4295128739");
   // @dev The maximum value that can be returned from #getSqrtRatioAtTick. Equivalent to getSqrtRatioAtTick(MAX_TICK)
-  private final static BigInteger MAX_SQRT_RATIO = new BigInteger("1461446703485210103287273052203988822378723970342");
+  public final static BigInteger MAX_SQRT_RATIO = new BigInteger("1461446703485210103287273052203988822378723970342");
 
   public static BigInteger getSqrtRatioAtTick (int tick) {
     BigInteger absTick = tick < 0 ? BigInteger.valueOf(-tick) : BigInteger.valueOf(tick);

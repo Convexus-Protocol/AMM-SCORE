@@ -39,7 +39,7 @@ public class SqrtPriceMath {
         : getAmount0Delta(sqrtRatioAX96, sqrtRatioBX96, liquidity, true);
   }
 
-  private static BigInteger getAmount0Delta(
+  public static BigInteger getAmount0Delta(
     BigInteger sqrtRatioAX96, 
     BigInteger sqrtRatioBX96, 
     BigInteger liquidity,
@@ -75,7 +75,7 @@ public class SqrtPriceMath {
         : getAmount1Delta(sqrtRatioAX96, sqrtRatioBX96, liquidity, true);
   }
 
-  private static BigInteger getAmount1Delta(
+  public static BigInteger getAmount1Delta(
     BigInteger sqrtRatioAX96, 
     BigInteger sqrtRatioBX96, 
     BigInteger liquidity,
@@ -91,5 +91,15 @@ public class SqrtPriceMath {
         roundUp
             ? FullMath.mulDivRoundingUp(liquidity, sqrtRatioBX96.subtract(sqrtRatioAX96), FixedPoint96.Q96)
             : FullMath.mulDiv(liquidity, sqrtRatioBX96.subtract(sqrtRatioAX96), FixedPoint96.Q96);
+  }
+
+  public static BigInteger getNextSqrtPriceFromInput(BigInteger sqrtRatioCurrentX96, BigInteger liquidity,
+      BigInteger amountRemainingLessFee, boolean zeroForOne) {
+    return null;
+  }
+
+  public static BigInteger getNextSqrtPriceFromOutput(BigInteger sqrtRatioCurrentX96, BigInteger liquidity,
+      BigInteger negate, boolean zeroForOne) {
+    return null;
   }
 }

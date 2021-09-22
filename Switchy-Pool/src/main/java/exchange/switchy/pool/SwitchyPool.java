@@ -19,6 +19,8 @@ package exchange.switchy.pool;
 import java.math.BigInteger;
 
 import exchange.switchy.common.SwitchyPoolDeployerParameters;
+import exchange.switchy.librairies.FixedPoint128;
+import exchange.switchy.librairies.FullMath;
 import exchange.switchy.librairies.LiquidityMath;
 import exchange.switchy.librairies.Oracle;
 import exchange.switchy.librairies.Position;
@@ -28,6 +30,7 @@ import exchange.switchy.librairies.Tick;
 import exchange.switchy.librairies.TickBitmap;
 import exchange.switchy.librairies.TickMath;
 import exchange.switchy.librairies.Ticks;
+import exchange.switchy.librairies.Position.Info;
 import exchange.switchy.utils.ReentrancyLock;
 import exchange.switchy.utils.TimeUtils;
 import score.Address;
@@ -194,6 +197,27 @@ public class SwitchyPool {
         BigInteger amount1
     ) {}
   
+    @EventLog(indexed = 3)
+    protected void Burn(
+        Address caller, 
+        int tickLower, 
+        int tickUpper, 
+        BigInteger amount, 
+        BigInteger amount0,
+        BigInteger amount1
+    ) {}
+
+    @EventLog(indexed = 2)
+    protected void Swap(
+        Address sender,
+        Address recipient,
+        BigInteger amount0,
+        BigInteger amount1,
+        BigInteger sqrtPriceX96,
+        BigInteger liquidity,
+        int tick
+    ) {}
+
     // ================================================
     // Methods
     // ================================================
@@ -390,6 +414,15 @@ public class SwitchyPool {
         this.Initialize(sqrtPriceX96, tick);
     }
 
+    class PositionStorage {
+        public PositionStorage(Info position, byte[] positionKey) {
+            this.position = position;
+            this.key = positionKey;
+        }
+        public Position.Info position;
+        public byte[] key;
+    }
+
     /**
      * @dev Gets and updates a position with the given liquidity delta
      * @param owner the owner of the position
@@ -397,7 +430,7 @@ public class SwitchyPool {
      * @param tickUpper the upper tick of the position's tick range
      * @param tick the current tick, passed to avoid sloads
      */
-    private Position.Info _updatePosition (
+    private PositionStorage _updatePosition (
         Address owner,
         int tickLower,
         int tickUpper,
@@ -479,7 +512,7 @@ public class SwitchyPool {
         }
 
         this.positions.set(positionKey, position);
-        return position;
+        return new PositionStorage(position, positionKey);
     }
 
     class ModifyPositionParams {
@@ -500,12 +533,12 @@ public class SwitchyPool {
     }
 
     class ModifyPositionResult {
-        public Position.Info position;
+        public PositionStorage positionStorage;
         public BigInteger amount0;
         public BigInteger amount1;
         
-        public ModifyPositionResult (Position.Info position, BigInteger amount0, BigInteger amount1) {
-            this.position = position;
+        public ModifyPositionResult (PositionStorage positionStorage, BigInteger amount0, BigInteger amount1) {
+            this.positionStorage = positionStorage;
             this.amount0 = amount0;
             this.amount1 = amount1;
         }
@@ -516,7 +549,7 @@ public class SwitchyPool {
 
         Slot0 _slot0 = this.slot0.get();
 
-        Position.Info position = _updatePosition(
+        var positionStorage = _updatePosition(
             params.owner,
             params.tickLower,
             params.tickUpper,
@@ -577,7 +610,7 @@ public class SwitchyPool {
             }
         }
 
-        return new ModifyPositionResult(position, amount0, amount1);
+        return new ModifyPositionResult(positionStorage, amount0, amount1);
     }
 
     class PairAmounts {
@@ -630,7 +663,7 @@ public class SwitchyPool {
             balance1Before = balance1();
         }
 
-        Context.call(caller, "uniswapV3MintCallback", amount0, amount1);
+        Context.call(caller, "switchyMintCallback", amount0, amount1);
         
         if (amount0.compareTo(BigInteger.ZERO) > 0) {
             Context.require(balance0Before.add(amount0).compareTo(balance0()) <= 0, 
@@ -681,6 +714,362 @@ public class SwitchyPool {
         this.Collect(caller, tickLower, tickUpper, recipient, amount0, amount1);
 
         this.poolLock.lock(false);
+        return new PairAmounts(amount0, amount1);
+    }
+
+    
+    public PairAmounts burn (
+        int tickLower,
+        int tickUpper,
+        BigInteger amount
+    ) {
+        this.poolLock.lock(true);
+        final Address caller = Context.getCaller();
+
+        var result = _modifyPosition(new ModifyPositionParams(
+            caller,
+            tickLower,
+            tickUpper,
+            amount.negate()
+        ));
+
+        BigInteger amount0 = result.amount0.negate();
+        BigInteger amount1 = result.amount1.negate();
+        Position.Info position = result.positionStorage.position;
+        byte[] positionKey = result.positionStorage.key;
+
+        if (amount0.compareTo(BigInteger.ZERO) > 0 || amount1.compareTo(BigInteger.ZERO) > 0) {
+            position.tokensOwed0 = position.tokensOwed0.add(amount0);
+            position.tokensOwed1 = position.tokensOwed1.add(amount1);
+            this.positions.set(positionKey, position);
+        }
+
+        this.Burn(caller, tickLower, tickUpper, amount, amount0, amount1);
+
+        this.poolLock.lock(false);
+        return new PairAmounts(amount0, amount1);
+    }
+
+    class SwapCache {
+        public SwapCache(
+            BigInteger liquidityStart, 
+            BigInteger blockTimestamp, 
+            int feeProtocol, 
+            BigInteger secondsPerLiquidityCumulativeX128, 
+            BigInteger tickCumulative, 
+            boolean computedLatestObservation
+        ) {
+            this.liquidityStart = liquidityStart;
+            this.blockTimestamp = blockTimestamp;
+            this.feeProtocol = feeProtocol;
+            this.secondsPerLiquidityCumulativeX128 = secondsPerLiquidityCumulativeX128;
+            this.tickCumulative = tickCumulative;
+            this.computedLatestObservation = computedLatestObservation;
+        }
+        // the protocol fee for the input token
+        int feeProtocol;
+        // liquidity at the beginning of the swap
+        BigInteger liquidityStart;
+        // the timestamp of the current block
+        BigInteger blockTimestamp;
+        // the current value of the tick accumulator, computed only if we cross an initialized tick
+        BigInteger tickCumulative;
+        // the current value of seconds per liquidity accumulator, computed only if we cross an initialized tick
+        BigInteger secondsPerLiquidityCumulativeX128;
+        // whether we've computed and cached the above two accumulators
+        boolean computedLatestObservation;
+    }
+
+    // the top level state of the swap, the results of which are recorded in storage at the end
+    class SwapState {
+        public SwapState(
+            BigInteger amountSpecifiedRemaining,
+            BigInteger amountCalculated,
+            BigInteger sqrtPriceX96,
+            int tick,
+            BigInteger feeGrowthGlobalX128,
+            BigInteger protocolFee,
+            BigInteger liquidity
+        ) {
+            this.amountSpecifiedRemaining = amountSpecifiedRemaining;
+            this.amountCalculated = amountCalculated;
+            this.sqrtPriceX96 = sqrtPriceX96;
+            this.tick = tick;
+            this.feeGrowthGlobalX128 = feeGrowthGlobalX128;
+            this.protocolFee = protocolFee;
+            this.liquidity = liquidity;
+        }
+        // the amount remaining to be swapped in/out of the input/output asset
+        BigInteger amountSpecifiedRemaining;
+        // the amount already swapped out/in of the output/input asset
+        BigInteger amountCalculated;
+        // current sqrt(price)
+        BigInteger sqrtPriceX96;
+        // the tick associated with the current price
+        int tick;
+        // the global fee growth of the input token
+        BigInteger feeGrowthGlobalX128;
+        // amount of input token paid as protocol fee
+        BigInteger protocolFee;
+        // the current liquidity in range
+        BigInteger liquidity;
+    }
+
+    class StepComputations {
+        // the price at the beginning of the step
+        BigInteger sqrtPriceStartX96;
+        // the next tick to swap to from the current tick in the swap direction
+        int tickNext;
+        // whether tickNext is initialized or not
+        boolean initialized;
+        // sqrt(price) for the next tick (1/0)
+        BigInteger sqrtPriceNextX96;
+        // how much is being swapped in in this step
+        BigInteger amountIn;
+        // how much is being swapped out
+        BigInteger amountOut;
+        // how much fee is being paid in
+        BigInteger feeAmount;
+    }
+
+    /**
+     * @notice Swap token0 for token1, or token1 for token0
+     * @dev The caller of this method receives a callback in the form of switchySwapCallback
+     * @param recipient The address to receive the output of the swap
+     * @param zeroForOne The direction of the swap, true for token0 to token1, false for token1 to token0
+     * @param amountSpecified The amount of the swap, which implicitly configures the swap as exact input (positive), or exact output (negative)
+     * @param sqrtPriceLimitX96 The Q64.96 sqrt price limit. If zero for one, the price cannot be less than this
+     * value after the swap. If one for zero, the price cannot be greater than this value after the swap
+     * @param data Any data to be passed through to the callback
+     * @return amount0 The delta of the balance of token0 of the pool, exact when negative, minimum when positive
+     * @return amount1 The delta of the balance of token1 of the pool, exact when negative, minimum when positive
+     */
+    @External
+    public PairAmounts swap (
+        Address recipient,
+        boolean zeroForOne,
+        BigInteger amountSpecified,
+        BigInteger sqrtPriceLimitX96
+    ) {
+        this.poolLock.lock(true);
+        final Address caller = Context.getCaller();
+
+        Context.require(!amountSpecified.equals(BigInteger.ZERO),
+            "swap: amountSpecified must be different from zero");
+        
+        Slot0 slot0Start = this.slot0.get();
+
+        Context.require(
+            zeroForOne
+                ? sqrtPriceLimitX96.compareTo(slot0Start.sqrtPriceX96) < 0 && sqrtPriceLimitX96.compareTo(TickMath.MIN_SQRT_RATIO) > 0
+                : sqrtPriceLimitX96.compareTo(slot0Start.sqrtPriceX96) > 0 && sqrtPriceLimitX96.compareTo(TickMath.MAX_SQRT_RATIO) < 0,
+            "swap: SPL"
+        );
+
+        SwapCache cache = new SwapCache(
+            liquidity.get(),
+            _blockTimestamp(),
+            zeroForOne ? (slot0Start.feeProtocol % 16) : (slot0Start.feeProtocol >> 4),
+            BigInteger.ZERO,
+            BigInteger.ZERO,
+            false
+        );
+
+        boolean exactInput = amountSpecified.compareTo(BigInteger.ZERO) > 0;
+
+        SwapState state = new SwapState(
+            amountSpecified,
+            BigInteger.ZERO,
+            slot0Start.sqrtPriceX96,
+            slot0Start.tick,
+            zeroForOne ? feeGrowthGlobal0X128.get() : feeGrowthGlobal1X128.get(),
+            BigInteger.ZERO,
+            cache.liquidityStart
+        );
+        
+        // continue swapping as long as we haven't used the entire input/output and haven't reached the price limit
+        while (!state.amountSpecifiedRemaining.equals(BigInteger.ZERO) && !state.sqrtPriceX96.equals(sqrtPriceLimitX96)) {
+            StepComputations step = new StepComputations();
+            step.sqrtPriceStartX96 = state.sqrtPriceX96;
+
+            var next = tickBitmap.nextInitializedTickWithinOneWord(
+                state.tick,
+                tickSpacing,
+                zeroForOne
+            );
+
+            step.tickNext = next.tickNext;
+            step.initialized = next.initialized;
+            
+            // ensure that we do not overshoot the min/max tick, as the tick bitmap is not aware of these bounds
+            if (step.tickNext < TickMath.MIN_TICK) {
+                step.tickNext = TickMath.MIN_TICK;
+            } else if (step.tickNext > TickMath.MAX_TICK) {
+                step.tickNext = TickMath.MAX_TICK;
+            }
+
+            // get the price for the next tick
+            step.sqrtPriceNextX96 = TickMath.getSqrtRatioAtTick(step.tickNext);
+
+            // compute values to swap to the target tick, price limit, or point where input/output amount is exhausted
+            var swapStep = SwapMath.computeSwapStep(
+                state.sqrtPriceX96,
+                (zeroForOne ? step.sqrtPriceNextX96.compareTo(sqrtPriceLimitX96) < 0 : step.sqrtPriceNextX96.compareTo(sqrtPriceLimitX96) > 0)
+                    ? sqrtPriceLimitX96
+                    : step.sqrtPriceNextX96,
+                state.liquidity,
+                state.amountSpecifiedRemaining,
+                fee
+            );
+
+            state.sqrtPriceX96 = swapStep.sqrtRatioNextX96;
+            step.amountIn = swapStep.amountIn;
+            step.amountOut = swapStep.amountOut;
+            step.feeAmount = swapStep.feeAmount;
+
+            if (exactInput) {
+                state.amountSpecifiedRemaining = state.amountSpecifiedRemaining.subtract(step.amountIn.add(step.feeAmount));
+                state.amountCalculated = state.amountCalculated.subtract(step.amountOut);
+            } else {
+                state.amountSpecifiedRemaining = state.amountSpecifiedRemaining.add(step.amountOut);
+                state.amountCalculated = state.amountCalculated.add((step.amountIn.add(step.feeAmount)));
+            }
+            
+            // if the protocol fee is on, calculate how much is owed, decrement feeAmount, and increment protocolFee
+            if (cache.feeProtocol > 0) {
+                BigInteger delta = step.feeAmount.divide(BigInteger.valueOf(cache.feeProtocol));
+                step.feeAmount = step.feeAmount.subtract(delta);
+                state.protocolFee = state.protocolFee.add(delta);
+            }
+
+            // update global fee tracker
+            if (state.liquidity.compareTo(BigInteger.ZERO) > 0) {
+                state.feeGrowthGlobalX128 = state.feeGrowthGlobalX128.add(FullMath.mulDiv(step.feeAmount, FixedPoint128.Q128, state.liquidity));
+            }
+            
+            // shift tick if we reached the next price
+            if (state.sqrtPriceX96 == step.sqrtPriceNextX96) {
+                // if the tick is initialized, run the tick transition
+                if (step.initialized) {
+                    // check for the placeholder value, which we replace with the actual value the first time the swap
+                    // crosses an initialized tick
+                    if (!cache.computedLatestObservation) {
+                        var result = observations.observeSingle(
+                            cache.blockTimestamp,
+                            BigInteger.ZERO,
+                            slot0Start.tick,
+                            slot0Start.observationIndex,
+                            cache.liquidityStart,
+                            slot0Start.observationCardinality
+                        );
+                        cache.tickCumulative = result.tickCumulative;
+                        cache.secondsPerLiquidityCumulativeX128 = result.secondsPerLiquidityCumulativeX128;
+                        cache.computedLatestObservation = true;
+                    }
+                    BigInteger liquidityNet = ticks.cross(
+                        step.tickNext,
+                        (zeroForOne ? state.feeGrowthGlobalX128 : feeGrowthGlobal0X128.get()),
+                        (zeroForOne ? feeGrowthGlobal1X128.get() : state.feeGrowthGlobalX128),
+                        cache.secondsPerLiquidityCumulativeX128,
+                        cache.tickCumulative,
+                        cache.blockTimestamp
+                    );
+                    // if we're moving leftward, we interpret liquidityNet as the opposite sign
+                    // safe because liquidityNet cannot be type(int128).min
+                    if (zeroForOne) liquidityNet = liquidityNet.negate();
+
+                    state.liquidity = LiquidityMath.addDelta(state.liquidity, liquidityNet);
+                }
+
+                state.tick = zeroForOne ? step.tickNext - 1 : step.tickNext;
+            } else if (state.sqrtPriceX96 != step.sqrtPriceStartX96) {
+                // recompute unless we're on a lower tick boundary (i.e. already transitioned ticks), and haven't moved
+                state.tick = TickMath.getTickAtSqrtRatio(state.sqrtPriceX96);
+            }
+        }
+
+        // update tick and write an oracle entry if the tick change
+        if (state.tick != slot0Start.tick) {
+            var result =
+                observations.write(
+                    slot0Start.observationIndex,
+                    cache.blockTimestamp,
+                    slot0Start.tick,
+                    cache.liquidityStart,
+                    slot0Start.observationCardinality,
+                    slot0Start.observationCardinalityNext
+                );
+            Slot0 _slot0 = this.slot0.get();
+            _slot0.sqrtPriceX96 = state.sqrtPriceX96;
+            _slot0.tick = state.tick;
+            _slot0.observationIndex = result.indexUpdated;
+            _slot0.observationCardinality = result.cardinalityUpdated;
+            this.slot0.set(_slot0);
+        } else {
+            // otherwise just update the price
+            Slot0 _slot0 = this.slot0.get();
+            _slot0.sqrtPriceX96 = state.sqrtPriceX96;
+            this.slot0.set(_slot0);
+        }
+
+        // update liquidity if it changed
+        if (cache.liquidityStart != state.liquidity) {
+            liquidity.set(state.liquidity);
+        }
+
+        // update fee growth global and, if necessary, protocol fees
+        // overflow is acceptable, protocol has to withdraw before it hits type(uint128).max fees
+        if (zeroForOne) {
+            feeGrowthGlobal0X128.set(state.feeGrowthGlobalX128);
+            if (state.protocolFee.compareTo(BigInteger.ZERO) > 0) {
+                var _protocolFees = this.protocolFees.get();
+                _protocolFees.token0 = _protocolFees.token0.add(state.protocolFee);
+                this.protocolFees.set(_protocolFees);
+            }
+        } else {
+            feeGrowthGlobal1X128.set(state.feeGrowthGlobalX128);
+            if (state.protocolFee.compareTo(BigInteger.ZERO) > 0) {
+                var _protocolFees = this.protocolFees.get();
+                _protocolFees.token1 = _protocolFees.token1.add(state.protocolFee);
+                this.protocolFees.set(_protocolFees);
+            }
+        }
+
+        BigInteger amount0;
+        BigInteger amount1;
+
+        if (zeroForOne == exactInput) {
+            amount0 = amountSpecified.subtract(state.amountSpecifiedRemaining);
+            amount1 = state.amountCalculated;
+        } else {
+            amount0 = state.amountCalculated;
+            amount1 = amountSpecified.subtract(state.amountSpecifiedRemaining);
+        }
+
+        // do the transfers and collect payment
+        if (zeroForOne) {
+            if (amount1.compareTo(BigInteger.ZERO) < 0) {
+                Context.call(token1, "transfer", recipient, amount1.negate());
+            }
+
+            BigInteger balance0Before = balance0();
+            Context.call(caller, "switchySwapCallback", amount0, amount1);
+            Context.require(balance0Before.add(amount0).compareTo(balance0()) <= 0, 
+                "swap: IIA 1");
+        } else {
+            if (amount0.compareTo(BigInteger.ZERO) < 0) {
+                Context.call(token0, "transfer", recipient, amount0.negate());
+            }
+
+            BigInteger balance1Before = balance1();
+            Context.call(caller, "switchySwapCallback", amount0, amount1);
+            Context.require(balance1Before.add(amount1).compareTo(balance1()) <= 0, 
+                "swap: IIA 2");
+        }
+
+        this.Swap(caller, recipient, amount0, amount1, state.sqrtPriceX96, state.liquidity, state.tick);
+        this.poolLock.lock(false);
+
         return new PairAmounts(amount0, amount1);
     }
 

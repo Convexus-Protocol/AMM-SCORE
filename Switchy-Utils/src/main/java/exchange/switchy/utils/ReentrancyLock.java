@@ -26,6 +26,10 @@ public class ReentrancyLock {
         locked = Context.newVarDB(id + "_locked", Boolean.class);
     }
 
+    public boolean unlocked () {
+        return !this.locked.get();
+    }
+
     /**
      * Enable or disable the reentrancy protection
      * @param state reentrancy protection state

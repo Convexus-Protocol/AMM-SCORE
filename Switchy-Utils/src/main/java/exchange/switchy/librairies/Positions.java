@@ -49,7 +49,7 @@ public class Positions {
           BytesUtils.concat(
               owner.toByteArray(), 
               BytesUtils.intToBytes(tickLower), 
-              BytesUtils.intToBytes(tickLower)
+              BytesUtils.intToBytes(tickUpper)
           )
       );
   }
