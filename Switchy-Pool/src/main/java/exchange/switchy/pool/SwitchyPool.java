@@ -170,12 +170,28 @@ public class SwitchyPool {
         int observationCardinalityNextNew
     ) {}
   
+    /**
+     * @notice Emitted exactly once by a pool when #initialize is first called on the pool
+     * @dev Mint/Burn/Swap cannot be emitted by the pool before Initialize
+     * @param sqrtPriceX96 The initial sqrt price of the pool, as a Q64.96
+     * @param tick The initial tick of the pool, i.e. log base 1.0001 of the starting price of the pool
+     */
     @EventLog
     protected void Initialize(
         BigInteger sqrtPriceX96,
         int tick
     ) {}
     
+    /**
+     * @notice Emitted when liquidity is minted for a given position
+     * @param sender The address that minted the liquidity
+     * @param owner The owner of the position and recipient of any minted liquidity
+     * @param tickLower The lower tick of the position
+     * @param tickUpper The upper tick of the position
+     * @param amount The amount of liquidity minted to the position range
+     * @param amount0 How much token0 was required for the minted liquidity
+     * @param amount1 How much token1 was required for the minted liquidity
+     */
     @EventLog(indexed = 3)
     protected void Mint(
         Address recipient, 
@@ -187,6 +203,15 @@ public class SwitchyPool {
         BigInteger amount1
     ) {}
 
+    /**
+     * @notice Emitted when fees are collected by the owner of a position
+     * @dev Collect events may be emitted with zero amount0 and amount1 when the caller chooses not to collect fees
+     * @param owner The owner of the position for which fees are collected
+     * @param tickLower The lower tick of the position
+     * @param tickUpper The upper tick of the position
+     * @param amount0 The amount of token0 fees collected
+     * @param amount1 The amount of token1 fees collected
+     */
     @EventLog(indexed = 3)
     protected void Collect(
         Address caller, 
@@ -197,6 +222,16 @@ public class SwitchyPool {
         BigInteger amount1
     ) {}
   
+    /**
+     * @notice Emitted when a position's liquidity is removed
+     * @dev Does not withdraw any fees earned by the liquidity position, which must be withdrawn via #collect
+     * @param owner The owner of the position for which liquidity is removed
+     * @param tickLower The lower tick of the position
+     * @param tickUpper The upper tick of the position
+     * @param amount The amount of liquidity to remove
+     * @param amount0 The amount of token0 withdrawn
+     * @param amount1 The amount of token1 withdrawn
+     */
     @EventLog(indexed = 3)
     protected void Burn(
         Address caller, 
@@ -207,6 +242,16 @@ public class SwitchyPool {
         BigInteger amount1
     ) {}
 
+    /**
+     * @notice Emitted by the pool for any swaps between token0 and token1
+     * @param sender The address that initiated the swap call, and that received the callback
+     * @param recipient The address that received the output of the swap
+     * @param amount0 The delta of the token0 balance of the pool
+     * @param amount1 The delta of the token1 balance of the pool
+     * @param sqrtPriceX96 The sqrt(price) of the pool after the swap, as a Q64.96
+     * @param liquidity The liquidity of the pool after the swap
+     * @param tick The log base 1.0001 of price of the pool after the swap
+     */
     @EventLog(indexed = 2)
     protected void Swap(
         Address sender,
@@ -217,6 +262,56 @@ public class SwitchyPool {
         BigInteger liquidity,
         int tick
     ) {}
+
+    /**
+     * @notice Emitted by the pool for any flashes of token0/token1
+     * @param sender The address that initiated the swap call, and that received the callback
+     * @param recipient The address that received the tokens from flash
+     * @param amount0 The amount of token0 that was flashed
+     * @param amount1 The amount of token1 that was flashed
+     * @param paid0 The amount of token0 paid for the flash, which can exceed the amount0 plus the fee
+     * @param paid1 The amount of token1 paid for the flash, which can exceed the amount1 plus the fee
+     */
+    @EventLog(indexed = 2)
+    protected void Flash(
+        Address sender,
+        Address recipient,
+        BigInteger amount0,
+        BigInteger amount1,
+        BigInteger paid0,
+        BigInteger paid1
+    ) {}
+
+    /**
+     * @notice Emitted when the protocol fee is changed by the pool
+     * @param feeProtocol0Old The previous value of the token0 protocol fee
+     * @param feeProtocol1Old The previous value of the token1 protocol fee
+     * @param feeProtocol0New The updated value of the token0 protocol fee
+     * @param feeProtocol1New The updated value of the token1 protocol fee
+     */    
+    @EventLog
+    private void SetFeeProtocol(
+        int feeProtocol0Old, 
+        int feeProtocol1Old, 
+        int feeProtocol0New, 
+        int feeProtocol1New
+    ) {}
+
+    /**
+     * @notice Emitted when the collected protocol fees are withdrawn by the factory owner
+     * @param sender The address that collects the protocol fees
+     * @param recipient The address that receives the collected protocol fees
+     * @param amount0 The amount of token0 protocol fees that is withdrawn
+     * @param amount0 The amount of token1 protocol fees that is withdrawn
+     */
+    @EventLog(indexed = 2)
+    protected void CollectProtocol(
+        Address sender, 
+        Address recipient, 
+        BigInteger amount0, 
+        BigInteger amount1
+    ) {}
+
 
     // ================================================
     // Methods
@@ -1071,6 +1166,158 @@ public class SwitchyPool {
         this.poolLock.lock(false);
 
         return new PairAmounts(amount0, amount1);
+    }
+
+    @External
+    public void flash (
+        Address recipient,
+        BigInteger amount0,
+        BigInteger amount1
+    ) {
+        this.poolLock.lock(true);
+        final Address caller = Context.getCaller();
+
+        BigInteger _liquidity = this.liquidity.get();
+        Context.require(_liquidity.compareTo(BigInteger.ZERO) > 0,
+            "flash: no liquidity");
+        
+        final BigInteger TEN_E6 = BigInteger.valueOf(1000000);
+        
+        BigInteger fee0 = FullMath.mulDivRoundingUp(amount0, BigInteger.valueOf(fee), TEN_E6);
+        BigInteger fee1 = FullMath.mulDivRoundingUp(amount1, BigInteger.valueOf(fee), TEN_E6);
+        BigInteger balance0Before = balance0();
+        BigInteger balance1Before = balance1();
+
+        if (amount0.compareTo(BigInteger.ZERO) > 0) {
+            Context.call(token0, "transfer", recipient, amount0);
+        }
+        if (amount1.compareTo(BigInteger.ZERO) > 0) {
+            Context.call(token1, "transfer", recipient, amount1);
+        }
+
+        Context.call(caller, "switchyFlashCallback", fee0, fee1);
+
+        BigInteger balance0After = balance0();
+        BigInteger balance1After = balance1();
+
+        Context.require(balance0Before.add(fee0).compareTo(balance0After) <= 0, 
+            "flash: F0");
+        Context.require(balance1Before.add(fee1).compareTo(balance1After) <= 0, 
+            "flash: F1");
+
+        // sub is safe because we know balanceAfter is gt balanceBefore by at least fee
+        BigInteger paid0 = balance0After.subtract(balance0Before);
+        BigInteger paid1 = balance1After.subtract(balance1Before);
+
+        Slot0 _slot0 = this.slot0.get();
+
+        if (paid0.compareTo(BigInteger.ZERO) > 0) {
+            int feeProtocol0 = _slot0.feeProtocol % 16;
+            BigInteger fees0 = feeProtocol0 == 0 ? BigInteger.ZERO : paid0.divide(BigInteger.valueOf(feeProtocol0));
+            if (fees0.compareTo(BigInteger.ZERO) > 0) {
+                var _protocolFees = protocolFees.get();
+                _protocolFees.token0 = _protocolFees.token0.add(fees0);
+                protocolFees.set(_protocolFees);
+            }
+            feeGrowthGlobal0X128.set(feeGrowthGlobal0X128.get().add(FullMath.mulDiv(paid0.subtract(fees0), FixedPoint128.Q128, _liquidity)));
+        }
+        if (paid1.compareTo(BigInteger.ZERO) > 0) {
+            int feeProtocol1 = _slot0.feeProtocol >> 4;
+            BigInteger fees1 = feeProtocol1 == 0 ? BigInteger.ZERO : paid1.divide(BigInteger.valueOf(feeProtocol1));
+            if (fees1.compareTo(BigInteger.ZERO) > 0) {
+                var _protocolFees = protocolFees.get();
+                _protocolFees.token1 = _protocolFees.token1.add(fees1);
+                protocolFees.set(_protocolFees);
+            }
+            feeGrowthGlobal1X128.set(feeGrowthGlobal1X128.get().add(FullMath.mulDiv(paid1.subtract(fees1), FixedPoint128.Q128, _liquidity)));
+        }
+
+        this.Flash(caller, recipient, amount0, amount1, paid0, paid1);
+    
+        this.poolLock.lock(false);
+    }
+
+    /**
+     * @notice Set the denominator of the protocol's % share of the fees
+     * @param feeProtocol0 new protocol fee for token0 of the pool
+     * @param feeProtocol1 new protocol fee for token1 of the pool
+     */
+    @External
+    public void setFeeProtocol (
+        int feeProtocol0,
+        int feeProtocol1
+    ) {
+        this.poolLock.lock(true);
+        this.onlyFactoryOwner();
+        
+        Context.require(
+            (feeProtocol0 == 0 || (feeProtocol0 >= 4 && feeProtocol0 <= 10)) &&
+                (feeProtocol1 == 0 || (feeProtocol1 >= 4 && feeProtocol1 <= 10))
+        );
+
+        Slot0 _slot0 = this.slot0.get();
+        int feeProtocolOld = _slot0.feeProtocol;
+        _slot0.feeProtocol = feeProtocol0 + (feeProtocol1 << 4);
+        this.slot0.set(_slot0);
+        
+        this.SetFeeProtocol(feeProtocolOld % 16, feeProtocolOld >> 4, feeProtocol0, feeProtocol1);
+
+        this.poolLock.lock(false);
+    }
+
+    /**
+     * @notice Collect the protocol fee accrued to the pool
+     * @param recipient The address to which collected protocol fees should be sent
+     * @param amount0Requested The maximum amount of token0 to send, can be 0 to collect fees in only token1
+     * @param amount1Requested The maximum amount of token1 to send, can be 0 to collect fees in only token0
+     * @return amount0 The protocol fee collected in token0
+     * @return amount1 The protocol fee collected in token1
+     */
+    @External
+    public PairAmounts collectProtocol(
+        Address recipient,
+        BigInteger amount0Requested,
+        BigInteger amount1Requested
+    ) {
+        this.poolLock.lock(true);
+        this.onlyFactoryOwner();
+
+        var _protocolFees = protocolFees.get();
+        final Address caller = Context.getCaller();
+
+        BigInteger amount0 = amount0Requested.compareTo(_protocolFees.token0) > 0 ? _protocolFees.token0 : amount0Requested;
+        BigInteger amount1 = amount1Requested.compareTo(_protocolFees.token1) > 0 ? _protocolFees.token1 : amount1Requested;
+        
+        if (amount0.compareTo(BigInteger.ZERO) > 0) {
+            if (amount0 == _protocolFees.token0) {
+                // ensure that the slot is not cleared, for gas savings
+                amount0 = amount0.subtract(BigInteger.ONE); 
+            }
+            _protocolFees.token0 = _protocolFees.token0.subtract(amount0);
+            this.protocolFees.set(_protocolFees);
+            Context.call(token0, "transfer", recipient, amount0);
+        }
+        if (amount1.compareTo(BigInteger.ZERO) > 0) {
+            if (amount1 == _protocolFees.token1) {
+                // ensure that the slot is not cleared, for gas savings
+                amount1 = amount1.subtract(BigInteger.ONE); 
+            }
+            _protocolFees.token1 = _protocolFees.token1.subtract(amount1);
+            this.protocolFees.set(_protocolFees);
+            Context.call(token1, "transfer", recipient, amount1);
+        }
+
+        this.CollectProtocol(caller, recipient, amount0, amount1);
+        
+        this.poolLock.lock(false);
+        return new PairAmounts(amount0, amount1);
+    }
+
+    // ================================================
+    // Auth Checks
+    // ================================================
+    private void onlyFactoryOwner() {
+        Context.require(Context.getCaller().equals(Context.call(factory, "owner")));
     }
 
     // ================================================
