@@ -1,5 +1,6 @@
 rootProject.name = 'Switchy'
 include (
+    'Switchy-Factory',
     'Switchy-Pool',
     'Switchy-Pool-Test',
     'Switchy-Tests',

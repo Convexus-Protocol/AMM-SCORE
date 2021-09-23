@@ -317,8 +317,7 @@ public class SwitchyPool {
     // Methods
     // ================================================
     /**
-     *  Contract constructor
-     *  
+     *  @notice Contract constructor
      */
     public SwitchyPool() {
         SwitchyPoolDeployerParameters parameters = (SwitchyPoolDeployerParameters) Context.call(Context.getCaller(), "parameters");
@@ -343,21 +342,21 @@ public class SwitchyPool {
     }
 
     /**
-     * Returns the block timestamp truncated to seconds.
+     * @notice Returns the block timestamp truncated to seconds.
      */
     private BigInteger _blockTimestamp () {
         return TimeUtils.nowSeconds();
     }
 
     /**
-     * @dev Get the pool's balance of token0
+     * @notice Get the pool's balance of token0
      */
     private BigInteger balance0 () {
         return (BigInteger) Context.call(this.token0, "balanceOf", Context.getAddress());
     }
 
     /**
-     * @dev Get the pool's balance of token1
+     * @notice Get the pool's balance of token1
      */
     private BigInteger balance1 () {
         return (BigInteger) Context.call(this.token1, "balanceOf", Context.getAddress());
@@ -639,6 +638,13 @@ public class SwitchyPool {
         }
     }
 
+    /**
+     * @dev Effect some changes to a position
+     * @param params the position details and the change to the position's liquidity to effect
+     * @return position a storage pointer referencing the position with the given owner and tick range
+     * @return amount0 the amount of token0 owed to the pool, negative if the pool should pay the recipient
+     * @return amount1 the amount of token1 owed to the pool, negative if the pool should pay the recipient
+     */
     private ModifyPositionResult _modifyPosition (ModifyPositionParams params) {
         checkTicks(params.tickLower, params.tickUpper);
 
@@ -721,6 +727,19 @@ public class SwitchyPool {
         public void setamount1(BigInteger v) { this.amount1 = v; }
     }
 
+    /**
+     * @notice Adds liquidity for the given recipient/tickLower/tickUpper position
+     * @dev The caller of this method receives a callback in the form of IUniswapV3MintCallback#uniswapV3MintCallback
+     * in which they must pay any token0 or token1 owed for the liquidity. The amount of token0/token1 due depends
+     * on tickLower, tickUpper, the amount of liquidity, and the current price.
+     * @param recipient The address for which the liquidity will be created
+     * @param tickLower The lower tick of the position in which to add liquidity
+     * @param tickUpper The upper tick of the position in which to add liquidity
+     * @param amount The amount of liquidity to mint
+     * @param data Any data that should be passed through to the callback
+     * @return amount0 The amount of token0 that was paid to mint the given amount of liquidity. Matches the value in the callback
+     * @return amount1 The amount of token1 that was paid to mint the given amount of liquidity. Matches the value in the callback
+     */
     @External
     public PairAmounts mint (
         Address recipient,
@@ -775,6 +794,20 @@ public class SwitchyPool {
         return new PairAmounts(amount0, amount1);
     }
 
+    /**
+     * @notice Collects tokens owed to a position
+     * @dev Does not recompute fees earned, which must be done either via mint or burn of any amount of liquidity.
+     * Collect must be called by the position owner. To withdraw only token0 or only token1, amount0Requested or
+     * amount1Requested may be set to zero. To withdraw all tokens owed, caller may pass any value greater than the
+     * actual tokens owed, e.g. type(uint128).max. Tokens owed may be from accumulated swap fees or burned liquidity.
+     * @param recipient The address which should receive the fees collected
+     * @param tickLower The lower tick of the position for which to collect fees
+     * @param tickUpper The upper tick of the position for which to collect fees
+     * @param amount0Requested How much token0 should be withdrawn from the fees owed
+     * @param amount1Requested How much token1 should be withdrawn from the fees owed
+     * @return amount0 The amount of fees collected in token0
+     * @return amount1 The amount of fees collected in token1
+     */
     public PairAmounts collect (
         Address recipient,
         int tickLower,
@@ -812,7 +845,16 @@ public class SwitchyPool {
         return new PairAmounts(amount0, amount1);
     }
 
-    
+    /**
+     * @notice Burn liquidity from the sender and account tokens owed for the liquidity to the position
+     * @dev Can be used to trigger a recalculation of fees owed to a position by calling with an amount of 0
+     * @dev Fees must be collected separately via a call to #collect
+     * @param tickLower The lower tick of the position for which to burn liquidity
+     * @param tickUpper The upper tick of the position for which to burn liquidity
+     * @param amount How much liquidity to burn
+     * @return amount0 The amount of token0 sent to the recipient
+     * @return amount1 The amount of token1 sent to the recipient
+     */
     public PairAmounts burn (
         int tickLower,
         int tickUpper,
@@ -1168,6 +1210,16 @@ public class SwitchyPool {
         return new PairAmounts(amount0, amount1);
     }
 
+    /**
+     * @notice Receive token0 and/or token1 and pay it back, plus a fee, in the callback
+     * @dev The caller of this method receives a callback in the form of IUniswapV3FlashCallback#uniswapV3FlashCallback
+     * @dev Can be used to donate underlying tokens pro-rata to currently in-range liquidity providers by calling
+     * with 0 amount{0,1} and sending the donation amount(s) from the callback
+     * @param recipient The address which will receive the token0 and token1 amounts
+     * @param amount0 The amount of token0 to send
+     * @param amount1 The amount of token1 to send
+     * @param data Any data to be passed through to the callback
+     */
     @External
     public void flash (
         Address recipient,
@@ -1314,7 +1366,7 @@ public class SwitchyPool {
     }
 
     // ================================================
-    // Auth Checks
+    // Checks
     // ================================================
     private void onlyFactoryOwner() {
         Context.require(Context.getCaller().equals(Context.call(factory, "owner")));
