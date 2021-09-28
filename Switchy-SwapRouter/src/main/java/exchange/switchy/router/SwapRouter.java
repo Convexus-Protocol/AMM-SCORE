@@ -20,7 +20,6 @@ import static java.math.BigInteger.ZERO;
 import static java.math.BigInteger.ONE;
 
 import java.math.BigInteger;
-import java.util.Arrays;
 
 import exchange.switchy.librairies.Path;
 import exchange.switchy.librairies.PoolData;
@@ -35,30 +34,6 @@ import score.VarDB;
 import score.annotation.External;
 
 import static exchange.switchy.librairies.BlockTimestamp._blockTimestamp;
-
-class SwapCallbackData {
-    public byte[] path;
-    public Address payer;
-
-    public SwapCallbackData (byte[] path, Address payer) {
-        this.path = path;
-        this.payer = payer;
-    }
-
-    public static SwapCallbackData fromBytes (byte[] data) {
-        int size = data.length;
-        byte[] path = Arrays.copyOfRange(data, 0, size - Address.LENGTH);
-        Address payer = new Address(Arrays.copyOfRange(data, Address.LENGTH, size));
-        return new SwapCallbackData(path, payer);
-    }
-
-    public byte[] toBytes () {
-        return BytesUtils.concat(
-            this.path,
-            this.payer.toByteArray()
-        );
-    }
-}
 
 /**
  * @title Switchy Swap Router
@@ -89,10 +64,6 @@ public class SwapRouter {
     // DB Variables
     // ================================================
     private VarDB<BigInteger> amountInCached = Context.newVarDB(NAME + "_amountInCached", BigInteger.class);
-
-    // ================================================
-    // Event Logs
-    // ================================================
 
     // ================================================
     // Methods
@@ -197,7 +168,6 @@ public class SwapRouter {
                 : sqrtPriceLimitX96,
             data.toBytes()
         );
-
 
         return zeroForOne ? result.amount1.negate() : result.amount0.negate();
     }
@@ -396,7 +366,6 @@ public class SwapRouter {
             "checkDeadline: Transaction too old");
     }
 
-
     // ================================================
     // Public variable getters
     // ================================================
@@ -404,8 +373,4 @@ public class SwapRouter {
     public String name() {
         return this.name;
     }
-
-    // ================================================
-    // Admin methods
-    // ================================================
 }
