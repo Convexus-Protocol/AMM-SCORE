@@ -19,8 +19,11 @@ package exchange.switchy.utils;
 import score.Context;
 
 public class BytesUtils {
+
+    public final static int INT_SIZE = 4;
+
     public static int getBigEndianInt (byte[] bytearray) {
-        Context.require(bytearray.length == 4, 
+        Context.require(bytearray.length == INT_SIZE, 
             "getBigEndianInt: Invalid bytearray size");
         return  ((bytearray[0] & 0xFF) << 24) 
               | ((bytearray[1] & 0xFF) << 16) 

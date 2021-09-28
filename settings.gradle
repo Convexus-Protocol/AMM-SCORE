@@ -1,8 +1,11 @@
 rootProject.name = 'Switchy'
 include (
     'Switchy-Factory',
+    'Switchy-Factory-Test',
     'Switchy-Pool',
     'Switchy-Pool-Test',
+    'Switchy-SwapRouter',
+    'Switchy-SwapRouter-Test',
     'Switchy-Tests',
     'Switchy-Utils',
     'javaee-tokens',

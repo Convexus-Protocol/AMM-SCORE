@@ -14,17 +14,16 @@
  * limitations under the License.
  */
 
-package exchange.switchy.utils;
+package exchange.switchy.router;
 
 import java.math.BigInteger;
 
 import score.Address;
 
-public class AddressUtils {
-    public static final Address ZERO_ADDRESS = new Address(new byte[Address.LENGTH]);
-    public static final Address ICX_ADDRESS = Address.fromString("cx1111111111111111111111111111111111111111");
-
-    public static int compareTo (Address a, Address b) {
-        return new BigInteger(a.toByteArray()).compareTo(new BigInteger(b.toByteArray()));
-    }
+public class ExactOutputParams {
+  byte[] path;
+  Address recipient;
+  BigInteger deadline;
+  BigInteger amountOut;
+  BigInteger amountInMaximum;
 }

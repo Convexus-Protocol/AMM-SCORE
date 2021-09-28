@@ -14,17 +14,16 @@
  * limitations under the License.
  */
 
-package exchange.switchy.utils;
+package exchange.switchy.librairies;
 
 import java.math.BigInteger;
 
-import score.Address;
-
-public class AddressUtils {
-    public static final Address ZERO_ADDRESS = new Address(new byte[Address.LENGTH]);
-    public static final Address ICX_ADDRESS = Address.fromString("cx1111111111111111111111111111111111111111");
-
-    public static int compareTo (Address a, Address b) {
-        return new BigInteger(a.toByteArray()).compareTo(new BigInteger(b.toByteArray()));
+public class PairAmounts {
+    public BigInteger amount0;
+    public BigInteger amount1;
+    
+    public PairAmounts(BigInteger amount0, BigInteger amount1) {
+        this.amount0 = amount0;
+        this.amount1 = amount1;
     }
 }

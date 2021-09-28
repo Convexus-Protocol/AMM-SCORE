@@ -134,13 +134,11 @@ public class SwitchyFactory {
     ) {
         Context.require(!tokenA.equals(tokenB),
             "createPool: tokenA must be different from tokenB");
-        Address token0;
-        Address token1;
 
-        if (new BigInteger(tokenA.toByteArray()).compareTo(new BigInteger(tokenB.toByteArray())) < 0) {
-            token0 = tokenA;
-            token1 = tokenB;
-        } else {
+        Address token0 = tokenA;
+        Address token1 = tokenB;
+
+        if (AddressUtils.compareTo(tokenA, tokenB) >= 0) {
             token0 = tokenB;
             token1 = tokenA;
         }

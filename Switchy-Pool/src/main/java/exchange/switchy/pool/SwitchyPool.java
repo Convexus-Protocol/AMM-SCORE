@@ -16,6 +16,8 @@
 
 package exchange.switchy.pool;
 
+import static exchange.switchy.librairies.BlockTimestamp._blockTimestamp;
+
 import java.math.BigInteger;
 
 import exchange.switchy.common.SwitchyPoolDeployerParameters;
@@ -23,6 +25,7 @@ import exchange.switchy.librairies.FixedPoint128;
 import exchange.switchy.librairies.FullMath;
 import exchange.switchy.librairies.LiquidityMath;
 import exchange.switchy.librairies.Oracle;
+import exchange.switchy.librairies.PairAmounts;
 import exchange.switchy.librairies.Position;
 import exchange.switchy.librairies.Positions;
 import exchange.switchy.librairies.SqrtPriceMath;
@@ -32,7 +35,6 @@ import exchange.switchy.librairies.TickMath;
 import exchange.switchy.librairies.Ticks;
 import exchange.switchy.librairies.Position.Info;
 import exchange.switchy.utils.ReentrancyLock;
-import exchange.switchy.utils.TimeUtils;
 import score.Address;
 import score.Context;
 import score.VarDB;
@@ -339,13 +341,6 @@ public class SwitchyPool {
         Context.require(tickLower < tickUpper, "checkTicks: TLU");
         Context.require(tickLower >= TickMath.MIN_TICK, "checkTicks: TLM");
         Context.require(tickUpper <= TickMath.MAX_TICK, "checkTicks: TUM");
-    }
-
-    /**
-     * @notice Returns the block timestamp truncated to seconds.
-     */
-    private BigInteger _blockTimestamp () {
-        return TimeUtils.nowSeconds();
     }
 
     /**
@@ -714,19 +709,9 @@ public class SwitchyPool {
         return new ModifyPositionResult(positionStorage, amount0, amount1);
     }
 
-    class PairAmounts {
-        public BigInteger amount0;
-        public BigInteger amount1;
-        
-        public PairAmounts(BigInteger amount0, BigInteger amount1) {
-            this.amount0 = amount0;
-            this.amount1 = amount1;
-        }
-    }
-
     /**
      * @notice Adds liquidity for the given recipient/tickLower/tickUpper position
-     * @dev The caller of this method receives a callback in the form of IUniswapV3MintCallback#uniswapV3MintCallback
+     * @dev The caller of this method receives a callback in the form of switchyMintCallback
      * in which they must pay any token0 or token1 owed for the liquidity. The amount of token0/token1 due depends
      * on tickLower, tickUpper, the amount of liquidity, and the current price.
      * @param recipient The address for which the liquidity will be created
@@ -742,7 +727,8 @@ public class SwitchyPool {
         Address recipient,
         int tickLower,
         int tickUpper,
-        BigInteger amount
+        BigInteger amount,
+        byte[] data
     ) {
         this.poolLock.lock(true);
 
@@ -774,7 +760,7 @@ public class SwitchyPool {
             balance1Before = balance1();
         }
 
-        Context.call(caller, "switchyMintCallback", amount0, amount1);
+        Context.call(caller, "switchyMintCallback", amount0, amount1, data);
         
         if (amount0.compareTo(BigInteger.ZERO) > 0) {
             Context.require(balance0Before.add(amount0).compareTo(balance0()) <= 0, 
@@ -983,7 +969,8 @@ public class SwitchyPool {
         Address recipient,
         boolean zeroForOne,
         BigInteger amountSpecified,
-        BigInteger sqrtPriceLimitX96
+        BigInteger sqrtPriceLimitX96,
+        byte[] data
     ) {
         this.poolLock.lock(true);
         final Address caller = Context.getCaller();
@@ -1187,7 +1174,7 @@ public class SwitchyPool {
             }
 
             BigInteger balance0Before = balance0();
-            Context.call(caller, "switchySwapCallback", amount0, amount1);
+            Context.call(caller, "switchySwapCallback", amount0, amount1, data);
             Context.require(balance0Before.add(amount0).compareTo(balance0()) <= 0, 
                 "swap: IIA 1");
         } else {
@@ -1196,7 +1183,7 @@ public class SwitchyPool {
             }
 
             BigInteger balance1Before = balance1();
-            Context.call(caller, "switchySwapCallback", amount0, amount1);
+            Context.call(caller, "switchySwapCallback", amount0, amount1, data);
             Context.require(balance1Before.add(amount1).compareTo(balance1()) <= 0, 
                 "swap: IIA 2");
         }
@@ -1209,7 +1196,7 @@ public class SwitchyPool {
 
     /**
      * @notice Receive token0 and/or token1 and pay it back, plus a fee, in the callback
-     * @dev The caller of this method receives a callback in the form of IUniswapV3FlashCallback#uniswapV3FlashCallback
+     * @dev The caller of this method receives a callback in the form of switchyFlashCallback
      * @dev Can be used to donate underlying tokens pro-rata to currently in-range liquidity providers by calling
      * with 0 amount{0,1} and sending the donation amount(s) from the callback
      * @param recipient The address which will receive the token0 and token1 amounts
@@ -1221,7 +1208,8 @@ public class SwitchyPool {
     public void flash (
         Address recipient,
         BigInteger amount0,
-        BigInteger amount1
+        BigInteger amount1,
+        byte[] data
     ) {
         this.poolLock.lock(true);
         final Address caller = Context.getCaller();
@@ -1244,7 +1232,7 @@ public class SwitchyPool {
             Context.call(token1, "transfer", recipient, amount1);
         }
 
-        Context.call(caller, "switchyFlashCallback", fee0, fee1);
+        Context.call(caller, "switchyFlashCallback", fee0, fee1, data);
 
         BigInteger balance0After = balance0();
         BigInteger balance1After = balance1();
