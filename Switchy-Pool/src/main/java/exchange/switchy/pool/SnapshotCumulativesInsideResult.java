@@ -19,19 +19,11 @@ package exchange.switchy.pool;
 import java.math.BigInteger;
 
 public class SnapshotCumulativesInsideResult {
-    BigInteger tickCumulativeInside;
-    public BigInteger gettickCumulativeInside() { return this.tickCumulativeInside; }
-    public void settickCumulativeInside(BigInteger v) { this.tickCumulativeInside = v; }
+    public BigInteger tickCumulativeInside;
+    public BigInteger secondsPerLiquidityInsideX128;
+    public BigInteger secondsInside;
 
-    BigInteger secondsPerLiquidityInsideX128;
-    public BigInteger getsecondsPerLiquidityInsideX128() { return this.secondsPerLiquidityInsideX128; }
-    public void setsecondsPerLiquidityInsideX128(BigInteger v) { this.secondsPerLiquidityInsideX128 = v; }
-
-    BigInteger secondsInside;
-    public BigInteger getsecondsInside() { return this.secondsInside; }
-    public void setsecondsInside(BigInteger v) { this.secondsInside = v; }
-
-    SnapshotCumulativesInsideResult (BigInteger tickCumulativeInside, BigInteger secondsPerLiquidityInsideX128, BigInteger secondsInside) {
+    public SnapshotCumulativesInsideResult (BigInteger tickCumulativeInside, BigInteger secondsPerLiquidityInsideX128, BigInteger secondsInside) {
       this.tickCumulativeInside = tickCumulativeInside;
       this.secondsPerLiquidityInsideX128 = secondsPerLiquidityInsideX128;
       this.secondsInside = secondsInside;

@@ -24,26 +24,16 @@ public class Position {
     public static class Info {
         // the amount of liquidity owned by this position
         public BigInteger liquidity;
-        public BigInteger getliquidity() { return this.liquidity; }
-        public void setliquidity(BigInteger v) { this.liquidity = v; }
 
         // fee growth per unit of liquidity as of the last update to liquidity or fees owed
         public BigInteger feeGrowthInside0LastX128;
-        public BigInteger getfeeGrowthInside0LastX128() { return this.feeGrowthInside0LastX128; }
-        public void setfeeGrowthInside0LastX128(BigInteger v) { this.feeGrowthInside0LastX128 = v; }
 
         public BigInteger feeGrowthInside1LastX128;
-        public BigInteger getfeeGrowthInside1LastX128() { return this.feeGrowthInside1LastX128; }
-        public void setfeeGrowthInside1LastX128(BigInteger v) { this.feeGrowthInside1LastX128 = v; }
 
         // the fees owed to the position owner in token0/token1
         public BigInteger tokensOwed0;
-        public BigInteger gettokensOwed0() { return this.tokensOwed0; }
-        public void settokensOwed0(BigInteger v) { this.tokensOwed0 = v; }
 
         public BigInteger tokensOwed1;
-        public BigInteger gettokensOwed1() { return this.tokensOwed1; }
-        public void settokensOwed1(BigInteger v) { this.tokensOwed1 = v; }
         
         /**
          * @notice Credits accumulated fees to a user's position

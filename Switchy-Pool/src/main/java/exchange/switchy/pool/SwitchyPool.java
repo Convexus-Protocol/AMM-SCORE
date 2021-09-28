@@ -715,16 +715,13 @@ public class SwitchyPool {
     }
 
     class PairAmounts {
+        public BigInteger amount0;
+        public BigInteger amount1;
+        
         public PairAmounts(BigInteger amount0, BigInteger amount1) {
             this.amount0 = amount0;
             this.amount1 = amount1;
         }
-        public BigInteger amount0;
-        public BigInteger getamount0() { return this.amount0; }
-        public void setamount0(BigInteger v) { this.amount0 = v; }
-        public BigInteger amount1;
-        public BigInteger getamount1() { return this.amount1; }
-        public void setamount1(BigInteger v) { this.amount1 = v; }
     }
 
     /**

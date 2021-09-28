@@ -7,24 +7,10 @@ import score.annotation.External;
 
 class Parameters {
   public Address factory;
-  public Address getfactory () { return this.factory; }
-  public void setfactory (Address v) { this.factory = v; }
-
   public Address token0;
-  public Address gettoken0 () { return this.token0; }
-  public void settoken0 (Address v) { this.token0 = v; }
-
   public Address token1;
-  public Address gettoken1 () { return this.token1; }
-  public void settoken1 (Address v) { this.token1 = v; }
-
   public int fee;
-  public int getfee () { return this.fee; }
-  public void setfee (int v) { this.fee = v; }
-
   public int tickSpacing;
-  public int gettickSpacing () { return this.tickSpacing; }
-  public void settickSpacing (int v) { this.tickSpacing = v; }
 
   public Parameters (
     Address factory,
