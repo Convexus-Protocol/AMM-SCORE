@@ -53,7 +53,7 @@ public class SwitchyPoolDeployer {
     return pool;
   }
 
-  @External
+  @External(readonly = true)
   public Parameters parameters () {
     return SwitchyPoolDeployer.parameters.get();
   }

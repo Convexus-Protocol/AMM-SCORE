@@ -202,17 +202,17 @@ public class SwitchyFactory {
     // ================================================
     // Public variable getters
     // ================================================
-    @External(readonly=true)
+    @External(readonly = true)
     public String name() {
         return this.name;
     }
 
-    @External(readonly=true)
+    @External(readonly = true)
     public Address owner() {
         return this.owner.get();
     }
 
-    @External(readonly=true)
+    @External(readonly = true)
     public Address getPool(Address token0, Address token1, int fee) {
         return this.getPool.at(token0).at(token1).get(fee);
     }

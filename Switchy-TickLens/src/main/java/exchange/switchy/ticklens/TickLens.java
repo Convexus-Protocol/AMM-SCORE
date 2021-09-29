@@ -63,7 +63,7 @@ public class TickLens {
         return bitmap.and(BigInteger.ONE.shiftLeft(index)).compareTo(BigInteger.ZERO) > 0;
     }
 
-    @External
+    @External(readonly = true)
     public PopulatedTick[] getPopulatedTicksInWord (Address pool, int tickBitmapIndex) {
 
         // fetch bitmap
@@ -99,7 +99,7 @@ public class TickLens {
     // ================================================
     // Public variable getters
     // ================================================
-    @External(readonly=true)
+    @External(readonly = true)
     public String name() {
         return this.name;
     }

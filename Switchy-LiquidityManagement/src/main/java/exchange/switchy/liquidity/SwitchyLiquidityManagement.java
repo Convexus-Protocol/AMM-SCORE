@@ -167,7 +167,7 @@ public class SwitchyLiquidityManagement {
     // ================================================
     // Public variable getters
     // ================================================
-    @External(readonly=true)
+    @External(readonly = true)
     public String name() {
         return this.name;
     }
