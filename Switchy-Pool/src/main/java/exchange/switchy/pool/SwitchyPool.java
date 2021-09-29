@@ -20,7 +20,6 @@ import static exchange.switchy.librairies.BlockTimestamp._blockTimestamp;
 
 import java.math.BigInteger;
 
-import exchange.switchy.common.SwitchyPoolDeployerParameters;
 import exchange.switchy.librairies.FixedPoint128;
 import exchange.switchy.librairies.FullMath;
 import exchange.switchy.librairies.LiquidityMath;
@@ -1351,6 +1350,14 @@ public class SwitchyPool {
 
     public Slot0 slot0 () {
         return this.slot0.get();
+    }
+
+    public BigInteger tickBitmap (int index) {
+        return this.tickBitmap.get(index);
+    }
+
+    public int tickSpacing () {
+        return this.tickSpacing;
     }
 
     // ================================================

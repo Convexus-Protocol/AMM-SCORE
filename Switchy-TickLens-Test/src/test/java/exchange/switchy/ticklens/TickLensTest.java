@@ -14,28 +14,16 @@
  * limitations under the License.
  */
 
-package exchange.switchy.common;
+package exchange.switchy.ticklens;
 
-import score.Address;
+import exchange.switchy.utils.SwitchyTest;
+import exchange.switchy.utils.ScoreSpy;
 
-public class SwitchyPoolDeployerParameters {
-    public Address factory;
-    public Address token0;
-    public Address token1;
-    public int fee;
-    public int tickSpacing;
+public class TickLensTest extends SwitchyTest {
 
-    public SwitchyPoolDeployerParameters (
-        Address factory,
-        Address token0,
-        Address token1,
-        int fee,
-        int tickSpacing
-    ) {
-        this.factory = factory;
-        this.token0 = token0;
-        this.token1 = token1;
-        this.fee = fee;
-        this.tickSpacing = tickSpacing;
-    }
+  ScoreSpy<TickLens> ticklens;
+
+  void setup_ticklens () throws Exception {
+    ticklens = deploy_ticklens();
+  }
 }

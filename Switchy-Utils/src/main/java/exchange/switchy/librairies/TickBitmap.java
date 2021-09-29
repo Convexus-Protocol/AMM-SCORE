@@ -48,6 +48,10 @@ public class TickBitmap {
     }
   }
 
+  public BigInteger get (int index) {
+    return this.tickBitmap.get(index);
+  }
+
   /**
    * @notice Computes the position in the mapping where the initialized bit for a tick lives
    * @param tick The tick for which to compute the position

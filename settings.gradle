@@ -10,6 +10,8 @@ include (
     'Switchy-LiquidityManagement-Test',
     'Switchy-PoolInitializer',
     'Switchy-PoolInitializer-Test',
+    'Switchy-TickLens',
+    'Switchy-TickLens-Test',
     'Switchy-Tests',
     'Switchy-Utils',
     'javaee-tokens',

@@ -25,6 +25,7 @@ import exchange.switchy.pool.SwitchyPool;
 import exchange.switchy.factory.SwitchyFactory;
 import exchange.switchy.initializer.SwitchyPoolInitializer;
 import exchange.switchy.router.SwapRouter;
+import exchange.switchy.ticklens.TickLens;
 import exchange.switchy.liquidity.SwitchyLiquidityManagement;
 
 import static org.mockito.Mockito.spy;
@@ -89,5 +90,13 @@ public class SwitchyTest extends TestBase {
         var spy = (SwitchyLiquidityManagement) spy(score.getInstance());
         score.setInstance(spy);
         return new ScoreSpy<SwitchyLiquidityManagement>(score, spy);
+    }
+    
+    public ScoreSpy<TickLens> deploy_ticklens () throws Exception {
+        Score score = sm.deploy(owner, TickLens.class);
+
+        var spy = (TickLens) spy(score.getInstance());
+        score.setInstance(spy);
+        return new ScoreSpy<TickLens>(score, spy);
     }
 }

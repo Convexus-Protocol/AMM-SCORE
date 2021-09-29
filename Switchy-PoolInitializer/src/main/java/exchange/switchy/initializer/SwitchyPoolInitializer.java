@@ -16,21 +16,25 @@
 
 package exchange.switchy.initializer;
 
+import java.math.BigInteger;
+
+import exchange.switchy.utils.AddressUtils;
+import exchange.switchy.pool.Slot0;
+import score.Address;
+import score.Context;
 import score.annotation.External;
 
 /**
- * @title Creates and initializes V3 Pools
+ * @title Creates and initializes Switchy Pools
  */
 public class SwitchyPoolInitializer {
 
     // ================================================
     // Consts
     // ================================================
-    // Contract class name
-    // private static final String NAME = "SwitchyPoolInitializer";
-
     // Contract name
     private final String name;
+    private final Address factory;
 
     // ================================================
     // Methods
@@ -39,9 +43,39 @@ public class SwitchyPoolInitializer {
      *  Contract constructor
      *  
      */
-    public SwitchyPoolInitializer() {
+    public SwitchyPoolInitializer(
+        Address _factory
+    ) {
         // final Address caller = Context.getCaller();
         this.name = "Switchy Pool Initializer";
+        this.factory = _factory;
+    }
+
+    @External
+    public Address createAndInitializePoolIfNecessary (
+        Address token0,
+        Address token1,
+        int fee,
+        BigInteger sqrtPriceX96
+    ) {
+        
+        Context.require(AddressUtils.compareTo(token0, token1) < 0, 
+        "createAndInitializePoolIfNecessary: token0 < token1");
+        
+        Address pool = (Address) Context.call(factory, "getPool", token0, token1, fee);
+
+        if (pool == null) {
+            pool = (Address) Context.call(factory, "createPool", token0, token1, fee);
+            Context.call(pool, "initialize", sqrtPriceX96);
+        } else {
+            var slot0 = (Slot0) Context.call(pool, "slot0");
+            BigInteger sqrtPriceX96Existing = slot0.sqrtPriceX96;
+            if (sqrtPriceX96Existing.equals(BigInteger.ZERO)) {
+                Context.call(pool, "initialize", sqrtPriceX96);
+            }
+        }
+
+        return pool;
     }
 
     // ================================================
