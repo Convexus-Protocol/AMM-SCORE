@@ -16,14 +16,20 @@
 
 package exchange.switchy.factory;
 
-import exchange.switchy.utils.SwitchyTest;
-import exchange.switchy.utils.ScoreSpy;
+import static org.mockito.Mockito.reset;
 
-public class SwitchyFactoryTest extends SwitchyTest {
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-  ScoreSpy<SwitchyFactory> factory;
+public class FactoryTest extends SwitchyFactoryTest {
+  
+  @BeforeEach
+  void setup() throws Exception {
+    setup_factory();
+    reset(factory.spy);
+  }
 
-  void setup_factory () throws Exception {
-    factory = deploy_factory();
+  @Test
+  void testAssumptions() {
   }
 }

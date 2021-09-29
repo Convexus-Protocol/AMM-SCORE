@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-package exchange.switchy.factory;
+package exchange.switchy.router;
 
 import exchange.switchy.utils.SwitchyTest;
 import exchange.switchy.utils.ScoreSpy;
 
-public class SwitchyFactoryTest extends SwitchyTest {
+public class SwapRouterTest extends SwitchyTest {
 
-  ScoreSpy<SwitchyFactory> factory;
+  ScoreSpy<SwapRouter> router;
 
-  void setup_factory () throws Exception {
-    factory = deploy_factory();
+  void setup_router () throws Exception {
+    router = deploy_router();
   }
 }

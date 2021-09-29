@@ -5,12 +5,11 @@ dependencies {
     implementation project(':javaee-tokens')
     implementation 'foundation.icon:javaee-scorex:0.5.2'
     implementation 'com.github.sink772:minimal-json:0.9.6'
-    implementation project(':Switchy-Pool')
     implementation project(':Switchy-Utils')
 }
 
 optimizedJar {
-    mainClassName = 'exchange.switchy.liquidity.SwitchyLiquidityManagement'
+    mainClassName = 'exchange.switchy.initializer.SwitchyPoolInitializer'
     setEnableDebug(true)
     from {
         configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
@@ -38,8 +37,6 @@ deployJar {
         }
     }
     parameters {
-        arg('_factory', 'cx0000000000000000000000000000000000000000')
-        arg('_wICX', 'cx0000000000000000000000000000000000000000')
     }
 }
 

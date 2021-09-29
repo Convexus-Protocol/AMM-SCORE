@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-package exchange.switchy.factory;
+package exchange.switchy.initializer;
 
 import exchange.switchy.utils.SwitchyTest;
 import exchange.switchy.utils.ScoreSpy;
 
-public class SwitchyFactoryTest extends SwitchyTest {
+public class SwitchyPoolInitializerTest extends SwitchyTest {
 
-  ScoreSpy<SwitchyFactory> factory;
+  ScoreSpy<SwitchyPoolInitializer> initializer;
 
-  void setup_factory () throws Exception {
-    factory = deploy_factory();
+  void setup_initializer () throws Exception {
+    initializer = deploy_initializer();
   }
 }

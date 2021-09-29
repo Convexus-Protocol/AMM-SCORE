@@ -13,6 +13,7 @@
       "**/.project": true,
       "**/bin": true,
       "**/gradle": true,
+      "**/build": true,
     }
   }
 }

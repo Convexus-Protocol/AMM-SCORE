@@ -63,7 +63,7 @@ public class SwitchyLiquidityManagement {
     // Consts
     // ================================================
     // Contract class name
-    private static final String NAME = "SwitchyLiquidityManagement";
+    // private static final String NAME = "SwitchyLiquidityManagement";
 
     // Contract name
     private final String name;

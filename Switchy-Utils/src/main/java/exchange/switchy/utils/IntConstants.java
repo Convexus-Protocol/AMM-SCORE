@@ -24,6 +24,5 @@ public class IntConstants {
   public final static BigInteger MAX_UINT32  = new BigInteger("ffffffff", 16);
   public final static BigInteger MAX_UINT64  = new BigInteger("ffffffffffffffff", 16);
   public final static BigInteger MAX_UINT128 = new BigInteger("ffffffffffffffffffffffffffffffff", 16);
-  // TODO: FixMe
-  public final static BigInteger MAX_UINT256 = new BigInteger("7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff", 16);
+  public final static BigInteger MAX_UINT256 = new BigInteger("ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff", 16);
 }

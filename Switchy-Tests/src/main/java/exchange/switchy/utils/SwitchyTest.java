@@ -23,6 +23,8 @@ import com.iconloop.score.test.TestBase;
 
 import exchange.switchy.pool.SwitchyPool;
 import exchange.switchy.factory.SwitchyFactory;
+import exchange.switchy.initializer.SwitchyPoolInitializer;
+import exchange.switchy.router.SwapRouter;
 import exchange.switchy.liquidity.SwitchyLiquidityManagement;
 
 import static org.mockito.Mockito.spy;
@@ -63,6 +65,22 @@ public class SwitchyTest extends TestBase {
         var spy = (SwitchyFactory) spy(score.getInstance());
         score.setInstance(spy);
         return new ScoreSpy<SwitchyFactory>(score, spy);
+    }
+    
+    public ScoreSpy<SwapRouter> deploy_router () throws Exception {
+        Score score = sm.deploy(owner, SwapRouter.class);
+
+        var spy = (SwapRouter) spy(score.getInstance());
+        score.setInstance(spy);
+        return new ScoreSpy<SwapRouter>(score, spy);
+    }
+    
+    public ScoreSpy<SwitchyPoolInitializer> deploy_initializer () throws Exception {
+        Score score = sm.deploy(owner, SwitchyPoolInitializer.class);
+
+        var spy = (SwitchyPoolInitializer) spy(score.getInstance());
+        score.setInstance(spy);
+        return new ScoreSpy<SwitchyPoolInitializer>(score, spy);
     }
     
     public ScoreSpy<SwitchyLiquidityManagement> deploy_liquidity_management () throws Exception {

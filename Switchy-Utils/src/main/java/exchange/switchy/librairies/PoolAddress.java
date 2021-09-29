@@ -1,6 +1,21 @@
+/*
+ * Copyright 2021 ICONation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package exchange.switchy.librairies;
 
-import java.math.BigInteger;
 import java.util.Arrays;
 
 import exchange.switchy.utils.AddressUtils;
@@ -41,7 +56,8 @@ public class PoolAddress {
     }
   }
 
-  private final static byte[] POOL_INIT_CODE_HASH = new BigInteger("e34f199b19b2b4f47f68442619d555527d244f78a3297ea89325f843f87b8b54", 16).toByteArray();
+  // TODO: changeme
+  private final static byte[] POOL_INIT_CODE_HASH = {(byte) 0xe3, (byte) 0x4f, (byte) 0x19, (byte) 0x9b, (byte) 0x19, (byte) 0xb2, (byte) 0xb4, (byte) 0xf4, (byte) 0x7f, (byte) 0x68, (byte) 0x44, (byte) 0x26, (byte) 0x19, (byte) 0xd5, (byte) 0x55, (byte) 0x52, (byte) 0x7d, (byte) 0x24, (byte) 0x4f, (byte) 0x78, (byte) 0xa3, (byte) 0x29, (byte) 0x7e, (byte) 0xa8, (byte) 0x93, (byte) 0x25, (byte) 0xf8, (byte) 0x43, (byte) 0xf8, (byte) 0x7b, (byte) 0x8b, (byte) 0x54};
 
   /**
    * @notice Returns PoolKey: the ordered tokens with the matched fee levels

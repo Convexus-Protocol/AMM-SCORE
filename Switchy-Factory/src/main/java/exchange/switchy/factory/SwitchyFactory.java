@@ -16,8 +16,6 @@
 
 package exchange.switchy.factory;
 
-import java.math.BigInteger;
-
 import exchange.switchy.utils.AddressUtils;
 import score.Address;
 import score.BranchDB;
