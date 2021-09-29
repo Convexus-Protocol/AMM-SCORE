@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package exchange.switchy.router;
+package exchange.switchy.librairies;
 
 import java.math.BigInteger;
 
@@ -30,17 +30,17 @@ public class PeripheryPayments {
    * @param value The amount to pay
    */
   public static void pay(
-    SwapRouter router,
+    Address wICX,
     Address token, 
     Address payer,
     Address recipient, 
     BigInteger value
   ) {
     final Address thisAddress = Context.getAddress();
-    if (token.equals(router.wICX) && Context.getBalance(thisAddress).compareTo(value) >= 0) {
+    if (token.equals(wICX) && Context.getBalance(thisAddress).compareTo(value) >= 0) {
       // pay with wICX
-      Context.call(value, router.wICX, "deposit");
-      Context.call(router.wICX, "transfer", recipient, value);
+      Context.call(value, wICX, "deposit");
+      Context.call(wICX, "transfer", recipient, value);
     } else if (payer.equals(thisAddress)) {
       Context.call(token, "transfer", recipient, value);
     } else {

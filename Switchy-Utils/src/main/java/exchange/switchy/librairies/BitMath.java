@@ -36,35 +36,35 @@ public class BitMath {
     Context.require(x.compareTo(BigInteger.ZERO) > 0);
     char r = 0;
 
-    if (x.compareTo(new BigInteger("0x100000000000000000000000000000000")) >= 0) {
+    if (x.compareTo(new BigInteger("100000000000000000000000000000000", 16)) >= 0) {
         x = x.shiftRight(128);
         r += 128;
     }
-    if (x.compareTo(new BigInteger("0x10000000000000000")) >= 0) {
+    if (x.compareTo(new BigInteger("10000000000000000", 16)) >= 0) {
         x = x.shiftRight(64);
         r += 64;
     }
-    if (x.compareTo(new BigInteger("0x100000000")) >= 0) {
+    if (x.compareTo(new BigInteger("100000000", 16)) >= 0) {
         x = x.shiftRight(32);
         r += 32;
     }
-    if (x.compareTo(new BigInteger("0x10000")) >= 0) {
+    if (x.compareTo(new BigInteger("10000", 16)) >= 0) {
         x = x.shiftRight(16);
         r += 16;
     }
-    if (x.compareTo(new BigInteger("0x100")) >= 0) {
+    if (x.compareTo(new BigInteger("100", 16)) >= 0) {
         x = x.shiftRight(8);
         r += 8;
     }
-    if (x.compareTo(new BigInteger("0x10")) >= 0) {
+    if (x.compareTo(new BigInteger("10", 16)) >= 0) {
         x = x.shiftRight(4);
         r += 4;
     }
-    if (x.compareTo(new BigInteger("0x4")) >= 0) {
+    if (x.compareTo(new BigInteger("4", 16)) >= 0) {
         x = x.shiftRight(2);
         r += 2;
     }
-    if (x.compareTo(new BigInteger("0x2")) >= 0) {
+    if (x.compareTo(new BigInteger("2", 16)) >= 0) {
       r += 1;
     }
 

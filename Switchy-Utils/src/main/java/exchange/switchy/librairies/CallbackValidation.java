@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package exchange.switchy.router;
+package exchange.switchy.librairies;
 
 import score.Address;
 import score.Context;
@@ -39,8 +39,9 @@ public class CallbackValidation {
    * @param poolKey The identifying key of the V3 pool
    * @return pool The pool contract address
    */
-  private static Address verifyCallback (Address factory, PoolKey poolKey) {
+  public static Address verifyCallback (Address factory, PoolAddress.PoolKey poolKey) {
     Address pool = PoolAddress.computeAddress(factory, poolKey);
+    // TODO: ICON deploy address aren't deterministic
     Context.require(Context.getCaller().equals(pool));
     return pool;
   }

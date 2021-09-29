@@ -33,7 +33,7 @@ class SwapCallbackData {
     public static SwapCallbackData fromBytes (byte[] data) {
         int size = data.length;
         byte[] path = Arrays.copyOfRange(data, 0, size - Address.LENGTH);
-        Address payer = new Address(Arrays.copyOfRange(data, Address.LENGTH, size));
+        Address payer = new Address(Arrays.copyOfRange(data, size - Address.LENGTH, size));
         return new SwapCallbackData(path, payer);
     }
 

@@ -6,6 +6,8 @@ include (
     'Switchy-Pool-Test',
     'Switchy-SwapRouter',
     'Switchy-SwapRouter-Test',
+    'Switchy-LiquidityManagement',
+    'Switchy-LiquidityManagement-Test',
     'Switchy-Tests',
     'Switchy-Utils',
     'javaee-tokens',

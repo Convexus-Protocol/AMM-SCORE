@@ -21,5 +21,5 @@ import java.math.BigInteger;
 // @title FixedPoint128
 // @notice A library for handling binary fixed point numbers, see https://en.wikipedia.org/wiki/Q_(number_format)
 public class FixedPoint128 {
-  public final static BigInteger Q128 = new BigInteger("0x100000000000000000000000000000000");
+  public final static BigInteger Q128 = new BigInteger("100000000000000000000000000000000", 16);
 }

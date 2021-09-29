@@ -8,3 +8,5 @@ find . -name ".settings" -type d | while read i; do rm -rf "$i"; done
 find . -name "build" -type d | while read i; do rm -rf "$i"; done
 rm -rf .gradle
 rm -rf ./build
+
+notepad.exe ./workspace.code-workspace

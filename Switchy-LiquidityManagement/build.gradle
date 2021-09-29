@@ -5,11 +5,12 @@ dependencies {
     implementation project(':javaee-tokens')
     implementation 'foundation.icon:javaee-scorex:0.5.2'
     implementation 'com.github.sink772:minimal-json:0.9.6'
+    implementation project(':Switchy-Pool')
     implementation project(':Switchy-Utils')
 }
 
 optimizedJar {
-    mainClassName = 'exchange.switchy.router.SwitchyRouter'
+    mainClassName = 'exchange.switchy.liquidity.SwitchyLiquidityManagement'
     setEnableDebug(true)
     from {
         configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }

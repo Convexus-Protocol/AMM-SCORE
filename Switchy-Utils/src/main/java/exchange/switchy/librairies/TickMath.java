@@ -44,26 +44,26 @@ public class TickMath {
     Context.require(absTick.compareTo(BigInteger.valueOf(MAX_TICK)) <= 0, 
       "getSqrtRatioAtTick: tick can't be superior to MAX_TICK");
 
-    BigInteger ratio = !absTick.and(BigInteger.valueOf(0x1)).equals(ZERO) ? new BigInteger("0xfffcb933bd6fad37aa2d162d1a594001") : new BigInteger("0x100000000000000000000000000000000");
-    if (!absTick.and(BigInteger.valueOf(0x2)).equals(ZERO)) ratio = (ratio.multiply(new BigInteger("0xfff97272373d413259a46990580e213a"))).shiftRight(128);
-    if (!absTick.and(BigInteger.valueOf(0x4)).equals(ZERO)) ratio = (ratio.multiply(new BigInteger("0xfff2e50f5f656932ef12357cf3c7fdcc"))).shiftRight(128);
-    if (!absTick.and(BigInteger.valueOf(0x8)).equals(ZERO)) ratio = (ratio.multiply(new BigInteger("0xffe5caca7e10e4e61c3624eaa0941cd0"))).shiftRight(128);
-    if (!absTick.and(BigInteger.valueOf(0x10)).equals(ZERO)) ratio = (ratio.multiply(new BigInteger("0xffcb9843d60f6159c9db58835c926644"))).shiftRight(128);
-    if (!absTick.and(BigInteger.valueOf(0x20)).equals(ZERO)) ratio = (ratio.multiply(new BigInteger("0xff973b41fa98c081472e6896dfb254c0"))).shiftRight(128);
-    if (!absTick.and(BigInteger.valueOf(0x40)).equals(ZERO)) ratio = (ratio.multiply(new BigInteger("0xff2ea16466c96a3843ec78b326b52861"))).shiftRight(128);
-    if (!absTick.and(BigInteger.valueOf(0x80)).equals(ZERO)) ratio = (ratio.multiply(new BigInteger("0xfe5dee046a99a2a811c461f1969c3053"))).shiftRight(128);
-    if (!absTick.and(BigInteger.valueOf(0x100)).equals(ZERO)) ratio = (ratio.multiply(new BigInteger("0xfcbe86c7900a88aedcffc83b479aa3a4"))).shiftRight(128);
-    if (!absTick.and(BigInteger.valueOf(0x200)).equals(ZERO)) ratio = (ratio.multiply(new BigInteger("0xf987a7253ac413176f2b074cf7815e54"))).shiftRight(128);
-    if (!absTick.and(BigInteger.valueOf(0x400)).equals(ZERO)) ratio = (ratio.multiply(new BigInteger("0xf3392b0822b70005940c7a398e4b70f3"))).shiftRight(128);
-    if (!absTick.and(BigInteger.valueOf(0x800)).equals(ZERO)) ratio = (ratio.multiply(new BigInteger("0xe7159475a2c29b7443b29c7fa6e889d9"))).shiftRight(128);
-    if (!absTick.and(BigInteger.valueOf(0x1000)).equals(ZERO)) ratio = (ratio.multiply(new BigInteger("0xd097f3bdfd2022b8845ad8f792aa5825"))).shiftRight(128);
-    if (!absTick.and(BigInteger.valueOf(0x2000)).equals(ZERO)) ratio = (ratio.multiply(new BigInteger("0xa9f746462d870fdf8a65dc1f90e061e5"))).shiftRight(128);
-    if (!absTick.and(BigInteger.valueOf(0x4000)).equals(ZERO)) ratio = (ratio.multiply(new BigInteger("0x70d869a156d2a1b890bb3df62baf32f7"))).shiftRight(128);
-    if (!absTick.and(BigInteger.valueOf(0x8000)).equals(ZERO)) ratio = (ratio.multiply(new BigInteger("0x31be135f97d08fd981231505542fcfa6"))).shiftRight(128);
-    if (!absTick.and(BigInteger.valueOf(0x10000)).equals(ZERO)) ratio = (ratio.multiply(new BigInteger("0x9aa508b5b7a84e1c677de54f3e99bc9"))).shiftRight(128);
-    if (!absTick.and(BigInteger.valueOf(0x20000)).equals(ZERO)) ratio = (ratio.multiply(new BigInteger("0x5d6af8dedb81196699c329225ee604"))).shiftRight(128);
-    if (!absTick.and(BigInteger.valueOf(0x40000)).equals(ZERO)) ratio = (ratio.multiply(new BigInteger("0x2216e584f5fa1ea926041bedfe98"))).shiftRight(128);
-    if (!absTick.and(BigInteger.valueOf(0x80000)).equals(ZERO)) ratio = (ratio.multiply(new BigInteger("0x48a170391f7dc42444e8fa2"))).shiftRight(128);
+    BigInteger ratio = !absTick.and(BigInteger.valueOf(0x1)).equals(ZERO) ? new BigInteger("fffcb933bd6fad37aa2d162d1a594001", 16) : new BigInteger("100000000000000000000000000000000", 16);
+    if (!absTick.and(BigInteger.valueOf(0x2)).equals(ZERO)) ratio = (ratio.multiply(new BigInteger("fff97272373d413259a46990580e213a", 16))).shiftRight(128);
+    if (!absTick.and(BigInteger.valueOf(0x4)).equals(ZERO)) ratio = (ratio.multiply(new BigInteger("fff2e50f5f656932ef12357cf3c7fdcc", 16))).shiftRight(128);
+    if (!absTick.and(BigInteger.valueOf(0x8)).equals(ZERO)) ratio = (ratio.multiply(new BigInteger("ffe5caca7e10e4e61c3624eaa0941cd0", 16))).shiftRight(128);
+    if (!absTick.and(BigInteger.valueOf(0x10)).equals(ZERO)) ratio = (ratio.multiply(new BigInteger("ffcb9843d60f6159c9db58835c926644", 16))).shiftRight(128);
+    if (!absTick.and(BigInteger.valueOf(0x20)).equals(ZERO)) ratio = (ratio.multiply(new BigInteger("ff973b41fa98c081472e6896dfb254c0", 16))).shiftRight(128);
+    if (!absTick.and(BigInteger.valueOf(0x40)).equals(ZERO)) ratio = (ratio.multiply(new BigInteger("ff2ea16466c96a3843ec78b326b52861", 16))).shiftRight(128);
+    if (!absTick.and(BigInteger.valueOf(0x80)).equals(ZERO)) ratio = (ratio.multiply(new BigInteger("fe5dee046a99a2a811c461f1969c3053", 16))).shiftRight(128);
+    if (!absTick.and(BigInteger.valueOf(0x100)).equals(ZERO)) ratio = (ratio.multiply(new BigInteger("fcbe86c7900a88aedcffc83b479aa3a4", 16))).shiftRight(128);
+    if (!absTick.and(BigInteger.valueOf(0x200)).equals(ZERO)) ratio = (ratio.multiply(new BigInteger("f987a7253ac413176f2b074cf7815e54", 16))).shiftRight(128);
+    if (!absTick.and(BigInteger.valueOf(0x400)).equals(ZERO)) ratio = (ratio.multiply(new BigInteger("f3392b0822b70005940c7a398e4b70f3", 16))).shiftRight(128);
+    if (!absTick.and(BigInteger.valueOf(0x800)).equals(ZERO)) ratio = (ratio.multiply(new BigInteger("e7159475a2c29b7443b29c7fa6e889d9", 16))).shiftRight(128);
+    if (!absTick.and(BigInteger.valueOf(0x1000)).equals(ZERO)) ratio = (ratio.multiply(new BigInteger("d097f3bdfd2022b8845ad8f792aa5825", 16))).shiftRight(128);
+    if (!absTick.and(BigInteger.valueOf(0x2000)).equals(ZERO)) ratio = (ratio.multiply(new BigInteger("a9f746462d870fdf8a65dc1f90e061e5", 16))).shiftRight(128);
+    if (!absTick.and(BigInteger.valueOf(0x4000)).equals(ZERO)) ratio = (ratio.multiply(new BigInteger("70d869a156d2a1b890bb3df62baf32f7", 16))).shiftRight(128);
+    if (!absTick.and(BigInteger.valueOf(0x8000)).equals(ZERO)) ratio = (ratio.multiply(new BigInteger("31be135f97d08fd981231505542fcfa6", 16))).shiftRight(128);
+    if (!absTick.and(BigInteger.valueOf(0x10000)).equals(ZERO)) ratio = (ratio.multiply(new BigInteger("9aa508b5b7a84e1c677de54f3e99bc9", 16))).shiftRight(128);
+    if (!absTick.and(BigInteger.valueOf(0x20000)).equals(ZERO)) ratio = (ratio.multiply(new BigInteger("5d6af8dedb81196699c329225ee604", 16))).shiftRight(128);
+    if (!absTick.and(BigInteger.valueOf(0x40000)).equals(ZERO)) ratio = (ratio.multiply(new BigInteger("2216e584f5fa1ea926041bedfe98", 16))).shiftRight(128);
+    if (!absTick.and(BigInteger.valueOf(0x80000)).equals(ZERO)) ratio = (ratio.multiply(new BigInteger("48a170391f7dc42444e8fa2", 16))).shiftRight(128);
 
     if (tick > 0) {
       ratio = IntConstants.MAX_UINT256.divide(ratio);
@@ -86,35 +86,35 @@ public class TickMath {
       BigInteger msb = ZERO;
       BigInteger f = null;
 
-      f = gt(r, new BigInteger("0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF")).shiftLeft(7);
+      f = gt(r, new BigInteger("ffffffffffffffffffffffffffffffff", 16)).shiftLeft(7);
       msb = msb.or(f);
       r = r.shiftRight(f.intValue());
       
-      f = gt(r, new BigInteger("0xFFFFFFFFFFFFFFFF")).shiftLeft(6);
+      f = gt(r, new BigInteger("ffffffffffffffff", 16)).shiftLeft(6);
       msb = msb.or(f);
       r = r.shiftRight(f.intValue());
 
-      f = gt(r, new BigInteger("0xFFFFFFFF")).shiftLeft(5);
+      f = gt(r, new BigInteger("ffffffff", 16)).shiftLeft(5);
       msb = msb.or(f);
       r = r.shiftRight(f.intValue());
 
-      f = gt(r, new BigInteger("0xFFFF")).shiftLeft(4);
+      f = gt(r, new BigInteger("ffff", 16)).shiftLeft(4);
       msb = msb.or(f);
       r = r.shiftRight(f.intValue());
       
-      f = gt(r, new BigInteger("0xFF")).shiftLeft(3);
+      f = gt(r, new BigInteger("ff", 16)).shiftLeft(3);
       msb = msb.or(f);
       r = r.shiftRight(f.intValue());
       
-      f = gt(r, new BigInteger("0xF")).shiftLeft(2);
+      f = gt(r, new BigInteger("f", 16)).shiftLeft(2);
       msb = msb.or(f);
       r = r.shiftRight(f.intValue());
       
-      f = gt(r, new BigInteger("0x3")).shiftLeft(1);
+      f = gt(r, new BigInteger("3", 16)).shiftLeft(1);
       msb = msb.or(f);
       r = r.shiftRight(f.intValue());
       
-      f = gt(r, new BigInteger("0x1"));
+      f = gt(r, new BigInteger("1", 16));
       msb = msb.or(f);
 
       if (msb.compareTo(BigInteger.valueOf(128)) >= 0) {

@@ -22,8 +22,11 @@ import static java.math.BigInteger.ONE;
 import java.math.BigInteger;
 
 import exchange.switchy.librairies.Path;
+import exchange.switchy.librairies.PeripheryPayments;
+import exchange.switchy.librairies.PoolAddress;
 import exchange.switchy.librairies.PoolData;
 import exchange.switchy.librairies.TickMath;
+import exchange.switchy.librairies.CallbackValidation;
 import exchange.switchy.librairies.PairAmounts;
 import exchange.switchy.utils.AddressUtils;
 import exchange.switchy.utils.BytesUtils;
@@ -122,7 +125,7 @@ public class SwapRouter {
         }
 
         if (isExactInput) {
-            PeripheryPayments.pay(this, tokenIn, callbackData.payer, caller, amountToPay);
+            PeripheryPayments.pay(this.wICX, tokenIn, callbackData.payer, caller, amountToPay);
         } else {
             // either initiate the next swap or pay
             if (Path.hasMultiplePools(callbackData.path)) {
@@ -131,7 +134,7 @@ public class SwapRouter {
             } else {
                 this.amountInCached.set(amountToPay);
                 tokenIn = tokenOut; // swap in/out because exact output swaps are reversed
-                PeripheryPayments.pay(this, tokenIn, callbackData.payer, caller, amountToPay);
+                PeripheryPayments.pay(this.wICX, tokenIn, callbackData.payer, caller, amountToPay);
             }
         }
     }

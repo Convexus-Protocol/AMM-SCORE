@@ -41,41 +41,6 @@ import score.VarDB;
 import score.annotation.EventLog;
 import score.annotation.External;
 
-class Slot0 {
-    // The current price of the pool as a sqrt(token1/token0) Q64.96 value
-    BigInteger sqrtPriceX96;
-    // The current tick of the pool, i.e. according to the last tick transition that was run.
-    // This value may not always be equal to SqrtTickMath.getTickAtSqrtRatio(sqrtPriceX96) if the price is on a tick boundary
-    int tick;
-    // The index of the last oracle observation that was written
-    int observationIndex;
-    // the current maximum number of observations that are being stored
-    int observationCardinality;
-    // the next maximum number of observations to store, triggered in observations.write
-    int observationCardinalityNext;
-    // The current protocol fee as a percentage of the swap fee taken on withdrawal
-    // represented as an integer denominator (1/x)%
-    // Encoded as two 4 bit values, where the protocol fee of token1 is shifted 4 bits and the protocol fee of token0
-    // is the lower 4 bits. Used as the denominator of a fraction of the swap fee, e.g. 4 means 1/4th of the swap fee.
-    int feeProtocol;
-
-    public Slot0 (
-        BigInteger sqrtPriceX96,
-        int tick,
-        int observationIndex,
-        int observationCardinality,
-        int observationCardinalityNext,
-        int feeProtocol
-    ) {
-        this.sqrtPriceX96 = sqrtPriceX96;
-        this.tick = tick;
-        this.observationIndex = observationIndex;
-        this.observationCardinality = observationCardinality;
-        this.observationCardinalityNext = observationCardinalityNext;
-        this.feeProtocol = feeProtocol;
-    }
-}
-
 // accumulated protocol fees in token0/token1 units
 class ProtocolFees {
     BigInteger token0;
@@ -323,6 +288,10 @@ public class SwitchyPool {
      */
     public SwitchyPool() {
         SwitchyPoolDeployerParameters parameters = (SwitchyPoolDeployerParameters) Context.call(Context.getCaller(), "parameters");
+
+        Context.require(parameters != null,
+            "SwitchyPool: Invalid SwitchyPoolDeployerParameters");
+
         this.factory = parameters.factory;
         this.token0 = parameters.token0;
         this.token1 = parameters.token1;
@@ -1378,6 +1347,10 @@ public class SwitchyPool {
     @External(readonly = true)
     public Oracle.Observation observations (int index) {
         return this.observations.get(index);
+    }
+
+    public Slot0 slot0 () {
+        return this.slot0.get();
     }
 
     // ================================================

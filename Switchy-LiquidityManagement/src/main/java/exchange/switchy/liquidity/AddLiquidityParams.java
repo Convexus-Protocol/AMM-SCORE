@@ -14,13 +14,23 @@
  * limitations under the License.
  */
 
-package exchange.switchy.librairies;
+package exchange.switchy.liquidity;
 
 import java.math.BigInteger;
 
-/// @title FixedPoint96
-/// @notice A library for handling binary fixed point numbers, see https://en.wikipedia.org/wiki/Q_(number_format)
-public class FixedPoint96 {
-  public static final int RESOLUTION = 96;
-  public static final BigInteger Q96 = new BigInteger("1000000000000000000000000", 16);
+import score.Address;
+
+public class AddLiquidityParams {
+    public Address token0;
+    public Address token1;
+    public int fee;
+    public Address recipient;
+    public int tickLower;
+    public int tickUpper;
+    public BigInteger amount0Desired;
+    public BigInteger amount1Desired;
+    public BigInteger amount0Min;
+    public BigInteger amount1Min;
+
+    public AddLiquidityParams () {}
 }

@@ -9,6 +9,8 @@ dependencies {
     // TODO: testImplementation?
     implementation project(':Switchy-Utils')
     implementation project(':Switchy-Pool')
+    implementation project(':Switchy-Factory')
+    implementation project(':Switchy-LiquidityManagement')
 
     implementation project(':unittest')
     // implementation 'foundation.icon:javaee-unittest:0.9.1'

@@ -1,27 +1,47 @@
-package exchange.switchy.router;
+package exchange.switchy.librairies;
 
 import java.math.BigInteger;
+import java.util.Arrays;
 
 import exchange.switchy.utils.AddressUtils;
 import exchange.switchy.utils.BytesUtils;
 import score.Address;
 import score.Context;
 
-class PoolKey {
-  public Address token0;
-  public Address token1;
-  public int fee;
-
-  public PoolKey(Address token0, Address token1, int fee) {
-    this.token0 = token0;
-    this.token1 = token1;
-    this.fee = fee;
-  }
-}
-
 public class PoolAddress {
   
-  private final static byte[] POOL_INIT_CODE_HASH = new BigInteger("0xe34f199b19b2b4f47f68442619d555527d244f78a3297ea89325f843f87b8b54").toByteArray();
+  public static class PoolKey {
+    public Address token0;
+    public Address token1;
+    public int fee;
+    public static final int LENGTH = Address.LENGTH + Address.LENGTH + BytesUtils.INT_SIZE;
+
+    public PoolKey(Address token0, Address token1, int fee) {
+      this.token0 = token0;
+      this.token1 = token1;
+      this.fee = fee;
+    }
+
+    public static PoolKey fromBytes(byte[] data) {
+      int offset = 0;
+      Address token0 = new Address(Arrays.copyOfRange(data, offset, offset + Address.LENGTH));
+      offset += Address.LENGTH;
+      Address token1 = new Address(Arrays.copyOfRange(data, offset, offset + Address.LENGTH));
+      offset += Address.LENGTH;
+      int fee = BytesUtils.getBigEndianInt(Arrays.copyOfRange(data, offset, offset + BytesUtils.INT_SIZE));
+      return new PoolKey(token0, token1, fee);
+    }
+
+    public byte[] toBytes() {
+      return BytesUtils.concat(
+        this.token0.toByteArray(),
+        this.token1.toByteArray(),
+        BytesUtils.intToBytes(this.fee)
+      );
+    }
+  }
+
+  private final static byte[] POOL_INIT_CODE_HASH = new BigInteger("e34f199b19b2b4f47f68442619d555527d244f78a3297ea89325f843f87b8b54", 16).toByteArray();
 
   /**
    * @notice Returns PoolKey: the ordered tokens with the matched fee levels
@@ -39,7 +59,7 @@ public class PoolAddress {
         token1 = tokenA;
     }
 
-    return new PoolKey(token0, token1, fee);
+    return new PoolAddress.PoolKey(token0, token1, fee);
   }
 
   /**

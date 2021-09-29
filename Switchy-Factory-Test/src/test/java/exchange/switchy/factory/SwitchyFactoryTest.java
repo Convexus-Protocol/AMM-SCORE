@@ -14,13 +14,16 @@
  * limitations under the License.
  */
 
-package exchange.switchy.librairies;
+package exchange.switchy.factory;
 
-import java.math.BigInteger;
+import exchange.switchy.utils.SwitchyTest;
+import exchange.switchy.utils.ScoreSpy;
 
-/// @title FixedPoint96
-/// @notice A library for handling binary fixed point numbers, see https://en.wikipedia.org/wiki/Q_(number_format)
-public class FixedPoint96 {
-  public static final int RESOLUTION = 96;
-  public static final BigInteger Q96 = new BigInteger("1000000000000000000000000", 16);
+public class SwitchyFactoryTest extends SwitchyTest {
+
+  ScoreSpy<SwitchyFactory> pool;
+
+  void setup_factory () throws Exception {
+    pool = deploy_factory();
+  }
 }

@@ -22,6 +22,8 @@ import com.iconloop.score.test.ServiceManager;
 import com.iconloop.score.test.TestBase;
 
 import exchange.switchy.pool.SwitchyPool;
+import exchange.switchy.factory.SwitchyFactory;
+import exchange.switchy.liquidity.SwitchyLiquidityManagement;
 
 import static org.mockito.Mockito.spy;
 
@@ -53,5 +55,21 @@ public class SwitchyTest extends TestBase {
         var spy = (SwitchyPool) spy(score.getInstance());
         score.setInstance(spy);
         return new ScoreSpy<SwitchyPool>(score, spy);
+    }
+    
+    public ScoreSpy<SwitchyFactory> deploy_factory () throws Exception {
+        Score score = sm.deploy(owner, SwitchyFactory.class);
+
+        var spy = (SwitchyFactory) spy(score.getInstance());
+        score.setInstance(spy);
+        return new ScoreSpy<SwitchyFactory>(score, spy);
+    }
+    
+    public ScoreSpy<SwitchyLiquidityManagement> deploy_liquidity_management () throws Exception {
+        Score score = sm.deploy(owner, SwitchyLiquidityManagement.class);
+
+        var spy = (SwitchyLiquidityManagement) spy(score.getInstance());
+        score.setInstance(spy);
+        return new ScoreSpy<SwitchyLiquidityManagement>(score, spy);
     }
 }
