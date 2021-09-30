@@ -12,6 +12,8 @@ include (
     'Switchy-PoolInitializer-Test',
     'Switchy-TickLens',
     'Switchy-TickLens-Test',
+    'Switchy-Quoter',
+    'Switchy-Quoter-Test',
     'Switchy-Tests',
     'Switchy-Utils',
     'javaee-tokens',
