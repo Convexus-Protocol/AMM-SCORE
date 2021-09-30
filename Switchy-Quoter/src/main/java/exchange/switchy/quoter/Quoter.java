@@ -63,12 +63,11 @@ public class Quoter {
     private final String name;
     private final Address factory;
 
-    /// @dev Transient storage variable used to check a safety condition in exact output swaps.
-    private final VarDB<BigInteger> amountOutCached = Context.newVarDB(NAME + "_amountOutCached", BigInteger.class);
-
     // ================================================
     // DB Variables
     // ================================================
+    /// @dev Transient storage variable used to check a safety condition in exact output swaps.
+    private final VarDB<BigInteger> amountOutCached = Context.newVarDB(NAME + "_amountOutCached", BigInteger.class);
 
     // ================================================
     // Methods
