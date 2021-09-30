@@ -157,6 +157,9 @@ public class Quoter {
         }
     }
 
+    /**
+     * @dev Parses a revert reason that should contain the numeric quote
+     */
     private RevertReason parseRevertReason (String reason) {
         StringTokenizer scanner = new StringTokenizer(reason, ";");
         BigInteger amountReceived = StringUtils.toBigInt(scanner.nextToken());
@@ -483,7 +486,12 @@ public class Quoter {
         return null;
     }
 
-
+    /**
+     * @notice Returns the amount in required for a given exact output swap without executing the swap
+     * @param path The path of the swap, i.e. each token pair and the pool fee. Path must be provided in reverse order
+     * @param amountOut The amount of the last token to receive
+     * @return amountIn The amount of first token required to be paid
+     */
     @External
     public QuoteMultiResult quoteExactOutput (byte[] path, BigInteger amountOut) {
         
