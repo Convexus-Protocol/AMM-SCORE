@@ -29,6 +29,7 @@ import exchange.switchy.librairies.TickMath;
 import exchange.switchy.librairies.CallbackValidation;
 import exchange.switchy.librairies.PairAmounts;
 import exchange.switchy.utils.AddressUtils;
+import exchange.switchy.utils.ByteReader;
 import exchange.switchy.utils.BytesUtils;
 import exchange.switchy.utils.IntConstants;
 import score.Address;
@@ -106,8 +107,8 @@ public class SwapRouter {
             "switchySwapCallback: swaps entirely within 0-liquidity regions are not supported");
 
         final Address caller = Context.getCaller();
-        SwapCallbackData callbackData = SwapCallbackData.fromBytes(data);
-        PoolData pool = Path.decodeFirstPool(callbackData.path);
+        SwapCallbackData callbackData = SwapCallbackData.fromBytes(new ByteReader(data));
+        PoolData pool = Path.decodeFirstPool(new ByteReader(callbackData.path));
         Address tokenIn = pool.tokenA;
         Address tokenOut = pool.tokenB;
         int fee = pool.fee;
@@ -155,7 +156,7 @@ public class SwapRouter {
             recipient = Context.getAddress();
         }
         
-        PoolData pool = Path.decodeFirstPool(data.path);
+        PoolData pool = Path.decodeFirstPool(new ByteReader(data.path));
         Address tokenIn = pool.tokenA;
         Address tokenOut = pool.tokenB;
         int fee = pool.fee;
@@ -258,7 +259,7 @@ public class SwapRouter {
             recipient = Context.getAddress();
         }
 
-        PoolData pool = Path.decodeFirstPool(data.path);
+        PoolData pool = Path.decodeFirstPool(new ByteReader(data.path));
         Address tokenOut = pool.tokenA;
         Address tokenIn = pool.tokenB;
         int fee = pool.fee;

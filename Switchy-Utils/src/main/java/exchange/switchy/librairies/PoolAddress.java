@@ -19,6 +19,7 @@ package exchange.switchy.librairies;
 import java.util.Arrays;
 
 import exchange.switchy.utils.AddressUtils;
+import exchange.switchy.utils.ByteReader;
 import exchange.switchy.utils.BytesUtils;
 import score.Address;
 import score.Context;
@@ -29,7 +30,6 @@ public class PoolAddress {
     public Address token0;
     public Address token1;
     public int fee;
-    public static final int LENGTH = Address.LENGTH + Address.LENGTH + BytesUtils.INT_SIZE;
 
     public PoolKey(Address token0, Address token1, int fee) {
       this.token0 = token0;
@@ -37,13 +37,10 @@ public class PoolAddress {
       this.fee = fee;
     }
 
-    public static PoolKey fromBytes(byte[] data) {
-      int offset = 0;
-      Address token0 = new Address(Arrays.copyOfRange(data, offset, offset + Address.LENGTH));
-      offset += Address.LENGTH;
-      Address token1 = new Address(Arrays.copyOfRange(data, offset, offset + Address.LENGTH));
-      offset += Address.LENGTH;
-      int fee = BytesUtils.getBigEndianInt(Arrays.copyOfRange(data, offset, offset + BytesUtils.INT_SIZE));
+    public static PoolKey fromBytes(ByteReader reader) {
+      Address token0 = reader.readAddress();
+      Address token1 = reader.readAddress();
+      int fee = reader.readInt();
       return new PoolKey(token0, token1, fee);
     }
 

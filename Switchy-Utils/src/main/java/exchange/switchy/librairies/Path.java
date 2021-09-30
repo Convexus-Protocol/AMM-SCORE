@@ -18,6 +18,7 @@ package exchange.switchy.librairies;
 
 import java.util.Arrays;
 
+import exchange.switchy.utils.ByteReader;
 import exchange.switchy.utils.BytesUtils;
 import score.Address;
 
@@ -61,14 +62,10 @@ public class Path {
    *  tokenB The second token of the given pool
    *  fee The fee level of the pool
    */
-  public static PoolData decodeFirstPool (byte[] path) {
-    int offset = 0;
-    Address tokenA = new Address(Arrays.copyOfRange(path, offset, offset+ADDR_SIZE));
-    offset += ADDR_SIZE;
-    int fee = BytesUtils.getBigEndianInt(Arrays.copyOfRange(path, offset, offset+FEE_SIZE));
-    offset += FEE_SIZE;
-    Address tokenB = new Address(Arrays.copyOfRange(path, offset, offset+ADDR_SIZE));
-    
+  public static PoolData decodeFirstPool (ByteReader reader) {
+    Address tokenA = reader.readAddress();
+    int fee = reader.readInt();
+    Address tokenB = reader.readAddress();
     return new PoolData(tokenA, tokenB, fee);
   }
 

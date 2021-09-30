@@ -16,8 +16,7 @@
 
 package exchange.switchy.router;
 
-import java.util.Arrays;
-
+import exchange.switchy.utils.ByteReader;
 import exchange.switchy.utils.BytesUtils;
 import score.Address;
 
@@ -30,15 +29,16 @@ class SwapCallbackData {
         this.payer = payer;
     }
 
-    public static SwapCallbackData fromBytes (byte[] data) {
-        int size = data.length;
-        byte[] path = Arrays.copyOfRange(data, 0, size - Address.LENGTH);
-        Address payer = new Address(Arrays.copyOfRange(data, size - Address.LENGTH, size));
+    public static SwapCallbackData fromBytes (ByteReader reader) {
+        int pathLength = reader.readInt();
+        byte[] path = reader.read(pathLength);
+        Address payer = reader.readAddress();
         return new SwapCallbackData(path, payer);
     }
 
     public byte[] toBytes () {
         return BytesUtils.concat(
+            BytesUtils.intToBytes(this.path.length),
             this.path,
             this.payer.toByteArray()
         );

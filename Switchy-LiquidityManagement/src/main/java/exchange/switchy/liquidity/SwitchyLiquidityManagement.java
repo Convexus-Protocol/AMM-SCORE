@@ -17,7 +17,6 @@
 package exchange.switchy.liquidity;
 
 import java.math.BigInteger;
-import java.util.Arrays;
 
 import exchange.switchy.librairies.CallbackValidation;
 import exchange.switchy.librairies.LiquidityAmounts;
@@ -30,6 +29,7 @@ import score.Context;
 import score.annotation.External;
 
 import exchange.switchy.pool.Slot0;
+import exchange.switchy.utils.ByteReader;
 import exchange.switchy.utils.BytesUtils;
 
 class MintCallbackData {
@@ -41,11 +41,9 @@ class MintCallbackData {
         this.payer = payer;
     }
 
-    public static MintCallbackData fromBytes(byte[] data) {
-        int offset = 0;
-        PoolAddress.PoolKey poolKey = PoolAddress.PoolKey.fromBytes(Arrays.copyOfRange(data, offset, offset + PoolAddress.PoolKey.LENGTH));
-        offset += PoolAddress.PoolKey.LENGTH;
-        Address payer = new Address(Arrays.copyOfRange(data, offset, offset + Address.LENGTH));
+    public static MintCallbackData fromBytes(ByteReader reader) {
+        PoolAddress.PoolKey poolKey = PoolAddress.PoolKey.fromBytes(reader);
+        Address payer = reader.readAddress();
         return new MintCallbackData(poolKey, payer);
     }
 
@@ -110,7 +108,7 @@ public class SwitchyLiquidityManagement {
         BigInteger amount1Owed,
         byte[] data
     ) {
-        MintCallbackData decoded = MintCallbackData.fromBytes(data);
+        MintCallbackData decoded = MintCallbackData.fromBytes(new ByteReader(data));
         CallbackValidation.verifyCallback(factory, decoded.poolKey);
 
         final Address caller = Context.getCaller();

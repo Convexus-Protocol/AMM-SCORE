@@ -28,6 +28,7 @@ import exchange.switchy.librairies.PoolAddress;
 import exchange.switchy.librairies.PoolData;
 import exchange.switchy.librairies.TickMath;
 import exchange.switchy.utils.AddressUtils;
+import exchange.switchy.utils.ByteReader;
 import exchange.switchy.utils.BytesUtils;
 import exchange.switchy.utils.StringUtils;
 import exchange.switchy.pool.Slot0;
@@ -104,7 +105,7 @@ public class Quoter {
         ||  amount1Delta.compareTo(ZERO) > 0, 
             "switchySwapCallback: swaps entirely within 0-liquidity regions are not supported");
 
-        PoolData decoded = Path.decodeFirstPool(path);
+        PoolData decoded = Path.decodeFirstPool(new ByteReader(path));
         Address tokenIn = decoded.tokenA;
         Address tokenOut = decoded.tokenB;
         int fee = decoded.fee;
@@ -382,7 +383,7 @@ public class Quoter {
 
         int i = 0;
         while (true) {
-            var firstPool = Path.decodeFirstPool(path);
+            var firstPool = Path.decodeFirstPool(new ByteReader(path));
             Address tokenIn = firstPool.tokenA;
             Address tokenOut = firstPool.tokenB;
             int fee = firstPool.fee;
@@ -500,7 +501,7 @@ public class Quoter {
 
         int i = 0;
         while (true) {
-            var firstPool = Path.decodeFirstPool(path);
+            var firstPool = Path.decodeFirstPool(new ByteReader(path));
             Address tokenIn = firstPool.tokenA;
             Address tokenOut = firstPool.tokenB;
             int fee = firstPool.fee;
