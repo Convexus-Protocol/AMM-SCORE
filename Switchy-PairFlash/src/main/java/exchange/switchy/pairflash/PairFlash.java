@@ -39,10 +39,6 @@ public class PairFlash {
     // ================================================
     // Consts
     // ================================================
-    
-    // Contract class name
-    private static final String NAME = "PairFlash";
-
     // Contract name
     private final String name;
     private final Address factory;

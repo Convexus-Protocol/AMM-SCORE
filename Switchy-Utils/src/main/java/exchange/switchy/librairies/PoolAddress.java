@@ -16,8 +16,6 @@
 
 package exchange.switchy.librairies;
 
-import java.util.Arrays;
-
 import exchange.switchy.utils.AddressUtils;
 import exchange.switchy.utils.ByteReader;
 import exchange.switchy.utils.BytesUtils;
