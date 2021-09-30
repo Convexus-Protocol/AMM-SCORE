@@ -20,13 +20,33 @@ import java.math.BigInteger;
 
 import score.Address;
 
-class ExactInputSingleParams {
-    Address tokenIn;
-    Address tokenOut;
-    int fee;
-    Address recipient;
-    BigInteger deadline;
-    BigInteger amountIn;
-    BigInteger amountOutMinimum;
-    BigInteger sqrtPriceLimitX96;
+public class ExactInputSingleParams {
+    public Address tokenIn;
+    public Address tokenOut;
+    public int fee;
+    public Address recipient;
+    public BigInteger deadline;
+    public BigInteger amountIn;
+    public BigInteger amountOutMinimum;
+    public BigInteger sqrtPriceLimitX96;
+
+    public ExactInputSingleParams (
+        Address tokenIn,
+        Address tokenOut,
+        int fee,
+        Address recipient,
+        BigInteger deadline,
+        BigInteger amountIn,
+        BigInteger amountOutMinimum,
+        BigInteger sqrtPriceLimitX96
+    ) {
+        this.tokenIn = tokenIn;
+        this.tokenOut = tokenOut;
+        this.fee = fee;
+        this.recipient = recipient;
+        this.deadline = deadline;
+        this.amountIn = amountIn;
+        this.amountOutMinimum = amountOutMinimum;
+        this.sqrtPriceLimitX96 = sqrtPriceLimitX96;
+    }
 }
