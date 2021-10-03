@@ -18,6 +18,8 @@ package exchange.switchy.utils;
 
 import java.math.BigInteger;
 
+import score.Context;
+
 public class StringUtils {
 
     public static BigInteger toBigInt (String input) {
@@ -31,5 +33,47 @@ public class StringUtils {
                 return new BigInteger(input, 16);
             }
         }
+    }
+
+    /**
+     * Convert a hexstring with or without leading "0x" to byte array
+     * @param hexstring a hexstring
+     * @return a byte array
+     */
+    public static byte[] hexToByteArray(String hexstring) {
+        /* hexstring must be an even-length string. */
+        Context.require(hexstring.length() % 2 == 0,
+            "hexToByteArray: invalid hexstring length");
+
+        int len = hexstring.length();
+        byte[] data = new byte[len / 2];
+
+        int start = hexstring.startsWith("0x") ? 2 : 0;
+
+        for (int i = 0; i < len; i += 2) {
+            int c1 = Character.digit(hexstring.charAt(i+start), 16) << 4;
+            int c2 = Character.digit(hexstring.charAt(i+start+1), 16);
+
+            if (c1 == -1 || c2 == -1) {
+                Context.revert("hexToByteArray: invalid hexstring character at pos " + i);
+            }
+
+            data[i / 2] = (byte) (c1 + c2);
+        }
+        return data;
+    }
+
+    private static final char[] HEX_ARRAY = "0123456789ABCDEF".toCharArray();
+
+    public static String byteArrayToHex(byte[] data) {
+        char[] hexChars = new char[data.length * 2];
+
+        for (int j = 0; j < data.length; j++) {
+            int v = data[j] & 0xFF;
+            hexChars[j * 2] = HEX_ARRAY[v >>> 4];
+            hexChars[j * 2 + 1] = HEX_ARRAY[v & 0x0F];
+        }
+
+        return new String(hexChars);
     }
 }

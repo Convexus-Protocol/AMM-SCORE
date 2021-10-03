@@ -29,6 +29,7 @@ import exchange.switchy.ticklens.TickLens;
 import exchange.switchy.liquidity.SwitchyLiquidityManagement;
 import exchange.switchy.quoter.Quoter;
 import exchange.switchy.pairflash.PairFlash;
+import exchange.switchy.swap.Swap;
 
 import static org.mockito.Mockito.spy;
 
@@ -116,5 +117,13 @@ public class SwitchyTest extends TestBase {
         var spy = (PairFlash) spy(score.getInstance());
         score.setInstance(spy);
         return new ScoreSpy<PairFlash>(score, spy);
+    }
+
+    public ScoreSpy<Swap> deploy_swap () throws Exception {
+        Score score = sm.deploy(owner, Swap.class);
+
+        var spy = (Swap) spy(score.getInstance());
+        score.setInstance(spy);
+        return new ScoreSpy<Swap>(score, spy);
     }
 }

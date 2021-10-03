@@ -20,6 +20,10 @@ import static exchange.switchy.librairies.BlockTimestamp._blockTimestamp;
 
 import java.math.BigInteger;
 
+import com.eclipsesource.json.Json;
+import com.eclipsesource.json.JsonObject;
+import com.eclipsesource.json.JsonValue;
+
 import exchange.switchy.librairies.FixedPoint128;
 import exchange.switchy.librairies.FullMath;
 import exchange.switchy.librairies.LiquidityMath;
@@ -39,6 +43,9 @@ import score.Context;
 import score.VarDB;
 import score.annotation.EventLog;
 import score.annotation.External;
+import score.annotation.Optional;
+import scorex.io.Reader;
+import scorex.io.StringReader;
 
 // accumulated protocol fees in token0/token1 units
 class ProtocolFees {
@@ -118,7 +125,6 @@ public class SwitchyPool {
 
     // Returns data about a specific observation index
     private final Oracle.Observations observations = new Oracle.Observations();
-
 
     // ================================================
     // Event Logs
@@ -299,16 +305,19 @@ public class SwitchyPool {
 
         this.maxLiquidityPerTick = Tick.tickSpacingToMaxLiquidityPerTick(parameters.tickSpacing);
 
-        this.name = "SwitchyPool " + this.token0 + "-" + this.token1;
-        
+        this.name = "Switchy Pool " + this.token0 + "/" + this.token1;
+
         // locked by default
         this.poolLock.lock(true);
     }
 
     private void checkTicks (int tickLower, int tickUpper) {
-        Context.require(tickLower < tickUpper, "checkTicks: TLU");
-        Context.require(tickLower >= TickMath.MIN_TICK, "checkTicks: TLM");
-        Context.require(tickUpper <= TickMath.MAX_TICK, "checkTicks: TUM");
+        Context.require(tickLower < tickUpper, 
+            "checkTicks: tickLower must be lower than tickUpper");
+        Context.require(tickLower >= TickMath.MIN_TICK, 
+            "checkTicks: tickLower lower than expected");
+        Context.require(tickUpper <= TickMath.MAX_TICK, 
+            "checkTicks: tickUpper higher than expected");
     }
 
     /**
@@ -920,6 +929,40 @@ public class SwitchyPool {
         BigInteger feeAmount;
     }
 
+    @External
+    public void tokenFallback (Address _from, BigInteger _value, @Optional byte[] _data) throws Exception {
+        Reader reader = new StringReader(new String(_data));
+        JsonValue input = Json.parse(reader);
+        JsonObject root = input.asObject();
+        String method = root.get("method").asString();
+        Address token = Context.getCaller();
+
+        // Only accept token0 or token1
+        Context.require(token.equals(this.token0) || token.equals(this.token1));
+
+        switch (method)
+        {
+            case "deposit": {
+                deposit(_from, token, _value);
+                break;
+            }
+
+            default:
+                Context.revert("tokenFallback: Unimplemented tokenFallback action");
+        }
+    }
+
+    // @External - this method is external through tokenFallback
+    private void deposit (Address _address, Address _token, BigInteger _value) {
+        // --- Checks ---
+        Context.require(this.token0.equals(_token) || this.token1.equals(_token), 
+            "deposit: This token isn't registered in the pool");
+        Context.require(_value.compareTo(BigInteger.ZERO) > 0, 
+            "deposit: Deposit amount cannot be less or equal to 0");
+
+        // --- OK from here ---
+    }
+
     /**
      * @notice Swap token0 for token1, or token1 for token0
      * @dev The caller of this method receives a callback in the form of switchySwapCallback
@@ -934,6 +977,7 @@ public class SwitchyPool {
      */
     @External
     public PairAmounts swap (
+        Address caller,
         Address recipient,
         boolean zeroForOne,
         BigInteger amountSpecified,
@@ -941,7 +985,6 @@ public class SwitchyPool {
         byte[] data
     ) {
         this.poolLock.lock(true);
-        final Address caller = Context.getCaller();
 
         Context.require(!amountSpecified.equals(BigInteger.ZERO),
             "swap: amountSpecified must be different from zero");
@@ -1144,7 +1187,7 @@ public class SwitchyPool {
             BigInteger balance0Before = balance0();
             Context.call(caller, "switchySwapCallback", amount0, amount1, data);
             Context.require(balance0Before.add(amount0).compareTo(balance0()) <= 0, 
-                "swap: IIA 1");
+                "swap: the callback didn't charge the payment (1)");
         } else {
             if (amount0.compareTo(BigInteger.ZERO) < 0) {
                 Context.call(token0, "transfer", recipient, amount0.negate());
@@ -1153,7 +1196,7 @@ public class SwitchyPool {
             BigInteger balance1Before = balance1();
             Context.call(caller, "switchySwapCallback", amount0, amount1, data);
             Context.require(balance1Before.add(amount1).compareTo(balance1()) <= 0, 
-                "swap: IIA 2");
+                "swap: the callback didn't charge the payment (2)");
         }
 
         this.Swap(caller, recipient, amount0, amount1, state.sqrtPriceX96, state.liquidity, state.tick);
@@ -1359,8 +1402,4 @@ public class SwitchyPool {
     public int tickSpacing () {
         return this.tickSpacing;
     }
-
-    // ================================================
-    // Admin methods
-    // ================================================
 }

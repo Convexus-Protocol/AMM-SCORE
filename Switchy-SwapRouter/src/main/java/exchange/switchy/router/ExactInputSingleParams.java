@@ -18,35 +18,43 @@ package exchange.switchy.router;
 
 import java.math.BigInteger;
 
+import com.eclipsesource.json.JsonObject;
+
+import exchange.switchy.utils.StringUtils;
 import score.Address;
 
 public class ExactInputSingleParams {
-    public Address tokenIn;
     public Address tokenOut;
     public int fee;
     public Address recipient;
     public BigInteger deadline;
-    public BigInteger amountIn;
     public BigInteger amountOutMinimum;
     public BigInteger sqrtPriceLimitX96;
 
     public ExactInputSingleParams (
-        Address tokenIn,
         Address tokenOut,
         int fee,
         Address recipient,
         BigInteger deadline,
-        BigInteger amountIn,
         BigInteger amountOutMinimum,
         BigInteger sqrtPriceLimitX96
     ) {
-        this.tokenIn = tokenIn;
         this.tokenOut = tokenOut;
         this.fee = fee;
         this.recipient = recipient;
         this.deadline = deadline;
-        this.amountIn = amountIn;
         this.amountOutMinimum = amountOutMinimum;
         this.sqrtPriceLimitX96 = sqrtPriceLimitX96;
+    }
+
+    public static ExactInputSingleParams fromJson(JsonObject params) {
+      return new ExactInputSingleParams(
+          Address.fromString(params.get("tokenOut").asString()),
+          params.get("fee").asInt(),
+          Address.fromString(params.get("recipient").asString()),
+          StringUtils.toBigInt(params.get("deadline").asString()),
+          StringUtils.toBigInt(params.get("amountOutMinimum").asString()),
+          StringUtils.toBigInt(params.get("sqrtPriceLimitX96").asString())
+        );
     }
 }

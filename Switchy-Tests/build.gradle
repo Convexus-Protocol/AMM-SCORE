@@ -13,6 +13,7 @@ dependencies {
     implementation project(':Switchy-TickLens')
     implementation project(':Switchy-Quoter')
     implementation project(':Switchy-PairFlash')
+    implementation project(':Switchy-Swap')
 
     implementation project(':unittest')
     // implementation 'foundation.icon:javaee-unittest:0.9.1'

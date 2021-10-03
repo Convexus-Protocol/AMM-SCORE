@@ -21,6 +21,10 @@ import static java.math.BigInteger.ONE;
 
 import java.math.BigInteger;
 
+import com.eclipsesource.json.Json;
+import com.eclipsesource.json.JsonObject;
+import com.eclipsesource.json.JsonValue;
+
 import exchange.switchy.librairies.Path;
 import exchange.switchy.librairies.PeripheryPayments;
 import exchange.switchy.librairies.PoolAddress;
@@ -33,9 +37,14 @@ import exchange.switchy.utils.ByteReader;
 import exchange.switchy.utils.BytesUtils;
 import exchange.switchy.utils.IntConstants;
 import score.Address;
+import score.BranchDB;
 import score.Context;
+import score.DictDB;
 import score.VarDB;
 import score.annotation.External;
+import score.annotation.Optional;
+import scorex.io.Reader;
+import scorex.io.StringReader;
 
 import static exchange.switchy.librairies.BlockTimestamp._blockTimestamp;
 
@@ -67,7 +76,7 @@ public class SwapRouter {
     // ================================================
     // DB Variables
     // ================================================
-    private VarDB<BigInteger> amountInCached = Context.newVarDB(NAME + "_amountInCached", BigInteger.class);
+    private final VarDB<BigInteger> amountInCached = Context.newVarDB(NAME + "_amountInCached", BigInteger.class);
 
     // ================================================
     // Methods
@@ -155,14 +164,14 @@ public class SwapRouter {
         if (recipient.equals(AddressUtils.ZERO_ADDRESS)) {
             recipient = Context.getAddress();
         }
-        
+
         PoolData pool = Path.decodeFirstPool(new ByteReader(data.path));
         Address tokenIn = pool.tokenA;
         Address tokenOut = pool.tokenB;
         int fee = pool.fee;
 
         boolean zeroForOne = AddressUtils.compareTo(tokenIn, tokenOut) < 0;
-        
+
         var result = (PairAmounts) Context.call(getPool(tokenIn, tokenOut, fee), "swap", 
             recipient,
             zeroForOne,
@@ -181,18 +190,17 @@ public class SwapRouter {
      * @param params The parameters necessary for the swap, encoded as `ExactInputSingleParams` in calldata
      * @return amountOut The amount of the received token
      */
-    @External
-    public BigInteger exactInputSingle (ExactInputSingleParams params) {
+    // @External - this method is external through tokenFallback
+    public BigInteger exactInputSingle (Address caller, Address tokenIn, BigInteger amountIn, ExactInputSingleParams params) {
         this.checkDeadline(params.deadline);
-        final Address caller = Context.getCaller();
 
         BigInteger amountOut = exactInputInternal(
-            params.amountIn, 
+            amountIn, 
             params.recipient, 
             params.sqrtPriceLimitX96, 
             new SwapCallbackData(
                 BytesUtils.concat(
-                    params.tokenIn.toByteArray(),
+                    tokenIn.toByteArray(),
                     BytesUtils.intToBytes(params.fee),
                     params.tokenOut.toByteArray()
                 ), 
@@ -204,6 +212,27 @@ public class SwapRouter {
             "exactInputSingle: Too little received");
 
         return amountOut;
+    }
+
+    @External
+    public void tokenFallback (Address _from, BigInteger _value, @Optional byte[] _data) throws Exception {
+        Reader reader = new StringReader(new String(_data));
+        JsonValue input = Json.parse(reader);
+        JsonObject root = input.asObject();
+        String method = root.get("method").asString();
+        Address token = Context.getCaller();
+
+        switch (method)
+        {
+            case "exactInputSingle": {
+                JsonObject params = root.get("params").asObject();
+                exactInputSingle(_from, token, _value, ExactInputSingleParams.fromJson(params));
+                break;
+            }
+
+            default:
+                Context.revert("tokenFallback: Unimplemented tokenFallback action");
+        }
     }
 
     @External
@@ -265,6 +294,8 @@ public class SwapRouter {
         int fee = pool.fee;
 
         boolean zeroForOne = AddressUtils.compareTo(tokenIn, tokenOut) < 0;
+
+        // TODO: token transfer
 
         var result = (PairAmounts) Context.call(getPool(tokenIn, tokenOut, fee), "swap", 
             recipient,

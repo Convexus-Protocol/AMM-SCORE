@@ -4,12 +4,13 @@ dependencies {
     compileOnly 'foundation.icon:javaee-api:0.9.0'
     implementation 'foundation.icon:javaee-scorex:0.5.2'
     implementation 'com.github.sink772:minimal-json:0.9.6'
-    
+
+    implementation project(':Switchy-SwapRouter')
     implementation project(':Switchy-Utils')
 }
 
 optimizedJar {
-    mainClassName = 'exchange.switchy.pool.SwitchyPool'
+    mainClassName = 'exchange.switchy.swap.SwitchySwap'
     setEnableDebug(true)
     from {
         configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
@@ -37,6 +38,9 @@ deployJar {
         }
     }
     parameters {
+        arg('_swapRouter', 'cx0000000000000000000000000000000000000000')
+        arg('_factory', 'cx0000000000000000000000000000000000000000')
+        arg('_wICX', 'cx0000000000000000000000000000000000000000')
     }
 }
 

@@ -16,6 +16,8 @@ include (
     'Switchy-Quoter-Test',
     'Switchy-PairFlash',
     'Switchy-PairFlash-Test',
+    'Switchy-Swap',
+    'Switchy-Swap-Test',
     'Switchy-Tests',
     'Switchy-Utils',
     'javaee-tokens',
