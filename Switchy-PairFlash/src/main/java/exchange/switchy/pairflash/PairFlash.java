@@ -30,6 +30,9 @@ import score.Address;
 import score.Context;
 import score.annotation.External;
 
+import com.eclipsesource.json.Json;
+import com.eclipsesource.json.JsonObject;
+
 /**
  * @title Flash contract implementation
  * @notice An example contract using the Switchy flash function
@@ -39,6 +42,9 @@ public class PairFlash {
     // ================================================
     // Consts
     // ================================================
+    // Contract class name
+    // private static final String NAME = "SwitchyPairFlash";
+
     // Contract name
     private final String name;
     private final Address factory;
@@ -66,6 +72,34 @@ public class PairFlash {
         this.factory = _factory;
     }
 
+    private BigInteger routerExactInputSingle (Address tokenIn, BigInteger amountIn, Address tokenOut, BigInteger amountOutMinimum, int poolFee) {
+        final Address thisAddress = Context.getAddress();
+
+        BigInteger amountBefore = (BigInteger) Context.call(tokenOut, "balanceOf", thisAddress);
+
+        var params = new ExactInputSingleParams(
+            tokenOut, 
+            poolFee, 
+            thisAddress,
+            TimeUtils.nowSeconds(), 
+            amountOutMinimum,
+            ZERO
+        );
+
+        // Forward tokenIn to the router and call the "exactInputSingle" method
+        JsonObject data = Json.object()
+            .add("method", "exactInputSingle")
+            .add("params", params.toJson());
+
+        // The call to `exactInputSingle` executes the swap.
+        Context.call(tokenIn, "transfer", this.swapRouter, amountIn, data.toString().getBytes());
+
+        BigInteger amountAfter  = (BigInteger) Context.call(tokenOut, "balanceOf", thisAddress);
+        BigInteger amountOut = amountAfter.subtract(amountBefore);
+
+        return amountOut;
+    }
+
     /**
      * @param fee0 The fee from calling flash for token0
      * @param fee1 The fee from calling flash for token1
@@ -81,8 +115,7 @@ public class PairFlash {
     ) {
         FlashCallbackData decoded = FlashCallbackData.fromBytes(new ByteReader(data));
         CallbackValidation.verifyCallback(this.factory, decoded.poolKey);
-        
-        final Address thisAddress = Context.getAddress();
+
         final Address caller = Context.getCaller();
 
         Address token0 = decoded.poolKey.token0;
@@ -94,44 +127,28 @@ public class PairFlash {
         BigInteger amount1Min = decoded.amount1.add(fee1);
 
         // call exactInputSingle for swapping token1 for token0 in pool with fee2
-        BigInteger amountOut0 = (BigInteger)
-            Context.call(swapRouter, "exactInputSingle", new ExactInputSingleParams(
-                token0, 
-                decoded.poolFee2, 
-                thisAddress, 
-                TimeUtils.nowSeconds(), 
-                amount0Min, 
-                ZERO
-            ));
-            
-        // call exactInputSingle for swapping token0 for token 1 in pool with fee3
-        BigInteger amountOut1 = (BigInteger)
-            Context.call(swapRouter, "exactInputSingle", new ExactInputSingleParams(
-                token1,
-                decoded.poolFee3,
-                thisAddress, 
-                TimeUtils.nowSeconds(), 
-                amount1Min,
-                ZERO
-            )
-        );
-        
+        BigInteger amountOut0 = routerExactInputSingle(token1, decoded.amount1, token0, amount0Min, decoded.poolFee2);
+
+        // call exactInputSingle for swapping token0 for token1 in pool with fee3
+        BigInteger amountOut1 = routerExactInputSingle(token0, decoded.amount0, token1, amount1Min, decoded.poolFee3);
+
         // pay the required amounts back to the pair
         if (amount0Min.compareTo(ZERO) > 0) {
-            PeripheryPayments.pay(this.sICX, token0, thisAddress, caller, amount0Min);
+            PeripheryPayments.pay(this.sICX, token0, caller, amount0Min);
         }
         if (amount1Min.compareTo(ZERO) > 0) {
-            PeripheryPayments.pay(this.sICX, token1, thisAddress, caller, amount1Min);
+            PeripheryPayments.pay(this.sICX, token1, caller, amount1Min);
         }
 
         // if profitable pay profits to payer
         if (amountOut0.compareTo(amount0Min) > 0) {
             BigInteger profit0 = amountOut0.subtract(amount0Min);
-            PeripheryPayments.pay(this.sICX, token0, thisAddress, decoded.payer, profit0);
+            PeripheryPayments.pay(this.sICX, token0, decoded.payer, profit0);
         }
+
         if (amountOut1.compareTo(amount1Min) > 0) {
             BigInteger profit1 = amountOut1.subtract(amount1Min);
-            PeripheryPayments.pay(this.sICX, token1, thisAddress, decoded.payer, profit1);
+            PeripheryPayments.pay(this.sICX, token1, decoded.payer, profit1);
         }
     }
 

@@ -20,10 +20,6 @@ import static exchange.switchy.librairies.BlockTimestamp._blockTimestamp;
 
 import java.math.BigInteger;
 
-import com.eclipsesource.json.Json;
-import com.eclipsesource.json.JsonObject;
-import com.eclipsesource.json.JsonValue;
-
 import exchange.switchy.librairies.FixedPoint128;
 import exchange.switchy.librairies.FullMath;
 import exchange.switchy.librairies.LiquidityMath;
@@ -43,9 +39,6 @@ import score.Context;
 import score.VarDB;
 import score.annotation.EventLog;
 import score.annotation.External;
-import score.annotation.Optional;
-import scorex.io.Reader;
-import scorex.io.StringReader;
 
 // accumulated protocol fees in token0/token1 units
 class ProtocolFees {
@@ -738,7 +731,7 @@ public class SwitchyPool {
         }
 
         Context.call(caller, "switchyMintCallback", amount0, amount1, data);
-        
+
         if (amount0.compareTo(BigInteger.ZERO) > 0) {
             Context.require(balance0Before.add(amount0).compareTo(balance0()) <= 0, 
             "mint: M0");
@@ -927,40 +920,6 @@ public class SwitchyPool {
         BigInteger amountOut;
         // how much fee is being paid in
         BigInteger feeAmount;
-    }
-
-    @External
-    public void tokenFallback (Address _from, BigInteger _value, @Optional byte[] _data) throws Exception {
-        Reader reader = new StringReader(new String(_data));
-        JsonValue input = Json.parse(reader);
-        JsonObject root = input.asObject();
-        String method = root.get("method").asString();
-        Address token = Context.getCaller();
-
-        // Only accept token0 or token1
-        Context.require(token.equals(this.token0) || token.equals(this.token1));
-
-        switch (method)
-        {
-            case "deposit": {
-                deposit(_from, token, _value);
-                break;
-            }
-
-            default:
-                Context.revert("tokenFallback: Unimplemented tokenFallback action");
-        }
-    }
-
-    // @External - this method is external through tokenFallback
-    private void deposit (Address _address, Address _token, BigInteger _value) {
-        // --- Checks ---
-        Context.require(this.token0.equals(_token) || this.token1.equals(_token), 
-            "deposit: This token isn't registered in the pool");
-        Context.require(_value.compareTo(BigInteger.ZERO) > 0, 
-            "deposit: Deposit amount cannot be less or equal to 0");
-
-        // --- OK from here ---
     }
 
     /**

@@ -16,8 +16,6 @@
 
 package exchange.switchy.liquidity;
 
-import java.math.BigInteger;
-
 import exchange.switchy.librairies.CallbackValidation;
 import exchange.switchy.librairies.LiquidityAmounts;
 import exchange.switchy.librairies.PairAmounts;
@@ -25,35 +23,25 @@ import exchange.switchy.librairies.PeripheryPayments;
 import exchange.switchy.librairies.PoolAddress;
 import exchange.switchy.librairies.TickMath;
 import score.Address;
+import score.BranchDB;
 import score.Context;
+import score.DictDB;
 import score.annotation.External;
 
 import exchange.switchy.pool.Slot0;
 import exchange.switchy.utils.ByteReader;
-import exchange.switchy.utils.BytesUtils;
 
-class MintCallbackData {
-    PoolAddress.PoolKey poolKey;
-    Address payer;
+import static java.math.BigInteger.ZERO;
 
-    public MintCallbackData (PoolAddress.PoolKey poolKey, Address payer) {
-        this.poolKey = poolKey;
-        this.payer = payer;
-    }
+import java.math.BigInteger;
 
-    public static MintCallbackData fromBytes(ByteReader reader) {
-        PoolAddress.PoolKey poolKey = PoolAddress.PoolKey.fromBytes(reader);
-        Address payer = reader.readAddress();
-        return new MintCallbackData(poolKey, payer);
-    }
+import com.eclipsesource.json.Json;
+import com.eclipsesource.json.JsonObject;
+import com.eclipsesource.json.JsonValue;
 
-    public byte[] toBytes () {
-        return BytesUtils.concat(
-            this.poolKey.toBytes(),
-            this.payer.toByteArray()
-        );
-    }
-}
+import score.annotation.Optional;
+import scorex.io.Reader;
+import scorex.io.StringReader;
 
 public class SwitchyLiquidityManagement {
 
@@ -61,7 +49,7 @@ public class SwitchyLiquidityManagement {
     // Consts
     // ================================================
     // Contract class name
-    // private static final String NAME = "SwitchyLiquidityManagement";
+    private static final String NAME = "SwitchyLiquidityManagement";
 
     // Contract name
     private final String name;
@@ -74,6 +62,8 @@ public class SwitchyLiquidityManagement {
     // ================================================
     // DB Variables
     // ================================================
+    // User => Token => Amount
+    private final BranchDB<Address, DictDB<Address, BigInteger>> deposited = Context.newBranchDB(NAME + "_deposited", BigInteger.class);
 
     // ================================================
     // Event Logs
@@ -109,17 +99,21 @@ public class SwitchyLiquidityManagement {
         byte[] data
     ) {
         MintCallbackData decoded = MintCallbackData.fromBytes(new ByteReader(data));
-        CallbackValidation.verifyCallback(factory, decoded.poolKey);
+        CallbackValidation.verifyCallback(this.factory, decoded.poolKey);
 
+        if (amount0Owed.compareTo(ZERO) > 0) {
+            pay(decoded.payer, decoded.poolKey.token0, amount0Owed);
+        }
+
+        if (amount1Owed.compareTo(ZERO) > 0) {
+            pay(decoded.payer, decoded.poolKey.token1, amount1Owed);
+        }
+    }
+
+    private void pay (Address payer, Address token, BigInteger owed) {
         final Address caller = Context.getCaller();
-
-        if (amount0Owed.compareTo(BigInteger.ZERO) > 0) {
-            PeripheryPayments.pay(this.sICX, decoded.poolKey.token0, decoded.payer, caller, amount0Owed);
-        }
-
-        if (amount1Owed.compareTo(BigInteger.ZERO) > 0) {
-            PeripheryPayments.pay(this.sICX, decoded.poolKey.token1, decoded.payer, caller, amount1Owed);
-        }
+        checkEnoughDeposited(payer, token, owed);
+        PeripheryPayments.pay(this.sICX, token, caller, owed);
     }
 
     /**
@@ -162,11 +156,69 @@ public class SwitchyLiquidityManagement {
         return new AddLiquidityResult (liquidity, amounts.amount0, amounts.amount1, pool);
     }
 
+    // @External - this method is external through tokenFallback
+    private void deposit (Address caller, Address tokenIn, BigInteger amountIn) {
+        // --- Checks ---
+        Context.require(amountIn.compareTo(ZERO) > 0, 
+            "deposit: Deposit amount cannot be less or equal to 0");
+
+        // --- OK from here ---
+        var deposited = this.deposited.at(caller);
+        deposited.set(caller, deposited.get(caller).add(amountIn));
+    }
+
+    @External
+    public void withdraw (Address token) {
+        final Address caller = Context.getCaller();
+
+        var deposited = this.deposited.at(caller);
+        BigInteger amount = deposited.get(caller);
+
+        if (amount.compareTo(ZERO) > 0) {
+            Context.call(token, "transfer", caller, amount, "withdraw".getBytes());
+            deposited.set(caller, ZERO);
+        }
+    }
+
+    @External
+    public void tokenFallback (Address _from, BigInteger _value, @Optional byte[] _data) throws Exception {
+        Reader reader = new StringReader(new String(_data));
+        JsonValue input = Json.parse(reader);
+        JsonObject root = input.asObject();
+        String method = root.get("method").asString();
+        Address token = Context.getCaller();
+
+        switch (method)
+        {
+            case "deposit": {
+                deposit(_from, token, _value);
+                break;
+            }
+
+            default:
+                Context.revert("tokenFallback: Unimplemented tokenFallback action");
+        }
+    }
+
+    // ================================================
+    // Checks
+    // ================================================
+    private void checkEnoughDeposited (Address address, Address token, BigInteger amount) {
+        var deposited = this.deposited.at(address);
+        Context.require(deposited.get(token).compareTo(amount) >= 0,
+            "checkEnoughDeposited: user didn't deposit enough funds");
+    }
+
     // ================================================
     // Public variable getters
     // ================================================
     @External(readonly = true)
     public String name() {
         return this.name;
+    }
+    
+    @External(readonly = true)
+    public BigInteger deposited(Address user, Address token) {
+        return this.deposited.at(user).get(token);
     }
 }

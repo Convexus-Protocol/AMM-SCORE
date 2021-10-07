@@ -139,7 +139,7 @@ public class SwapRouter {
         }
 
         if (isExactInput) {
-            PeripheryPayments.pay(this.sICX, tokenIn, callbackData.payer, caller, amountToPay);
+            PeripheryPayments.pay(this.sICX, tokenIn, caller, amountToPay);
         } else {
             // either initiate the next swap or pay
             if (Path.hasMultiplePools(callbackData.path)) {
@@ -149,7 +149,7 @@ public class SwapRouter {
             } else {
                 this.amountInCached.set(amountToPay);
                 tokenIn = tokenOut; // swap in/out because exact output swaps are reversed
-                PeripheryPayments.pay(this.sICX, tokenIn, callbackData.payer, caller, amountToPay);
+                PeripheryPayments.pay(this.sICX, tokenIn, caller, amountToPay);
             }
         }
     }
@@ -160,7 +160,7 @@ public class SwapRouter {
      * @return amountOut The amount of the received token
      */
     // @External - this method is external through tokenFallback
-    public void exactInputSingle (Address caller, Address tokenIn, BigInteger amountIn, ExactInputSingleParams params) {
+    private void exactInputSingle (Address caller, Address tokenIn, BigInteger amountIn, ExactInputSingleParams params) {
         reentreancy.lock(true);
         this.checkDeadline(params.deadline);
 
@@ -267,39 +267,30 @@ public class SwapRouter {
         reentreancy.lock(false);
     }
 
-    @External
-    public void tokenFallback (Address _from, BigInteger _value, @Optional byte[] _data) throws Exception {
-        Reader reader = new StringReader(new String(_data));
-        JsonValue input = Json.parse(reader);
-        JsonObject root = input.asObject();
-        String method = root.get("method").asString();
-        Address token = Context.getCaller();
+    // @External - this method is external through tokenFallback
+    private void exactOutput (Address caller, Address tokenIn, BigInteger amountInMaximum, ExactOutputParams params) {
+        reentreancy.lock(true);
+        this.checkDeadline(params.deadline);
+        
+        // it's okay that the payer is fixed to msg.sender here, as they're only paying for the "final" exact output
+        // swap, which happens first, and subsequent swaps are paid for within nested callback frames
+        exactOutputInternal(
+            tokenIn,
+            params.amountOut, 
+            params.recipient, 
+            ZERO, 
+            new SwapCallbackData(params.path, Context.getCaller())
+        );
 
-        switch (method)
-        {
-            case "exactInputSingle": {
-                JsonObject params = root.get("params").asObject();
-                exactInputSingle(_from, token, _value, ExactInputSingleParams.fromJson(params));
-                break;
-            }
+        BigInteger amountIn = this.amountInCached.get();
 
-            case "exactOutputSingle": {
-                JsonObject params = root.get("params").asObject();
-                exactOutputSingle(_from, token, _value, ExactOutputSingleParams.fromJson(params));
-                break;
-            }
+        Context.require(amountIn.compareTo(amountInMaximum) <= 0, 
+            "exactOutput: Too much requested");
 
-            case "exactInput": {
-                JsonObject params = root.get("params").asObject();
-                exactInput(_from, token, _value, ExactInputParams.fromJson(params));
-                break;
-            }
-
-            default:
-                Context.revert("tokenFallback: Unimplemented tokenFallback action");
-        }
+        amountInCached.set(DEFAULT_AMOUNT_IN_CACHED);
+        reentreancy.lock(false);
     }
-    
+
     /**
      * @notice Swaps `amountIn` of one token for as much as possible of another token
      * @param params The parameters necessary for the swap, encoded as `ExactInputSingleParams` in calldata
@@ -398,29 +389,44 @@ public class SwapRouter {
     }
 
     @External
-    public BigInteger exactOutput(Address caller, Address tokenIn, BigInteger amountInMaximum, ExactOutputParams params) {
-        this.checkDeadline(params.deadline);
-        
-        // it's okay that the payer is fixed to msg.sender here, as they're only paying for the "final" exact output
-        // swap, which happens first, and subsequent swaps are paid for within nested callback frames
-        exactOutputInternal(
-            tokenIn,
-            params.amountOut, 
-            params.recipient, 
-            ZERO, 
-            new SwapCallbackData(params.path, Context.getCaller())
-        );
+    public void tokenFallback (Address _from, BigInteger _value, @Optional byte[] _data) throws Exception {
+        Reader reader = new StringReader(new String(_data));
+        JsonValue input = Json.parse(reader);
+        JsonObject root = input.asObject();
+        String method = root.get("method").asString();
+        Address token = Context.getCaller();
 
-        BigInteger amountIn = this.amountInCached.get();
+        switch (method)
+        {
+            case "exactInputSingle": {
+                JsonObject params = root.get("params").asObject();
+                exactInputSingle(_from, token, _value, ExactInputSingleParams.fromJson(params));
+                break;
+            }
 
-        Context.require(amountIn.compareTo(amountInMaximum) <= 0, 
-            "exactOutput: Too much requested");
+            case "exactOutputSingle": {
+                JsonObject params = root.get("params").asObject();
+                exactOutputSingle(_from, token, _value, ExactOutputSingleParams.fromJson(params));
+                break;
+            }
 
-        amountInCached.set(DEFAULT_AMOUNT_IN_CACHED);
+            case "exactInput": {
+                JsonObject params = root.get("params").asObject();
+                exactInput(_from, token, _value, ExactInputParams.fromJson(params));
+                break;
+            }
 
-        return amountIn;
+            case "exactOutput": {
+                JsonObject params = root.get("params").asObject();
+                exactOutput(_from, token, _value, ExactOutputParams.fromJson(params));
+                break;
+            }
+
+            default:
+                Context.revert("tokenFallback: Unimplemented tokenFallback action");
+        }
     }
-
+    
     // ================================================
     // Checks
     // ================================================
