@@ -18,6 +18,7 @@ package exchange.switchy.router;
 
 import java.math.BigInteger;
 
+import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonObject;
 
 import exchange.switchy.utils.StringUtils;
@@ -56,5 +57,15 @@ public class ExactInputSingleParams {
           StringUtils.toBigInt(params.get("amountOutMinimum").asString()),
           StringUtils.toBigInt(params.get("sqrtPriceLimitX96").asString())
         );
+    }
+
+    public JsonObject toJson() {
+        return Json.object()
+            .add("tokenOut", tokenOut.toString())
+            .add("fee", fee)
+            .add("recipient", recipient.toString())
+            .add("deadline", deadline.toString())
+            .add("amountOutMinimum", amountOutMinimum.toString())
+            .add("sqrtPriceLimitX96", sqrtPriceLimitX96.toString());
     }
 }

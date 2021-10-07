@@ -40,8 +40,7 @@ public class CallbackValidation {
    * @return pool The pool contract address
    */
   public static Address verifyCallback (Address factory, PoolAddress.PoolKey poolKey) {
-    Address pool = PoolAddress.computeAddress(factory, poolKey);
-    // TODO: ICON deploy address aren't deterministic
+    Address pool = PoolAddress.getPool(factory, poolKey);
     Context.require(Context.getCaller().equals(pool));
     return pool;
   }

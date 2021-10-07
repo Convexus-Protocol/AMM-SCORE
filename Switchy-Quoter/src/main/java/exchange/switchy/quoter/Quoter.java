@@ -91,7 +91,7 @@ public class Quoter {
         Address tokenB,
         int fee
     ) {
-        return PoolAddress.computeAddress(factory, PoolAddress.getPoolKey(tokenA, tokenB, fee));
+        return PoolAddress.getPool(factory, PoolAddress.getPoolKey(tokenA, tokenB, fee));
     }
 
     @External

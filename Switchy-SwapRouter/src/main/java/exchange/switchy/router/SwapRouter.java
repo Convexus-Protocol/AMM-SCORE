@@ -36,10 +36,9 @@ import exchange.switchy.utils.AddressUtils;
 import exchange.switchy.utils.ByteReader;
 import exchange.switchy.utils.BytesUtils;
 import exchange.switchy.utils.IntConstants;
+import exchange.switchy.utils.ReentrancyLock;
 import score.Address;
-import score.BranchDB;
 import score.Context;
-import score.DictDB;
 import score.VarDB;
 import score.annotation.External;
 import score.annotation.Optional;
@@ -70,13 +69,18 @@ public class SwapRouter {
 
     // address of the Switchy factory
     public final Address factory;
-    // address of wICX
-    public final Address wICX;
+    // address of sICX
+    public final Address sICX;
 
     // ================================================
     // DB Variables
     // ================================================
     private final VarDB<BigInteger> amountInCached = Context.newVarDB(NAME + "_amountInCached", BigInteger.class);
+    private final ReentrancyLock reentreancy = new ReentrancyLock(NAME + "_reentreancy");
+
+    // ================================================
+    // Event Logs
+    // ================================================
 
     // ================================================
     // Methods
@@ -86,11 +90,11 @@ public class SwapRouter {
      */
     public SwapRouter(
         Address _factory,
-        Address _wICX
+        Address _sICX
     ) {
         this.name = "Switchy Swap Router";
         this.factory = _factory;
-        this.wICX = _wICX;
+        this.sICX = _sICX;
     }
 
     /**
@@ -101,7 +105,7 @@ public class SwapRouter {
         Address tokenB,
         int fee
     ) {
-        return PoolAddress.computeAddress(factory, PoolAddress.getPoolKey(tokenA, tokenB, fee));
+        return PoolAddress.getPool(factory, PoolAddress.getPoolKey(tokenA, tokenB, fee));
     }
 
     @External
@@ -135,16 +139,17 @@ public class SwapRouter {
         }
 
         if (isExactInput) {
-            PeripheryPayments.pay(this.wICX, tokenIn, callbackData.payer, caller, amountToPay);
+            PeripheryPayments.pay(this.sICX, tokenIn, callbackData.payer, caller, amountToPay);
         } else {
             // either initiate the next swap or pay
             if (Path.hasMultiplePools(callbackData.path)) {
                 callbackData.path = Path.skipToken(callbackData.path);
-                exactOutputInternal(amountToPay, caller, ZERO, callbackData);
+                // TODO: tokenIn is valid?
+                exactOutputInternal(tokenIn, amountToPay, caller, ZERO, callbackData);
             } else {
                 this.amountInCached.set(amountToPay);
                 tokenIn = tokenOut; // swap in/out because exact output swaps are reversed
-                PeripheryPayments.pay(this.wICX, tokenIn, callbackData.payer, caller, amountToPay);
+                PeripheryPayments.pay(this.sICX, tokenIn, callbackData.payer, caller, amountToPay);
             }
         }
     }
@@ -154,7 +159,154 @@ public class SwapRouter {
      * @param params The parameters necessary for the swap, encoded as `ExactInputSingleParams` in calldata
      * @return amountOut The amount of the received token
      */
+    // @External - this method is external through tokenFallback
+    public void exactInputSingle (Address caller, Address tokenIn, BigInteger amountIn, ExactInputSingleParams params) {
+        reentreancy.lock(true);
+        this.checkDeadline(params.deadline);
+
+        BigInteger amountOut = exactInputInternal(
+            tokenIn,
+            amountIn, 
+            params.recipient, 
+            params.sqrtPriceLimitX96, 
+            new SwapCallbackData(
+                BytesUtils.concat(
+                    tokenIn.toByteArray(),
+                    BytesUtils.intToBytes(params.fee),
+                    params.tokenOut.toByteArray()
+                ), 
+                caller
+            )
+        );
+
+        Context.require(amountOut.compareTo(params.amountOutMinimum) >= 0,
+            "exactInputSingle: Too little received");
+
+        reentreancy.lock(false);
+    }
+
+    /**
+     * @notice Swaps as little as possible of one token for `amountOut` of another token
+     * @param params The parameters necessary for the swap, encoded as `ExactOutputSingleParams` in calldata
+     * @return amountIn The amount of the input token
+     */
+    // @External - this method is external through tokenFallback
+    private void exactOutputSingle (Address caller, Address tokenIn, BigInteger amountInMaximum, ExactOutputSingleParams params) {
+        reentreancy.lock(true);
+        this.checkDeadline(params.deadline);
+
+        // avoid an db loading by using the swap return data
+        BigInteger amountIn = exactOutputInternal(
+            tokenIn,
+            params.amountOut, 
+            params.recipient, 
+            params.sqrtPriceLimitX96, 
+            new SwapCallbackData(
+                BytesUtils.concat(
+                    params.tokenOut.toByteArray(), 
+                    BytesUtils.intToBytes(params.fee), 
+                    tokenIn.toByteArray()
+                ), 
+                caller // caller pays for the first hop
+            )
+        );
+
+        Context.require(amountIn.compareTo(amountInMaximum) <= 0, 
+            "exactOutputSingle: Too much requested");
+
+        // has to be reset even though we don't use it in the single hop case
+        this.amountInCached.set(DEFAULT_AMOUNT_IN_CACHED);
+
+        // send back the tokens excess to the caller if there's any
+        BigInteger excess = amountInMaximum.subtract(amountIn);
+        if (excess.compareTo(ZERO) > 0) {
+            Context.call(tokenIn, "transfer", caller, excess, "excess".getBytes());
+        }
+
+        reentreancy.lock(false);
+    }
+
+    // @External - this method is external through tokenFallback
+    private void exactInput (Address caller, Address tokenIn, BigInteger amountIn, ExactInputParams params) {
+        reentreancy.lock(true);
+        this.checkDeadline(params.deadline);
+
+        BigInteger amountOut = ZERO;
+        
+        this.checkDeadline(params.deadline);
+        Address payer = Context.getCaller(); // caller pays for the first hop
+
+        while (true) {
+            boolean hasMultiplePools = Path.hasMultiplePools(params.path);
+
+            // the outputs of prior swaps become the inputs to subsequent ones
+            amountIn = exactInputInternal(
+                tokenIn,
+                amountIn, 
+                hasMultiplePools ? Context.getAddress() : params.recipient, // for intermediate swaps, this contract custodies
+                ZERO, 
+                new SwapCallbackData(
+                    Path.getFirstPool(params.path), // only the first pool in the path is necessary
+                    payer
+                )
+            );
+            
+            // decide whether to continue or terminate
+            if (hasMultiplePools) {
+                payer = Context.getAddress(); // at this point, the caller has paid
+                params.path = Path.skipToken(params.path);
+            } else {
+                amountOut = amountIn;
+                break;
+            }
+        }
+
+        Context.require(amountOut.compareTo(params.amountOutMinimum) >= 0, 
+            "exactInput: Too little received");
+
+        reentreancy.lock(false);
+    }
+
+    @External
+    public void tokenFallback (Address _from, BigInteger _value, @Optional byte[] _data) throws Exception {
+        Reader reader = new StringReader(new String(_data));
+        JsonValue input = Json.parse(reader);
+        JsonObject root = input.asObject();
+        String method = root.get("method").asString();
+        Address token = Context.getCaller();
+
+        switch (method)
+        {
+            case "exactInputSingle": {
+                JsonObject params = root.get("params").asObject();
+                exactInputSingle(_from, token, _value, ExactInputSingleParams.fromJson(params));
+                break;
+            }
+
+            case "exactOutputSingle": {
+                JsonObject params = root.get("params").asObject();
+                exactOutputSingle(_from, token, _value, ExactOutputSingleParams.fromJson(params));
+                break;
+            }
+
+            case "exactInput": {
+                JsonObject params = root.get("params").asObject();
+                exactInput(_from, token, _value, ExactInputParams.fromJson(params));
+                break;
+            }
+
+            default:
+                Context.revert("tokenFallback: Unimplemented tokenFallback action");
+        }
+    }
+    
+    /**
+     * @notice Swaps `amountIn` of one token for as much as possible of another token
+     * @param params The parameters necessary for the swap, encoded as `ExactInputSingleParams` in calldata
+     * @return amountOut The amount of the received token
+     */
     private BigInteger exactInputInternal(
+        Address tokenIn,
         BigInteger amountIn,
         Address recipient,
         BigInteger sqrtPriceLimitX96,
@@ -166,7 +318,9 @@ public class SwapRouter {
         }
 
         PoolData pool = Path.decodeFirstPool(new ByteReader(data.path));
-        Address tokenIn = pool.tokenA;
+        Context.require(tokenIn.equals(pool.tokenA), 
+            "exactInputInternal: tokenIn should be tokenA");
+
         Address tokenOut = pool.tokenB;
         int fee = pool.fee;
 
@@ -186,98 +340,12 @@ public class SwapRouter {
     }
 
     /**
-     * @notice Swaps `amountIn` of one token for as much as possible of another token
-     * @param params The parameters necessary for the swap, encoded as `ExactInputSingleParams` in calldata
-     * @return amountOut The amount of the received token
-     */
-    // @External - this method is external through tokenFallback
-    public BigInteger exactInputSingle (Address caller, Address tokenIn, BigInteger amountIn, ExactInputSingleParams params) {
-        this.checkDeadline(params.deadline);
-
-        BigInteger amountOut = exactInputInternal(
-            amountIn, 
-            params.recipient, 
-            params.sqrtPriceLimitX96, 
-            new SwapCallbackData(
-                BytesUtils.concat(
-                    tokenIn.toByteArray(),
-                    BytesUtils.intToBytes(params.fee),
-                    params.tokenOut.toByteArray()
-                ), 
-                caller
-            )
-        );
-
-        Context.require(amountOut.compareTo(params.amountOutMinimum) >= 0,
-            "exactInputSingle: Too little received");
-
-        return amountOut;
-    }
-
-    @External
-    public void tokenFallback (Address _from, BigInteger _value, @Optional byte[] _data) throws Exception {
-        Reader reader = new StringReader(new String(_data));
-        JsonValue input = Json.parse(reader);
-        JsonObject root = input.asObject();
-        String method = root.get("method").asString();
-        Address token = Context.getCaller();
-
-        switch (method)
-        {
-            case "exactInputSingle": {
-                JsonObject params = root.get("params").asObject();
-                exactInputSingle(_from, token, _value, ExactInputSingleParams.fromJson(params));
-                break;
-            }
-
-            default:
-                Context.revert("tokenFallback: Unimplemented tokenFallback action");
-        }
-    }
-
-    @External
-    public BigInteger exactInput (ExactInputParams params) {
-        this.checkDeadline(params.deadline);
-        BigInteger amountOut = ZERO;
-        
-        Address payer = Context.getCaller(); // caller pays for the first hop
-
-        while (true) {
-            boolean hasMultiplePools = Path.hasMultiplePools(params.path);
-
-            // the outputs of prior swaps become the inputs to subsequent ones
-            params.amountIn = exactInputInternal(
-                params.amountIn, 
-                hasMultiplePools ? Context.getAddress() : params.recipient, // for intermediate swaps, this contract custodies
-                ZERO, 
-                new SwapCallbackData(
-                    Path.getFirstPool(params.path), // only the first pool in the path is necessary
-                    payer
-                )
-            );
-            
-            // decide whether to continue or terminate
-            if (hasMultiplePools) {
-                payer = Context.getAddress(); // at this point, the caller has paid
-                params.path = Path.skipToken(params.path);
-            } else {
-                amountOut = params.amountIn;
-                break;
-            }
-        }
-
-        Context.require(amountOut.compareTo(params.amountOutMinimum) >= 0, 
-            "exactInput: Too little received");
-
-        return amountOut;
-    }
-
-    /**
      * @notice Swaps as little as possible of one token for `amountOut` of another token
      * @param params The parameters necessary for the swap, encoded as `ExactOutputSingleParams` in calldata
      * @return amountIn The amount of the input token
      */
     private BigInteger exactOutputInternal(
+        Address tokenIn,
         BigInteger amountOut, 
         Address recipient, 
         BigInteger sqrtPriceLimitX96,
@@ -290,12 +358,11 @@ public class SwapRouter {
 
         PoolData pool = Path.decodeFirstPool(new ByteReader(data.path));
         Address tokenOut = pool.tokenA;
-        Address tokenIn = pool.tokenB;
+        Context.require(tokenIn.equals(pool.tokenB), 
+            "exactOutputInternal: tokenIn should be tokenB");
         int fee = pool.fee;
 
         boolean zeroForOne = AddressUtils.compareTo(tokenIn, tokenOut) < 0;
-
-        // TODO: token transfer
 
         var result = (PairAmounts) Context.call(getPool(tokenIn, tokenOut, fee), "swap", 
             recipient,
@@ -330,58 +397,23 @@ public class SwapRouter {
         return amountIn;
     }
 
-    /**
-     * 
-     * @notice Swaps as little as possible of one token for `amountOut` of another token
-     * @param params The parameters necessary for the swap, encoded as `ExactOutputSingleParams` in calldata
-     * @return amountIn The amount of the input token
-     */
     @External
-    public BigInteger exactOutputSingle (ExactOutputSingleParams params) {
-        this.checkDeadline(params.deadline);
-        
-        final Address caller = Context.getCaller(); // caller pays for the first hop
-
-        // avoid an db loading by using the swap return data
-        BigInteger amountIn = exactOutputInternal(
-            params.amountOut, 
-            params.recipient, 
-            params.sqrtPriceLimitX96, 
-            new SwapCallbackData(
-                BytesUtils.concat(
-                    params.tokenOut.toByteArray(), 
-                    BytesUtils.intToBytes(params.fee), 
-                    params.tokenIn.toByteArray()
-                ), 
-                caller
-            )
-        );
-
-        Context.require(amountIn.compareTo(params.amountInMaximum) <= 0, 
-            "exactOutputSingle: Too much requested");
-
-        // has to be reset even though we don't use it in the single hop case
-        this.amountInCached.set(DEFAULT_AMOUNT_IN_CACHED);
-
-        return amountIn;
-    }
-
-    @External
-    public BigInteger exactOutput(ExactOutputParams params) {
+    public BigInteger exactOutput(Address caller, Address tokenIn, BigInteger amountInMaximum, ExactOutputParams params) {
         this.checkDeadline(params.deadline);
         
         // it's okay that the payer is fixed to msg.sender here, as they're only paying for the "final" exact output
         // swap, which happens first, and subsequent swaps are paid for within nested callback frames
         exactOutputInternal(
+            tokenIn,
             params.amountOut, 
             params.recipient, 
             ZERO, 
             new SwapCallbackData(params.path, Context.getCaller())
         );
 
-        BigInteger amountIn = amountInCached.get();
+        BigInteger amountIn = this.amountInCached.get();
 
-        Context.require(amountIn.compareTo(params.amountInMaximum) <= 0, 
+        Context.require(amountIn.compareTo(amountInMaximum) <= 0, 
             "exactOutput: Too much requested");
 
         amountInCached.set(DEFAULT_AMOUNT_IN_CACHED);

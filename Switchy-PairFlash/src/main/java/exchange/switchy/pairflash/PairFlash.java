@@ -42,7 +42,7 @@ public class PairFlash {
     // Contract name
     private final String name;
     private final Address factory;
-    private final Address wICX;
+    private final Address sICX;
     private final Address swapRouter;
 
     // ================================================
@@ -58,11 +58,11 @@ public class PairFlash {
     public PairFlash(
         Address _swapRouter,
         Address _factory,
-        Address _wICX
+        Address _sICX
     ) {
         this.name = "Switchy Pair Flash";
         this.swapRouter = _swapRouter;
-        this.wICX = _wICX;
+        this.sICX = _sICX;
         this.factory = _factory;
     }
 
@@ -96,12 +96,10 @@ public class PairFlash {
         // call exactInputSingle for swapping token1 for token0 in pool with fee2
         BigInteger amountOut0 = (BigInteger)
             Context.call(swapRouter, "exactInputSingle", new ExactInputSingleParams(
-                token1, 
                 token0, 
                 decoded.poolFee2, 
                 thisAddress, 
                 TimeUtils.nowSeconds(), 
-                decoded.amount1, 
                 amount0Min, 
                 ZERO
             ));
@@ -109,12 +107,10 @@ public class PairFlash {
         // call exactInputSingle for swapping token0 for token 1 in pool with fee3
         BigInteger amountOut1 = (BigInteger)
             Context.call(swapRouter, "exactInputSingle", new ExactInputSingleParams(
-                token0,
                 token1,
                 decoded.poolFee3,
                 thisAddress, 
                 TimeUtils.nowSeconds(), 
-                decoded.amount0,
                 amount1Min,
                 ZERO
             )
@@ -122,20 +118,20 @@ public class PairFlash {
         
         // pay the required amounts back to the pair
         if (amount0Min.compareTo(ZERO) > 0) {
-            PeripheryPayments.pay(this.wICX, token0, thisAddress, caller, amount0Min);
+            PeripheryPayments.pay(this.sICX, token0, thisAddress, caller, amount0Min);
         }
         if (amount1Min.compareTo(ZERO) > 0) {
-            PeripheryPayments.pay(this.wICX, token1, thisAddress, caller, amount1Min);
+            PeripheryPayments.pay(this.sICX, token1, thisAddress, caller, amount1Min);
         }
 
         // if profitable pay profits to payer
         if (amountOut0.compareTo(amount0Min) > 0) {
             BigInteger profit0 = amountOut0.subtract(amount0Min);
-            PeripheryPayments.pay(this.wICX, token0, thisAddress, decoded.payer, profit0);
+            PeripheryPayments.pay(this.sICX, token0, thisAddress, decoded.payer, profit0);
         }
         if (amountOut1.compareTo(amount1Min) > 0) {
             BigInteger profit1 = amountOut1.subtract(amount1Min);
-            PeripheryPayments.pay(this.wICX, token1, thisAddress, decoded.payer, profit1);
+            PeripheryPayments.pay(this.sICX, token1, thisAddress, decoded.payer, profit1);
         }
     }
 
@@ -159,7 +155,7 @@ public class PairFlash {
     @External
     public void initFlash (FlashParams params) {
         PoolAddress.PoolKey poolKey = new PoolAddress.PoolKey(params.token0, params.token1, params.fee1);
-        Address pool = PoolAddress.computeAddress(this.factory, poolKey);
+        Address pool = PoolAddress.getPool(this.factory, poolKey);
 
         final Address thisAddress = Context.getAddress();
         final Address caller = Context.getCaller();

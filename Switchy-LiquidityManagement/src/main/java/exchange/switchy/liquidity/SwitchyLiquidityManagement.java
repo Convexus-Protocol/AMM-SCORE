@@ -68,8 +68,8 @@ public class SwitchyLiquidityManagement {
 
     // address of the Switchy factory
     public final Address factory;
-    // address of wICX
-    public final Address wICX;
+    // address of sICX
+    public final Address sICX;
 
     // ================================================
     // DB Variables
@@ -87,11 +87,11 @@ public class SwitchyLiquidityManagement {
      */
     public SwitchyLiquidityManagement(
         Address _factory,
-        Address _wICX
+        Address _sICX
     ) {
         this.name = "Switchy Liquidity Management";
         this.factory = _factory;
-        this.wICX = _wICX;
+        this.sICX = _sICX;
     }
 
     /**
@@ -114,11 +114,11 @@ public class SwitchyLiquidityManagement {
         final Address caller = Context.getCaller();
 
         if (amount0Owed.compareTo(BigInteger.ZERO) > 0) {
-            PeripheryPayments.pay(this.wICX, decoded.poolKey.token0, decoded.payer, caller, amount0Owed);
+            PeripheryPayments.pay(this.sICX, decoded.poolKey.token0, decoded.payer, caller, amount0Owed);
         }
 
         if (amount1Owed.compareTo(BigInteger.ZERO) > 0) {
-            PeripheryPayments.pay(this.wICX, decoded.poolKey.token1, decoded.payer, caller, amount1Owed);
+            PeripheryPayments.pay(this.sICX, decoded.poolKey.token1, decoded.payer, caller, amount1Owed);
         }
     }
 
@@ -129,7 +129,7 @@ public class SwitchyLiquidityManagement {
     public AddLiquidityResult addLiquidity (AddLiquidityParams params) {
         PoolAddress.PoolKey poolKey = new PoolAddress.PoolKey(params.token0, params.token1, params.fee);
 
-        Address pool = PoolAddress.computeAddress(factory, poolKey);
+        Address pool = PoolAddress.getPool(this.factory, poolKey);
 
         // compute the liquidity amount
         var result = (Slot0) Context.call(pool, "slot0");

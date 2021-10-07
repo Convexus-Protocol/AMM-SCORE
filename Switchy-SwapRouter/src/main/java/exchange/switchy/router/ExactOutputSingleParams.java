@@ -18,15 +18,54 @@ package exchange.switchy.router;
 
 import java.math.BigInteger;
 
+import com.eclipsesource.json.Json;
+import com.eclipsesource.json.JsonObject;
+
+import exchange.switchy.utils.StringUtils;
 import score.Address;
 
 public class ExactOutputSingleParams {
-  Address tokenIn;
-  Address tokenOut;
-  int fee;
-  Address recipient;
-  BigInteger deadline;
-  BigInteger amountOut;
-  BigInteger amountInMaximum;
-  BigInteger sqrtPriceLimitX96;
+  public ExactOutputSingleParams(
+    Address tokenOut, 
+    int fee, 
+    Address recipient, 
+    BigInteger deadline,
+    BigInteger amountOut,
+    BigInteger sqrtPriceLimitX96
+  ) {
+    this.tokenOut = tokenOut;
+    this.fee = fee;
+    this.recipient = recipient;
+    this.deadline = deadline;
+    this.amountOut = amountOut;
+    this.sqrtPriceLimitX96 = sqrtPriceLimitX96;
+  }
+
+  public Address tokenOut;
+  public int fee;
+  public Address recipient;
+  public BigInteger deadline;
+  public BigInteger amountOut;
+  public BigInteger sqrtPriceLimitX96;
+  
+  public JsonObject toJson() {
+    return Json.object()
+        .add("tokenOut", tokenOut.toString())
+        .add("fee", fee)
+        .add("recipient", recipient.toString())
+        .add("deadline", deadline.toString())
+        .add("amountOut", amountOut.toString())
+        .add("sqrtPriceLimitX96", sqrtPriceLimitX96.toString());
+}
+
+  public static ExactOutputSingleParams fromJson(JsonObject params) {
+    return new ExactOutputSingleParams(
+        Address.fromString(params.get("tokenOut").asString()),
+        params.get("fee").asInt(),
+        Address.fromString(params.get("recipient").asString()),
+        StringUtils.toBigInt(params.get("deadline").asString()),
+        StringUtils.toBigInt(params.get("amountOut").asString()),
+        StringUtils.toBigInt(params.get("sqrtPriceLimitX96").asString())
+      );
+  }
 }

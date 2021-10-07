@@ -30,7 +30,7 @@ public class PeripheryPayments {
    * @param value The amount to pay
    */
   public static void pay(
-    Address wICX,
+    Address sICX,
     Address token, 
     Address payer,
     Address recipient, 
@@ -38,24 +38,18 @@ public class PeripheryPayments {
   ) {
     final Address thisAddress = Context.getAddress();
 
-    if (token.equals(wICX) && Context.getBalance(thisAddress).compareTo(value) >= 0) {
-      // pay with wICX
+    if (token.equals(sICX) && Context.getBalance(thisAddress).compareTo(value) >= 0) {
+      // pay with sICX
       // TODO: deposit?
-      Context.call(value, wICX, "deposit");
-      Context.call(wICX, "transfer", recipient, value);
-
-    // } else if (payer.equals(thisAddress)) {
-    //   Context.call(token, "transfer", recipient, value);
-
+      Context.call(value, sICX, "deposit");
+      Context.call(sICX, "transfer", recipient, value);
     } else {
-      // Check if we pay everything
+      // Check if we're paying everything as expected
       BigInteger thisBalance = (BigInteger) Context.call(token, "balanceOf", thisAddress);
       Context.require(thisBalance.equals(value),
-        "pay: invalid balance");
-      // pull payment - the tokens have already been transfered to the SwapRouter, so we can transfer the tokens directly to the recipient
-      // Context.call(token, "transferFrom", payer, recipient, value);
+        "PeripheryPayments::pay: invalid balance");
+      // the tokens have already been transfered to the SwapRouter, so we can transfer the tokens directly to the recipient
       Context.call(token, "transfer", recipient, value);
     }
   }
-
 }

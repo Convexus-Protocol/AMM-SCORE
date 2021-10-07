@@ -51,9 +51,6 @@ public class PoolAddress {
     }
   }
 
-  // TODO: changeme
-  private final static byte[] POOL_INIT_CODE_HASH = {(byte) 0xe3, (byte) 0x4f, (byte) 0x19, (byte) 0x9b, (byte) 0x19, (byte) 0xb2, (byte) 0xb4, (byte) 0xf4, (byte) 0x7f, (byte) 0x68, (byte) 0x44, (byte) 0x26, (byte) 0x19, (byte) 0xd5, (byte) 0x55, (byte) 0x52, (byte) 0x7d, (byte) 0x24, (byte) 0x4f, (byte) 0x78, (byte) 0xa3, (byte) 0x29, (byte) 0x7e, (byte) 0xa8, (byte) 0x93, (byte) 0x25, (byte) 0xf8, (byte) 0x43, (byte) 0xf8, (byte) 0x7b, (byte) 0x8b, (byte) 0x54};
-
   /**
    * @notice Returns PoolKey: the ordered tokens with the matched fee levels
    * @param tokenA The first token of a pool, unsorted
@@ -73,30 +70,7 @@ public class PoolAddress {
     return new PoolAddress.PoolKey(token0, token1, fee);
   }
 
-  /**
-   * @notice Deterministically computes the pool address given the factory and PoolKey
-   * @param factory The Switchy factory contract address
-   * @param key The PoolKey
-   * @return pool The contract address of the pool
-   */
-  public static Address computeAddress (Address factory, PoolKey key) {
-    Context.require(AddressUtils.compareTo(key.token0, key.token1) < 0,
-      "computeAddress: key.token0 < key.token1");
-
-    byte[] prefix = {(byte) 0xff};
-    
-    return new Address(
-      Context.hash("keccak-256", BytesUtils.concat(
-        prefix,
-        factory.toByteArray(), 
-        Context.hash("keccak-256", BytesUtils.concat(
-            key.token0.toByteArray(),
-            key.token1.toByteArray(),
-            BytesUtils.intToBytes(key.fee)
-        )),
-        POOL_INIT_CODE_HASH
-      ))
-    );
+  public static Address getPool (Address factory, PoolKey key) {
+    return (Address) Context.call(factory, "getPool", key.token0, key.token1, key.fee);
   }
-
 }

@@ -18,12 +18,43 @@ package exchange.switchy.router;
 
 import java.math.BigInteger;
 
+import com.eclipsesource.json.Json;
+import com.eclipsesource.json.JsonObject;
+import exchange.switchy.utils.StringUtils;
 import score.Address;
 
-class ExactInputParams {
+public class ExactInputParams {
     byte[] path;
     Address recipient;
     BigInteger deadline;
-    BigInteger amountIn;
     BigInteger amountOutMinimum;
+    
+    public ExactInputParams (
+      byte[] path,
+      Address recipient,
+      BigInteger deadline,
+      BigInteger amountOutMinimum
+    ) {
+        this.path = path;
+        this.recipient = recipient;
+        this.deadline = deadline;
+        this.amountOutMinimum = amountOutMinimum;
+    }
+
+    public static ExactInputParams fromJson(JsonObject params) {
+      return new ExactInputParams(
+          StringUtils.hexToByteArray(params.get("path").asString()),
+          Address.fromString(params.get("recipient").asString()),
+          StringUtils.toBigInt(params.get("deadline").asString()),
+          StringUtils.toBigInt(params.get("amountOutMinimum").asString())
+        );
+    }
+
+    public JsonObject toJson() {
+        return Json.object()
+            .add("path", StringUtils.byteArrayToHex(this.path))
+            .add("recipient", this.recipient.toString())
+            .add("deadline", this.deadline.toString())
+            .add("amountOutMinimum", this.amountOutMinimum.toString());
+    }
 }
