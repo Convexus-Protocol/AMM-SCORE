@@ -16,11 +16,11 @@
 
 package foundation.icon.test.score;
 
-import foundation.icon.test.Constants;
-import foundation.icon.test.TransactionHandler;
-
 import java.io.IOException;
 import java.math.BigInteger;
+
+import foundation.icon.test.Constants;
+import foundation.icon.test.TransactionHandler;
 
 public class ChainScore extends Score {
 

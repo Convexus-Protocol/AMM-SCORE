@@ -13,7 +13,6 @@ config/equality/gangnam
 config/equality/mainnet
 config/equality/yeouido
 
-testinteg/
 testsvc/
 
 .project

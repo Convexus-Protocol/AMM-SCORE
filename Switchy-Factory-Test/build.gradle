@@ -1,5 +1,14 @@
 version = '0.9.1'
 
+// for integration tests
+sourceSets {
+    intTest {}
+}
+configurations {
+    intTestImplementation.extendsFrom testImplementation
+    intTestRuntimeOnly.extendsFrom testRuntimeOnly
+}
+
 dependencies {
     compileOnly 'foundation.icon:javaee-api:0.9.0'
     testImplementation project(':Switchy-Utils')
@@ -11,22 +20,19 @@ dependencies {
     testImplementation 'org.mockito:mockito-inline:3.11.0'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.0'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.6.0'
+    
+    testImplementation project(':testinteg')
+    testImplementation 'foundation.icon:icon-sdk:2.0.0'
+    testRuntimeOnly project(':Switchy-Factory')
 }
 
 test {
     useJUnitPlatform()
 }
 
-
-
-// for integration tests
-sourceSets {
-    intTest {}
-}
-
 def thisJar = project(':Switchy-Factory').getTasks().getByName('optimizedJar')
 
-task integrationTest(type: Test, dependsOn: optimizedJar) {
+task integrationTest(type: Test) {
     useJUnitPlatform()
     description = 'Runs integration tests.'
     group = 'verification'
@@ -40,7 +46,7 @@ task integrationTest(type: Test, dependsOn: optimizedJar) {
 
     def prefix = 'score.path.'
     systemProperty(prefix + project.name, optimizedJar.outputJarName)
-    systemProperty(prefix + 'switchy', thisJar.outputJarName)
+    systemProperty(prefix + 'Switchy-Factory', thisJar.outputJarName)
 }
 
 integrationTest.dependsOn(thisJar)

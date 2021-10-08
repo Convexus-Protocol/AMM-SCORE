@@ -34,13 +34,13 @@ import foundation.icon.test.score.ChainScore;
 import foundation.icon.test.score.Score;
 import foundation.icon.test.util.ZipFile;
 
+import static foundation.icon.test.Env.LOG;
+
 import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
-
-import static foundation.icon.test.Env.LOG;
 
 public class TransactionHandler {
     private final IconService iconService;
