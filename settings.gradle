@@ -21,4 +21,5 @@ include (
     'Switchy-Tests',
     'Switchy-Utils',
     'javaee-tokens',
-    'unittest')
+    'unittest',
+    'testinteg')
