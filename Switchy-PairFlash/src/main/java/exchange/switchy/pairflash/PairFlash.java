@@ -24,10 +24,11 @@ import exchange.switchy.librairies.CallbackValidation;
 import exchange.switchy.librairies.PeripheryPayments;
 import exchange.switchy.librairies.PoolAddress;
 import exchange.switchy.router.ExactInputSingleParams;
-import exchange.switchy.utils.ByteReader;
 import exchange.switchy.utils.TimeUtils;
 import score.Address;
+import score.ByteArrayObjectWriter;
 import score.Context;
+import score.ObjectReader;
 import score.annotation.External;
 
 import com.eclipsesource.json.Json;
@@ -113,7 +114,8 @@ public class PairFlash {
         BigInteger fee1,
         byte[] data
     ) {
-        FlashCallbackData decoded = FlashCallbackData.fromBytes(new ByteReader(data));
+        ObjectReader reader = Context.newByteArrayObjectReader("RLPn", data);
+        FlashCallbackData decoded = FlashCallbackData.readObject(reader);
         CallbackValidation.verifyCallback(this.factory, decoded.poolKey);
 
         final Address caller = Context.getCaller();
@@ -177,6 +179,16 @@ public class PairFlash {
         final Address thisAddress = Context.getAddress();
         final Address caller = Context.getCaller();
 
+        ByteArrayObjectWriter writer = Context.newByteArrayObjectWriter("RLPn");
+        FlashCallbackData.writeObject(writer, new FlashCallbackData(
+            params.amount0,
+            params.amount1,
+            caller,
+            poolKey,
+            params.fee2,
+            params.fee3
+        ));
+
         // recipient of borrowed amounts
         // amount of token0 requested to borrow
         // amount of token1 requested to borrow
@@ -186,14 +198,7 @@ public class PairFlash {
             thisAddress,
             params.amount0,
             params.amount1,
-            new FlashCallbackData(
-                params.amount0,
-                params.amount1,
-                caller,
-                poolKey,
-                params.fee2,
-                params.fee3
-            ).toBytes()
+            writer.toByteArray()
         );
     }
  

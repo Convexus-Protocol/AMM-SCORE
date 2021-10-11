@@ -19,6 +19,8 @@ package exchange.switchy.librairies;
 import java.math.BigInteger;
 
 import score.Context;
+import score.ObjectReader;
+import score.ObjectWriter;
 
 public class Position {
     public static class Info {
@@ -34,7 +36,39 @@ public class Position {
         public BigInteger tokensOwed0;
 
         public BigInteger tokensOwed1;
-        
+
+        public Info(
+            BigInteger liquidity ,
+            BigInteger feeGrowthInside0LastX128, 
+            BigInteger feeGrowthInside1LastX128,
+            BigInteger tokensOwed0,
+            BigInteger tokensOwed1
+        ) {
+            this.liquidity = liquidity;
+            this.feeGrowthInside0LastX128 = feeGrowthInside0LastX128;
+            this.feeGrowthInside1LastX128 = feeGrowthInside1LastX128;
+            this.tokensOwed0 = tokensOwed0;
+            this.tokensOwed1 = tokensOwed1;
+        }
+
+        public static void writeObject(ObjectWriter w, Info obj) {
+            w.write(obj.liquidity);
+            w.write(obj.feeGrowthInside0LastX128);
+            w.write(obj.feeGrowthInside1LastX128);
+            w.write(obj.tokensOwed0);
+            w.write(obj.tokensOwed1);
+        }
+
+        public static Info readObject(ObjectReader r) {
+            return new Info(
+                r.readBigInteger(), // liquidity
+                r.readBigInteger(), // feeGrowthInside0LastX128
+                r.readBigInteger(), // feeGrowthInside1LastX128
+                r.readBigInteger(), // tokensOwed0
+                r.readBigInteger()  // tokensOwed1
+            );
+        }
+
         /**
          * @notice Credits accumulated fees to a user's position
          * @param self The individual position to update

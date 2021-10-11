@@ -20,6 +20,7 @@ import static exchange.switchy.librairies.BlockTimestamp._blockTimestamp;
 
 import java.math.BigInteger;
 
+import exchange.switchy.factory.SwitchyPoolDeployerParameters;
 import exchange.switchy.librairies.FixedPoint128;
 import exchange.switchy.librairies.FullMath;
 import exchange.switchy.librairies.LiquidityMath;
@@ -39,12 +40,6 @@ import score.Context;
 import score.VarDB;
 import score.annotation.EventLog;
 import score.annotation.External;
-
-// accumulated protocol fees in token0/token1 units
-class ProtocolFees {
-    BigInteger token0;
-    BigInteger token1;
-}
 
 public class SwitchyPool {
 
@@ -284,8 +279,23 @@ public class SwitchyPool {
     /**
      *  @notice Contract constructor
      */
-    public SwitchyPool() {
-        SwitchyPoolDeployerParameters parameters = (SwitchyPoolDeployerParameters) Context.call(Context.getCaller(), "parameters");
+    public SwitchyPool(
+        // TODO: PATCH PATCH PATCH: REMOVE ME
+        Address _token0,
+        Address _token1
+        // END OF PATCH
+    ) {
+        // SwitchyPoolDeployerParameters parameters = (SwitchyPoolDeployerParameters) Context.call(Context.getCaller(), "parameters");
+
+        /**  === TODO: PATCH PATCH PATCH: REMOVE ME === */
+        SwitchyPoolDeployerParameters parameters = new SwitchyPoolDeployerParameters(
+            Address.fromString("cx0000000000000000000000000000000000000000"), 
+            _token0, 
+            _token1, 
+            500,
+            10
+        );
+        /**  === END OF PATCH === */
 
         Context.require(parameters != null,
             "SwitchyPool: Invalid SwitchyPoolDeployerParameters");
@@ -297,7 +307,6 @@ public class SwitchyPool {
         this.tickSpacing = parameters.tickSpacing;
 
         this.maxLiquidityPerTick = Tick.tickSpacingToMaxLiquidityPerTick(parameters.tickSpacing);
-
         this.name = "Switchy Pool " + this.token0 + "/" + this.token1;
 
         // locked by default
@@ -1324,7 +1333,7 @@ public class SwitchyPool {
     // Checks
     // ================================================
     private void onlyFactoryOwner() {
-        Context.require(Context.getCaller().equals(Context.call(factory, "owner")));
+        Context.require(Context.getCaller().equals(Context.call(this.factory, "owner")));
     }
 
     // ================================================

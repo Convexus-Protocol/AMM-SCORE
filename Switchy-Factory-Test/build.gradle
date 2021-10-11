@@ -11,6 +11,8 @@ configurations {
 
 dependencies {
     compileOnly 'foundation.icon:javaee-api:0.9.0'
+    implementation  'com.github.sink772:javaee-tokens:0.6.0'
+
     testImplementation project(':Switchy-Utils')
     testImplementation project(':Switchy-Tests')
     testImplementation project(':Switchy-Factory')
@@ -30,7 +32,9 @@ test {
     useJUnitPlatform()
 }
 
-def thisJar = project(':Switchy-Factory').getTasks().getByName('optimizedJar')
+def pooljar = project(':Switchy-Pool').getTasks().getByName('optimizedJar')
+def factoryjar = project(':Switchy-Factory').getTasks().getByName('optimizedJar')
+def irc2jar = project(':irc2-token').getTasks().getByName('optimizedJar')
 
 task integrationTest(type: Test) {
     useJUnitPlatform()
@@ -45,8 +49,13 @@ task integrationTest(type: Test) {
     systemProperty('env.props', new File(project(':testinteg').projectDir, 'conf/env.props'))
 
     def prefix = 'score.path.'
-    systemProperty(prefix + project.name, optimizedJar.outputJarName)
-    systemProperty(prefix + 'Switchy-Factory', thisJar.outputJarName)
+    systemProperty(prefix + 'Switchy-Factory', factoryjar.outputJarName)
+    systemProperty(prefix + 'Switchy-Pool', 
+        project(':Switchy-Pool').getProjectDir().toString()
+        + '/build/libs/Switchy-Pool-' 
+        + '0.9.1'
+        + '-optimized.jar')
+    systemProperty(prefix + 'IRC2BasicToken', irc2jar.outputJarName)
 }
 
-integrationTest.dependsOn(thisJar)
+integrationTest.dependsOn(irc2jar, factoryjar, pooljar)

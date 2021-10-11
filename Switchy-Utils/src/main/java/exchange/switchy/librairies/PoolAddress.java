@@ -17,10 +17,10 @@
 package exchange.switchy.librairies;
 
 import exchange.switchy.utils.AddressUtils;
-import exchange.switchy.utils.ByteReader;
-import exchange.switchy.utils.BytesUtils;
 import score.Address;
 import score.Context;
+import score.ObjectReader;
+import score.ObjectWriter;
 
 public class PoolAddress {
   
@@ -35,19 +35,17 @@ public class PoolAddress {
       this.fee = fee;
     }
 
-    public static PoolKey fromBytes(ByteReader reader) {
+    public static PoolKey readObject(ObjectReader reader) {
       Address token0 = reader.readAddress();
       Address token1 = reader.readAddress();
       int fee = reader.readInt();
       return new PoolKey(token0, token1, fee);
     }
 
-    public byte[] toBytes() {
-      return BytesUtils.concat(
-        this.token0.toByteArray(),
-        this.token1.toByteArray(),
-        BytesUtils.intToBytes(this.fee)
-      );
+    public static void writeObject(ObjectWriter w, PoolKey obj) {
+      w.write(obj.token0);
+      w.write(obj.token1);
+      w.write(obj.fee);
     }
   }
 

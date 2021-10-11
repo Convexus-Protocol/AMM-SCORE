@@ -5,6 +5,7 @@ dependencies {
     testImplementation project(':Switchy-Utils')
     testImplementation project(':Switchy-Tests')
     testImplementation project(':Switchy-Pool')
+    testImplementation project(':Switchy-SwapRouter')
     testImplementation project(':unittest')
     // testImplementation 'foundation.icon:javaee-unittest:0.9.1'
 

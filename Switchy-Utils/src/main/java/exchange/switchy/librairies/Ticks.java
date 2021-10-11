@@ -44,7 +44,7 @@ public class Ticks {
   public void set (int key, Tick.Info value) {
     this.ticks.set(key, value);
   }
-  
+
   /**
    * @notice Updates a tick and returns true if the tick was flipped from initialized to uninitialized, or vice versa
    * @param self The mapping containing all tick information for initialized ticks

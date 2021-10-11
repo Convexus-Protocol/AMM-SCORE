@@ -47,6 +47,7 @@ public class SwitchyFactory {
     private final VarDB<Address> owner = Context.newVarDB(NAME + "_owner", Address.class);
     private final DictDB<Integer, Integer> feeAmountTickSpacing = Context.newDictDB(NAME + "_feeAmountTickSpacing", Integer.class);
     private final BranchDB<Address, BranchDB<Address, DictDB<Integer, Address>>> getPool = Context.newBranchDB(NAME + "_getPool", Address.class);
+    private final VarDB<byte[]> poolContract = Context.newVarDB(NAME + "_poolContract", byte[].class);
 
     // ================================================
     // Event Logs
@@ -128,7 +129,9 @@ public class SwitchyFactory {
     public Address createPool(
         Address tokenA,
         Address tokenB,
-        int fee
+        int fee,
+        // TODO: UNPATCHME:
+        Address pool
     ) {
         Context.require(!tokenA.equals(tokenB),
             "createPool: tokenA must be different from tokenB");
@@ -151,9 +154,16 @@ public class SwitchyFactory {
         Context.require(getPool.at(token0).at(token1).get(fee) == null, 
             "createPool: pool already exists");
 
-        Address pool = SwitchyPoolDeployer.deploy(Context.getAddress(), token0, token1, fee, tickSpacing);
-        getPool.at(token0).at(token1).set(fee, pool);
+        /**  === TODO: FIX Begin patch === */
+        // Address pool = SwitchyPoolDeployer.deploy(
+        //     this.poolContract.get(), 
+        //     Context.getAddress(), 
+        //     token0, token1, fee, tickSpacing
+        // );
+        SwitchyPoolDeployer.parameters.set(new SwitchyPoolDeployerParameters(Context.getAddress(), token0, token1, fee, tickSpacing));
+        /** ==== End Patch === */
 
+        getPool.at(token0).at(token1).set(fee, pool);
         // populate mapping in the reverse direction, deliberate choice to avoid the cost of comparing addresses
         getPool.at(token1).at(token0).set(fee, pool);
 
@@ -169,8 +179,9 @@ public class SwitchyFactory {
      */
     @External
     public void setOwner (Address _owner) {
+        checkOwner();
+
         Address currentOwner = this.owner.get();
-        Context.require(Context.getCaller().equals(currentOwner));
         this.OwnerChanged(currentOwner, _owner);
         this.owner.set(_owner);
     }
@@ -183,20 +194,38 @@ public class SwitchyFactory {
      */
     @External
     public void enableFeeAmount (int fee, int tickSpacing) {
-        Address currentOwner = this.owner.get();
-        Context.require(Context.getCaller().equals(currentOwner));
+        checkOwner();
 
-        Context.require(fee < 1000000);
+        Context.require(fee < 1000000, 
+            "enableFeeAmount; fee needs to be lower than 1000000");
         
         // tick spacing is capped at 16384 to prevent the situation where tickSpacing is so large that
         // TickBitmap#nextInitializedTickWithinOneWord overflows int24 container from a valid tick
         // 16384 ticks represents a >5x price change with ticks of 1 bips
-        Context.require(tickSpacing > 0 && tickSpacing < 16384);
+        Context.require(tickSpacing > 0 && tickSpacing < 16384,
+            "enableFeeAmount: tickSpacing > 0 && tickSpacing < 16384");
         
-        Context.require(this.feeAmountTickSpacing.get(fee) == 0);
+        Context.require(this.feeAmountTickSpacing.get(fee) == 0,
+            "enableFeeAmount: fee amount is alreay enabled");
 
         this.feeAmountTickSpacing.set(fee, tickSpacing);
         this.FeeAmountEnabled(fee, tickSpacing);
+    }
+
+    @External
+    public void setPoolContract (byte[] contractBytes) {
+        checkOwner();
+
+        this.poolContract.set(contractBytes);
+    }
+
+    // ================================================
+    // Checks
+    // ================================================
+    private void checkOwner () {
+        Address currentOwner = this.owner.get();
+        Context.require(Context.getCaller().equals(currentOwner),
+            "checkOwner: caller must be owner");
     }
 
     // ================================================
@@ -205,6 +234,11 @@ public class SwitchyFactory {
     @External(readonly = true)
     public String name() {
         return this.name;
+    }
+
+    @External(readonly = true)
+    public byte[] poolContract () {
+        return this.poolContract.get();
     }
 
     @External(readonly = true)

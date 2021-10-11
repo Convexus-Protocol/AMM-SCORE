@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 ICON Foundation
+ * Copyright 2021 ICONation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,21 +19,24 @@ package foundation.icon.test.cases;
 import foundation.icon.icx.IconService;
 import foundation.icon.icx.KeyWallet;
 import foundation.icon.icx.data.Address;
-import foundation.icon.icx.data.TransactionResult;
 import foundation.icon.icx.transport.http.HttpProvider;
-import foundation.icon.icx.transport.jsonrpc.RpcItem;
 import foundation.icon.test.Env;
 import foundation.icon.test.TestBase;
 import foundation.icon.test.TransactionHandler;
+import foundation.icon.test.score.IRC2BasicToken;
+import foundation.icon.test.score.Score;
 import foundation.icon.test.score.SwitchyFactoryScore;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import exchange.switchy.utils.MathUtils;
+
+import java.io.File;
 import java.math.BigInteger;
+import java.nio.file.Files;
 
 import static foundation.icon.test.Env.LOG;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class SwitchyFactoryIntTest extends TestBase {
     private static TransactionHandler txHandler;
@@ -80,6 +83,22 @@ public class SwitchyFactoryIntTest extends TestBase {
         LOG.info("Address of Alice: " + aliceWallet.getAddress());
         LOG.info("Address of Bob:   " + bobWallet.getAddress());
         Address scoreAddress = score.getAddress();
+
+        LOG.info("Deploying IUSDC token");
+        var usdc = IRC2BasicToken.install(txHandler, ownerWallet, "ICON USDC", "IUSDC", BigInteger.valueOf(8), MathUtils.pow10(18));
+
+        LOG.info("Deploying SICX token");
+        var sicx = IRC2BasicToken.install(txHandler, ownerWallet, "Staked ICX", "sICX", BigInteger.valueOf(8), MathUtils.pow10(18));
+
+        LOG.info("Deploying bnUSD token");
+        var bnusd = IRC2BasicToken.install(txHandler, ownerWallet, "Balanced USD", "bnUSD", BigInteger.valueOf(8), MathUtils.pow10(18));
+
+        LOG.info("Setting the pool contract bytes to Factory");
+        byte[] fileContent = Files.readAllBytes(new File(Score.getFilePath("Switchy-Pool")).toPath());
+        score.setPoolContract(ownerWallet, fileContent);
+
+        LOG.info("Deploying a new SICX / USDC pool");
+        score.createPool(ownerWallet, sicx.getAddress(), usdc.getAddress(), 500);
 
         LOG.infoExiting();
     }

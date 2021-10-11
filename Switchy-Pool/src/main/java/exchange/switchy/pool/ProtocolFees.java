@@ -16,26 +16,33 @@
 
 package exchange.switchy.pool;
 
-import score.Address;
+import java.math.BigInteger;
 
-public class SwitchyPoolDeployerParameters {
-    public Address factory;
-    public Address token0;
-    public Address token1;
-    public int fee;
-    public int tickSpacing;
+import score.ObjectReader;
+import score.ObjectWriter;
 
-    public SwitchyPoolDeployerParameters (
-        Address factory,
-        Address token0,
-        Address token1,
-        int fee,
-        int tickSpacing
+// accumulated protocol fees in token0/token1 units
+class ProtocolFees {
+    BigInteger token0;
+    BigInteger token1;
+
+    public ProtocolFees (
+        BigInteger token0, 
+        BigInteger token1
     ) {
-        this.factory = factory;
         this.token0 = token0;
         this.token1 = token1;
-        this.fee = fee;
-        this.tickSpacing = tickSpacing;
+    }
+
+    public static void writeObject(ObjectWriter w, ProtocolFees obj) {
+        w.write(obj.token0);
+        w.write(obj.token1);
+    }
+
+    public static ProtocolFees readObject(ObjectReader r) {
+        return new ProtocolFees(
+            r.readBigInteger(), // token0
+            r.readBigInteger() // token1
+        );
     }
 }

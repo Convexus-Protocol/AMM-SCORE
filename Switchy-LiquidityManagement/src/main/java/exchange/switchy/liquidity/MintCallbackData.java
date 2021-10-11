@@ -17,9 +17,9 @@
 package exchange.switchy.liquidity;
 
 import exchange.switchy.librairies.PoolAddress;
-import exchange.switchy.utils.ByteReader;
-import exchange.switchy.utils.BytesUtils;
 import score.Address;
+import score.ObjectReader;
+import score.ObjectWriter;
 
 public class MintCallbackData {
     PoolAddress.PoolKey poolKey;
@@ -30,16 +30,14 @@ public class MintCallbackData {
         this.payer = payer;
     }
 
-    public static MintCallbackData fromBytes(ByteReader reader) {
-        PoolAddress.PoolKey poolKey = PoolAddress.PoolKey.fromBytes(reader);
+    public static MintCallbackData readObject(ObjectReader reader) {
+        PoolAddress.PoolKey poolKey = PoolAddress.PoolKey.readObject(reader);
         Address payer = reader.readAddress();
         return new MintCallbackData(poolKey, payer);
     }
 
-    public byte[] toBytes () {
-        return BytesUtils.concat(
-            this.poolKey.toBytes(),
-            this.payer.toByteArray()
-        );
+    public static void writeObject(ObjectWriter w, MintCallbackData obj) {
+        w.write(obj.poolKey);
+        w.write(obj.payer);
     }
 }

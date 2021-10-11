@@ -3,9 +3,10 @@ package exchange.switchy.pairflash;
 import java.math.BigInteger;
 
 import exchange.switchy.librairies.PoolAddress;
-import exchange.switchy.utils.ByteReader;
 import exchange.switchy.utils.BytesUtils;
 import score.Address;
+import score.ObjectReader;
+import score.ObjectWriter;
 
 // fee2 and fee3 are the two other fees associated with the two other pools of token0 and token1
 class FlashCallbackData {
@@ -32,37 +33,22 @@ class FlashCallbackData {
         this.poolFee3 = poolFee3;
     }
 
-    public static FlashCallbackData fromBytes(ByteReader reader) {
-        int amount0Size = reader.readInt();
-        BigInteger amount0 = reader.readBigInteger(amount0Size);
-
-        int amount1Size = reader.readInt();
-        BigInteger amount1 = reader.readBigInteger(amount1Size);
-
+    public static FlashCallbackData readObject(ObjectReader reader) {
+        BigInteger amount0 = reader.readBigInteger();
+        BigInteger amount1 = reader.readBigInteger();
         Address payer = reader.readAddress();
-
-        PoolAddress.PoolKey poolKey = PoolAddress.PoolKey.fromBytes(reader);
-
+        PoolAddress.PoolKey poolKey = PoolAddress.PoolKey.readObject(reader);
         int poolFee2 = reader.readInt();
         int poolFee3 = reader.readInt();
-
         return new FlashCallbackData(amount0, amount1, payer, poolKey, poolFee2, poolFee3);
     }
 
-    public byte[] toBytes () {
-      return BytesUtils.concat(
-        BytesUtils.intToBytes(this.amount0.toByteArray().length),
-        this.amount0.toByteArray(),
-        
-        BytesUtils.intToBytes(this.amount1.toByteArray().length),
-        this.amount1.toByteArray(),
-
-        this.payer.toByteArray(),
-
-        this.poolKey.toBytes(),
-
-        BytesUtils.intToBytes(this.poolFee2),
-        BytesUtils.intToBytes(this.poolFee3)
-      );
+    public static void writeObject(ObjectWriter w, FlashCallbackData obj) {
+      w.write(obj.amount0);
+      w.write(obj.amount1);
+      w.write(obj.payer);
+      w.write(obj.poolKey);
+      w.write(obj.poolFee2);
+      w.write(obj.poolFee3);
     }
 }

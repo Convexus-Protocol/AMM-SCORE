@@ -33,12 +33,13 @@ import exchange.switchy.librairies.TickMath;
 import exchange.switchy.librairies.CallbackValidation;
 import exchange.switchy.librairies.PairAmounts;
 import exchange.switchy.utils.AddressUtils;
-import exchange.switchy.utils.ByteReader;
 import exchange.switchy.utils.BytesUtils;
 import exchange.switchy.utils.IntConstants;
 import exchange.switchy.utils.ReentrancyLock;
 import score.Address;
+import score.ByteArrayObjectWriter;
 import score.Context;
+import score.ObjectReader;
 import score.VarDB;
 import score.annotation.External;
 import score.annotation.Optional;
@@ -120,8 +121,11 @@ public class SwapRouter {
             "switchySwapCallback: swaps entirely within 0-liquidity regions are not supported");
 
         final Address caller = Context.getCaller();
-        SwapCallbackData callbackData = SwapCallbackData.fromBytes(new ByteReader(data));
-        PoolData pool = Path.decodeFirstPool(new ByteReader(callbackData.path));
+
+        ObjectReader dataReader = Context.newByteArrayObjectReader("RLPn", data);
+        SwapCallbackData callbackData = SwapCallbackData.readObject(dataReader);
+        ObjectReader pathReader = Context.newByteArrayObjectReader("RLPn", callbackData.path);
+        PoolData pool = Path.decodeFirstPool(pathReader);
         Address tokenIn = pool.tokenA;
         Address tokenOut = pool.tokenB;
         int fee = pool.fee;
@@ -308,7 +312,8 @@ public class SwapRouter {
             recipient = Context.getAddress();
         }
 
-        PoolData pool = Path.decodeFirstPool(new ByteReader(data.path));
+        ObjectReader reader = Context.newByteArrayObjectReader("RLPn", data.path);
+        PoolData pool = Path.decodeFirstPool(reader);
         Context.require(tokenIn.equals(pool.tokenA), 
             "exactInputInternal: tokenIn should be tokenA");
 
@@ -317,6 +322,9 @@ public class SwapRouter {
 
         boolean zeroForOne = AddressUtils.compareTo(tokenIn, tokenOut) < 0;
 
+        ByteArrayObjectWriter writer = Context.newByteArrayObjectWriter("RLPn");
+        SwapCallbackData.writeObject(writer, data);
+        
         var result = (PairAmounts) Context.call(getPool(tokenIn, tokenOut, fee), "swap", 
             recipient,
             zeroForOne,
@@ -324,7 +332,7 @@ public class SwapRouter {
             sqrtPriceLimitX96.equals(ZERO)
                 ? (zeroForOne ? TickMath.MIN_SQRT_RATIO.add(ONE) : TickMath.MAX_SQRT_RATIO.subtract(ONE))
                 : sqrtPriceLimitX96,
-            data.toBytes()
+            writer.toByteArray()
         );
 
         return zeroForOne ? result.amount1.negate() : result.amount0.negate();
@@ -347,7 +355,8 @@ public class SwapRouter {
             recipient = Context.getAddress();
         }
 
-        PoolData pool = Path.decodeFirstPool(new ByteReader(data.path));
+        ObjectReader reader = Context.newByteArrayObjectReader("RLPn", data.path);
+        PoolData pool = Path.decodeFirstPool(reader);
         Address tokenOut = pool.tokenA;
         Context.require(tokenIn.equals(pool.tokenB), 
             "exactOutputInternal: tokenIn should be tokenB");
@@ -355,6 +364,9 @@ public class SwapRouter {
 
         boolean zeroForOne = AddressUtils.compareTo(tokenIn, tokenOut) < 0;
 
+        ByteArrayObjectWriter writer = Context.newByteArrayObjectWriter("RLPn");
+        SwapCallbackData.writeObject(writer, data);
+        
         var result = (PairAmounts) Context.call(getPool(tokenIn, tokenOut, fee), "swap", 
             recipient,
             zeroForOne,
@@ -362,7 +374,7 @@ public class SwapRouter {
             sqrtPriceLimitX96.equals(ZERO)
                 ? (zeroForOne ? TickMath.MIN_SQRT_RATIO.add(ONE) : TickMath.MAX_SQRT_RATIO.subtract(ONE))
                 : sqrtPriceLimitX96,
-            data.toBytes()
+            writer.toByteArray()
         );
 
         BigInteger amount0Delta = result.amount0;

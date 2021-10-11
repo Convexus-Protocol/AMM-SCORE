@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 ICON Foundation
+ * Copyright 2021 ICONation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,25 +18,17 @@ package foundation.icon.test.score;
 
 import foundation.icon.icx.Wallet;
 import foundation.icon.icx.data.Address;
-import foundation.icon.icx.data.IconAmount;
 import foundation.icon.icx.data.TransactionResult;
-import foundation.icon.icx.transport.jsonrpc.RpcItem;
 import foundation.icon.icx.transport.jsonrpc.RpcObject;
 import foundation.icon.icx.transport.jsonrpc.RpcValue;
 import foundation.icon.test.ResultTimeoutException;
 import foundation.icon.test.TransactionFailureException;
 import foundation.icon.test.TransactionHandler;
-import foundation.icon.test.score.Score;
 
 import java.io.IOException;
 import java.math.BigInteger;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import static foundation.icon.test.Env.LOG;
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class SwitchyFactoryScore extends Score {
 
@@ -53,5 +45,44 @@ public class SwitchyFactoryScore extends Score {
         LOG.info("scoreAddr = " + score.getAddress());
         LOG.infoExiting();
         return new SwitchyFactoryScore(score);
+    }
+
+    public TransactionResult createPool(Wallet fromWallet, Address tokenA, Address tokenB, int fee)
+            throws IOException, ResultTimeoutException {
+        RpcObject params = new RpcObject.Builder()
+                .put("tokenA", new RpcValue(tokenA))
+                .put("tokenB", new RpcValue(tokenB))
+                .put("fee", new RpcValue(BigInteger.valueOf(fee)))
+                .build();
+        TransactionResult result = invokeAndWaitResult(fromWallet, "createPool", params);
+        ensurePoolCreated(result, tokenA, tokenB, fee);
+        return result;
+    }
+
+    public TransactionResult setPoolContract(Wallet fromWallet, byte[] contractBytes)
+            throws IOException, ResultTimeoutException {
+        RpcObject params = new RpcObject.Builder()
+                .put("contractBytes", new RpcValue(contractBytes))
+                .build();
+        TransactionResult result = invokeAndWaitResult(fromWallet, "setPoolContract", params);
+        return result;
+    }
+
+    private Address ensurePoolCreated(TransactionResult result, Address tokenA, Address tokenB, int fee) throws IOException {
+        TransactionResult.EventLog event = findEventLog(result, getAddress(), "PoolCreated(Address,Address,int,int,Address)");
+        if (event != null) {
+            Address token0 = event.getIndexed().get(1).asAddress();
+            Address token1 = event.getIndexed().get(2).asAddress();
+            BigInteger _fee = event.getIndexed().get(3).asInteger();
+            // BigInteger tickSpacing = event.getIndexed().get(4).asInteger();
+            Address pool = event.getIndexed().get(5).asAddress();
+            if ((tokenA.equals(token0) && tokenB.equals(token1))
+            ||  (tokenA.equals(token1) && tokenB.equals(token0))
+            && fee == _fee.intValue()
+            ) {
+                return pool;
+            }
+        }
+        throw new IOException("Failed to get Confirmation.");
     }
 }

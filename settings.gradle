@@ -21,5 +21,6 @@ include (
     'Switchy-Tests',
     'Switchy-Utils',
     'javaee-tokens',
+    'irc2-token',
     'unittest',
     'testinteg')

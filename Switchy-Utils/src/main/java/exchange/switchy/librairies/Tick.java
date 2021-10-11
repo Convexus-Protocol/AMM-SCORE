@@ -18,6 +18,9 @@ package exchange.switchy.librairies;
 
 import java.math.BigInteger;
 
+import score.ObjectReader;
+import score.ObjectWriter;
+
 public class Tick {
     public static class Info {
       // the total position liquidity that references this tick
@@ -49,13 +52,56 @@ public class Tick {
       // a specific position.
       public boolean initialized;
 
-      public Info () {}
+      public Info(
+        BigInteger liquidityGross,
+        BigInteger liquidityNet,
+        BigInteger feeGrowthOutside0X128,
+        BigInteger feeGrowthOutside1X128,
+        BigInteger tickCumulativeOutside,
+        BigInteger secondsPerLiquidityOutsideX128,
+        BigInteger secondsOutside,
+        boolean initialized
+      ) {
+          this.liquidityGross = liquidityGross;
+          this.liquidityNet = liquidityNet;
+          this.feeGrowthOutside0X128 = feeGrowthOutside0X128;
+          this.feeGrowthOutside1X128 = feeGrowthOutside1X128;
+          this.tickCumulativeOutside = tickCumulativeOutside;
+          this.secondsPerLiquidityOutsideX128 = secondsPerLiquidityOutsideX128;
+          this.secondsOutside = secondsOutside;
+          this.initialized = initialized;
+      }
+    
+      public static void writeObject(ObjectWriter w, Info obj) {
+        w.write(obj.liquidityGross);
+        w.write(obj.liquidityNet);
+        w.write(obj.feeGrowthOutside0X128);
+        w.write(obj.feeGrowthOutside1X128);
+        w.write(obj.tickCumulativeOutside);
+        w.write(obj.secondsPerLiquidityOutsideX128);
+        w.write(obj.secondsOutside);
+        w.write(obj.initialized);
+      }
+
+      public static Info readObject(ObjectReader r) {
+        return new Info(
+          r.readBigInteger(), // liquidityGross
+          r.readBigInteger(), // liquidityNet
+          r.readBigInteger(), // feeGrowthOutside0X128
+          r.readBigInteger(), // feeGrowthOutside1X128
+          r.readBigInteger(), // tickCumulativeOutside
+          r.readBigInteger(), // secondsPerLiquidityOutsideX128
+          r.readBigInteger(), // secondsOutside
+          r.readBoolean()  // initialized
+        );
+      }
     }
 
     public static BigInteger tickSpacingToMaxLiquidityPerTick (int tickSpacing) {
       int minTick = (int) ((float) TickMath.MIN_TICK / tickSpacing) * tickSpacing;
       int maxTick = (int) ((float) TickMath.MAX_TICK / tickSpacing) * tickSpacing;
       int numTicks = ((maxTick - minTick) / tickSpacing) + 1;
+      // 340282366920938463463374607431768211456 = 2^128
       return new BigInteger("340282366920938463463374607431768211456").divide(BigInteger.valueOf(numTicks));
     }
 }

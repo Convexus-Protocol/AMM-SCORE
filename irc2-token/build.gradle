@@ -2,15 +2,16 @@ version = '0.9.1'
 
 dependencies {
     compileOnly 'foundation.icon:javaee-api:0.9.0'
-    implementation 'foundation.icon:javaee-scorex:0.5.2'
-    implementation 'com.github.sink772:minimal-json:0.9.6'
-    
-    implementation project(':Switchy-Utils')
-    implementation project(':Switchy-Factory')
+    implementation 'com.github.sink772:javaee-tokens:0.6.0'
+
+    testImplementation 'foundation.icon:javaee-unittest:0.9.1'
+    testImplementation 'org.mockito:mockito-core:3.3.3'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.6.0'
 }
 
 optimizedJar {
-    mainClassName = 'exchange.switchy.pool.SwitchyPool'
+    mainClassName = 'com.iconloop.score.example.IRC2BasicToken'
     setEnableDebug(true)
     from {
         configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
@@ -19,7 +20,7 @@ optimizedJar {
 
 deployJar {
     keystore = rootProject.hasProperty('keystoreName') ? "$keystoreName" 
-        : 'Z:/Work/ICON/Switchy/Switchy/config/keystores/sejong/operator.icx'
+        : 'Z:/Work/ICON/Equality/EqualityExchange/config/keystores/sejong/operator.icx'
     password = rootProject.hasProperty('keystorePass') ? "$keystorePass"
         : 'gochain'
 
@@ -28,8 +29,8 @@ deployJar {
             uri = 'https://sejong.net.solidwallet.io/api/v3'
             nid = 83
         }
-        switchy {
-            uri = ''
+        equality {
+            uri = 'http://46.105.138.206:9082/api/v3'
             nid = 3
         }
         local {
@@ -38,6 +39,10 @@ deployJar {
         }
     }
     parameters {
+        arg('_name', 'USDC')
+        arg('_symbol', 'USDC')
+        arg('_decimals', '6')
+        arg('_initialSupply', '0x10000000')
     }
 }
 

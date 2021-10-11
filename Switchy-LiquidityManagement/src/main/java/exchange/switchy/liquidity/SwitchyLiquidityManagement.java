@@ -24,12 +24,13 @@ import exchange.switchy.librairies.PoolAddress;
 import exchange.switchy.librairies.TickMath;
 import score.Address;
 import score.BranchDB;
+import score.ByteArrayObjectWriter;
 import score.Context;
 import score.DictDB;
+import score.ObjectReader;
 import score.annotation.External;
 
 import exchange.switchy.pool.Slot0;
-import exchange.switchy.utils.ByteReader;
 
 import static java.math.BigInteger.ZERO;
 
@@ -98,7 +99,8 @@ public class SwitchyLiquidityManagement {
         BigInteger amount1Owed,
         byte[] data
     ) {
-        MintCallbackData decoded = MintCallbackData.fromBytes(new ByteReader(data));
+        ObjectReader reader = Context.newByteArrayObjectReader("RLPn", data);
+        MintCallbackData decoded = MintCallbackData.readObject(reader);
         CallbackValidation.verifyCallback(this.factory, decoded.poolKey);
 
         if (amount0Owed.compareTo(ZERO) > 0) {
@@ -118,6 +120,7 @@ public class SwitchyLiquidityManagement {
 
     /**
      * @notice Add liquidity to an initialized pool
+     * @dev Liquidity must have been provided beforehand
      */
     @External
     public AddLiquidityResult addLiquidity (AddLiquidityParams params) {
@@ -139,12 +142,15 @@ public class SwitchyLiquidityManagement {
             params.amount1Desired
         );
 
+        ByteArrayObjectWriter writer = Context.newByteArrayObjectWriter("RLPn");
+        MintCallbackData.writeObject(writer, new MintCallbackData(poolKey, Context.getCaller()));
+
         PairAmounts amounts = (PairAmounts) Context.call(pool, "mint", 
             params.recipient,
             params.tickLower,
             params.tickUpper,
             liquidity,
-            new MintCallbackData(poolKey, Context.getCaller()).toBytes()
+            writer.toByteArray()
         );
 
         Context.require(

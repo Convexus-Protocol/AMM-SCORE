@@ -16,9 +16,9 @@
 
 package exchange.switchy.router;
 
-import exchange.switchy.utils.ByteReader;
-import exchange.switchy.utils.BytesUtils;
 import score.Address;
+import score.ObjectReader;
+import score.ObjectWriter;
 
 class SwapCallbackData {
     public byte[] path;
@@ -29,18 +29,14 @@ class SwapCallbackData {
         this.payer = payer;
     }
 
-    public static SwapCallbackData fromBytes (ByteReader reader) {
-        int pathLength = reader.readInt();
-        byte[] path = reader.read(pathLength);
+    public static SwapCallbackData readObject (ObjectReader reader) {
+        byte[] path = reader.readByteArray();
         Address payer = reader.readAddress();
         return new SwapCallbackData(path, payer);
     }
 
-    public byte[] toBytes () {
-        return BytesUtils.concat(
-            BytesUtils.intToBytes(this.path.length),
-            this.path,
-            this.payer.toByteArray()
-        );
-    }
+    public static void writeObject(ObjectWriter w, SwapCallbackData obj) {
+        w.write(obj.path);
+        w.write(obj.payer);
+      }
 }

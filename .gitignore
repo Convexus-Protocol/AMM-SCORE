@@ -18,4 +18,8 @@ testsvc/
 .project
 .classpath
 
+config/deploy
+
+*.pyc
+
 R&D/TODO
