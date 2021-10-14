@@ -1,0 +1,6 @@
+{
+  "method": "initialize",
+  "params": {
+    "sqrtPriceX96": "0xb504f333f9de680000000000"
+  }
+}

@@ -17,6 +17,7 @@
 package exchange.switchy.pool;
 
 import java.math.BigInteger;
+import java.util.Map;
 
 import score.ObjectReader;
 import score.ObjectWriter;
@@ -56,6 +57,19 @@ public class Slot0 {
             r.readInt(), // observationCardinality
             r.readInt(), // observationCardinalityNext
             r.readInt()  // feeProtocol
+        );
+    }
+
+    public static Slot0 fromCall(Object callresult) {
+        @SuppressWarnings("unchecked")
+        Map<String,Object> map = (Map<String,Object>) callresult;
+        return new Slot0(
+            (BigInteger) map.get("sqrtPriceX96"),
+            ((BigInteger) map.get("tick")).intValue(),
+            ((BigInteger) map.get("observationIndex")).intValue(),
+            ((BigInteger) map.get("observationCardinality")).intValue(),
+            ((BigInteger) map.get("observationCardinalityNext")).intValue(),
+            ((BigInteger) map.get("feeProtocol")).intValue()
         );
     }
 

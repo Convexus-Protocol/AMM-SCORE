@@ -30,24 +30,12 @@ public class PeripheryPayments {
    */
   public static void pay(
     Address sICX,
-    Address token, 
-    Address recipient, 
+    Address token,
+    Address recipient,
     BigInteger value
   ) {
-    final Address thisAddress = Context.getAddress();
-
-    if (token.equals(sICX) && Context.getBalance(thisAddress).compareTo(value) >= 0) {
-      // pay with sICX
-      // TODO: SICX deposit
-      Context.call(value, sICX, "deposit");
-      Context.call(sICX, "transfer", recipient, value);
-    } else {
-      // Check if we're paying everything as expected
-      BigInteger thisBalance = (BigInteger) Context.call(token, "balanceOf", thisAddress);
-      Context.require(thisBalance.compareTo(value) >= 0,
-        "PeripheryPayments::pay: not enough balance");
-
-      Context.call(token, "transfer", recipient, value);
-    }
+    // TODO: ICX payment
+    Context.println("Paying " + value + " " + token + " to " + recipient);
+    Context.call(token, "transfer", recipient, value);
   }
 }

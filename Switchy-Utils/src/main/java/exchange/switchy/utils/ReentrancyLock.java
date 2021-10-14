@@ -26,8 +26,8 @@ public class ReentrancyLock {
         locked = Context.newVarDB(id + "_locked", Boolean.class);
     }
 
-    public boolean unlocked () {
-        return !this.locked.get();
+    public Boolean get () {
+        return this.locked.get();
     }
 
     /**

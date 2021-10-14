@@ -27,7 +27,7 @@ import score.Context;
 public class FullMath {
 
   public static BigInteger mulDivRoundingUp(BigInteger a, BigInteger b, BigInteger denominator) {
-    
+
     BigInteger result = mulDiv(a, b, denominator);
 
     if (mulmod(a, b, denominator).compareTo(BigInteger.ZERO) > 0) {
@@ -60,22 +60,22 @@ public class FullMath {
     BigInteger prod0; // Least significant 256 bits of the product
     BigInteger prod1; // Most significant 256 bits of the product
 
-    BigInteger mm = mulmod(a, b, BigInteger.ZERO.not());
+    BigInteger mm = mulmod(a, b, IntConstants.MAX_UINT256);
     prod0 = a.multiply(b);
     prod1 = mm.subtract(prod0).subtract(lt(mm, prod0));
-    
+
     // Handle non-overflow cases, 256 by 256 division
     if (prod1.equals(BigInteger.ZERO)) {
       Context.require(denominator.compareTo(BigInteger.ZERO) > 0,
         "mulDiv: denominator > 0");
       return prod0.divide(denominator);
     }
-    
+
     // Make sure the result is less than 2**256.
     // Also prevents denominator == 0
     Context.require(denominator.compareTo(prod1) > 0,
       "mulDiv: denominator > prod1");
-      
+
     ///////////////////////////////////////////////
     // 512 by 256 division.
     ///////////////////////////////////////////////
@@ -83,22 +83,22 @@ public class FullMath {
     // Make division exact by subtracting the remainder from [prod1 prod0]
     // Compute remainder using mulmod
     BigInteger remainder = mulmod(a, b, denominator);
-    
+
     // Subtract 256 bit number from 512 bit number
     prod1 = prod1.subtract(gt(remainder, prod0));
     prod0 = prod0.subtract(remainder);
-    
+
     // Factor powers of two out of denominator
     // Compute largest power of two divisor of denominator.
     // Always >= 1.
     BigInteger twos = denominator.negate().and(denominator);
-    
+
     // Divide denominator by power of two
     denominator = denominator.divide(twos);
-    
+
     // Divide [prod1 prod0] by the factors of two
     prod0 = prod0.divide(twos);
-    
+
     // Shift in bits from prod1 into prod0. For this we need
     // to flip `twos` such that it is 2**256 / twos.
     // If twos is zero, then it becomes one
@@ -112,7 +112,7 @@ public class FullMath {
     // Compute the inverse by starting with a seed that is correct
     // correct for four bits. That is, denominator * inv = 1 mod 2**4
     BigInteger inv = denominator.multiply(BigInteger.valueOf(3)).xor(BigInteger.TWO);
-    
+
     // Now use Newton-Raphson iteration to improve the precision.
     // Thanks to Hensel's lifting lemma, this also works in modular
     // arithmetic, doubling the correct bits in each step.
@@ -122,7 +122,7 @@ public class FullMath {
     inv = inv.multiply(BigInteger.TWO.subtract(denominator.multiply(inv))); // inverse mod 2**64
     inv = inv.multiply(BigInteger.TWO.subtract(denominator.multiply(inv))); // inverse mod 2**128
     inv = inv.multiply(BigInteger.TWO.subtract(denominator.multiply(inv))); // inverse mod 2**256
-    
+
     // Because the division is now exact we can divide by multiplying
     // with the modular inverse of denominator. This will give us the
     // correct result modulo 2**256. Since the precoditions guarantee

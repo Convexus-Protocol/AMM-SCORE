@@ -17,13 +17,26 @@
 package exchange.switchy.pool;
 
 import exchange.switchy.utils.SwitchyTest;
+import score.Address;
+import exchange.switchy.factory.SwitchyFactory;
+import exchange.switchy.testtokens.Sicx;
+import exchange.switchy.testtokens.Usdc;
 import exchange.switchy.utils.ScoreSpy;
 
 public class SwitchyPoolTest extends SwitchyTest {
 
   ScoreSpy<SwitchyPool> pool;
+  ScoreSpy<SwitchyFactory> factory;
+  ScoreSpy<Sicx> sicx;
+  ScoreSpy<Usdc> usdc;
 
-  void setup_pool () throws Exception {
-    pool = deploy_pool();
+  void setup_pool (Address factory, int fee, int tickSpacing) throws Exception {
+    sicx = deploy_sicx();
+    usdc = deploy_usdc();
+    pool = deploy_pool(sicx.getAddress(), usdc.getAddress(), factory, fee, tickSpacing);
+  }
+
+  void setup_factory () throws Exception {
+    factory = deploy_factory();
   }
 }

@@ -18,7 +18,7 @@ package foundation.icon.test.cases;
 
 import foundation.icon.icx.IconService;
 import foundation.icon.icx.KeyWallet;
-import foundation.icon.icx.data.Address;
+// import foundation.icon.icx.data.Address;
 import foundation.icon.icx.transport.http.HttpProvider;
 import foundation.icon.test.Env;
 import foundation.icon.test.TestBase;
@@ -82,7 +82,7 @@ public class SwitchyFactoryIntTest extends TestBase {
         LOG.info("Address of owner: " + ownerWallet.getAddress());
         LOG.info("Address of Alice: " + aliceWallet.getAddress());
         LOG.info("Address of Bob:   " + bobWallet.getAddress());
-        Address scoreAddress = score.getAddress();
+        // Address scoreAddress = score.getAddress();
 
         LOG.info("Deploying IUSDC token");
         var usdc = IRC2BasicToken.install(txHandler, ownerWallet, "ICON USDC", "IUSDC", BigInteger.valueOf(8), MathUtils.pow10(18));
@@ -91,7 +91,7 @@ public class SwitchyFactoryIntTest extends TestBase {
         var sicx = IRC2BasicToken.install(txHandler, ownerWallet, "Staked ICX", "sICX", BigInteger.valueOf(8), MathUtils.pow10(18));
 
         LOG.info("Deploying bnUSD token");
-        var bnusd = IRC2BasicToken.install(txHandler, ownerWallet, "Balanced USD", "bnUSD", BigInteger.valueOf(8), MathUtils.pow10(18));
+        // var bnusd = IRC2BasicToken.install(txHandler, ownerWallet, "Balanced USD", "bnUSD", BigInteger.valueOf(8), MathUtils.pow10(18));
 
         LOG.info("Setting the pool contract bytes to Factory");
         byte[] fileContent = Files.readAllBytes(new File(Score.getFilePath("Switchy-Pool")).toPath());

@@ -26,10 +26,14 @@ import exchange.switchy.factory.SwitchyFactory;
 import exchange.switchy.initializer.SwitchyPoolInitializer;
 import exchange.switchy.router.SwapRouter;
 import exchange.switchy.ticklens.TickLens;
+import score.Address;
 import exchange.switchy.liquidity.SwitchyLiquidityManagement;
 import exchange.switchy.quoter.Quoter;
 import exchange.switchy.pairflash.PairFlash;
 import exchange.switchy.swap.Swap;
+import exchange.switchy.testtokens.Bnusd;
+import exchange.switchy.testtokens.Sicx;
+import exchange.switchy.testtokens.Usdc;
 
 import static org.mockito.Mockito.spy;
 
@@ -55,8 +59,8 @@ public class SwitchyTest extends TestBase {
     protected final BigInteger EXA = BigInteger.TEN.pow(18);
 
     // Deployers
-    public ScoreSpy<SwitchyPool> deploy_pool () throws Exception {
-        Score score = sm.deploy(owner, SwitchyPool.class);
+    public ScoreSpy<SwitchyPool> deploy_pool (Address token0, Address token1, Address factory, int fee, int tickSpacing) throws Exception {
+        Score score = sm.deploy(owner, SwitchyPool.class, token0, token1, factory, fee, tickSpacing);
 
         var spy = (SwitchyPool) spy(score.getInstance());
         score.setInstance(spy);
@@ -125,5 +129,29 @@ public class SwitchyTest extends TestBase {
         var spy = (Swap) spy(score.getInstance());
         score.setInstance(spy);
         return new ScoreSpy<Swap>(score, spy);
+    }
+
+    public ScoreSpy<Sicx> deploy_sicx () throws Exception {
+        Score score = sm.deploy(owner, Sicx.class);
+
+        var spy = (Sicx) spy(score.getInstance());
+        score.setInstance(spy);
+        return new ScoreSpy<Sicx>(score, spy);
+    }
+    
+    public ScoreSpy<Bnusd> deploy_bnusd () throws Exception {
+        Score score = sm.deploy(owner, Bnusd.class);
+
+        var spy = (Bnusd) spy(score.getInstance());
+        score.setInstance(spy);
+        return new ScoreSpy<Bnusd>(score, spy);
+    }
+    
+    public ScoreSpy<Usdc> deploy_usdc () throws Exception {
+        Score score = sm.deploy(owner, Usdc.class);
+
+        var spy = (Usdc) spy(score.getInstance());
+        score.setInstance(spy);
+        return new ScoreSpy<Usdc>(score, spy);
     }
 }

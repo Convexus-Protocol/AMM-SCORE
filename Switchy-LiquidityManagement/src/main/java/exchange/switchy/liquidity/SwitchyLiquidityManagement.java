@@ -127,9 +127,10 @@ public class SwitchyLiquidityManagement {
         PoolAddress.PoolKey poolKey = new PoolAddress.PoolKey(params.token0, params.token1, params.fee);
 
         Address pool = PoolAddress.getPool(this.factory, poolKey);
-
+        
         // compute the liquidity amount
-        var result = (Slot0) Context.call(pool, "slot0");
+        var result = Slot0.fromCall(Context.call(pool, "slot0"));
+
         BigInteger sqrtPriceX96 = result.sqrtPriceX96;
         BigInteger sqrtRatioAX96 = TickMath.getSqrtRatioAtTick(params.tickLower);
         BigInteger sqrtRatioBX96 = TickMath.getSqrtRatioAtTick(params.tickUpper);
@@ -141,7 +142,7 @@ public class SwitchyLiquidityManagement {
             params.amount0Desired,
             params.amount1Desired
         );
-
+            
         ByteArrayObjectWriter writer = Context.newByteArrayObjectWriter("RLPn");
         MintCallbackData.writeObject(writer, new MintCallbackData(poolKey, Context.getCaller()));
 
@@ -169,20 +170,22 @@ public class SwitchyLiquidityManagement {
             "deposit: Deposit amount cannot be less or equal to 0");
 
         // --- OK from here ---
-        var deposited = this.deposited.at(caller);
-        deposited.set(caller, deposited.get(caller).add(amountIn));
+        var depositedUser = this.deposited.at(caller);
+        BigInteger oldBalance = depositedUser.getOrDefault(tokenIn, ZERO);
+        depositedUser.set(tokenIn, oldBalance.add(amountIn));
+        Context.println("LM: deposit("+caller+")("+tokenIn+") = " + this.deposited.at(caller).get(tokenIn));
     }
 
     @External
     public void withdraw (Address token) {
         final Address caller = Context.getCaller();
 
-        var deposited = this.deposited.at(caller);
-        BigInteger amount = deposited.get(caller);
+        var depositedUser = this.deposited.at(caller);
+        BigInteger amount = depositedUser.getOrDefault(caller, ZERO);
 
         if (amount.compareTo(ZERO) > 0) {
             Context.call(token, "transfer", caller, amount, "withdraw".getBytes());
-            deposited.set(caller, ZERO);
+            depositedUser.set(token, ZERO);
         }
     }
 
@@ -210,8 +213,8 @@ public class SwitchyLiquidityManagement {
     // Checks
     // ================================================
     private void checkEnoughDeposited (Address address, Address token, BigInteger amount) {
-        var deposited = this.deposited.at(address);
-        Context.require(deposited.get(token).compareTo(amount) >= 0,
+        var depositedUser = this.deposited.at(address);
+        Context.require(depositedUser.getOrDefault(token, ZERO).compareTo(amount) >= 0,
             "checkEnoughDeposited: user didn't deposit enough funds");
     }
 

@@ -16,6 +16,8 @@
 
 package exchange.switchy.librairies;
 
+import static java.math.BigInteger.ZERO;
+
 import java.math.BigInteger;
 
 import score.Context;
@@ -33,12 +35,13 @@ public class Ticks {
   // ================================================
   // Look up information about a specific tick in the pool
   private final DictDB<Integer, Tick.Info> ticks = Context.newDictDB(NAME + "_ticks", Tick.Info.class);
+  private final Tick.Info emptyTick = new Tick.Info(ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, false);
 
   // ================================================
   // Methods
   // ================================================
   public Tick.Info get (int key) {
-    return this.ticks.get(key);
+    return this.ticks.getOrDefault(key, emptyTick);
   }
 
   public void set (int key, Tick.Info value) {
@@ -80,9 +83,9 @@ public class Ticks {
       Context.require(liquidityGrossAfter.compareTo(maxLiquidity) <= 0, 
         "update: liquidityGrossAfter <= maxLiquidity");
 
-      boolean flipped = (liquidityGrossAfter.equals(BigInteger.ZERO)) != (liquidityGrossBefore.equals(BigInteger.ZERO));
+      boolean flipped = (liquidityGrossAfter.equals(ZERO)) != (liquidityGrossBefore.equals(ZERO));
 
-      if (liquidityGrossBefore.equals(BigInteger.ZERO)) {
+      if (liquidityGrossBefore.equals(ZERO)) {
           // by convention, we assume that all growth before a tick was initialized happened _below_ the tick
           if (tick <= tickCurrent) {
               info.feeGrowthOutside0X128 = feeGrowthGlobal0X128;

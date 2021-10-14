@@ -3,7 +3,6 @@ package exchange.switchy.pairflash;
 import java.math.BigInteger;
 
 import exchange.switchy.librairies.PoolAddress;
-import exchange.switchy.utils.BytesUtils;
 import score.Address;
 import score.ObjectReader;
 import score.ObjectWriter;

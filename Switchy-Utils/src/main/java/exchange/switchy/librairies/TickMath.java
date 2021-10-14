@@ -40,11 +40,12 @@ public class TickMath {
   public final static BigInteger MAX_SQRT_RATIO = new BigInteger("1461446703485210103287273052203988822378723970342");
 
   public static BigInteger getSqrtRatioAtTick (int tick) {
-    BigInteger absTick = tick < 0 ? BigInteger.valueOf(-tick) : BigInteger.valueOf(tick);
+    BigInteger absTick = BigInteger.valueOf(tick).abs();
     Context.require(absTick.compareTo(BigInteger.valueOf(MAX_TICK)) <= 0, 
       "getSqrtRatioAtTick: tick can't be superior to MAX_TICK");
 
-    BigInteger ratio = !absTick.and(BigInteger.valueOf(0x1)).equals(ZERO) ? new BigInteger("fffcb933bd6fad37aa2d162d1a594001", 16) : new BigInteger("100000000000000000000000000000000", 16);
+    BigInteger ratio = 
+        !absTick.and(BigInteger.valueOf(0x1)).equals(ZERO) ? new BigInteger("fffcb933bd6fad37aa2d162d1a594001", 16) : new BigInteger("100000000000000000000000000000000", 16);
     if (!absTick.and(BigInteger.valueOf(0x2)).equals(ZERO)) ratio = (ratio.multiply(new BigInteger("fff97272373d413259a46990580e213a", 16))).shiftRight(128);
     if (!absTick.and(BigInteger.valueOf(0x4)).equals(ZERO)) ratio = (ratio.multiply(new BigInteger("fff2e50f5f656932ef12357cf3c7fdcc", 16))).shiftRight(128);
     if (!absTick.and(BigInteger.valueOf(0x8)).equals(ZERO)) ratio = (ratio.multiply(new BigInteger("ffe5caca7e10e4e61c3624eaa0941cd0", 16))).shiftRight(128);

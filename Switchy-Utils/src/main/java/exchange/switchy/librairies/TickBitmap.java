@@ -16,6 +16,8 @@
 
 package exchange.switchy.librairies;
 
+import static java.math.BigInteger.ZERO;
+
 import java.math.BigInteger;
 
 import exchange.switchy.utils.IntConstants;
@@ -49,7 +51,7 @@ public class TickBitmap {
   }
 
   public BigInteger get (int index) {
-    return this.tickBitmap.get(index);
+    return this.tickBitmap.getOrDefault(index, ZERO);
   }
 
   /**
@@ -80,7 +82,7 @@ public class TickBitmap {
       int bitPos = result.bitPos;
 
       BigInteger mask = BigInteger.ONE.shiftLeft(bitPos);
-      BigInteger packedTick = this.tickBitmap.get(wordPos);
+      BigInteger packedTick = this.get(wordPos);
 
       this.tickBitmap.set(wordPos, packedTick.xor(mask));
   }
@@ -107,10 +109,10 @@ public class TickBitmap {
         int bitPos  = position.bitPos;
         // all the 1s at or to the right of the current bitPos
         BigInteger mask = BigInteger.valueOf((1 << bitPos) - 1 + (1 << bitPos));
-        BigInteger masked = this.tickBitmap.get(wordPos).and(mask);
+        BigInteger masked = this.get(wordPos).and(mask);
 
         // if there are no initialized ticks to the right of or at the current tick, return rightmost in the word
-        result.initialized = !masked.equals(BigInteger.ZERO);
+        result.initialized = !masked.equals(ZERO);
         // overflow/underflow is possible, but prevented externally by limiting both tickSpacing and tick
         result.tickNext = result.initialized
             ? (compressed - (bitPos - BitMath.mostSignificantBit(masked))) * tickSpacing
@@ -122,10 +124,10 @@ public class TickBitmap {
         int bitPos  = position.bitPos;
         // all the 1s at or to the left of the bitPos
         BigInteger mask = BigInteger.valueOf(~((1 << bitPos) - 1));
-        BigInteger masked = this.tickBitmap.get(wordPos).and(mask);
+        BigInteger masked = this.get(wordPos).and(mask);
 
         // if there are no initialized ticks to the left of the current tick, return leftmost in the word
-        result.initialized = !masked.equals(BigInteger.ZERO);
+        result.initialized = !masked.equals(ZERO);
         // overflow/underflow is possible, but prevented externally by limiting both tickSpacing and tick
         result.tickNext = result.initialized
             ? (compressed + 1 + BitMath.leastSignificantBit(masked) - bitPos) * tickSpacing

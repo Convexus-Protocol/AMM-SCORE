@@ -151,6 +151,8 @@ public class SwitchyFactory {
         Context.require(tickSpacing != 0, 
             "createPool: tickSpacing cannot be 0");
 
+        Context.println("[SCORE] tickSpacing = " + tickSpacing);
+
         Context.require(getPool.at(token0).at(token1).get(fee) == null, 
             "createPool: pool already exists");
 

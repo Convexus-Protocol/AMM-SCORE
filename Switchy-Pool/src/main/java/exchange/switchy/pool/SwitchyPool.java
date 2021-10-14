@@ -40,6 +40,7 @@ import score.Context;
 import score.VarDB;
 import score.annotation.EventLog;
 import score.annotation.External;
+import score.annotation.Optional;
 
 public class SwitchyPool {
 
@@ -282,18 +283,21 @@ public class SwitchyPool {
     public SwitchyPool(
         // TODO: PATCH PATCH PATCH: REMOVE ME
         Address _token0,
-        Address _token1
+        Address _token1,
+        Address _factory,
+        int fee,
+        int tickSpacing
         // END OF PATCH
     ) {
         // SwitchyPoolDeployerParameters parameters = (SwitchyPoolDeployerParameters) Context.call(Context.getCaller(), "parameters");
 
         /**  === TODO: PATCH PATCH PATCH: REMOVE ME === */
         SwitchyPoolDeployerParameters parameters = new SwitchyPoolDeployerParameters(
-            Address.fromString("cx0000000000000000000000000000000000000000"), 
+            _factory, 
             _token0, 
             _token1, 
-            500,
-            10
+            fee,
+            tickSpacing
         );
         /**  === END OF PATCH === */
 
@@ -309,8 +313,22 @@ public class SwitchyPool {
         this.maxLiquidityPerTick = Tick.tickSpacingToMaxLiquidityPerTick(parameters.tickSpacing);
         this.name = "Switchy Pool " + this.token0 + "/" + this.token1;
 
+        // Default values
+        if (this.liquidity.get() == null) {
+            this.liquidity.set(BigInteger.ZERO);
+        }
+        if (this.feeGrowthGlobal0X128.get() == null) {
+            this.feeGrowthGlobal0X128.set(BigInteger.ZERO);
+        }
+        if (this.feeGrowthGlobal1X128.get() == null) {
+            this.feeGrowthGlobal1X128.set(BigInteger.ZERO);
+        }
+        
+
         // locked by default
-        this.poolLock.lock(true);
+        if (this.poolLock.get() == null) {
+            this.poolLock.lock(true);
+        }
     }
 
     private void checkTicks (int tickLower, int tickUpper) {
@@ -458,15 +476,13 @@ public class SwitchyPool {
      */
     @External
     public void initialize (BigInteger sqrtPriceX96) {
-        Slot0 _slot0 = this.slot0.get();
-
-        Context.require(_slot0.sqrtPriceX96.equals(BigInteger.ZERO), 
-            "initialize: sqrtPriceX96 must be equal to 0");
+        Context.require(this.slot0.get() == null, 
+            "initialize: slot0 must be uninitialized");
 
         int tick = TickMath.getTickAtSqrtRatio(sqrtPriceX96);
-
+        
         var result = observations.initialize(_blockTimestamp());
-
+        
         this.slot0.set(new Slot0(
             sqrtPriceX96,
             tick,
@@ -475,7 +491,7 @@ public class SwitchyPool {
             result.cardinalityNext,
             0
         ));
-        
+
         // Unlock the pool
         this.poolLock.lock(false);
 
@@ -508,8 +524,8 @@ public class SwitchyPool {
         byte[] positionKey = Positions.getKey(owner, tickLower, tickUpper);
         Position.Info position = this.positions.get(positionKey);
 
-        BigInteger _feeGrowthGlobal0X128 = feeGrowthGlobal0X128.get();
-        BigInteger _feeGrowthGlobal1X128 = feeGrowthGlobal1X128.get();
+        BigInteger _feeGrowthGlobal0X128 = this.feeGrowthGlobal0X128.get();
+        BigInteger _feeGrowthGlobal1X128 = this.feeGrowthGlobal1X128.get();
         Slot0 _slot0 = this.slot0.get();
         
         // if we need to update the ticks, do it
@@ -568,17 +584,17 @@ public class SwitchyPool {
         BigInteger feeGrowthInside1X128 = result.feeGrowthInside1X128;
 
         position.update(liquidityDelta, feeGrowthInside0X128, feeGrowthInside1X128);
-
+        
         // clear any tick data that is no longer needed
         if (liquidityDelta.compareTo(BigInteger.ZERO) < 0) {
             if (flippedLower) {
-                ticks.clear(tickLower);
+                this.ticks.clear(tickLower);
             }
             if (flippedUpper) {
-                ticks.clear(tickUpper);
+                this.ticks.clear(tickUpper);
             }
         }
-
+        
         this.positions.set(positionKey, position);
         return new PositionStorage(position, positionKey);
     }
@@ -673,7 +689,7 @@ public class SwitchyPool {
                     params.liquidityDelta
                 );
 
-                liquidity.set(LiquidityMath.addDelta(liquidityBefore, params.liquidityDelta));
+                this.liquidity.set(LiquidityMath.addDelta(liquidityBefore, params.liquidityDelta));
             } else {
                 // current tick is above the passed range; liquidity can only become in range by crossing from right to
                 // left, when we'll need _more_ token1 (it's becoming more valuable) so user must provide it
@@ -742,11 +758,13 @@ public class SwitchyPool {
         Context.call(caller, "switchyMintCallback", amount0, amount1, data);
 
         if (amount0.compareTo(BigInteger.ZERO) > 0) {
-            Context.require(balance0Before.add(amount0).compareTo(balance0()) <= 0, 
-            "mint: M0");
+            BigInteger expected = balance0Before.add(amount0);
+            Context.require(expected.compareTo(balance0()) <= 0, 
+            "mint: M0 - " + expected + " / " + balance0());
         }
         if (amount1.compareTo(BigInteger.ZERO) > 0) {
-            Context.require(balance1Before.add(amount1).compareTo(balance1()) <= 0, 
+            BigInteger expected = balance1Before.add(amount1);
+            Context.require(expected.compareTo(balance1()) <= 0, 
             "mint: M1");
         }
 
@@ -1329,6 +1347,12 @@ public class SwitchyPool {
         return new PairAmounts(amount0, amount1);
     }
 
+    @External
+    public void tokenFallback (Address _from, BigInteger _value, @Optional byte[] _data) throws Exception {
+        Context.require(_from.isContract(), "tokenFallback: Pool shouldn't need to receive funds from EOA");
+        Context.println("Pool: Received " + _value + " of " + Context.getCaller() + " tokens!");
+    }
+
     // ================================================
     // Checks
     // ================================================
@@ -1342,6 +1366,21 @@ public class SwitchyPool {
     @External(readonly = true)
     public String name() {
         return this.name;
+    }
+
+    @External(readonly = true)
+    public Address factory() {
+        return this.factory;
+    }
+
+    @External(readonly = true)
+    public Address token0() {
+        return this.token0;
+    }
+
+    @External(readonly = true)
+    public Address token1() {
+        return this.token1;
     }
 
     @External(readonly = true)
@@ -1359,14 +1398,22 @@ public class SwitchyPool {
         return this.observations.get(index);
     }
 
+    @External(readonly = true)
     public Slot0 slot0 () {
         return this.slot0.get();
     }
 
+    @External(readonly = true)
     public BigInteger tickBitmap (int index) {
         return this.tickBitmap.get(index);
     }
 
+    @External(readonly = true)
+    public BigInteger maxLiquidityPerTick () {
+        return this.maxLiquidityPerTick;
+    }
+
+    @External(readonly = true)
     public int tickSpacing () {
         return this.tickSpacing;
     }

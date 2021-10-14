@@ -17,6 +17,8 @@
 
 package exchange.switchy.librairies;
 
+import static java.math.BigInteger.ZERO;
+
 import exchange.switchy.utils.BytesUtils;
 import score.Address;
 import score.Context;
@@ -31,9 +33,10 @@ public class Positions {
   
   // Returns the information about a position by the position's key
   private final DictDB<byte[], Position.Info> positions = Context.newDictDB(NAME + "_positions", Position.Info.class);
-  
+  private final Position.Info emptyPosition = new Position.Info(ZERO, ZERO, ZERO, ZERO, ZERO);
+
   public Position.Info get (byte[] key) {
-    return this.positions.get(key);
+    return this.positions.getOrDefault(key, emptyPosition);
   }
 
   public void set (byte[] key, Position.Info value) {

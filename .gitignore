@@ -21,5 +21,6 @@ testsvc/
 config/deploy
 
 *.pyc
+venv/
 
 R&D/TODO

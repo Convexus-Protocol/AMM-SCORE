@@ -18,6 +18,7 @@ package exchange.switchy.librairies;
 
 import java.math.BigInteger;
 
+import score.Context;
 import score.ObjectReader;
 import score.ObjectWriter;
 
@@ -98,8 +99,12 @@ public class Tick {
     }
 
     public static BigInteger tickSpacingToMaxLiquidityPerTick (int tickSpacing) {
-      int minTick = (int) ((float) TickMath.MIN_TICK / tickSpacing) * tickSpacing;
-      int maxTick = (int) ((float) TickMath.MAX_TICK / tickSpacing) * tickSpacing;
+      Context.println("tickSpacing=" + tickSpacing);
+      Context.println("TickMath.MIN_TICK / tickSpacing=" + TickMath.MIN_TICK / tickSpacing);
+      int minTick = ((int) ((float) TickMath.MIN_TICK / tickSpacing)) * tickSpacing;
+      int maxTick = ((int) ((float) TickMath.MAX_TICK / tickSpacing)) * tickSpacing;
+      Context.println("minTick = " + minTick);
+      Context.println("maxTick = " + maxTick);
       int numTicks = ((maxTick - minTick) / tickSpacing) + 1;
       // 340282366920938463463374607431768211456 = 2^128
       return new BigInteger("340282366920938463463374607431768211456").divide(BigInteger.valueOf(numTicks));

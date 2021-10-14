@@ -19,36 +19,27 @@ package exchange.switchy.librairies;
 import java.math.BigInteger;
 
 import exchange.switchy.utils.MathUtils;
-import score.ArrayDB;
 import score.Context;
+import score.DictDB;
+import score.ObjectReader;
+import score.ObjectWriter;
 
 public class Oracle {
     public static class Observation {
       // the block timestamp of the observation
-      BigInteger blockTimestamp;
-      public BigInteger getblockTimestamp() { return this.blockTimestamp; }
-      public void setblockTimestamp(BigInteger v) { this.blockTimestamp = v; }
-
+      public BigInteger blockTimestamp;
       // the tick accumulator, i.e. tick * time elapsed since the pool was first initialized
-      BigInteger tickCumulative;
-      public BigInteger gettickCumulative() { return this.tickCumulative; }
-      public void settickCumulative(BigInteger v) { this.tickCumulative = v; }
-
+      public BigInteger tickCumulative;
       // the seconds per liquidity, i.e. seconds elapsed / max(1, liquidity) since the pool was first initialized
-      BigInteger secondsPerLiquidityCumulativeX128;
-      public BigInteger getsecondsPerLiquidityCumulativeX128() { return this.secondsPerLiquidityCumulativeX128; }
-      public void setsecondsPerLiquidityCumulativeX128(BigInteger v) { this.secondsPerLiquidityCumulativeX128 = v; }
-
+      public BigInteger secondsPerLiquidityCumulativeX128;
       // whether or not the observation is initialized
-      boolean initialized;
-      public boolean getinitialized() { return this.initialized; }
-      public void setinitialized(boolean v) { this.initialized = v; }
-        
+      public Boolean initialized;
+
       public Observation (
         BigInteger blockTimestamp,
         BigInteger tickCumulative,
         BigInteger secondsPerLiquidityCumulativeX128,
-        boolean initialized
+        Boolean initialized
       ) {
         this.blockTimestamp = blockTimestamp;
         this.tickCumulative = tickCumulative;
@@ -56,11 +47,29 @@ public class Oracle {
         this.initialized = initialized;
       }
 
+      public static void writeObject(ObjectWriter w, Observation obj) {
+        w.write(obj.blockTimestamp);
+        w.write(obj.tickCumulative);
+        w.write(obj.secondsPerLiquidityCumulativeX128);
+        w.write(obj.initialized);
+      }
+
+      public static Observation readObject(ObjectReader r) {
+        return new Observation(
+          r.readBigInteger(), // blockTimestamp, 
+          r.readBigInteger(), // tickCumulative, 
+          r.readBigInteger(), // secondsPerLiquidityCumulativeX128, 
+          r.readBoolean()     // initialized,
+        );
+      }
+      
       public Observation transform (
         BigInteger blockTimestamp,
         int tick,
         BigInteger liquidity
       ) {
+        Context.require(blockTimestamp.compareTo(this.blockTimestamp) >= 0,
+          "transform: invalid blockTimestamp");
         BigInteger delta = blockTimestamp.subtract(this.blockTimestamp);
         BigInteger tickCumulative = this.tickCumulative.add(BigInteger.valueOf(tick).multiply(delta));
         BigInteger denominator = liquidity.compareTo(BigInteger.ZERO) > 0 ? liquidity : BigInteger.ONE;
@@ -82,7 +91,7 @@ public class Oracle {
       // DB Variables
       // ================================================
       // Returns data about a specific observation index
-      private final ArrayDB<Oracle.Observation> observations = Context.newArrayDB(NAME + "_observations", Oracle.Observation.class);
+      private final DictDB<Integer, Oracle.Observation> observations = Context.newDictDB(NAME + "_observations", Oracle.Observation.class);
 
       // ================================================
       // Methods
@@ -234,7 +243,7 @@ public class Oracle {
 
       public ObserveSingleResult observeSingle (BigInteger time, BigInteger secondsAgo, int tick, int index, BigInteger liquidity, int cardinality) {
         if (secondsAgo.equals(BigInteger.ZERO)) {
-          Observation last = this.observations.get(index);
+          Observation last = this.get(index);
           if (!last.blockTimestamp.equals(time)) {
             last = last.transform(time, tick, liquidity);
             return new ObserveSingleResult(last.tickCumulative, last.secondsPerLiquidityCumulativeX128);
