@@ -9,4 +9,5 @@ find . -name "build" -type d | while read i; do rm -rf "$i"; done
 rm -rf .gradle
 rm -rf ./build
 
-notepad.exe ./workspace.code-workspace
+alias notepad="/mnt/c/Program\ Files/Microsoft\ VS\ Code/Code.exe"
+notepad ./workspace.code-workspace
