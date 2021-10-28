@@ -1,13 +1,13 @@
 <p align="center">
   <img 
-    src="https://i.imgur.com/1JmfKDo.png" 
+    src="https://i.imgur.com/LKPbTQv.png" 
     width="520px"
-    alt="Equality logo">
+    alt="Convexus logo">
 </p>
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
-# Equality SCORE
+# Convexus SCORE
 
 ## Requirements
 
