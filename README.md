@@ -1,15 +1,9 @@
-<br>
-<br>
-<br>
 <p align="center">
   <img 
-    src="https://i.imgur.com/LKPbTQv.png" 
-    width="520px"
+    src="https://i.imgur.com/FhDEoq4.png" 
+    width="350px"
     alt="Convexus logo">
 </p>
-<br>
-<br>
-<br>
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
