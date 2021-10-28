@@ -95,13 +95,15 @@ public class Oracle {
       // ================================================
       // Returns data about a specific observation index
       private final DictDB<Integer, Oracle.Observation> observations = Context.newDictDB(NAME + "_observations", Oracle.Observation.class);
-      private final Oracle.Observation emptyObservation = new Oracle.Observation(ZERO, ZERO, ZERO, false);
+      private Oracle.Observation emptyObservation () {
+        return new Oracle.Observation(ZERO, ZERO, ZERO, false);
+      }
 
       // ================================================
       // Methods
       // ================================================
       public Observation get (int index) {
-        return this.observations.getOrDefault(index, emptyObservation);
+        return this.observations.getOrDefault(index, emptyObservation());
       }
       public void set (int index, Observation observation) {
         this.observations.set(index, observation);
@@ -359,16 +361,14 @@ public class Oracle {
         Observation last = this.get(index);
         
         // early return if we've already written an observation this block
-        if (last.blockTimestamp == blockTimestamp) {
+        if (last.blockTimestamp.equals(blockTimestamp)) {
           return new WriteResult(index, cardinality);
         }
         
-        int cardinalityUpdated;
+        int cardinalityUpdated = cardinality;
         // if the conditions are right, we can bump the cardinality
         if (cardinalityNext > cardinality && index == (cardinality - 1)) {
             cardinalityUpdated = cardinalityNext;
-        } else {
-            cardinalityUpdated = cardinality;
         }
 
         int indexUpdated = (index + 1) % cardinalityUpdated;

@@ -34,7 +34,7 @@ import exchange.convexus.librairies.CallbackValidation;
 import exchange.convexus.librairies.PairAmounts;
 import exchange.convexus.utils.AddressUtils;
 import exchange.convexus.utils.BytesUtils;
-import exchange.convexus.utils.IntConstants;
+import exchange.convexus.utils.IntUtils;
 import exchange.convexus.utils.ReentrancyLock;
 import score.Address;
 import score.ByteArrayObjectWriter;
@@ -66,7 +66,7 @@ public class SwapRouter {
 
     /// @dev Used as the placeholder value for amountInCached, because the computed amount in for an exact output swap
     /// can never actually be this value
-    private BigInteger DEFAULT_AMOUNT_IN_CACHED = IntConstants.MAX_UINT256;
+    private BigInteger DEFAULT_AMOUNT_IN_CACHED = IntUtils.MAX_UINT256;
 
     // address of the Convexus factory
     public final Address factory;

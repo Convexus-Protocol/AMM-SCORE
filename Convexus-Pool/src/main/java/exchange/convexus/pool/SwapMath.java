@@ -16,10 +16,13 @@
 
 package exchange.convexus.pool;
 
+import static java.math.BigInteger.ZERO;
+
 import java.math.BigInteger;
 
 import exchange.convexus.librairies.FullMath;
 import exchange.convexus.librairies.SqrtPriceMath;
+import exchange.convexus.utils.IntUtils;
 
 class ComputeSwapStepResult {
   public BigInteger sqrtRatioNextX96;
@@ -62,14 +65,14 @@ public class SwapMath {
     int feePips
   ) {
     boolean zeroForOne = sqrtRatioCurrentX96.compareTo(sqrtRatioTargetX96) >= 0;
-    boolean exactIn = amountRemaining.compareTo(BigInteger.ZERO) >= 0;
+    boolean exactIn = amountRemaining.compareTo(ZERO) >= 0;
     final BigInteger TEN_E6 = BigInteger.valueOf(1000000);
-    
-    BigInteger sqrtRatioNextX96 = BigInteger.ZERO;
-    BigInteger amountIn = BigInteger.ZERO;
-    BigInteger amountOut = BigInteger.ZERO;
-    BigInteger feeAmount = BigInteger.ZERO;
-    
+
+    BigInteger sqrtRatioNextX96 = ZERO;
+    BigInteger amountIn = ZERO;
+    BigInteger amountOut = ZERO;
+    BigInteger feeAmount = ZERO;
+
     if (exactIn) {
       BigInteger amountRemainingLessFee = FullMath.mulDiv(amountRemaining, TEN_E6.subtract(BigInteger.valueOf(feePips)), TEN_E6);
       amountIn = zeroForOne
@@ -92,19 +95,58 @@ public class SwapMath {
           ? SqrtPriceMath.getAmount1Delta(sqrtRatioTargetX96, sqrtRatioCurrentX96, liquidity, false)
           : SqrtPriceMath.getAmount0Delta(sqrtRatioCurrentX96, sqrtRatioTargetX96, liquidity, false);
 
-      if (amountRemaining.negate().compareTo(amountOut) >= 0) {
+      if (uint256(amountRemaining.negate()).compareTo(amountOut) >= 0) {
         sqrtRatioNextX96 = sqrtRatioTargetX96;
       }
       else {
         sqrtRatioNextX96 = SqrtPriceMath.getNextSqrtPriceFromOutput(
           sqrtRatioCurrentX96,
           liquidity,
-          amountRemaining.negate(),
+          uint256(amountRemaining.negate()),
           zeroForOne
         );
       }
     }
 
+
+    boolean max = sqrtRatioTargetX96.equals(sqrtRatioNextX96);
+
+    // get the input/output amounts
+    if (zeroForOne) {
+        amountIn = max && exactIn
+            ? amountIn
+            : SqrtPriceMath.getAmount0Delta(sqrtRatioNextX96, sqrtRatioCurrentX96, liquidity, true);
+        amountOut = max && !exactIn
+            ? amountOut
+            : SqrtPriceMath.getAmount1Delta(sqrtRatioNextX96, sqrtRatioCurrentX96, liquidity, false);
+    } else {
+        amountIn = max && exactIn
+            ? amountIn
+            : SqrtPriceMath.getAmount1Delta(sqrtRatioCurrentX96, sqrtRatioNextX96, liquidity, true);
+        amountOut = max && !exactIn
+            ? amountOut
+            : SqrtPriceMath.getAmount0Delta(sqrtRatioCurrentX96, sqrtRatioNextX96, liquidity, false);
+    }
+
+    // cap the output amount to not exceed the remaining output amount
+    if (!exactIn && amountOut.compareTo(uint256(amountRemaining.negate())) > 0) {
+        amountOut = uint256(amountRemaining.negate());
+    }
+
+    if (exactIn && sqrtRatioNextX96 != sqrtRatioTargetX96) {
+        // we didn't reach the target, so take the remainder of the maximum input as fee
+        feeAmount = uint256(amountRemaining).subtract(amountIn);
+    } else {
+        feeAmount = FullMath.mulDivRoundingUp(amountIn, BigInteger.valueOf(feePips), TEN_E6.subtract(BigInteger.valueOf(feePips)));
+    }
+
     return new ComputeSwapStepResult(sqrtRatioNextX96, amountIn, amountOut, feeAmount);
+  }
+
+  private static BigInteger uint256(BigInteger n) {
+    if (n.compareTo(ZERO) < 0) {
+      return n.add(IntUtils.MAX_UINT256);
+    }
+    return n;
   }
 }

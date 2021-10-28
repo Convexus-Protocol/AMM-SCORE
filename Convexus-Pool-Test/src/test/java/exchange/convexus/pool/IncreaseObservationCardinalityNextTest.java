@@ -21,6 +21,8 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 
+import com.iconloop.score.test.ServiceManager;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -42,6 +44,7 @@ public class IncreaseObservationCardinalityNextTest extends ConvexusPoolTest {
 
   @BeforeEach
   void setup() throws Exception {
+    ServiceManager.Block.resetInstance();
     setup_factory();
     reset(factory.spy);
     setup_pool(factory.getAddress(), FEE, TICK_SPACING);

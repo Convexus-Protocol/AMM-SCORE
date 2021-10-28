@@ -16,7 +16,7 @@
 
 package exchange.convexus.quoter;
 
-import static exchange.convexus.utils.IntConstants.MAX_UINT256;
+import static exchange.convexus.utils.IntUtils.MAX_UINT256;
 import static java.math.BigInteger.ONE;
 import static java.math.BigInteger.ZERO;
 

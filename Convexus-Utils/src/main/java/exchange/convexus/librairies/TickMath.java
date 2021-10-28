@@ -22,7 +22,7 @@ import static java.math.BigInteger.ZERO;
 
 import java.math.BigInteger;
 
-import exchange.convexus.utils.IntConstants;
+import exchange.convexus.utils.IntUtils;
 import score.Context;
 
 // @title Math library for computing sqrt prices from ticks and vice versa
@@ -67,7 +67,7 @@ public class TickMath {
     if (!absTick.and(BigInteger.valueOf(0x80000)).equals(ZERO)) ratio = (ratio.multiply(new BigInteger("48a170391f7dc42444e8fa2", 16))).shiftRight(128);
 
     if (tick > 0) {
-      ratio = IntConstants.MAX_UINT256.divide(ratio);
+      ratio = IntUtils.MAX_UINT256.divide(ratio);
     }
 
     // this divides by 1<<32 rounding up to go from a Q128.128 to a Q128.96.

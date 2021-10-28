@@ -22,13 +22,15 @@ import static org.mockito.Mockito.reset;
 
 import java.math.BigInteger;
 
+import com.iconloop.score.test.ServiceManager;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import exchange.convexus.factory.ConvexusFactoryUtils;
 import exchange.convexus.utils.AssertUtils;
 
-public class MintTest extends ConvexusPoolTest {
+public class MintUnitializedTest extends ConvexusPoolTest {
 
   final int TICK_SPACINGS[] = {10, 60, 200};
   final int FEE_AMOUNTS[] = {500, 3000, 10000};
@@ -36,17 +38,25 @@ public class MintTest extends ConvexusPoolTest {
   final int MEDIUM = 1;
   final int HIGH = 2;
   int FEE = FEE_AMOUNTS[MEDIUM];
-  int TICK_SPACING = TICK_SPACINGS[MEDIUM];
+  int tickSpacing = TICK_SPACINGS[MEDIUM];
 
-  int minTick = getMinTick(TICK_SPACING);
-  int maxTick = getMaxTick(TICK_SPACING);
+  int minTick = getMinTick(tickSpacing);
+  int maxTick = getMaxTick(tickSpacing);
 
   @BeforeEach
   void setup() throws Exception {
+    ServiceManager.Block.resetInstance();
     setup_factory();
     reset(factory.spy);
-    setup_pool(factory.getAddress(), FEE, TICK_SPACING);
+    setup_pool(factory.getAddress(), FEE, tickSpacing);
     reset(pool.spy);
+
+    // Transfer some funds to Alice
+    sicx.invoke(owner, "mintTo", alice.getAddress(), TEN.pow(30).multiply(TEN.pow(18)));
+    usdc.invoke(owner, "mintTo", alice.getAddress(), TEN.pow(30).multiply(TEN.pow(18)));
+    // Transfer some funds to Bob
+    sicx.invoke(owner, "mintTo", bob.getAddress(), TEN.pow(30).multiply(TEN.pow(18)));
+    usdc.invoke(owner, "mintTo", bob.getAddress(), TEN.pow(30).multiply(TEN.pow(18)));
 
     ConvexusFactoryUtils.createPool(factory, alice, sicx.getAddress(), usdc.getAddress(), FEE, pool.getAddress());
   }
@@ -54,13 +64,15 @@ public class MintTest extends ConvexusPoolTest {
   @Test
   void testNotInitialized() {
     AssertUtils.assertThrowsMessage(AssertionError.class, () ->
-      callee.invoke(alice, "mint", pool.getAddress(), alice.getAddress(), -TICK_SPACING, TICK_SPACING, ONE),
+      callee.invoke(alice, "mint", pool.getAddress(), alice.getAddress(), -tickSpacing, tickSpacing, ONE),
       "ReentrancyLock: wrong lock state: true");
   }
 
   @Test
-  void testInitializeWithPrice10_1() {
-    pool.invoke(alice, "initialize", encodePriceSqrt(ONE, TEN));
-    callee.invoke(alice, "mint", pool.getAddress(), alice.getAddress(), minTick, maxTick, BigInteger.valueOf(3161));
+  void testNoDeposit() {
+    pool.invoke(alice, "initialize", encodePriceSqrt(ONE, ONE));
+    AssertUtils.assertThrowsMessage(AssertionError.class, () -> 
+      callee.invoke(alice, "mint", pool.getAddress(), alice.getAddress(), minTick, maxTick, BigInteger.valueOf(3161)), 
+      "checkEnoughDeposited: user didn't deposit enough funds");
   }
 }

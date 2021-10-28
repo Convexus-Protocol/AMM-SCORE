@@ -18,6 +18,8 @@ package exchange.convexus.factory;
 
 import static org.mockito.Mockito.reset;
 
+import com.iconloop.score.test.ServiceManager;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -25,6 +27,7 @@ public class FactoryTest extends ConvexusFactoryTest {
   
   @BeforeEach
   void setup() throws Exception {
+    ServiceManager.Block.resetInstance();
     setup_factory();
     reset(factory.spy);
   }

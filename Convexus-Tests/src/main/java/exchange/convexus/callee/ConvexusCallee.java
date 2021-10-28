@@ -51,6 +51,9 @@ public class ConvexusCallee {
   @EventLog
   private void MintCallback(BigInteger amount0Owed, BigInteger amount1Owed) {}
 
+  @EventLog
+  private void SwapCallback(BigInteger amount0Delta, BigInteger amount1Delta) {}
+
   @External
   public void mint (
     Address pool,
@@ -59,33 +62,61 @@ public class ConvexusCallee {
     int tickUpper,
     BigInteger amount
   ) {
-    Context.call(pool, "mint", recipient, tickLower, tickUpper, amount, Context.getAddress().toByteArray());
+    Context.call(pool, "mint", recipient, tickLower, tickUpper, amount, Context.getCaller().toByteArray());
   }
 
   @External
-  public void uniswapV3MintCallback (
+  public void convexusMintCallback (
     BigInteger amount0Owed,
     BigInteger amount1Owed,
     byte[] data
   ) {
-    Address payer = new Address(data);
+    Address sender = new Address(data);
     final Address caller = Context.getCaller();
 
     this.MintCallback(amount0Owed, amount1Owed);
 
     if (amount0Owed.compareTo(ZERO) > 0) {
-      pay(payer, (Address) Context.call(caller, "token0"), amount0Owed);
+      pay(sender, (Address) Context.call(caller, "token0"), caller, amount0Owed);
     }
-
+    
     if (amount1Owed.compareTo(ZERO) > 0) {
-      pay(payer, (Address) Context.call(caller, "token1"), amount1Owed);
+      pay(sender, (Address) Context.call(caller, "token1"), caller, amount1Owed);
     }
   }
 
-  private void pay (Address payer, Address token, BigInteger owed) {
+  @External
+  public void convexusSwapCallback (
+    BigInteger amount0Delta,
+    BigInteger amount1Delta,
+    byte[] data
+  ) {
+    Address sender = new Address(data);
     final Address caller = Context.getCaller();
+
+    this.SwapCallback(amount0Delta, amount1Delta);
+
+    if (amount0Delta.compareTo(ZERO) > 0) {
+      pay(sender, (Address) Context.call(caller, "token0"), caller, amount0Delta);
+    } else if (amount1Delta.compareTo(ZERO) > 0) {
+      pay(sender, (Address) Context.call(caller, "token1"), caller, amount1Delta);
+    } else {
+      // if both are not gt 0, both must be 0.
+      Context.require(amount0Delta.equals(ZERO) && amount1Delta.equals(ZERO),
+        "convexusSwapCallback: both amounts must be 0");
+    }
+  }
+
+  private void pay (Address payer, Address token, Address destination, BigInteger owed) {
     checkEnoughDeposited(payer, token, owed);
-    Context.call(token, "transfer", caller, owed);
+
+    // Remove funds from deposited
+    var depositedUser = this.deposited.at(payer);
+    BigInteger oldBalance = depositedUser.getOrDefault(token, ZERO);
+    depositedUser.set(token, oldBalance.subtract(owed));
+
+    // Actually transfer the tokens
+    Context.call(token, "transfer", destination, owed, "pay".getBytes());
   }
 
   // @External - this method is external through tokenFallback
@@ -98,7 +129,6 @@ public class ConvexusCallee {
     var depositedUser = this.deposited.at(caller);
     BigInteger oldBalance = depositedUser.getOrDefault(tokenIn, ZERO);
     depositedUser.set(tokenIn, oldBalance.add(amountIn));
-    Context.println("LM: deposit("+caller+")("+tokenIn+") = " + this.deposited.at(caller).get(tokenIn));
   }
 
   @External
@@ -116,22 +146,32 @@ public class ConvexusCallee {
 
   @External
   public void tokenFallback (Address _from, BigInteger _value, @Optional byte[] _data) throws Exception {
-      Reader reader = new StringReader(new String(_data));
-      JsonValue input = Json.parse(reader);
-      JsonObject root = input.asObject();
-      String method = root.get("method").asString();
-      Address token = Context.getCaller();
+    Reader reader = new StringReader(new String(_data));
+    JsonValue input = Json.parse(reader);
+    JsonObject root = input.asObject();
+    String method = root.get("method").asString();
+    Address token = Context.getCaller();
 
-      switch (method)
-      {
-          case "deposit": {
-              deposit(_from, token, _value);
-              break;
-          }
-
-          default:
-              Context.revert("tokenFallback: Unimplemented tokenFallback action");
+    switch (method)
+    {
+      case "deposit": {
+        deposit(_from, token, _value);
+        break;
       }
+
+      default:
+        Context.revert("tokenFallback: Unimplemented tokenFallback action");
+    }
+  }
+
+  @External
+  public void swapExact0For1 (Address pool, BigInteger amount0In, Address recipient, BigInteger sqrtPriceLimitX96) {
+    Context.call(pool, "swap", recipient, true, amount0In, sqrtPriceLimitX96, Context.getCaller().toByteArray());
+  }
+
+  @External
+  public void swapExact1For0 (Address pool, BigInteger amount1In, Address recipient, BigInteger sqrtPriceLimitX96) {
+    Context.call(pool, "swap", recipient, false, amount1In, sqrtPriceLimitX96, Context.getCaller().toByteArray());
   }
 
   // ================================================
@@ -139,7 +179,10 @@ public class ConvexusCallee {
   // ================================================
   private void checkEnoughDeposited (Address address, Address token, BigInteger amount) {
     var depositedUser = this.deposited.at(address);
-    Context.require(depositedUser.getOrDefault(token, ZERO).compareTo(amount) >= 0,
+    BigInteger userBalance = depositedUser.getOrDefault(token, ZERO);
+    Context.println("[DEBUG][checkEnoughDeposited][" + Context.call(token, "symbol") + "] " + userBalance + " / " + amount);
+    Context.require(userBalance.compareTo(amount) >= 0,
+        // "checkEnoughDeposited: user didn't deposit enough funds - " + userBalance + "/" + amount);
         "checkEnoughDeposited: user didn't deposit enough funds");
   }
 }

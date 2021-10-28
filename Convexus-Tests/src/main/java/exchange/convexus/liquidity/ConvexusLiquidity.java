@@ -14,15 +14,33 @@
  * limitations under the License.
  */
 
-package exchange.convexus.utils;
+package exchange.convexus.liquidity;
 
 import java.math.BigInteger;
 
-public class IntConstants {
-  public final static BigInteger MAX_UINT8   = new BigInteger("ff", 16);
-  public final static BigInteger MAX_UINT16  = new BigInteger("ffff", 16);
-  public final static BigInteger MAX_UINT32  = new BigInteger("ffffffff", 16);
-  public final static BigInteger MAX_UINT64  = new BigInteger("ffffffffffffffff", 16);
-  public final static BigInteger MAX_UINT128 = new BigInteger("ffffffffffffffffffffffffffffffff", 16);
-  public final static BigInteger MAX_UINT256 = new BigInteger("ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff", 16);
+import com.eclipsesource.json.Json;
+import com.eclipsesource.json.JsonObject;
+import com.iconloop.score.test.Account;
+import com.iconloop.score.test.Score;
+
+import score.Address;
+
+public class ConvexusLiquidity {
+  
+  public static void deposit (Account from, Address pool, Score token, BigInteger _value) {
+
+    JsonObject data = Json.object()
+      .add("method", "deposit");
+
+    byte[] dataBytes = data.toString().getBytes();
+
+    token.invoke(
+      from, 
+      "transfer", 
+      pool, 
+      _value, 
+      dataBytes
+    );
+  }
+
 }

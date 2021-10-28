@@ -33,10 +33,12 @@ public class Positions {
   
   // Returns the information about a position by the position's key
   private final DictDB<byte[], Position.Info> positions = Context.newDictDB(NAME + "_positions", Position.Info.class);
-  private final Position.Info emptyPosition = new Position.Info(ZERO, ZERO, ZERO, ZERO, ZERO);
+  private Position.Info emptyPosition () {
+    return new Position.Info(ZERO, ZERO, ZERO, ZERO, ZERO);
+  }
 
   public Position.Info get (byte[] key) {
-    return this.positions.getOrDefault(key, emptyPosition);
+    return this.positions.getOrDefault(key, emptyPosition());
   }
 
   public void set (byte[] key, Position.Info value) {
@@ -48,7 +50,7 @@ public class Positions {
       int tickLower,
       int tickUpper
   ) {
-      return Context.hash("keccak-256", 
+      return Context.hash("sha3-256", 
           BytesUtils.concat(
               owner.toByteArray(), 
               BytesUtils.intToBytes(tickLower), 

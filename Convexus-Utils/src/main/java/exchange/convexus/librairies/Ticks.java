@@ -35,16 +35,18 @@ public class Ticks {
   // ================================================
   // Look up information about a specific tick in the pool
   private final DictDB<Integer, Tick.Info> ticks = Context.newDictDB(NAME + "_ticks", Tick.Info.class);
-  private final Tick.Info emptyTick = new Tick.Info(ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, false);
+  private Tick.Info emptyTick () { 
+    return new Tick.Info(ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, false);
+  }
 
   // ================================================
   // Methods
   // ================================================
   public Tick.Info get (int key) {
-    return this.ticks.getOrDefault(key, emptyTick);
+    return this.ticks.getOrDefault(key, emptyTick());
   }
 
-  public void set (int key, Tick.Info value) {
+  private void set (int key, Tick.Info value) {
     this.ticks.set(key, value);
   }
 
@@ -76,7 +78,6 @@ public class Ticks {
       BigInteger maxLiquidity
   ) {
       Tick.Info info = this.get(tick);
-
       BigInteger liquidityGrossBefore = info.liquidityGross;
       BigInteger liquidityGrossAfter = LiquidityMath.addDelta(liquidityGrossBefore, liquidityDelta);
 
@@ -163,7 +164,7 @@ public class Ticks {
    * @param tick The tick that will be cleared
    */
   public void clear(int tick) {
-    this.ticks.set(tick, null);
+    this.set(tick, null);
   }
 
   /**

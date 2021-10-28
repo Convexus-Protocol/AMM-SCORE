@@ -17,6 +17,7 @@
 package exchange.convexus.pool;
 
 import static exchange.convexus.librairies.BlockTimestamp._blockTimestamp;
+import static java.math.BigInteger.ZERO;
 
 import java.math.BigInteger;
 
@@ -315,15 +316,17 @@ public class ConvexusPool {
 
         // Default values
         if (this.liquidity.get() == null) {
-            this.liquidity.set(BigInteger.ZERO);
+            this.liquidity.set(ZERO);
         }
         if (this.feeGrowthGlobal0X128.get() == null) {
-            this.feeGrowthGlobal0X128.set(BigInteger.ZERO);
+            this.feeGrowthGlobal0X128.set(ZERO);
         }
         if (this.feeGrowthGlobal1X128.get() == null) {
-            this.feeGrowthGlobal1X128.set(BigInteger.ZERO);
+            this.feeGrowthGlobal1X128.set(ZERO);
         }
-        
+        if (this.protocolFees.get() == null) {
+            this.protocolFees.set(new ProtocolFees(ZERO, ZERO));
+        }
 
         // locked by default
         if (this.poolLock.get() == null) {
@@ -337,7 +340,7 @@ public class ConvexusPool {
         Context.require(tickLower >= TickMath.MIN_TICK, 
             "checkTicks: tickLower lower than expected");
         Context.require(tickUpper <= TickMath.MAX_TICK, 
-            "checkTicks: tickUpper higher than expected");
+            "checkTicks: tickUpper greater than expected");
     }
 
     /**
@@ -396,7 +399,7 @@ public class ConvexusPool {
             BigInteger time = _blockTimestamp();
             Oracle.Observations.ObserveSingleResult result = observations.observeSingle(
                 time, 
-                BigInteger.ZERO, 
+                ZERO, 
                 _slot0.tick, 
                 _slot0.observationIndex, 
                 this.liquidity.get(), 
@@ -531,11 +534,11 @@ public class ConvexusPool {
         // if we need to update the ticks, do it
         boolean flippedLower = false;
         boolean flippedUpper = false;
-        if (!liquidityDelta.equals(BigInteger.ZERO)) {
+        if (!liquidityDelta.equals(ZERO)) {
             BigInteger time = _blockTimestamp();
             var result = this.observations.observeSingle(
                 time, 
-                BigInteger.ZERO, 
+                ZERO, 
                 _slot0.tick, 
                 _slot0.observationIndex, 
                 this.liquidity.get(), 
@@ -586,7 +589,7 @@ public class ConvexusPool {
         position.update(liquidityDelta, feeGrowthInside0X128, feeGrowthInside1X128);
         
         // clear any tick data that is no longer needed
-        if (liquidityDelta.compareTo(BigInteger.ZERO) < 0) {
+        if (liquidityDelta.compareTo(ZERO) < 0) {
             if (flippedLower) {
                 this.ticks.clear(tickLower);
             }
@@ -648,10 +651,10 @@ public class ConvexusPool {
             _slot0.tick
         );
 
-        BigInteger amount0 = BigInteger.ZERO;
-        BigInteger amount1 = BigInteger.ZERO;
+        BigInteger amount0 = ZERO;
+        BigInteger amount1 = ZERO;
 
-        if (!params.liquidityDelta.equals(BigInteger.ZERO)) {
+        if (!params.liquidityDelta.equals(ZERO)) {
             if (_slot0.tick < params.tickLower) {
                 // current tick is below the passed range; liquidity can only become in range by crossing from left to
                 // right, when we'll need _more_ token0 (it's becoming more valuable) so user must provide it
@@ -729,7 +732,7 @@ public class ConvexusPool {
 
         final Address caller = Context.getCaller();
 
-        Context.require(amount.compareTo(BigInteger.ZERO) > 0,
+        Context.require(amount.compareTo(ZERO) > 0,
             "mint: amount must be superior to 0");
 
         BigInteger amount0;
@@ -745,24 +748,24 @@ public class ConvexusPool {
         amount0 = result.amount0;
         amount1 = result.amount1;
 
-        BigInteger balance0Before = BigInteger.ZERO;
-        BigInteger balance1Before = BigInteger.ZERO;
+        BigInteger balance0Before = ZERO;
+        BigInteger balance1Before = ZERO;
         
-        if (amount0.compareTo(BigInteger.ZERO) > 0) {
+        if (amount0.compareTo(ZERO) > 0) {
             balance0Before = balance0();
         }
-        if (amount1.compareTo(BigInteger.ZERO) > 0) {
+        if (amount1.compareTo(ZERO) > 0) {
             balance1Before = balance1();
         }
 
         Context.call(caller, "convexusMintCallback", amount0, amount1, data);
 
-        if (amount0.compareTo(BigInteger.ZERO) > 0) {
+        if (amount0.compareTo(ZERO) > 0) {
             BigInteger expected = balance0Before.add(amount0);
             Context.require(expected.compareTo(balance0()) <= 0, 
             "mint: M0 - " + expected + " / " + balance0());
         }
-        if (amount1.compareTo(BigInteger.ZERO) > 0) {
+        if (amount1.compareTo(ZERO) > 0) {
             BigInteger expected = balance1Before.add(amount1);
             Context.require(expected.compareTo(balance1()) <= 0, 
             "mint: M1");
@@ -788,6 +791,7 @@ public class ConvexusPool {
      * @return amount0 The amount of fees collected in token0
      * @return amount1 The amount of fees collected in token1
      */
+    @External
     public PairAmounts collect (
         Address recipient,
         int tickLower,
@@ -808,15 +812,15 @@ public class ConvexusPool {
         amount0 = amount0Requested.compareTo(position.tokensOwed0) > 0 ? position.tokensOwed0 : amount0Requested;
         amount1 = amount1Requested.compareTo(position.tokensOwed1) > 0 ? position.tokensOwed1 : amount1Requested;
 
-        if (amount0.compareTo(BigInteger.ZERO) > 0) {
+        if (amount0.compareTo(ZERO) > 0) {
             position.tokensOwed0 = position.tokensOwed0.subtract(amount0);
             this.positions.set(key, position);
-            Context.call(this.token0, "transfer", recipient, amount0);
+            Context.call(this.token0, "transfer", recipient, amount0, "collect".getBytes());
         }
-        if (amount1.compareTo(BigInteger.ZERO) > 0) {
+        if (amount1.compareTo(ZERO) > 0) {
             position.tokensOwed1 = position.tokensOwed1.subtract(amount1);
             this.positions.set(key, position);
-            Context.call(this.token1, "transfer", recipient, amount1);
+            Context.call(this.token1, "transfer", recipient, amount1, "collect".getBytes());
         }
 
         this.Collect(caller, tickLower, tickUpper, recipient, amount0, amount1);
@@ -835,6 +839,7 @@ public class ConvexusPool {
      * @return amount0 The amount of token0 sent to the recipient
      * @return amount1 The amount of token1 sent to the recipient
      */
+    @External
     public PairAmounts burn (
         int tickLower,
         int tickUpper,
@@ -855,7 +860,7 @@ public class ConvexusPool {
         Position.Info position = result.positionStorage.position;
         byte[] positionKey = result.positionStorage.key;
 
-        if (amount0.compareTo(BigInteger.ZERO) > 0 || amount1.compareTo(BigInteger.ZERO) > 0) {
+        if (amount0.compareTo(ZERO) > 0 || amount1.compareTo(ZERO) > 0) {
             position.tokensOwed0 = position.tokensOwed0.add(amount0);
             position.tokensOwed1 = position.tokensOwed1.add(amount1);
             this.positions.set(positionKey, position);
@@ -963,7 +968,6 @@ public class ConvexusPool {
      */
     @External
     public PairAmounts swap (
-        Address caller,
         Address recipient,
         boolean zeroForOne,
         BigInteger amountSpecified,
@@ -971,8 +975,9 @@ public class ConvexusPool {
         byte[] data
     ) {
         this.poolLock.lock(true);
+        final Address caller = Context.getCaller();
 
-        Context.require(!amountSpecified.equals(BigInteger.ZERO),
+        Context.require(!amountSpecified.equals(ZERO),
             "swap: amountSpecified must be different from zero");
         
         Slot0 slot0Start = this.slot0.get();
@@ -988,25 +993,28 @@ public class ConvexusPool {
             liquidity.get(),
             _blockTimestamp(),
             zeroForOne ? (slot0Start.feeProtocol % 16) : (slot0Start.feeProtocol >> 4),
-            BigInteger.ZERO,
-            BigInteger.ZERO,
+            ZERO,
+            ZERO,
             false
         );
 
-        boolean exactInput = amountSpecified.compareTo(BigInteger.ZERO) > 0;
+        boolean exactInput = amountSpecified.compareTo(ZERO) > 0;
 
         SwapState state = new SwapState(
             amountSpecified,
-            BigInteger.ZERO,
+            ZERO,
             slot0Start.sqrtPriceX96,
             slot0Start.tick,
             zeroForOne ? feeGrowthGlobal0X128.get() : feeGrowthGlobal1X128.get(),
-            BigInteger.ZERO,
+            ZERO,
             cache.liquidityStart
         );
         
         // continue swapping as long as we haven't used the entire input/output and haven't reached the price limit
-        while (!state.amountSpecifiedRemaining.equals(BigInteger.ZERO) && !state.sqrtPriceX96.equals(sqrtPriceLimitX96)) {
+        while (
+            !state.amountSpecifiedRemaining.equals(ZERO) 
+         && !state.sqrtPriceX96.equals(sqrtPriceLimitX96)
+        ) {
             StepComputations step = new StepComputations();
             step.sqrtPriceStartX96 = state.sqrtPriceX96;
 
@@ -1015,7 +1023,7 @@ public class ConvexusPool {
                 tickSpacing,
                 zeroForOne
             );
-
+            
             step.tickNext = next.tickNext;
             step.initialized = next.initialized;
             
@@ -1061,7 +1069,7 @@ public class ConvexusPool {
             }
 
             // update global fee tracker
-            if (state.liquidity.compareTo(BigInteger.ZERO) > 0) {
+            if (state.liquidity.compareTo(ZERO) > 0) {
                 state.feeGrowthGlobalX128 = state.feeGrowthGlobalX128.add(FullMath.mulDiv(step.feeAmount, FixedPoint128.Q128, state.liquidity));
             }
             
@@ -1074,7 +1082,7 @@ public class ConvexusPool {
                     if (!cache.computedLatestObservation) {
                         var result = observations.observeSingle(
                             cache.blockTimestamp,
-                            BigInteger.ZERO,
+                            ZERO,
                             slot0Start.tick,
                             slot0Start.observationIndex,
                             cache.liquidityStart,
@@ -1104,6 +1112,8 @@ public class ConvexusPool {
                 // recompute unless we're on a lower tick boundary (i.e. already transitioned ticks), and haven't moved
                 state.tick = TickMath.getTickAtSqrtRatio(state.sqrtPriceX96);
             }
+
+           
         }
 
         // update tick and write an oracle entry if the tick change
@@ -1139,14 +1149,14 @@ public class ConvexusPool {
         // overflow is acceptable, protocol has to withdraw before it hits type(uint128).max fees
         if (zeroForOne) {
             feeGrowthGlobal0X128.set(state.feeGrowthGlobalX128);
-            if (state.protocolFee.compareTo(BigInteger.ZERO) > 0) {
+            if (state.protocolFee.compareTo(ZERO) > 0) {
                 var _protocolFees = this.protocolFees.get();
                 _protocolFees.token0 = _protocolFees.token0.add(state.protocolFee);
                 this.protocolFees.set(_protocolFees);
             }
         } else {
             feeGrowthGlobal1X128.set(state.feeGrowthGlobalX128);
-            if (state.protocolFee.compareTo(BigInteger.ZERO) > 0) {
+            if (state.protocolFee.compareTo(ZERO) > 0) {
                 var _protocolFees = this.protocolFees.get();
                 _protocolFees.token1 = _protocolFees.token1.add(state.protocolFee);
                 this.protocolFees.set(_protocolFees);
@@ -1166,8 +1176,8 @@ public class ConvexusPool {
 
         // do the transfers and collect payment
         if (zeroForOne) {
-            if (amount1.compareTo(BigInteger.ZERO) < 0) {
-                Context.call(token1, "transfer", recipient, amount1.negate());
+            if (amount1.compareTo(ZERO) < 0) {
+                Context.call(token1, "transfer", recipient, amount1.negate(), "swap".getBytes());
             }
 
             BigInteger balance0Before = balance0();
@@ -1175,8 +1185,8 @@ public class ConvexusPool {
             Context.require(balance0Before.add(amount0).compareTo(balance0()) <= 0, 
                 "swap: the callback didn't charge the payment (1)");
         } else {
-            if (amount0.compareTo(BigInteger.ZERO) < 0) {
-                Context.call(token0, "transfer", recipient, amount0.negate());
+            if (amount0.compareTo(ZERO) < 0) {
+                Context.call(token0, "transfer", recipient, amount0.negate(), "swap".getBytes());
             }
 
             BigInteger balance1Before = balance1();
@@ -1212,7 +1222,7 @@ public class ConvexusPool {
         final Address caller = Context.getCaller();
 
         BigInteger _liquidity = this.liquidity.get();
-        Context.require(_liquidity.compareTo(BigInteger.ZERO) > 0,
+        Context.require(_liquidity.compareTo(ZERO) > 0,
             "flash: no liquidity");
         
         final BigInteger TEN_E6 = BigInteger.valueOf(1000000);
@@ -1222,11 +1232,11 @@ public class ConvexusPool {
         BigInteger balance0Before = balance0();
         BigInteger balance1Before = balance1();
 
-        if (amount0.compareTo(BigInteger.ZERO) > 0) {
-            Context.call(token0, "transfer", recipient, amount0);
+        if (amount0.compareTo(ZERO) > 0) {
+            Context.call(token0, "transfer", recipient, amount0, "flash".getBytes());
         }
-        if (amount1.compareTo(BigInteger.ZERO) > 0) {
-            Context.call(token1, "transfer", recipient, amount1);
+        if (amount1.compareTo(ZERO) > 0) {
+            Context.call(token1, "transfer", recipient, amount1, "flash".getBytes());
         }
 
         Context.call(caller, "convexusFlashCallback", fee0, fee1, data);
@@ -1245,20 +1255,20 @@ public class ConvexusPool {
 
         Slot0 _slot0 = this.slot0.get();
 
-        if (paid0.compareTo(BigInteger.ZERO) > 0) {
+        if (paid0.compareTo(ZERO) > 0) {
             int feeProtocol0 = _slot0.feeProtocol % 16;
-            BigInteger fees0 = feeProtocol0 == 0 ? BigInteger.ZERO : paid0.divide(BigInteger.valueOf(feeProtocol0));
-            if (fees0.compareTo(BigInteger.ZERO) > 0) {
+            BigInteger fees0 = feeProtocol0 == 0 ? ZERO : paid0.divide(BigInteger.valueOf(feeProtocol0));
+            if (fees0.compareTo(ZERO) > 0) {
                 var _protocolFees = protocolFees.get();
                 _protocolFees.token0 = _protocolFees.token0.add(fees0);
                 protocolFees.set(_protocolFees);
             }
             feeGrowthGlobal0X128.set(feeGrowthGlobal0X128.get().add(FullMath.mulDiv(paid0.subtract(fees0), FixedPoint128.Q128, _liquidity)));
         }
-        if (paid1.compareTo(BigInteger.ZERO) > 0) {
+        if (paid1.compareTo(ZERO) > 0) {
             int feeProtocol1 = _slot0.feeProtocol >> 4;
-            BigInteger fees1 = feeProtocol1 == 0 ? BigInteger.ZERO : paid1.divide(BigInteger.valueOf(feeProtocol1));
-            if (fees1.compareTo(BigInteger.ZERO) > 0) {
+            BigInteger fees1 = feeProtocol1 == 0 ? ZERO : paid1.divide(BigInteger.valueOf(feeProtocol1));
+            if (fees1.compareTo(ZERO) > 0) {
                 var _protocolFees = protocolFees.get();
                 _protocolFees.token1 = _protocolFees.token1.add(fees1);
                 protocolFees.set(_protocolFees);
@@ -1286,14 +1296,15 @@ public class ConvexusPool {
         
         Context.require(
             (feeProtocol0 == 0 || (feeProtocol0 >= 4 && feeProtocol0 <= 10)) &&
-                (feeProtocol1 == 0 || (feeProtocol1 >= 4 && feeProtocol1 <= 10))
+            (feeProtocol1 == 0 || (feeProtocol1 >= 4 && feeProtocol1 <= 10)),
+            "setFeeProtocol: Bad fees amount"
         );
 
         Slot0 _slot0 = this.slot0.get();
         int feeProtocolOld = _slot0.feeProtocol;
         _slot0.feeProtocol = feeProtocol0 + (feeProtocol1 << 4);
         this.slot0.set(_slot0);
-        
+
         this.SetFeeProtocol(feeProtocolOld % 16, feeProtocolOld >> 4, feeProtocol0, feeProtocol1);
 
         this.poolLock.lock(false);
@@ -1322,23 +1333,23 @@ public class ConvexusPool {
         BigInteger amount0 = amount0Requested.compareTo(_protocolFees.token0) > 0 ? _protocolFees.token0 : amount0Requested;
         BigInteger amount1 = amount1Requested.compareTo(_protocolFees.token1) > 0 ? _protocolFees.token1 : amount1Requested;
         
-        if (amount0.compareTo(BigInteger.ZERO) > 0) {
+        if (amount0.compareTo(ZERO) > 0) {
             if (amount0 == _protocolFees.token0) {
                 // ensure that the slot is not cleared, for gas savings
                 amount0 = amount0.subtract(BigInteger.ONE); 
             }
             _protocolFees.token0 = _protocolFees.token0.subtract(amount0);
             this.protocolFees.set(_protocolFees);
-            Context.call(token0, "transfer", recipient, amount0);
+            Context.call(token0, "transfer", recipient, amount0, "collectProtocol".getBytes());
         }
-        if (amount1.compareTo(BigInteger.ZERO) > 0) {
+        if (amount1.compareTo(ZERO) > 0) {
             if (amount1 == _protocolFees.token1) {
                 // ensure that the slot is not cleared, for gas savings
                 amount1 = amount1.subtract(BigInteger.ONE); 
             }
             _protocolFees.token1 = _protocolFees.token1.subtract(amount1);
             this.protocolFees.set(_protocolFees);
-            Context.call(token1, "transfer", recipient, amount1);
+            Context.call(token1, "transfer", recipient, amount1, "collectProtocol".getBytes());
         }
 
         this.CollectProtocol(caller, recipient, amount0, amount1);
@@ -1350,14 +1361,14 @@ public class ConvexusPool {
     @External
     public void tokenFallback (Address _from, BigInteger _value, @Optional byte[] _data) throws Exception {
         Context.require(_from.isContract(), "tokenFallback: Pool shouldn't need to receive funds from EOA");
-        Context.println("Pool: Received " + _value + " of " + Context.getCaller() + " tokens!");
     }
 
     // ================================================
     // Checks
     // ================================================
     private void onlyFactoryOwner() {
-        Context.require(Context.getCaller().equals(Context.call(this.factory, "owner")));
+        Context.require(Context.getCaller().equals(Context.call(this.factory, "owner")),
+            "onlyFactoryOwner: Only owner can call this method");
     }
 
     // ================================================
@@ -1404,6 +1415,11 @@ public class ConvexusPool {
     }
 
     @External(readonly = true)
+    public ProtocolFees protocolFees () {
+        return this.protocolFees.get();
+    }
+
+    @External(readonly = true)
     public BigInteger tickBitmap (int index) {
         return this.tickBitmap.get(index);
     }
@@ -1411,6 +1427,11 @@ public class ConvexusPool {
     @External(readonly = true)
     public BigInteger maxLiquidityPerTick () {
         return this.maxLiquidityPerTick;
+    }
+
+    @External(readonly = true)
+    public BigInteger liquidity () {
+        return this.liquidity.get();
     }
 
     @External(readonly = true)

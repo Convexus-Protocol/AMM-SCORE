@@ -31,6 +31,6 @@ public class TimeUtils {
   public static final BigInteger ONE_YEAR   = BigInteger.valueOf(365).multiply(ONE_DAY);
 
   public static BigInteger nowSeconds () {
-    return BigInteger.valueOf(Context.getBlockTimestamp()).divide(ONE_SECOND).multiply(ONE_SECOND);
+    return BigInteger.valueOf(Context.getBlockTimestamp()).divide(ONE_SECOND);
   }
 }

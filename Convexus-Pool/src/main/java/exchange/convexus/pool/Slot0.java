@@ -60,9 +60,9 @@ public class Slot0 {
         );
     }
 
-    public static Slot0 fromCall(Object callresult) {
+    public static Slot0 fromCall(Object call) {
         @SuppressWarnings("unchecked")
-        Map<String,Object> map = (Map<String,Object>) callresult;
+        Map<String,Object> map = (Map<String,Object>) call;
         return new Slot0(
             (BigInteger) map.get("sqrtPriceX96"),
             ((BigInteger) map.get("tick")).intValue(),

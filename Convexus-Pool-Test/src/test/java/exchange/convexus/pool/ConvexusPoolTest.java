@@ -19,12 +19,18 @@ package exchange.convexus.pool;
 import exchange.convexus.utils.ConvexusTest;
 import score.Address;
 
+import static java.math.BigInteger.ONE;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.MathContext;
 
 import exchange.convexus.callee.ConvexusCallee;
 import exchange.convexus.factory.ConvexusFactory;
+import exchange.convexus.librairies.TickMath;
+import exchange.convexus.librairies.Oracle.Observation;
+import exchange.convexus.liquidity.ConvexusLiquidity;
 import exchange.convexus.testtokens.Sicx;
 import exchange.convexus.testtokens.Usdc;
 import exchange.convexus.utils.ScoreSpy;
@@ -58,5 +64,32 @@ public class ConvexusPoolTest extends ConvexusTest {
 
   protected int getMaxTick(int tickSpacing) {
     return ((int) Math.floor(887272 / tickSpacing)) * tickSpacing;
+  }
+  
+  protected void assertObservationEquals(Observation expected, Observation actual) {
+    assertEquals(expected.initialized, actual.initialized);
+    assertEquals(expected.tickCumulative, actual.tickCumulative);
+    assertEquals(expected.secondsPerLiquidityCumulativeX128, actual.secondsPerLiquidityCumulativeX128);
+  }
+  
+  protected void swapExact0For1 (BigInteger amount, Address to) {
+    BigInteger sqrtPriceLimitX96 = TickMath.MIN_SQRT_RATIO.add(ONE);
+    callee.invoke(alice, "swapExact0For1", pool.getAddress(), amount, to, sqrtPriceLimitX96);
+  }
+  
+  protected void swapExact1For0(BigInteger amount, Address to) {
+    BigInteger sqrtPriceLimitX96 = TickMath.MAX_SQRT_RATIO.subtract(ONE);
+    callee.invoke(alice, "swapExact1For0", pool.getAddress(), amount, to, sqrtPriceLimitX96);
+  }
+
+  protected void initializeAtZeroTick() {
+    BigInteger initializeLiquidityAmount = BigInteger.TEN.pow(18).multiply(BigInteger.TWO);
+    pool.invoke(alice, "initialize", encodePriceSqrt(ONE, ONE));
+    int tickSpacing = (int) pool.call("tickSpacing");
+    int min = getMinTick(tickSpacing);
+    int max = getMaxTick(tickSpacing);
+    ConvexusLiquidity.deposit(alice, callee.getAddress(), usdc.score, new BigInteger("2000000000000000000"));
+    ConvexusLiquidity.deposit(alice, callee.getAddress(), sicx.score, new BigInteger("2000000000000000000"));
+    callee.invoke(alice, "mint", pool.getAddress(), alice.getAddress(), min, max, initializeLiquidityAmount);
   }
 }

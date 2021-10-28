@@ -27,13 +27,14 @@ import static org.mockito.Mockito.verify;
 
 import java.math.BigInteger;
 
+import com.iconloop.score.test.ServiceManager;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
 import exchange.convexus.factory.ConvexusFactoryUtils;
 import exchange.convexus.librairies.Oracle;
-import exchange.convexus.librairies.Oracle.Observation;
 import exchange.convexus.utils.AssertUtils;
 import exchange.convexus.utils.TimeUtils;
 
@@ -49,6 +50,7 @@ public class InitializeTest extends ConvexusPoolTest {
 
   @BeforeEach
   void setup() throws Exception {
+    ServiceManager.Block.resetInstance();
     setup_factory();
     reset(factory.spy);
     setup_pool(factory.getAddress(), FEE, TICK_SPACING);
@@ -124,14 +126,10 @@ public class InitializeTest extends ConvexusPoolTest {
 
   @Test
   void testFirstObservationsSlot () {
-    
     pool.invoke(alice, "initialize", encodePriceSqrt(ONE, ONE));
+
     Oracle.Observation observation = (Oracle.Observation) pool.call("observations", 0);
-    Oracle.Observation expected = new Oracle.Observation(
-      TimeUtils.nowSeconds(), 
-      ZERO, 
-      ZERO,
-      true);
+    Oracle.Observation expected = new Oracle.Observation(TimeUtils.nowSeconds(), ZERO, ZERO, true);
     assertObservationEquals(expected, observation);
   }
 
@@ -145,12 +143,6 @@ public class InitializeTest extends ConvexusPoolTest {
     verify(pool.spy).Initialize(_sqrtPriceX96.capture(), _tick.capture());
     assertEquals(_sqrtPriceX96.getValue(), sqrtPriceX96);
     assertEquals(_tick.getValue(), -6932);
-  }
-
-  private void assertObservationEquals(Observation expected, Observation actual) {
-    assertEquals(expected.initialized, actual.initialized);
-    assertEquals(expected.secondsPerLiquidityCumulativeX128, actual.secondsPerLiquidityCumulativeX128);
-    assertEquals(expected.tickCumulative, actual.tickCumulative);
   }
 
   private BigInteger getMaxLiquidityPerTick(int tickSpacing) {

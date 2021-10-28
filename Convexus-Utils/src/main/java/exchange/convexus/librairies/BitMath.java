@@ -19,7 +19,7 @@ package exchange.convexus.librairies;
 
 import java.math.BigInteger;
 
-import exchange.convexus.utils.IntConstants;
+import exchange.convexus.utils.IntUtils;
 import score.Context;
 
 public class BitMath {
@@ -76,27 +76,27 @@ public class BitMath {
 
     char r = 255;
 
-    if (x.and(IntConstants.MAX_UINT128).compareTo(BigInteger.ZERO) > 0) {
+    if (x.and(IntUtils.MAX_UINT128).compareTo(BigInteger.ZERO) > 0) {
         r -= 128;
     } else {
         x = x.shiftRight(128);
     }
-    if (x.and(IntConstants.MAX_UINT64).compareTo(BigInteger.ZERO) > 0) {
+    if (x.and(IntUtils.MAX_UINT64).compareTo(BigInteger.ZERO) > 0) {
         r -= 64;
     } else {
         x = x.shiftRight(64);
     }
-    if (x.and(IntConstants.MAX_UINT32).compareTo(BigInteger.ZERO) > 0) {
+    if (x.and(IntUtils.MAX_UINT32).compareTo(BigInteger.ZERO) > 0) {
         r -= 32;
     } else {
         x = x.shiftRight(32);
     }
-    if (x.and(IntConstants.MAX_UINT16).compareTo(BigInteger.ZERO) > 0) {
+    if (x.and(IntUtils.MAX_UINT16).compareTo(BigInteger.ZERO) > 0) {
         r -= 16;
     } else {
         x = x.shiftRight(16);
     }
-    if (x.and(IntConstants.MAX_UINT8).compareTo(BigInteger.ZERO) > 0) {
+    if (x.and(IntUtils.MAX_UINT8).compareTo(BigInteger.ZERO) > 0) {
         r -= 8;
     } else {
         x = x.shiftRight(8);

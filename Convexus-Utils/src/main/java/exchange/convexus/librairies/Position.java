@@ -85,7 +85,7 @@ public class Position {
             
             if (liquidityDelta.equals(BigInteger.ZERO)) {
                 Context.require(this.liquidity.compareTo(BigInteger.ZERO) > 0, 
-                    "Position::update: NP"); // disallow pokes for 0 liquidity positions
+                    "update: pokes aren't allowed for 0 liquidity positions"); // disallow pokes for 0 liquidity positions
                 liquidityNext = this.liquidity;
             } else {
                 liquidityNext = LiquidityMath.addDelta(this.liquidity, liquidityDelta);

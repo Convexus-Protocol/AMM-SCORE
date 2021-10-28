@@ -33,6 +33,7 @@ public class ServiceManager {
     private final Map<Class<?>, Score> classScoreMap = new HashMap<>();
     private final Map<Address, Score> addressScoreMap = new HashMap<>();
     private final Map<String, Object> storageMap = new HashMap<>();
+    private final Map<String, Class<?>> storageClassMap = new HashMap<>();
     private int nextCount = 1;
 
     public Score deploy(Account owner, Class<?> mainClass, Object... params) throws Exception {
@@ -142,11 +143,20 @@ public class ServiceManager {
     }
 
     public void putStorage(String key, Object value) {
+        putStorage(key, value, value != null ? value.getClass() : null);
+    }
+
+    public void putStorage(String key, Object value, Class<?> clazz) {
         storageMap.put(getAddress().toString() + key, value);
+        storageClassMap.put(getAddress().toString() + key, clazz);
     }
 
     public Object getStorage(String key) {
         return storageMap.get(getAddress().toString() + key);
+    }
+
+    public Class<?> getStorageClass(String key) {
+        return storageClassMap.get(getAddress().toString() + key);
     }
 
     public static class Block {
@@ -158,6 +168,10 @@ public class ServiceManager {
         private Block(long height, long timestamp) {
             this.height = height;
             this.timestamp = timestamp;
+        }
+
+        public static void resetInstance() {
+            sInstance = null;
         }
 
         public static Block getInstance() {
@@ -177,12 +191,12 @@ public class ServiceManager {
         }
 
         public void increase() {
-            increase(1);
+            // increase(1);
         }
 
         public void increase(long delta) {
             height += delta;
-            timestamp += 2_000_000 * delta; // 2 secs block generation
+            timestamp += 1_000_000 * delta; // 1 secs block generation
         }
     }
 

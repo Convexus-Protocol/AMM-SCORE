@@ -16,23 +16,29 @@
 
 package exchange.convexus.librairies;
 
+import static exchange.convexus.utils.IntUtils.MAX_UINT256;
+import static exchange.convexus.utils.IntUtils.TWO_POW_256;
 import static exchange.convexus.utils.MathUtils.gt;
 import static exchange.convexus.utils.MathUtils.lt;
+import static java.math.BigInteger.ONE;
+import static java.math.BigInteger.TWO;
+import static java.math.BigInteger.ZERO;
 
 import java.math.BigInteger;
 
-import exchange.convexus.utils.IntConstants;
 import score.Context;
 
 public class FullMath {
+
+  private static final BigInteger THREE = BigInteger.valueOf(3);
 
   public static BigInteger mulDivRoundingUp(BigInteger a, BigInteger b, BigInteger denominator) {
 
     BigInteger result = mulDiv(a, b, denominator);
 
-    if (mulmod(a, b, denominator).compareTo(BigInteger.ZERO) > 0) {
-        Context.require(result.compareTo(IntConstants.MAX_UINT256) < 0);
-        result = result.add(BigInteger.ONE);
+    if (mulmod(a, b, denominator).compareTo(ZERO) > 0) {
+        Context.require(result.compareTo(MAX_UINT256) < 0);
+        result = result.add(ONE);
     }
 
     return result;
@@ -40,6 +46,10 @@ public class FullMath {
 
   private static BigInteger mulmod(BigInteger x, BigInteger y, BigInteger m) {
     return x.multiply(y).mod(m);
+  }
+
+  private static BigInteger mulmod256(BigInteger x, BigInteger y) {
+    return x.multiply(y).mod(TWO_POW_256);
   }
 
   /**
@@ -60,14 +70,15 @@ public class FullMath {
     BigInteger prod0; // Least significant 256 bits of the product
     BigInteger prod1; // Most significant 256 bits of the product
 
-    BigInteger mm = mulmod(a, b, IntConstants.MAX_UINT256);
-    prod0 = a.multiply(b);
-    prod1 = mm.subtract(prod0).subtract(lt(mm, prod0));
+    BigInteger mm = mulmod(a, b, MAX_UINT256);
+    prod0 = mulmod256(a, b);
+    prod1 = sub256(sub256(mm, prod0), lt(mm, prod0));
 
     // Handle non-overflow cases, 256 by 256 division
-    if (prod1.equals(BigInteger.ZERO)) {
-      Context.require(denominator.compareTo(BigInteger.ZERO) > 0,
+    if (prod1.equals(ZERO)) {
+      Context.require(denominator.compareTo(ZERO) > 0,
         "mulDiv: denominator > 0");
+      
       return prod0.divide(denominator);
     }
 
@@ -85,8 +96,8 @@ public class FullMath {
     BigInteger remainder = mulmod(a, b, denominator);
 
     // Subtract 256 bit number from 512 bit number
-    prod1 = prod1.subtract(gt(remainder, prod0));
-    prod0 = prod0.subtract(remainder);
+    prod1 = sub256(prod1, gt(remainder, prod0));
+    prod0 = sub256(prod0, remainder);
 
     // Factor powers of two out of denominator
     // Compute largest power of two divisor of denominator.
@@ -102,26 +113,26 @@ public class FullMath {
     // Shift in bits from prod1 into prod0. For this we need
     // to flip `twos` such that it is 2**256 / twos.
     // If twos is zero, then it becomes one
-    twos = BigInteger.ZERO.subtract(twos).divide(twos).add(BigInteger.ONE);
+    twos = sub256(ZERO, twos).divide(twos).add(ONE);
 
-    prod0 = prod0.or(prod1.multiply(twos));
+    prod0 = prod0.or(mulmod256(prod1, twos));
 
     // Invert denominator mod 2**256
     // Now that denominator is an odd number, it has an inverse
     // modulo 2**256 such that denominator * inv = 1 mod 2**256.
     // Compute the inverse by starting with a seed that is correct
     // correct for four bits. That is, denominator * inv = 1 mod 2**4
-    BigInteger inv = denominator.multiply(BigInteger.valueOf(3)).xor(BigInteger.TWO);
+    BigInteger inv = mulmod256(denominator, THREE).xor(TWO);
 
     // Now use Newton-Raphson iteration to improve the precision.
     // Thanks to Hensel's lifting lemma, this also works in modular
     // arithmetic, doubling the correct bits in each step.
-    inv = inv.multiply(BigInteger.TWO.subtract(denominator.multiply(inv))); // inverse mod 2**8
-    inv = inv.multiply(BigInteger.TWO.subtract(denominator.multiply(inv))); // inverse mod 2**16
-    inv = inv.multiply(BigInteger.TWO.subtract(denominator.multiply(inv))); // inverse mod 2**32
-    inv = inv.multiply(BigInteger.TWO.subtract(denominator.multiply(inv))); // inverse mod 2**64
-    inv = inv.multiply(BigInteger.TWO.subtract(denominator.multiply(inv))); // inverse mod 2**128
-    inv = inv.multiply(BigInteger.TWO.subtract(denominator.multiply(inv))); // inverse mod 2**256
+    inv = newtonRaphson(denominator, inv); // inverse mod 2**8
+    inv = newtonRaphson(denominator, inv); // inverse mod 2**16
+    inv = newtonRaphson(denominator, inv); // inverse mod 2**32
+    inv = newtonRaphson(denominator, inv); // inverse mod 2**64
+    inv = newtonRaphson(denominator, inv); // inverse mod 2**128
+    inv = newtonRaphson(denominator, inv); // inverse mod 2**256
 
     // Because the division is now exact we can divide by multiplying
     // with the modular inverse of denominator. This will give us the
@@ -129,6 +140,20 @@ public class FullMath {
     // that the outcome is less than 2**256, this is the final result.
     // We don't need to compute the high bits of the result and prod1
     // is no longer required.
-    return prod0.multiply(inv);
+    return mulmod256(prod0, inv);
+  }
+
+  private static BigInteger sub256 (BigInteger a, BigInteger b) {
+    BigInteger c = a.subtract(b);
+    if (c.compareTo(ZERO) < 0) {
+      c = c.add(TWO_POW_256);
+    }
+    return c;
+  }
+
+  private static BigInteger newtonRaphson (BigInteger denominator, BigInteger inv) {
+    BigInteger a = mulmod256(denominator, inv);
+    BigInteger b = sub256(TWO, a);
+    return mulmod256(inv, b);
   }
 }

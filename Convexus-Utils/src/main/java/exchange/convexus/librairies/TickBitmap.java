@@ -20,7 +20,7 @@ import static java.math.BigInteger.ZERO;
 
 import java.math.BigInteger;
 
-import exchange.convexus.utils.IntConstants;
+import exchange.convexus.utils.IntUtils;
 import score.Context;
 import score.DictDB;
 
@@ -62,8 +62,12 @@ public class TickBitmap {
    */
   private PositionResult position (int tick) {
     int wordPos = tick >> 8;
-    int bitPos = tick % 256;
+    int bitPos = uint8(tick % 256);
     return new PositionResult(wordPos, bitPos);
+  }
+
+  private int uint8(int i) {
+    return i < 0 ? i + 256 : i;
   }
 
   /**
@@ -131,7 +135,7 @@ public class TickBitmap {
         // overflow/underflow is possible, but prevented externally by limiting both tickSpacing and tick
         result.tickNext = result.initialized
             ? (compressed + 1 + BitMath.leastSignificantBit(masked) - bitPos) * tickSpacing
-            : (compressed + 1 + IntConstants.MAX_UINT8.intValue() - bitPos) * tickSpacing;
+            : (compressed + 1 + IntUtils.MAX_UINT8.intValue() - bitPos) * tickSpacing;
     }
 
     return result;

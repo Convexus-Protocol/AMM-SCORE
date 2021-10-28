@@ -112,6 +112,13 @@ public class ConvexusLiquidityManagement {
     private void pay (Address payer, Address token, BigInteger owed) {
         final Address caller = Context.getCaller();
         checkEnoughDeposited(payer, token, owed);
+        
+        // Remove funds from deposited
+        var depositedUser = this.deposited.at(payer);
+        BigInteger oldBalance = depositedUser.getOrDefault(token, ZERO);
+        depositedUser.set(token, oldBalance.subtract(owed));
+        
+        // Actually transfer the tokens
         PeripheryPayments.pay(token, caller, owed);
     }
 
@@ -211,7 +218,8 @@ public class ConvexusLiquidityManagement {
     // ================================================
     private void checkEnoughDeposited (Address address, Address token, BigInteger amount) {
         var depositedUser = this.deposited.at(address);
-        Context.require(depositedUser.getOrDefault(token, ZERO).compareTo(amount) >= 0,
+        BigInteger userBalance = depositedUser.getOrDefault(token, ZERO);
+        Context.require(userBalance.compareTo(amount) >= 0,
             "checkEnoughDeposited: user didn't deposit enough funds");
     }
 

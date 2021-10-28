@@ -22,7 +22,7 @@ import score.ObjectReader;
 import score.ObjectWriter;
 
 // accumulated protocol fees in token0/token1 units
-class ProtocolFees {
+public class ProtocolFees {
     BigInteger token0;
     BigInteger token1;
 
