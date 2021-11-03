@@ -1,0 +1,137 @@
+/*
+ * Copyright 2021 ICONation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package exchange.convexus.pool;
+
+import static java.math.BigInteger.TEN;
+import static java.math.BigInteger.TWO;
+import static java.math.BigInteger.ZERO;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+
+import java.math.BigInteger;
+
+import com.iconloop.score.test.ServiceManager;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import exchange.convexus.factory.ConvexusFactoryUtils;
+import exchange.convexus.liquidity.ConvexusLiquidity;
+import exchange.convexus.utils.IntUtils;
+
+public class LimitOrderTest extends ConvexusPoolTest {
+
+  final int TICK_SPACINGS[] = {10, 60, 200};
+  final int FEE_AMOUNTS[] = {500, 3000, 10000};
+  final int LOW = 0;
+  final int MEDIUM = 1;
+  final int HIGH = 2;
+  int FEE = FEE_AMOUNTS[MEDIUM];
+  int tickSpacing = TICK_SPACINGS[MEDIUM];
+
+  int minTick = getMinTick(tickSpacing);
+  int maxTick = getMaxTick(tickSpacing);
+
+  @BeforeEach
+  void setup() throws Exception {
+    ServiceManager.Block.resetInstance();
+    setup_factory();
+    reset(factory.spy);
+    setup_pool(factory.getAddress(), FEE, tickSpacing);
+    reset(pool.spy);
+
+    // Transfer some funds to Alice
+    sicx.invoke(owner, "mintTo", alice.getAddress(), TEN.pow(30).multiply(TEN.pow(18)));
+    usdc.invoke(owner, "mintTo", alice.getAddress(), TEN.pow(30).multiply(TEN.pow(18)));
+    // Transfer some funds to Bob
+    sicx.invoke(owner, "mintTo", bob.getAddress(), TEN.pow(30).multiply(TEN.pow(18)));
+    usdc.invoke(owner, "mintTo", bob.getAddress(), TEN.pow(30).multiply(TEN.pow(18)));
+
+    ConvexusFactoryUtils.createPool(factory, alice, sicx.getAddress(), usdc.getAddress(), FEE, pool.getAddress());
+    initializeAtZeroTick();
+  }
+
+  @Test
+  void testLimitSelling0For1AtTick0Thru1() {
+    ConvexusLiquidity.deposit(alice, callee.getAddress(), sicx.score, new BigInteger("5981737760509663"));
+
+    reset(sicx.spy);
+    callee.invoke(alice, "mint", pool.getAddress(), alice.getAddress(), 0, 120, TEN.pow(18));
+    verify(sicx.spy).Transfer(callee.getAddress(), pool.getAddress(), new BigInteger("5981737760509663"), "pay".getBytes());
+
+    // somebody takes the limit order
+    ConvexusLiquidity.deposit(bob, callee.getAddress(), usdc.score, new BigInteger("2000000000000000000"));
+    swapExact1For0(TEN.pow(18).multiply(TWO), bob);
+
+    reset(sicx.spy);
+    reset(usdc.spy);
+    pool.invoke(alice, "burn", 0, 120, TEN.pow(18));
+    verify(pool.spy).Burn(alice.getAddress(), 0, 120, TEN.pow(18), ZERO, new BigInteger("6017734268818165"));
+    verifyNoInteractions(sicx.spy);
+    verifyNoInteractions(usdc.spy);
+
+    reset(pool.spy);
+    reset(usdc.spy);
+    pool.invoke(alice, "collect", alice.getAddress(), 0, 120, IntUtils.MAX_UINT256, IntUtils.MAX_UINT256);
+
+    verify(usdc.spy).Transfer(
+      pool.getAddress(), 
+      alice.getAddress(), 
+      // roughly 0.3% despite other liquidity
+      // 6017734268818165 + 18107525382602
+      new BigInteger("6035841794200767"), 
+      "collect".getBytes());
+    
+    assertTrue(((Slot0) pool.call("slot0")).tick >= 120);
+  }
+
+  @Test
+  void testLimitSelling1For0AtTick0ThruMinus1 () {
+    ConvexusLiquidity.deposit(alice, callee.getAddress(), usdc.score, new BigInteger("5981737760509663"));
+
+    reset(usdc.spy);
+    callee.invoke(alice, "mint", pool.getAddress(), alice.getAddress(), -120, 0, TEN.pow(18));
+    verify(usdc.spy).Transfer(callee.getAddress(), pool.getAddress(), new BigInteger("5981737760509663"), "pay".getBytes());
+
+    // somebody takes the limit order
+    ConvexusLiquidity.deposit(bob, callee.getAddress(), sicx.score, new BigInteger("2000000000000000000"));
+    swapExact0For1(TEN.pow(18).multiply(TWO), bob);
+
+    reset(sicx.spy);
+    reset(usdc.spy);
+    pool.invoke(alice, "burn", -120, 0, TEN.pow(18));
+    verify(pool.spy).Burn(alice.getAddress(), -120, 0, TEN.pow(18), new BigInteger("6017734268818165"), ZERO);
+    verifyNoInteractions(sicx.spy);
+    verifyNoInteractions(usdc.spy);
+
+    reset(pool.spy);
+    reset(sicx.spy);
+    pool.invoke(alice, "collect", alice.getAddress(), -120, 0, IntUtils.MAX_UINT256, IntUtils.MAX_UINT256);
+
+    verify(sicx.spy).Transfer(
+      pool.getAddress(), 
+      alice.getAddress(), 
+      // roughly 0.3% despite other liquidity
+      // 6017734268818165 + 18107525382602
+      new BigInteger("6035841794200767"), 
+      "collect".getBytes());
+      
+    assertTrue(((Slot0) pool.call("slot0")).tick < -120);
+  }
+}

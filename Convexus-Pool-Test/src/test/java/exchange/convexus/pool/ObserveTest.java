@@ -84,7 +84,7 @@ public class ObserveTest extends ConvexusPoolTest {
   void testCurrentTickAccumulatorAfterSingleSwap () {
     // moves to tick -1
     ConvexusLiquidity.deposit(alice, callee.getAddress(), sicx.score, new BigInteger("1000"));
-    swapExact0For1(BigInteger.valueOf(1000), alice.getAddress());
+    swapExact0For1(BigInteger.valueOf(1000), alice);
     sm.getBlock().increase(4);
     
     BigInteger[] secondsAgos = { ZERO };
@@ -95,14 +95,14 @@ public class ObserveTest extends ConvexusPoolTest {
   @Test
   void testCurrentTickAccumulatorAfterTwoSwaps () {
     ConvexusLiquidity.deposit(alice, callee.getAddress(), sicx.score, new BigInteger("500000000000000000"));
-    swapExact0For1(TEN.pow(18).divide(TWO), alice.getAddress());
+    swapExact0For1(TEN.pow(18).divide(TWO), alice);
     var slot0 = (Slot0) pool.call("slot0");
     assertEquals(-4452, slot0.tick);
     
     sm.getBlock().increase(4);
 
     ConvexusLiquidity.deposit(alice, callee.getAddress(), usdc.score, new BigInteger("250000000000000000"));
-    swapExact1For0(TEN.pow(18).divide(BigInteger.valueOf(4)), alice.getAddress());
+    swapExact1For0(TEN.pow(18).divide(BigInteger.valueOf(4)), alice);
     slot0 = (Slot0) pool.call("slot0");
     assertEquals(-1558, slot0.tick);
 

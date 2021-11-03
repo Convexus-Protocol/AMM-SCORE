@@ -50,7 +50,7 @@ public class ConvexusPool {
     // ================================================
     
     // Contract class name
-    private static final String NAME = "ConvexusPool";
+    public static final String NAME = "ConvexusPool";
 
     // Contract name
     private final String name;
@@ -94,9 +94,9 @@ public class ConvexusPool {
     private final ReentrancyLock poolLock = new ReentrancyLock(NAME + "_poolLock");
     
     // The fee growth as a Q128.128 fees of token0 collected per unit of liquidity for the entire life of the pool
-    private final VarDB<BigInteger> feeGrowthGlobal0X128 = Context.newVarDB(NAME + "_feeGrowthGlobal0X128", BigInteger.class);
+    public final VarDB<BigInteger> feeGrowthGlobal0X128 = Context.newVarDB(NAME + "_feeGrowthGlobal0X128", BigInteger.class);
     // The fee growth as a Q128.128 fees of token1 collected per unit of liquidity for the entire life of the pool
-    private final VarDB<BigInteger> feeGrowthGlobal1X128 = Context.newVarDB(NAME + "_feeGrowthGlobal1X128", BigInteger.class);
+    public final VarDB<BigInteger> feeGrowthGlobal1X128 = Context.newVarDB(NAME + "_feeGrowthGlobal1X128", BigInteger.class);
     
     // The amounts of token0 and token1 that are owed to the protocol
     private final VarDB<ProtocolFees> protocolFees = Context.newVarDB(NAME + "_protocolFees", ProtocolFees.class);
@@ -530,7 +530,7 @@ public class ConvexusPool {
         BigInteger _feeGrowthGlobal0X128 = this.feeGrowthGlobal0X128.get();
         BigInteger _feeGrowthGlobal1X128 = this.feeGrowthGlobal1X128.get();
         Slot0 _slot0 = this.slot0.get();
-        
+
         // if we need to update the ticks, do it
         boolean flippedLower = false;
         boolean flippedUpper = false;
@@ -808,6 +808,8 @@ public class ConvexusPool {
         // we don't need to checkTicks here, because invalid positions will never have non-zero tokensOwed{0,1}
         byte[] key = Positions.getKey(caller, tickLower, tickUpper);
         Position.Info position = this.positions.get(key);
+
+
 
         amount0 = amount0Requested.compareTo(position.tokensOwed0) > 0 ? position.tokensOwed0 : amount0Requested;
         amount1 = amount1Requested.compareTo(position.tokensOwed1) > 0 ? position.tokensOwed1 : amount1Requested;

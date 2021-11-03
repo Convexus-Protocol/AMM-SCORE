@@ -35,7 +35,7 @@ public class Ticks {
   // ================================================
   // Look up information about a specific tick in the pool
   private final DictDB<Integer, Tick.Info> ticks = Context.newDictDB(NAME + "_ticks", Tick.Info.class);
-  private Tick.Info emptyTick () { 
+  private Tick.Info emptyTick () {
     return new Tick.Info(ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, false);
   }
 
@@ -43,7 +43,8 @@ public class Ticks {
   // Methods
   // ================================================
   public Tick.Info get (int key) {
-    return this.ticks.getOrDefault(key, emptyTick());
+    var result = this.ticks.get(key);
+    return result == null ? emptyTick() : result;
   }
 
   private void set (int key, Tick.Info value) {

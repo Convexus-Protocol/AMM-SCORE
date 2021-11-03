@@ -228,11 +228,11 @@ public class ServiceManager {
         }
     }
 
-    protected void pushFrame(Account from, Account to, boolean readonly, String method, BigInteger value) {
+    public void pushFrame(Account from, Account to, boolean readonly, String method, BigInteger value) {
         contexts.push(new Frame(from, to, readonly, method, value));
     }
 
-    protected void popFrame() {
+    public void popFrame() {
         contexts.pop();
     }
 

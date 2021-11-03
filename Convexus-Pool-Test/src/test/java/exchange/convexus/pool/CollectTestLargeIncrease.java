@@ -18,12 +18,9 @@ package exchange.convexus.pool;
 
 import static java.math.BigInteger.ONE;
 import static java.math.BigInteger.TEN;
-import static java.math.BigInteger.TWO;
 import static java.math.BigInteger.ZERO;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.verify;
 
 import java.math.BigInteger;
 
@@ -31,19 +28,12 @@ import com.iconloop.score.test.ServiceManager;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 
 import exchange.convexus.factory.ConvexusFactoryUtils;
-import exchange.convexus.librairies.Tick;
-import exchange.convexus.liquidity.ConvexusLiquidity;
-import exchange.convexus.utils.AssertUtils;
 import exchange.convexus.utils.IntUtils;
-import score.Address;
 
-public class LimitOrdersTest extends ConvexusPoolTest {
+class CollectTestLargeIncrease extends ConvexusPoolTest {
 
-  private static final BigInteger THREE = BigInteger.valueOf(3);
-  private static final BigInteger FIVE = BigInteger.valueOf(5);
   final int TICK_SPACINGS[] = {10, 60, 200};
   final int FEE_AMOUNTS[] = {500, 3000, 10000};
   final int LOW = 0;
@@ -54,6 +44,10 @@ public class LimitOrdersTest extends ConvexusPoolTest {
 
   int minTick = getMinTick(tickSpacing);
   int maxTick = getMaxTick(tickSpacing);
+
+  // UINT128_MAX * 2**128 / 1e18
+  // https://www.wolframalpha.com/input/?i=%282**128+-+1%29+*+2**128+%2F+1e18
+  BigInteger magicNumber = new BigInteger("115792089237316195423570985008687907852929702298719625575994");
 
   @BeforeEach
   void setup() throws Exception {
@@ -71,11 +65,40 @@ public class LimitOrdersTest extends ConvexusPoolTest {
     usdc.invoke(owner, "mintTo", bob.getAddress(), TEN.pow(30).multiply(TEN.pow(18)));
 
     ConvexusFactoryUtils.createPool(factory, alice, sicx.getAddress(), usdc.getAddress(), FEE, pool.getAddress());
-    initializeAtZeroTick();
+    pool.invoke(alice, "initialize", encodePriceSqrt(ONE, ONE));
+    mint(alice, minTick, maxTick, expandTo18Decimals(1), "1000000000000000000", "1000000000000000000");
   }
 
   @Test
-  void testLimitSelling0For1AtTick0Thru1() {
-    
+  void testWorksJustBeforeTheCapBinds () {
+    setFeeGrowthGlobal0X128(magicNumber);
+    burn(minTick, maxTick, ZERO);
+
+    var position = positions(alice, minTick, maxTick);
+
+    assertEquals(IntUtils.MAX_UINT128.subtract(ONE), position.tokensOwed0);
+    assertEquals(ZERO, position.tokensOwed1);
+  }
+
+  @Test
+  void testWorksJustAfterCapBinds () {
+    setFeeGrowthGlobal0X128(magicNumber.add(ONE));
+    burn(minTick, maxTick, ZERO);
+
+    var position = positions(alice, minTick, maxTick);
+
+    assertEquals(IntUtils.MAX_UINT128, position.tokensOwed0);
+    assertEquals(ZERO, position.tokensOwed1);
+  }
+
+  @Test
+  void testWorksWellAfterCapBinds () {
+    setFeeGrowthGlobal0X128(IntUtils.MAX_UINT256);
+    burn(minTick, maxTick, ZERO);
+
+    var position = positions(alice, minTick, maxTick);
+
+    assertEquals(IntUtils.MAX_UINT128, position.tokensOwed0);
+    assertEquals(ZERO, position.tokensOwed1);
   }
 }

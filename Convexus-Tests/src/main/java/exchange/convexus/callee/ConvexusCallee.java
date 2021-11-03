@@ -174,6 +174,11 @@ public class ConvexusCallee {
     Context.call(pool, "swap", recipient, false, amount1In, sqrtPriceLimitX96, Context.getCaller().toByteArray());
   }
 
+  @External(readonly = true)
+  public String name () {
+    return new String(NAME);
+  }
+
   // ================================================
   // Checks
   // ================================================

@@ -171,7 +171,7 @@ public class MintMiscTest extends ConvexusPoolTest {
 
     BigInteger amount0In = TEN.pow(18);
     ConvexusLiquidity.deposit(alice, callee.getAddress(), sicx.score, new BigInteger("1000000000000000000"));
-    swapExact0For1(amount0In, alice.getAddress());
+    swapExact0For1(amount0In, alice);
     
     BigInteger liquidityAfter = (BigInteger) pool.call("liquidity");
     assertTrue(liquidityAfter.compareTo(liquidityBefore) >= 0);

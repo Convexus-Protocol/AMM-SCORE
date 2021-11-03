@@ -76,7 +76,9 @@ public class Usdc {
 
         // check some basic requirements
         Context.require(_value.compareTo(BigInteger.ZERO) >= 0, "Value must be >= 0");
-        Context.require(safeGetBalance(_from).compareTo(_value) >= 0, String.format("%s: Not enough balance (%s < %s)", _from, safeGetBalance(_from), _value));
+        Context.require(safeGetBalance(_from).compareTo(_value) >= 0, 
+            String.format("[%s] %s: Not enough balance (%s < %s)", 
+            this.symbol, _from.isContract() ? Context.call(_from, "name") : _from, safeGetBalance(_from), _value));
 
         // adjust the balances
         safeSetBalance(_from, safeGetBalance(_from).subtract(_value));

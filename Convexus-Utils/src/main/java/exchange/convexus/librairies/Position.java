@@ -16,6 +16,8 @@
 
 package exchange.convexus.librairies;
 
+import static exchange.convexus.utils.IntUtils.uint128;
+
 import java.math.BigInteger;
 
 import score.Context;
@@ -91,8 +93,9 @@ public class Position {
                 liquidityNext = LiquidityMath.addDelta(this.liquidity, liquidityDelta);
             }
 
-            BigInteger tokensOwed0 = FullMath.mulDiv(feeGrowthInside0X128.subtract(this.feeGrowthInside0LastX128), this.liquidity, FixedPoint128.Q128);
-            BigInteger tokensOwed1 = FullMath.mulDiv(feeGrowthInside1X128.subtract(this.feeGrowthInside1LastX128), this.liquidity, FixedPoint128.Q128);
+
+            BigInteger tokensOwed0 = uint128(FullMath.mulDiv(feeGrowthInside0X128.subtract(this.feeGrowthInside0LastX128), this.liquidity, FixedPoint128.Q128));
+            BigInteger tokensOwed1 = uint128(FullMath.mulDiv(feeGrowthInside1X128.subtract(this.feeGrowthInside1LastX128), this.liquidity, FixedPoint128.Q128));
 
             // update the position
             if (!liquidityDelta.equals(BigInteger.ZERO)) {
@@ -104,8 +107,8 @@ public class Position {
 
             if (tokensOwed0.compareTo(BigInteger.ZERO) > 0 || tokensOwed1.compareTo(BigInteger.ZERO) > 0) {
                 // overflow is acceptable, have to withdraw before you hit type(uint128).max fees
-                this.tokensOwed0 = this.tokensOwed0.add(tokensOwed0);
-                this.tokensOwed1 = this.tokensOwed1.add(tokensOwed1);
+                this.tokensOwed0 = uint128(this.tokensOwed0.add(tokensOwed0));
+                this.tokensOwed1 = uint128(this.tokensOwed1.add(tokensOwed1));
             }
         }
     }

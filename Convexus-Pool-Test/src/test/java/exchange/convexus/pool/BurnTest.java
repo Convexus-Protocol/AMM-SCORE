@@ -93,10 +93,10 @@ public class BurnTest extends ConvexusPoolTest {
       callee.invoke(bob, "mint", pool.getAddress(), bob.getAddress(), minTick, maxTick, TEN.pow(18));
       
       ConvexusLiquidity.deposit(alice, callee.getAddress(), sicx.score, new BigInteger("1000000000000000000"));
-      swapExact0For1(TEN.pow(18), alice.getAddress());
+      swapExact0For1(TEN.pow(18), alice);
       
       ConvexusLiquidity.deposit(alice, callee.getAddress(), usdc.score, new BigInteger("1000000000000000000"));
-      swapExact1For0(TEN.pow(18), alice.getAddress());
+      swapExact1For0(TEN.pow(18), alice);
 
       pool.invoke(bob, "burn", minTick, maxTick, TEN.pow(18));
       var position = (Position.Info) pool.call("positions", Positions.getKey(bob.getAddress(), minTick, maxTick));
@@ -118,7 +118,7 @@ public class BurnTest extends ConvexusPoolTest {
     callee.invoke(alice, "mint", pool.getAddress(), alice.getAddress(), tickLower, tickUpper, ONE);
     
     ConvexusLiquidity.deposit(alice, callee.getAddress(), sicx.score, new BigInteger("1000000000000000000"));
-    swapExact0For1(TEN.pow(18), alice.getAddress());
+    swapExact0For1(TEN.pow(18), alice);
     
     pool.invoke(alice, "burn", tickLower, tickUpper, ONE);
     checkTickIsClear(tickLower);
@@ -142,7 +142,7 @@ public class BurnTest extends ConvexusPoolTest {
     callee.invoke(alice, "mint", pool.getAddress(), alice.getAddress(), tickLower + tickSpacing, tickUpper, ONE);
     
     ConvexusLiquidity.deposit(alice, callee.getAddress(), sicx.score, new BigInteger("1000000000000000000"));
-    swapExact0For1(TEN.pow(18), alice.getAddress());
+    swapExact0For1(TEN.pow(18), alice);
     
     pool.invoke(alice, "burn", tickLower, tickUpper, ONE);
     checkTickIsClear(tickLower);
@@ -166,7 +166,7 @@ public class BurnTest extends ConvexusPoolTest {
     callee.invoke(alice, "mint", pool.getAddress(), alice.getAddress(), tickLower, tickUpper - tickSpacing, ONE);
     
     ConvexusLiquidity.deposit(alice, callee.getAddress(), sicx.score, new BigInteger("1000000000000000000"));
-    swapExact0For1(TEN.pow(18), alice.getAddress());
+    swapExact0For1(TEN.pow(18), alice);
     
     pool.invoke(alice, "burn", tickLower, tickUpper, ONE);
     checkTickIsNotClear(tickLower);
