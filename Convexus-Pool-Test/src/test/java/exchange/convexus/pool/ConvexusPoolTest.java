@@ -241,4 +241,16 @@ public class ConvexusPoolTest extends ConvexusTest {
     doSwap(minTick, maxTick, amount, tokenAmount, zeroForOne, poke);
     return collectGetFeesOwed(minTick, maxTick);
   }
+  
+  protected void flash(Account from, BigInteger amount0, BigInteger amount1, Account recipient) {
+    BigInteger fee = (BigInteger) pool.call("fee");
+    BigInteger TENE6 = BigInteger.TEN.pow(6);
+    BigInteger pay0 = amount0.multiply(fee).add(TENE6.subtract(ONE)).divide(TENE6).add(amount0);
+    BigInteger pay1 = amount1.multiply(fee).add(TENE6.subtract(ONE)).divide(TENE6).add(amount1);
+    callee.invoke(from, "flash", pool.getAddress(), recipient.getAddress(), amount0, amount1, pay0, pay1);
+  }
+  
+  protected void flash(Account from, String amount0, String amount1, Account recipient) {
+    flash(from, new BigInteger(amount0), new BigInteger(amount1), recipient);
+  }
 }

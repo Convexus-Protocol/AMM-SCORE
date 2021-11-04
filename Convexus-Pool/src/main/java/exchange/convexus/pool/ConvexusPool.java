@@ -1435,6 +1435,11 @@ public class ConvexusPool {
     }
 
     @External(readonly = true)
+    public BigInteger fee () {
+        return BigInteger.valueOf(this.fee);
+    }
+
+    @External(readonly = true)
     public int tickSpacing () {
         return this.tickSpacing;
     }

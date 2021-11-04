@@ -26,8 +26,10 @@ import com.eclipsesource.json.JsonValue;
 
 import score.Address;
 import score.BranchDB;
+import score.ByteArrayObjectWriter;
 import score.Context;
 import score.DictDB;
+import score.ObjectReader;
 import score.annotation.EventLog;
 import score.annotation.External;
 import score.annotation.Optional;
@@ -161,6 +163,47 @@ public class ConvexusCallee {
 
       default:
         Context.revert("tokenFallback: Unimplemented tokenFallback action");
+    }
+  }
+
+  @External
+  public void flash (
+    Address pool,
+    Address recipient,
+    BigInteger amount0, 
+    BigInteger amount1, 
+    BigInteger pay0, 
+    BigInteger pay1
+  ) {
+    ByteArrayObjectWriter writer = Context.newByteArrayObjectWriter("RLPn");
+    FlashData.writeObject(writer, new FlashData(Context.getCaller(), pay0, pay1));
+    Context.call(pool, "flash", recipient, amount0, amount1, writer.toByteArray());
+  }
+
+  @EventLog
+  protected void FlashCallback(BigInteger fee0, BigInteger fee1) {}
+
+  @External
+  public void convexusFlashCallback (
+      BigInteger fee0,
+      BigInteger fee1,
+      byte[] data
+  ) {
+    this.FlashCallback(fee0, fee1);
+    final Address caller = Context.getCaller();
+
+    ObjectReader reader = Context.newByteArrayObjectReader("RLPn", data);
+    FlashData flashData = FlashData.readObject(reader);
+
+    Address sender = flashData.sender;
+    BigInteger pay0 = flashData.pay0;
+    BigInteger pay1 = flashData.pay1;
+
+    if (pay0.compareTo(ZERO) > 0) {
+      pay(sender, (Address) Context.call(caller, "token0"), caller, pay0);
+    }
+    if (pay1.compareTo(ZERO) > 0) {
+      pay(sender, (Address) Context.call(caller, "token1"), caller, pay1);
     }
   }
 
