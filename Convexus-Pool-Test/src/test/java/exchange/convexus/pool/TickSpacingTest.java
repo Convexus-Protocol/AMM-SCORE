@@ -18,7 +18,6 @@ package exchange.convexus.pool;
 
 import static java.math.BigInteger.ONE;
 import static java.math.BigInteger.TEN;
-import static java.math.BigInteger.ZERO;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
