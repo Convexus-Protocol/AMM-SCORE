@@ -80,7 +80,10 @@ public class TickBitmap {
     int tick,
     int tickSpacing
   ) {
-      Context.require(tick % tickSpacing == 0); // ensure that the tick is spaced
+      // ensure that the tick is spaced
+      Context.require(tick % tickSpacing == 0, 
+        "flipTick: tick isn't spaced");
+
       var result = position(tick / tickSpacing);
       int wordPos = result.wordPos;
       int bitPos = result.bitPos;
