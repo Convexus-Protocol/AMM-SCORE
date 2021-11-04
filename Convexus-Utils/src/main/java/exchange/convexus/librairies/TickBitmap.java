@@ -16,6 +16,7 @@
 
 package exchange.convexus.librairies;
 
+import static java.math.BigInteger.ONE;
 import static java.math.BigInteger.ZERO;
 
 import java.math.BigInteger;
@@ -88,7 +89,7 @@ public class TickBitmap {
       int wordPos = result.wordPos;
       int bitPos = result.bitPos;
 
-      BigInteger mask = BigInteger.ONE.shiftLeft(bitPos);
+      BigInteger mask = ONE.shiftLeft(bitPos);
       BigInteger packedTick = this.get(wordPos);
 
       this.tickBitmap.set(wordPos, packedTick.xor(mask));
@@ -114,8 +115,10 @@ public class TickBitmap {
         var position = position(compressed);
         int wordPos = position.wordPos;
         int bitPos  = position.bitPos;
+
+        var oneShifted = ONE.shiftLeft(bitPos);
         // all the 1s at or to the right of the current bitPos
-        BigInteger mask = BigInteger.valueOf((1 << bitPos) - 1 + (1 << bitPos));
+        BigInteger mask = oneShifted.subtract(ONE).add(oneShifted);
         BigInteger masked = this.get(wordPos).and(mask);
 
         // if there are no initialized ticks to the right of or at the current tick, return rightmost in the word
@@ -130,7 +133,7 @@ public class TickBitmap {
         int wordPos = position.wordPos;
         int bitPos  = position.bitPos;
         // all the 1s at or to the left of the bitPos
-        BigInteger mask = BigInteger.valueOf(~((1 << bitPos) - 1));
+        BigInteger mask = ONE.shiftLeft(bitPos).subtract(ONE).not();
         BigInteger masked = this.get(wordPos).and(mask);
 
         // if there are no initialized ticks to the left of the current tick, return leftmost in the word

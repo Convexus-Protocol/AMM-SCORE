@@ -94,9 +94,9 @@ public class ConvexusPool {
     private final ReentrancyLock poolLock = new ReentrancyLock(NAME + "_poolLock");
     
     // The fee growth as a Q128.128 fees of token0 collected per unit of liquidity for the entire life of the pool
-    public final VarDB<BigInteger> feeGrowthGlobal0X128 = Context.newVarDB(NAME + "_feeGrowthGlobal0X128", BigInteger.class);
+    protected final VarDB<BigInteger> feeGrowthGlobal0X128 = Context.newVarDB(NAME + "_feeGrowthGlobal0X128", BigInteger.class);
     // The fee growth as a Q128.128 fees of token1 collected per unit of liquidity for the entire life of the pool
-    public final VarDB<BigInteger> feeGrowthGlobal1X128 = Context.newVarDB(NAME + "_feeGrowthGlobal1X128", BigInteger.class);
+    protected final VarDB<BigInteger> feeGrowthGlobal1X128 = Context.newVarDB(NAME + "_feeGrowthGlobal1X128", BigInteger.class);
     
     // The amounts of token0 and token1 that are owed to the protocol
     private final VarDB<ProtocolFees> protocolFees = Context.newVarDB(NAME + "_protocolFees", ProtocolFees.class);
@@ -990,7 +990,7 @@ public class ConvexusPool {
         );
 
         SwapCache cache = new SwapCache(
-            liquidity.get(),
+            this.liquidity.get(),
             _blockTimestamp(),
             zeroForOne ? (slot0Start.feeProtocol % 16) : (slot0Start.feeProtocol >> 4),
             ZERO,
@@ -1148,14 +1148,14 @@ public class ConvexusPool {
         // update fee growth global and, if necessary, protocol fees
         // overflow is acceptable, protocol has to withdraw before it hits type(uint128).max fees
         if (zeroForOne) {
-            feeGrowthGlobal0X128.set(state.feeGrowthGlobalX128);
+            this.feeGrowthGlobal0X128.set(state.feeGrowthGlobalX128);
             if (state.protocolFee.compareTo(ZERO) > 0) {
                 var _protocolFees = this.protocolFees.get();
                 _protocolFees.token0 = _protocolFees.token0.add(state.protocolFee);
                 this.protocolFees.set(_protocolFees);
             }
         } else {
-            feeGrowthGlobal1X128.set(state.feeGrowthGlobalX128);
+            this.feeGrowthGlobal1X128.set(state.feeGrowthGlobalX128);
             if (state.protocolFee.compareTo(ZERO) > 0) {
                 var _protocolFees = this.protocolFees.get();
                 _protocolFees.token1 = _protocolFees.token1.add(state.protocolFee);

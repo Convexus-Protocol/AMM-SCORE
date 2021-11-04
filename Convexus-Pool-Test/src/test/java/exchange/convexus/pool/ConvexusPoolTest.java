@@ -32,8 +32,10 @@ import java.math.BigInteger;
 import java.math.MathContext;
 
 import com.iconloop.score.test.Account;
+import com.iconloop.score.test.Score;
 
 import org.mockito.ArgumentCaptor;
+import org.mockito.Mockito;
 
 import exchange.convexus.callee.ConvexusCallee;
 import exchange.convexus.factory.ConvexusFactory;
@@ -48,7 +50,7 @@ import exchange.convexus.utils.ScoreSpy;
 
 public class ConvexusPoolTest extends ConvexusTest {
 
-  ScoreSpy<ConvexusPool> pool;
+  ScoreSpy<ConvexusPoolMock> pool;
   ScoreSpy<ConvexusFactory> factory;
   ScoreSpy<Sicx> sicx;
   ScoreSpy<Usdc> usdc;
@@ -57,13 +59,21 @@ public class ConvexusPoolTest extends ConvexusTest {
   void setup_pool (Address factory, int fee, int tickSpacing) throws Exception {
     sicx = deploy_sicx();
     usdc = deploy_usdc();
-    pool = deploy_pool(sicx.getAddress(), usdc.getAddress(), factory, fee, tickSpacing);
+    pool = deploy_mock_pool(sicx.getAddress(), usdc.getAddress(), factory, fee, tickSpacing);
     callee = deploy_callee();
   }
 
   void setup_factory () throws Exception {
     factory = deploy_factory();
   }
+  
+  public ScoreSpy<ConvexusPoolMock> deploy_mock_pool (Address token0, Address token1, Address factory, int fee, int tickSpacing) throws Exception {
+    Score score = sm.deploy(owner, ConvexusPoolMock.class, token0, token1, factory, fee, tickSpacing);
+
+    var spy = (ConvexusPoolMock) Mockito.spy(score.getInstance());
+    score.setInstance(spy);
+    return new ScoreSpy<ConvexusPoolMock>(score, spy);
+}
   
   protected BigInteger encodePriceSqrt (BigInteger reserve1, BigInteger reserve0) {
     return new BigDecimal(reserve1).divide(new BigDecimal(reserve0), MathContext.DECIMAL128).sqrt(MathContext.DECIMAL128).multiply(BigDecimal.valueOf(2).pow(96)).toBigInteger();
@@ -153,11 +163,11 @@ public class ConvexusPoolTest extends ConvexusTest {
   }
 
   protected void setFeeGrowthGlobal0X128(BigInteger _feeGrowthGlobal0X128) {
-    sm.putStorage("VarDB" + ConvexusPool.NAME + "_feeGrowthGlobal0X128", _feeGrowthGlobal0X128);
+    pool.invoke(owner, "setFeeGrowthGlobal0X128", _feeGrowthGlobal0X128);
   }
 
   protected void setFeeGrowthGlobal1X128(BigInteger _feeGrowthGlobal1X128) {
-    sm.putStorage("VarDB" + ConvexusPool.NAME + "_feeGrowthGlobal1X128", _feeGrowthGlobal1X128);
+    pool.invoke(owner, "setFeeGrowthGlobal1X128", _feeGrowthGlobal1X128);
   }
   
   class Fees {

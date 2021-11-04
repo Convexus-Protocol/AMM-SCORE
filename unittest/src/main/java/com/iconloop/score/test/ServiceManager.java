@@ -17,6 +17,7 @@
 package com.iconloop.score.test;
 
 import score.Address;
+import score.Context;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -231,7 +232,7 @@ public class ServiceManager {
     public void pushFrame(Account from, Account to, boolean readonly, String method, BigInteger value) {
         contexts.push(new Frame(from, to, readonly, method, value));
     }
-
+    
     public void popFrame() {
         contexts.pop();
     }

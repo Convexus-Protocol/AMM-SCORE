@@ -103,7 +103,7 @@ class TickSpacingTest extends ConvexusPoolTest {
   }
 
   @Test
-  void testSwappingAcrossGazpsWorksIn0For1Direction () {
+  void testSwappingAcrossGapsWorksIn0For1Direction () {
     var liquidityAmount = expandTo18Decimals(1).divide(BigInteger.valueOf(4));
     mint(alice, -121200, -120000, liquidityAmount, "0", "36096898321357");
 

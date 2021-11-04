@@ -27,7 +27,6 @@ import java.math.BigInteger;
 
 import com.iconloop.score.test.ServiceManager;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -51,7 +50,6 @@ class CollectOverflowTest extends ConvexusPoolTest {
 
   @BeforeEach
   void setup() throws Exception {
-    sm.pushFrame(owner, alice, false, "<init>", ZERO);
     ServiceManager.Block.resetInstance();
     setup_factory();
     reset(factory.spy);
@@ -67,16 +65,10 @@ class CollectOverflowTest extends ConvexusPoolTest {
 
     ConvexusFactoryUtils.createPool(factory, alice, sicx.getAddress(), usdc.getAddress(), FEE, pool.getAddress());
     pool.invoke(alice, "initialize", encodePriceSqrt(ONE, ONE));
-    mint(alice, minTick, maxTick, expandTo18Decimals(1), "1000000000000000000", "1000000000000000000");
     
     setFeeGrowthGlobal0X128(IntUtils.MAX_UINT256);
     setFeeGrowthGlobal1X128(IntUtils.MAX_UINT256);
     mint(alice, minTick, maxTick, expandTo18Decimals(10), "10000000000000000000", "10000000000000000000");
-  }
-
-  @AfterEach
-  void after() {
-    sm.popFrame();
   }
 
   @Test
