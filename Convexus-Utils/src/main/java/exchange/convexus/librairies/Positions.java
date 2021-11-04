@@ -38,7 +38,8 @@ public class Positions {
   }
 
   public Position.Info get (byte[] key) {
-    return this.positions.getOrDefault(key, emptyPosition());
+    var position = this.positions.get(key);
+    return position == null ? emptyPosition() : position;
   }
 
   public void set (byte[] key, Position.Info value) {

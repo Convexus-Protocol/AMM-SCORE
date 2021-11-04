@@ -36,6 +36,7 @@ import exchange.convexus.librairies.TickMath;
 import exchange.convexus.librairies.Ticks;
 import exchange.convexus.librairies.Position.Info;
 import exchange.convexus.utils.ReentrancyLock;
+import exchange.convexus.utils.StringUtils;
 import score.Address;
 import score.Context;
 import score.VarDB;
@@ -587,7 +588,7 @@ public class ConvexusPool {
         BigInteger feeGrowthInside1X128 = result.feeGrowthInside1X128;
 
         position.update(liquidityDelta, feeGrowthInside0X128, feeGrowthInside1X128);
-        
+
         // clear any tick data that is no longer needed
         if (liquidityDelta.compareTo(ZERO) < 0) {
             if (flippedLower) {
@@ -597,7 +598,7 @@ public class ConvexusPool {
                 this.ticks.clear(tickUpper);
             }
         }
-        
+
         this.positions.set(positionKey, position);
         return new PositionStorage(position, positionKey);
     }
@@ -808,8 +809,6 @@ public class ConvexusPool {
         // we don't need to checkTicks here, because invalid positions will never have non-zero tokensOwed{0,1}
         byte[] key = Positions.getKey(caller, tickLower, tickUpper);
         Position.Info position = this.positions.get(key);
-
-
 
         amount0 = amount0Requested.compareTo(position.tokensOwed0) > 0 ? position.tokensOwed0 : amount0Requested;
         amount1 = amount1Requested.compareTo(position.tokensOwed1) > 0 ? position.tokensOwed1 : amount1Requested;
@@ -1337,7 +1336,7 @@ public class ConvexusPool {
         
         if (amount0.compareTo(ZERO) > 0) {
             if (amount0 == _protocolFees.token0) {
-                // ensure that the slot is not cleared, for gas savings
+                // ensure that the slot is not cleared, for steps savings
                 amount0 = amount0.subtract(BigInteger.ONE); 
             }
             _protocolFees.token0 = _protocolFees.token0.subtract(amount0);
@@ -1346,7 +1345,7 @@ public class ConvexusPool {
         }
         if (amount1.compareTo(ZERO) > 0) {
             if (amount1 == _protocolFees.token1) {
-                // ensure that the slot is not cleared, for gas savings
+                // ensure that the slot is not cleared, for steps savings
                 amount1 = amount1.subtract(BigInteger.ONE); 
             }
             _protocolFees.token1 = _protocolFees.token1.subtract(amount1);

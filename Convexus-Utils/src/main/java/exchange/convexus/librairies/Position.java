@@ -93,7 +93,6 @@ public class Position {
                 liquidityNext = LiquidityMath.addDelta(this.liquidity, liquidityDelta);
             }
 
-
             BigInteger tokensOwed0 = uint128(FullMath.mulDiv(feeGrowthInside0X128.subtract(this.feeGrowthInside0LastX128), this.liquidity, FixedPoint128.Q128));
             BigInteger tokensOwed1 = uint128(FullMath.mulDiv(feeGrowthInside1X128.subtract(this.feeGrowthInside1LastX128), this.liquidity, FixedPoint128.Q128));
 

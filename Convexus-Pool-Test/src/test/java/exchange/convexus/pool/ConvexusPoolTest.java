@@ -17,17 +17,23 @@
 package exchange.convexus.pool;
 
 import exchange.convexus.utils.ConvexusTest;
+import exchange.convexus.utils.IntUtils;
 import score.Address;
 
 import static java.math.BigInteger.ONE;
 import static java.math.BigInteger.ZERO;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.verify;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.MathContext;
 
 import com.iconloop.score.test.Account;
+
+import org.mockito.ArgumentCaptor;
 
 import exchange.convexus.callee.ConvexusCallee;
 import exchange.convexus.factory.ConvexusFactory;
@@ -152,5 +158,77 @@ public class ConvexusPoolTest extends ConvexusTest {
 
   protected void setFeeGrowthGlobal1X128(BigInteger _feeGrowthGlobal1X128) {
     sm.putStorage("VarDB" + ConvexusPool.NAME + "_feeGrowthGlobal1X128", _feeGrowthGlobal1X128);
+  }
+  
+  class Fees {
+    public Fees(BigInteger token0Fees, BigInteger token1Fees) {
+      this.token0Fees = token0Fees;
+      this.token1Fees = token1Fees;
+    }
+    public BigInteger token0Fees;
+    public BigInteger token1Fees;
+  }
+  
+  protected Fees collectGetFeesOwed (int minTick, int maxTick) {
+    reset(pool.spy);
+    pool.invoke(alice, "collect", alice.getAddress(), minTick, maxTick, IntUtils.MAX_UINT128, IntUtils.MAX_UINT128);
+
+    // Get Collect event
+    ArgumentCaptor<Address> _caller = ArgumentCaptor.forClass(Address.class);
+    ArgumentCaptor<Integer> _tickLower = ArgumentCaptor.forClass(Integer.class);
+    ArgumentCaptor<Integer> _tickUpper = ArgumentCaptor.forClass(Integer.class);
+    ArgumentCaptor<Address> _recipient = ArgumentCaptor.forClass(Address.class);
+    ArgumentCaptor<BigInteger> _amount0 = ArgumentCaptor.forClass(BigInteger.class);
+    ArgumentCaptor<BigInteger> _amount1 = ArgumentCaptor.forClass(BigInteger.class);
+    verify(pool.spy).Collect(_caller.capture(), _tickLower.capture(), _tickUpper.capture(), _recipient.capture(), _amount0.capture(), _amount1.capture());
+    
+    assertTrue(_amount0.getValue().compareTo(ZERO) >= 0);
+    assertTrue(_amount1.getValue().compareTo(ZERO) >= 0);
+
+    return new Fees(_amount0.getValue(), _amount1.getValue());
+  }
+
+  protected Fees collectProtocolGetFeesOwed (Account from, Account to) {
+    reset(pool.spy);
+    pool.invoke(from, "collectProtocol", to.getAddress(), IntUtils.MAX_UINT128, IntUtils.MAX_UINT128);
+
+    // Get CollectProtocol event
+    ArgumentCaptor<Address> _caller = ArgumentCaptor.forClass(Address.class);
+    ArgumentCaptor<Address> _recipient = ArgumentCaptor.forClass(Address.class);
+    ArgumentCaptor<BigInteger> _amount0 = ArgumentCaptor.forClass(BigInteger.class);
+    ArgumentCaptor<BigInteger> _amount1 = ArgumentCaptor.forClass(BigInteger.class);
+    verify(pool.spy).CollectProtocol(_caller.capture(), _recipient.capture(), _amount0.capture(), _amount1.capture());
+    
+    return new Fees(_amount0.getValue(), _amount1.getValue());
+  }
+
+  protected void doSwap (
+    int minTick, int maxTick,
+    BigInteger amount,
+    String tokenAmount,
+    boolean zeroForOne,
+    boolean poke
+  ) {
+    if (zeroForOne) {
+      swapExact0For1(amount, alice, tokenAmount); 
+    }
+    else {
+      swapExact1For0(amount, alice, tokenAmount);
+    }
+
+    if (poke) {
+      burn(minTick, maxTick, ZERO);
+    }
+  }
+
+  protected Fees swapAndGetFeesOwed (
+    int minTick, int maxTick,
+    BigInteger amount,
+    String tokenAmount,
+    boolean zeroForOne,
+    boolean poke
+  ) {
+    doSwap(minTick, maxTick, amount, tokenAmount, zeroForOne, poke);
+    return collectGetFeesOwed(minTick, maxTick);
   }
 }

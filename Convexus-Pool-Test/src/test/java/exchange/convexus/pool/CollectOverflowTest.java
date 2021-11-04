@@ -36,7 +36,7 @@ import exchange.convexus.factory.ConvexusFactoryUtils;
 import exchange.convexus.utils.IntUtils;
 import score.Address;
 
-class CollectTestOverflow extends ConvexusPoolTest {
+class CollectOverflowTest extends ConvexusPoolTest {
 
   final int TICK_SPACINGS[] = {10, 60, 200};
   final int FEE_AMOUNTS[] = {500, 3000, 10000};
