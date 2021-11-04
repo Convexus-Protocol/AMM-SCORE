@@ -126,7 +126,7 @@ public class ConvexusPoolTest extends ConvexusTest {
   protected void initializeAtZeroTick() {
     BigInteger initializeLiquidityAmount = BigInteger.TEN.pow(18).multiply(BigInteger.TWO);
     pool.invoke(alice, "initialize", encodePriceSqrt(ONE, ONE));
-    int tickSpacing = (int) pool.call("tickSpacing");
+    int tickSpacing = ((BigInteger) pool.call("tickSpacing")).intValue();
     int min = getMinTick(tickSpacing);
     int max = getMaxTick(tickSpacing);
     ConvexusLiquidity.deposit(alice, callee.getAddress(), usdc.score, new BigInteger("2000000000000000000"));

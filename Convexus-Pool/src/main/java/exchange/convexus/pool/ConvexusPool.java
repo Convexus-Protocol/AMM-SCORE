@@ -1440,7 +1440,7 @@ public class ConvexusPool {
     }
 
     @External(readonly = true)
-    public int tickSpacing () {
-        return this.tickSpacing;
+    public BigInteger tickSpacing () {
+        return BigInteger.valueOf(this.tickSpacing);
     }
 }

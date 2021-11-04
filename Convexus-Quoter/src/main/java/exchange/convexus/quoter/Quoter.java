@@ -227,7 +227,6 @@ public class Quoter {
     private int countInitializedTicksCrossed(Address pool, int tickBefore, int tickAfter) {
         int initializedTicksCrossed = 0;
 
-    
         // Get the key and offset in the tick bitmap of the active tick before and after the swap.
         int tickSpacing = ((BigInteger) Context.call(pool, "tickSpacing")).intValue();
         int wordPos = (tickBefore / tickSpacing) >> 8;
