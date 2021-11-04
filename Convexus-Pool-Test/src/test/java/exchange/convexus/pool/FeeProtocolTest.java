@@ -18,8 +18,10 @@ package exchange.convexus.pool;
 
 import static java.math.BigInteger.ONE;
 import static java.math.BigInteger.TEN;
+import static java.math.BigInteger.ZERO;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.verify;
 
 import java.math.BigInteger;
 
@@ -32,6 +34,7 @@ import exchange.convexus.factory.ConvexusFactoryUtils;
 import exchange.convexus.librairies.Position;
 import exchange.convexus.librairies.Positions;
 import exchange.convexus.utils.AssertUtils;
+import exchange.convexus.utils.IntUtils;
 
 class FeeProtocolTest extends ConvexusPoolTest {
 
@@ -155,5 +158,54 @@ class FeeProtocolTest extends ConvexusPoolTest {
     
     assertEquals(new BigInteger("416666666666666"), fees.token0Fees);
     assertEquals(new BigInteger("0"), fees.token1Fees);
+  }
+
+  @Test
+  void testFeesCollectedByLpAfterTwoSwapsShouldBeDoubleOneSwap () {
+    doSwap(minTick, maxTick, expandTo18Decimals(1), "1000000000000000000", true, true);
+    var fees = swapAndGetFeesOwed(minTick, maxTick, expandTo18Decimals(1), "1000000000000000000", true, true);
+
+    assertEquals(fees.token0Fees, new BigInteger("999999999999998"));
+    assertEquals(fees.token1Fees, ZERO);
+  }
+
+  @Test
+  void testFeesCollectedAfterTwoSwapsWithFeeTurnedOnInMiddleAreFeesFromLastSwap () {
+    doSwap(minTick, maxTick, expandTo18Decimals(1), "1000000000000000000", true, false);
+    pool.invoke(owner, "setFeeProtocol", 6, 6);
+    
+    var fees = swapAndGetFeesOwed(minTick, maxTick, expandTo18Decimals(1), "1000000000000000000", true, true);
+    
+    assertEquals(fees.token0Fees, new BigInteger("916666666666666"));
+    assertEquals(fees.token1Fees, ZERO);
+  }
+
+  @Test
+  void testFeesCollectedByLpAfterTwoSwapsWithIntermediateWithdrawal () {
+    pool.invoke(owner, "setFeeProtocol", 6, 6);
+
+    var fees = swapAndGetFeesOwed(minTick, maxTick, expandTo18Decimals(1), "1000000000000000000", true, true);
+    
+    assertEquals(fees.token0Fees, new BigInteger("416666666666666"));
+    assertEquals(fees.token1Fees, ZERO);
+
+    fees = swapAndGetFeesOwed(minTick, maxTick, expandTo18Decimals(1), "1000000000000000000", true, false);
+    
+    assertEquals(fees.token0Fees, ZERO);
+    assertEquals(fees.token1Fees, ZERO);
+
+    var protocolFees = (ProtocolFees) pool.call("protocolFees");
+    assertEquals(new BigInteger("166666666666666"), protocolFees.token0);
+    assertEquals(ZERO, protocolFees.token1);
+    
+    burn(minTick, maxTick, ZERO); // poke to update fees
+    
+    reset(sicx.spy);
+    pool.invoke(alice, "collect", alice.getAddress(), minTick, maxTick, IntUtils.MAX_UINT128, IntUtils.MAX_UINT128);
+    verify(sicx.spy).Transfer(pool.getAddress(), alice.getAddress(), new BigInteger ("416666666666666"), "collect".getBytes());
+
+    protocolFees = (ProtocolFees) pool.call("protocolFees");
+    assertEquals(new BigInteger("166666666666666"), protocolFees.token0);
+    assertEquals(ZERO, protocolFees.token1);
   }
 }
