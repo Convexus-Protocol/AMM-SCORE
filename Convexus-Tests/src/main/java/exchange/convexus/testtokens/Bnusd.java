@@ -55,8 +55,8 @@ public class Bnusd {
     }
 
     @External(readonly=true)
-    public int decimals() {
-        return decimals;
+    public BigInteger decimals() {
+        return BigInteger.valueOf(decimals);
     }
 
     @External(readonly=true)

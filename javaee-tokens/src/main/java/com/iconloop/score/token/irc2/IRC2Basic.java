@@ -55,8 +55,8 @@ public abstract class IRC2Basic implements IRC2 {
     }
 
     @External(readonly=true)
-    public int decimals() {
-        return decimals;
+    public BigInteger decimals() {
+        return BigInteger.valueOf(decimals);
     }
 
     @External(readonly=true)

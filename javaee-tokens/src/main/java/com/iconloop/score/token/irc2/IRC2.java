@@ -35,7 +35,7 @@ public interface IRC2 {
     /**
      * Returns the number of decimals the token uses. (e.g. 18)
      */
-    int decimals();
+    BigInteger decimals();
 
     /**
      * Returns the total token supply.
