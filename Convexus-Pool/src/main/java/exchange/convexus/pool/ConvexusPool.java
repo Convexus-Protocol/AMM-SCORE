@@ -36,7 +36,6 @@ import exchange.convexus.librairies.TickMath;
 import exchange.convexus.librairies.Ticks;
 import exchange.convexus.librairies.Position.Info;
 import exchange.convexus.utils.ReentrancyLock;
-import exchange.convexus.utils.StringUtils;
 import score.Address;
 import score.Context;
 import score.VarDB;
