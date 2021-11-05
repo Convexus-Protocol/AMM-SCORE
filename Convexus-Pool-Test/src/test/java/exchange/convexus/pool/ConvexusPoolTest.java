@@ -19,7 +19,6 @@ package exchange.convexus.pool;
 import exchange.convexus.utils.ConvexusTest;
 import exchange.convexus.utils.IntUtils;
 import score.Address;
-import score.Context;
 
 import static java.math.BigInteger.ONE;
 import static java.math.BigInteger.ZERO;
@@ -243,7 +242,7 @@ public class ConvexusPoolTest extends ConvexusTest {
     return collectGetFeesOwed(minTick, maxTick);
   }
   
-  protected void flash(Account from, BigInteger amount0, BigInteger amount1, Account recipient, BigInteger sicxAmount, BigInteger usdcAmount) {
+  protected void flash(Account from, BigInteger amount0, BigInteger amount1, Address recipient, BigInteger sicxAmount, BigInteger usdcAmount) {
     if (sicxAmount.compareTo(ZERO) > 0) {
       ConvexusLiquidity.deposit(from, callee.getAddress(), sicx.score, sicxAmount);
     }
@@ -251,7 +250,11 @@ public class ConvexusPoolTest extends ConvexusTest {
       ConvexusLiquidity.deposit(from, callee.getAddress(), usdc.score, usdcAmount);
     }
 
-    callee.invoke(from, "flash", pool.getAddress(), recipient.getAddress(), amount0, amount1, sicxAmount, usdcAmount);
+    callee.invoke(from, "flash", pool.getAddress(), recipient, amount0, amount1, sicxAmount, usdcAmount);
+  }
+  
+  protected void flash(Account from, BigInteger amount0, BigInteger amount1, Account recipient, BigInteger sicxAmount, BigInteger usdcAmount) {
+    flash(from, amount0, amount1, recipient.getAddress(), sicxAmount, usdcAmount);
   }
   
   protected void flash(Account from, BigInteger amount0, BigInteger amount1, Account recipient, String sicxAmount, String usdcAmount) {
@@ -259,6 +262,10 @@ public class ConvexusPoolTest extends ConvexusTest {
   }
 
   protected void flash(Account from, String amount0, String amount1, Account recipient, String sicxAmount, String usdcAmount) {
+    flash(from, new BigInteger(amount0), new BigInteger(amount1), recipient, new BigInteger(sicxAmount), new BigInteger(usdcAmount));
+  }
+  
+  protected void flash(Account from, String amount0, String amount1, Address recipient, String sicxAmount, String usdcAmount) {
     flash(from, new BigInteger(amount0), new BigInteger(amount1), recipient, new BigInteger(sicxAmount), new BigInteger(usdcAmount));
   }
 }

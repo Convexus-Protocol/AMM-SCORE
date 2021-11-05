@@ -19,7 +19,6 @@ package exchange.convexus.pool;
 import static java.math.BigInteger.ONE;
 import static java.math.BigInteger.TEN;
 import static java.math.BigInteger.TWO;
-import static java.math.BigInteger.ZERO;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
@@ -33,7 +32,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import exchange.convexus.factory.ConvexusFactoryUtils;
-import exchange.convexus.utils.AssertUtils;
+import exchange.convexus.utils.AddressUtils;
 
 class FlashWithLiquidityAndFeeOnTest extends ConvexusPoolTest {
 
@@ -97,5 +96,54 @@ class FlashWithLiquidityAndFeeOnTest extends ConvexusPoolTest {
     assertEquals(expectedFee1, pool.call("feeGrowthGlobal1X128"));
   }
 
-  // TODO
+  @Test
+  void testAllowsDonatingToken0 () {
+    reset(pool.spy);
+    reset(sicx.spy);
+    reset(usdc.spy);
+    flash(alice, "0", "0", AddressUtils.ZERO_ADDRESS, "567", "0");
+    verify(sicx.spy).Transfer(callee.getAddress(), pool.getAddress(), new BigInteger("567"), "pay".getBytes());
+    verify(usdc.spy, times(2)).balanceOf(pool.getAddress());
+
+    var fees = (ProtocolFees) pool.call("protocolFees");
+
+    assertEquals(fees.token0, new BigInteger("94"));
+    BigInteger expectedFee0 = BigInteger.valueOf(473).multiply(TWO.pow(128)).divide(expandTo18Decimals(2));
+    assertEquals(expectedFee0, pool.call("feeGrowthGlobal0X128"));
+  }
+  
+  @Test
+  void testAllowsDonatingToken1 () {
+    reset(pool.spy);
+    reset(sicx.spy);
+    reset(usdc.spy);
+    flash(alice, "0", "0", AddressUtils.ZERO_ADDRESS, "0", "678");
+    verify(usdc.spy).Transfer(callee.getAddress(), pool.getAddress(), new BigInteger("678"), "pay".getBytes());
+    verify(sicx.spy, times(2)).balanceOf(pool.getAddress());
+
+    var fees = (ProtocolFees) pool.call("protocolFees");
+
+    assertEquals(fees.token1, new BigInteger("113"));
+    BigInteger expectedFee1 = BigInteger.valueOf(565).multiply(TWO.pow(128)).divide(expandTo18Decimals(2));
+    assertEquals(expectedFee1, pool.call("feeGrowthGlobal1X128"));
+  }
+
+  @Test
+  void testAllowsDonatingToken0AndToken1Together () {
+    reset(pool.spy);
+    reset(sicx.spy);
+    reset(usdc.spy);
+    flash(alice, "0", "0", bob, "789", "1234");
+    verify(sicx.spy).Transfer(callee.getAddress(), pool.getAddress(), new BigInteger("789"), "pay".getBytes());
+    verify(usdc.spy).Transfer(callee.getAddress(), pool.getAddress(), new BigInteger("1234"), "pay".getBytes());
+    
+    var fees = (ProtocolFees) pool.call("protocolFees");
+    assertEquals(fees.token0, new BigInteger("131"));
+    assertEquals(fees.token1, new BigInteger("205"));
+
+    BigInteger expectedFee0 = BigInteger.valueOf(658).multiply(TWO.pow(128)).divide(expandTo18Decimals(2));
+    assertEquals(expectedFee0, pool.call("feeGrowthGlobal0X128"));
+    BigInteger expectedFee1 = BigInteger.valueOf(1029).multiply(TWO.pow(128)).divide(expandTo18Decimals(2));
+    assertEquals(expectedFee1, pool.call("feeGrowthGlobal1X128"));
+  }
 }
