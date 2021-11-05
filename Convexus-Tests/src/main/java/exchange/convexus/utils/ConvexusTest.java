@@ -31,7 +31,6 @@ import exchange.convexus.liquidity.ConvexusLiquidityManagement;
 import exchange.convexus.quoter.Quoter;
 import exchange.convexus.pairflash.PairFlash;
 import exchange.convexus.swap.Swap;
-import exchange.convexus.testtokens.Bnusd;
 import exchange.convexus.testtokens.Sicx;
 import exchange.convexus.testtokens.Usdc;
 import exchange.convexus.callee.ConvexusCallee;
@@ -133,23 +132,15 @@ public class ConvexusTest extends TestBase {
     }
 
     public ScoreSpy<Sicx> deploy_sicx () throws Exception {
-        Score score = sm.deploy(owner, Sicx.class);
+        Score score = sm.deploy(owner, Sicx.class, "Staked ICX", "sICX", 18);
 
         var spy = (Sicx) spy(score.getInstance());
         score.setInstance(spy);
         return new ScoreSpy<Sicx>(score, spy);
     }
     
-    public ScoreSpy<Bnusd> deploy_bnusd () throws Exception {
-        Score score = sm.deploy(owner, Bnusd.class);
-
-        var spy = (Bnusd) spy(score.getInstance());
-        score.setInstance(spy);
-        return new ScoreSpy<Bnusd>(score, spy);
-    }
-    
     public ScoreSpy<Usdc> deploy_usdc () throws Exception {
-        Score score = sm.deploy(owner, Usdc.class);
+        Score score = sm.deploy(owner, Usdc.class, "USDC", "USDC", 18);
 
         var spy = (Usdc) spy(score.getInstance());
         score.setInstance(spy);

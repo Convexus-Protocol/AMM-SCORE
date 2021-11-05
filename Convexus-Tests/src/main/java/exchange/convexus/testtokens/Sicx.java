@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 ICONation
+ * Copyright 2020 ICONLOOP Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,45 +18,54 @@ package exchange.convexus.testtokens;
 
 import score.Address;
 import score.Context;
-import score.annotation.External;
 import score.DictDB;
 import score.VarDB;
 import score.annotation.EventLog;
+import score.annotation.External;
 import score.annotation.Optional;
+
 import java.math.BigInteger;
 
-import static exchange.convexus.utils.AddressUtils.ZERO_ADDRESS;
-
 public class Sicx {
-    private final String name;
-    private final String symbol;
-    private final int decimals;
-    private final VarDB<BigInteger> totalSupply = Context.newVarDB("totalSupply", BigInteger.class);
+    protected static final Address ZERO_ADDRESS = new Address(new byte[Address.LENGTH]);
+    private final VarDB<String> name = Context.newVarDB("token_name", String.class);
+    private final VarDB<String> symbol = Context.newVarDB("token_symbol", String.class);
+    private final VarDB<BigInteger> decimals = Context.newVarDB("decimals", BigInteger.class);
+    private final VarDB<BigInteger> totalSupply = Context.newVarDB("total_supply", BigInteger.class);
     private final DictDB<Address, BigInteger> balances = Context.newDictDB("balances", BigInteger.class);
 
-    public Sicx() {
-        this.name = "Staked ICX";
-        this.symbol = "sICX";
-        this.decimals = 18;
+    public Sicx(String _name, String _symbol, int _decimals) {
+        // initialize values only at first deployment
+        if (this.name.get() == null) {
+            this.name.set(ensureNotEmpty(_name));
+            this.symbol.set(ensureNotEmpty(_symbol));
 
-        // decimals must be larger than 0 and less than 21
-        Context.require(this.decimals >= 0, "this.decimals >= 0");
-        Context.require(this.decimals <= 21, "this.decimals <= 21");
+            // decimals must be larger than 0 and less than 21
+            Context.require(_decimals >= 0, "decimals needs to be positive");
+            Context.require(_decimals <= 21, "decimals needs to be equal or lower than 21");
+            this.decimals.set(BigInteger.valueOf(_decimals));
+        }
+    }
+
+    private String ensureNotEmpty(String str) {
+        Context.require(str != null && !str.trim().isEmpty(), "str is null or empty");
+        assert str != null;
+        return str.trim();
     }
 
     @External(readonly=true)
     public String name() {
-        return name;
+        return name.get();
     }
 
     @External(readonly=true)
     public String symbol() {
-        return symbol;
+        return symbol.get();
     }
 
     @External(readonly=true)
     public BigInteger decimals() {
-        return BigInteger.valueOf(decimals);
+        return decimals.get();
     }
 
     @External(readonly=true)
@@ -74,10 +83,12 @@ public class Sicx {
         Address _from = Context.getCaller();
 
         // check some basic requirements
-        Context.require(_value.compareTo(BigInteger.ZERO) >= 0, "Value must be >= 0");
-        Context.require(safeGetBalance(_from).compareTo(_value) >= 0, 
-            String.format("[%s] %s: Not enough balance (%s < %s)", 
+        Context.require(_value.compareTo(BigInteger.ZERO) >= 0, "_value needs to be positive");
+        if (safeGetBalance(_from).compareTo(_value) < 0) {
+            Context.println(String.format("[%s] %s: Insufficient balance (%s < %s)", 
             this.symbol, _from.isContract() ? Context.call(_from, "name") : _from, safeGetBalance(_from), _value));
+        }
+        Context.require(safeGetBalance(_from).compareTo(_value) >= 0, "Insufficient balance");
 
         // adjust the balances
         safeSetBalance(_from, safeGetBalance(_from).subtract(_value));
@@ -97,8 +108,8 @@ public class Sicx {
      * Creates `amount` tokens and assigns them to `owner`, increasing the total supply.
      */
     protected void _mint(Address owner, BigInteger amount) {
-        Context.require(!ZERO_ADDRESS.equals(owner), "!ZERO_ADDRESS.equals(owner)");
-        Context.require(amount.compareTo(BigInteger.ZERO) >= 0, "amount.compareTo(BigInteger.ZERO) >= 0");
+        Context.require(!ZERO_ADDRESS.equals(owner), "Owner address cannot be zero address");
+        Context.require(amount.compareTo(BigInteger.ZERO) >= 0, "amount needs to be positive");
 
         totalSupply.set(totalSupply.getOrDefault(BigInteger.ZERO).add(amount));
         safeSetBalance(owner, safeGetBalance(owner).add(amount));
@@ -109,9 +120,9 @@ public class Sicx {
      * Destroys `amount` tokens from `owner`, reducing the total supply.
      */
     protected void _burn(Address owner, BigInteger amount) {
-        Context.require(!ZERO_ADDRESS.equals(owner), "!ZERO_ADDRESS.equals(owner)");
-        Context.require(amount.compareTo(BigInteger.ZERO) >= 0, "amount.compareTo(BigInteger.ZERO) >= 0");
-        Context.require(safeGetBalance(owner).compareTo(amount) >= 0, "safeGetBalance(owner).compareTo(amount) >= 0");
+        Context.require(!ZERO_ADDRESS.equals(owner), "Owner address cannot be zero address");
+        Context.require(amount.compareTo(BigInteger.ZERO) >= 0, "amount needs to be positive");
+        Context.require(safeGetBalance(owner).compareTo(amount) >= 0, "Insufficient balance");
 
         safeSetBalance(owner, safeGetBalance(owner).subtract(amount));
         totalSupply.set(totalSupply.getOrDefault(BigInteger.ZERO).subtract(amount));
@@ -128,7 +139,7 @@ public class Sicx {
 
     @EventLog(indexed=3)
     public void Transfer(Address _from, Address _to, BigInteger _value, byte[] _data) {}
-
+    
     @External
     public void mint(BigInteger amount) {
         // simple access control - only the contract owner can mint new token

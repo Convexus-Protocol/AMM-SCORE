@@ -181,7 +181,7 @@ public class ConvexusCallee {
   }
 
   @EventLog
-  protected void FlashCallback(BigInteger fee0, BigInteger fee1) {}
+  public void FlashCallback(BigInteger fee0, BigInteger fee1) {}
 
   @External
   public void convexusFlashCallback (
@@ -200,10 +200,14 @@ public class ConvexusCallee {
     BigInteger pay1 = flashData.pay1;
 
     if (pay0.compareTo(ZERO) > 0) {
-      pay(sender, (Address) Context.call(caller, "token0"), caller, pay0);
+      Address token0 = (Address) Context.call(caller, "token0");
+      Context.println("[Callee][flashcallback] Paying " + pay0 + " " + Context.call(token0, "symbol") + " to the pool");
+      pay(sender, token0, caller, pay0);
     }
     if (pay1.compareTo(ZERO) > 0) {
-      pay(sender, (Address) Context.call(caller, "token1"), caller, pay1);
+      Address token1 = (Address) Context.call(caller, "token1");
+      Context.println("[Callee][flashcallback] Paying " + pay1 + " " + Context.call(token1, "symbol") + " to the pool");
+      pay(sender, token1, caller, pay1);
     }
   }
 
@@ -228,7 +232,7 @@ public class ConvexusCallee {
   private void checkEnoughDeposited (Address address, Address token, BigInteger amount) {
     var depositedUser = this.deposited.at(address);
     BigInteger userBalance = depositedUser.getOrDefault(token, ZERO);
-    Context.println("[DEBUG][checkEnoughDeposited][" + Context.call(token, "symbol") + "] " + userBalance + " / " + amount);
+    Context.println("[Callee][checkEnoughDeposited][" + Context.call(token, "symbol") + "] " + userBalance + " / " + amount);
     Context.require(userBalance.compareTo(amount) >= 0,
         // "checkEnoughDeposited: user didn't deposit enough funds - " + userBalance + "/" + amount);
         "checkEnoughDeposited: user didn't deposit enough funds");

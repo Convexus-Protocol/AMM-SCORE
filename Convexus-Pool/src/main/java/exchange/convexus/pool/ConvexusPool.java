@@ -815,18 +815,23 @@ public class ConvexusPool {
         if (amount0.compareTo(ZERO) > 0) {
             position.tokensOwed0 = position.tokensOwed0.subtract(amount0);
             this.positions.set(key, position);
-            Context.call(this.token0, "transfer", recipient, amount0, "collect".getBytes());
+            pay(this.token0, recipient, amount0, "collect");
         }
         if (amount1.compareTo(ZERO) > 0) {
             position.tokensOwed1 = position.tokensOwed1.subtract(amount1);
             this.positions.set(key, position);
-            Context.call(this.token1, "transfer", recipient, amount1, "collect".getBytes());
+            pay(this.token1, recipient, amount1, "collect");
         }
 
         this.Collect(caller, tickLower, tickUpper, recipient, amount0, amount1);
 
         this.poolLock.lock(false);
         return new PairAmounts(amount0, amount1);
+    }
+
+    private void pay (Address token, Address recipient, BigInteger amount, String reason) {
+        Context.println("[Pool][pay][" + Context.call(token, "symbol") + "] " + amount + " (" + reason + ")");
+        Context.call(token, "transfer", recipient, amount, reason.getBytes());
     }
 
     /**
@@ -1177,7 +1182,7 @@ public class ConvexusPool {
         // do the transfers and collect payment
         if (zeroForOne) {
             if (amount1.compareTo(ZERO) < 0) {
-                Context.call(token1, "transfer", recipient, amount1.negate(), "swap".getBytes());
+                pay(token1, recipient, amount1.negate(), "swap");
             }
 
             BigInteger balance0Before = balance0();
@@ -1186,7 +1191,7 @@ public class ConvexusPool {
                 "swap: the callback didn't charge the payment (1)");
         } else {
             if (amount0.compareTo(ZERO) < 0) {
-                Context.call(token0, "transfer", recipient, amount0.negate(), "swap".getBytes());
+                pay(token0, recipient, amount0.negate(), "swap");
             }
 
             BigInteger balance1Before = balance1();
@@ -1233,10 +1238,10 @@ public class ConvexusPool {
         BigInteger balance1Before = balance1();
 
         if (amount0.compareTo(ZERO) > 0) {
-            Context.call(token0, "transfer", recipient, amount0, "flash".getBytes());
+            pay(token0, recipient, amount0, "flash");
         }
         if (amount1.compareTo(ZERO) > 0) {
-            Context.call(token1, "transfer", recipient, amount1, "flash".getBytes());
+            pay(token1, recipient, amount1, "flash");
         }
 
         Context.call(caller, "convexusFlashCallback", fee0, fee1, data);
@@ -1244,10 +1249,13 @@ public class ConvexusPool {
         BigInteger balance0After = balance0();
         BigInteger balance1After = balance1();
 
+        Context.println("[Pool][flash] balance0 = " + balance0Before + " / " + fee0 + " / " + balance0After + " (" + balance0After.subtract(balance0Before) + ")");
         Context.require(balance0Before.add(fee0).compareTo(balance0After) <= 0, 
-            "flash: F0");
+            "flash: not enough token0 returned");
+        
+        Context.println("[Pool][flash] balance1 = " + balance1Before + " / " + fee1 + " / " + balance1After + " (" + balance1After.subtract(balance1Before) + ")");
         Context.require(balance1Before.add(fee1).compareTo(balance1After) <= 0, 
-            "flash: F1");
+            "flash: not enough token1 returned");
 
         // sub is safe because we know balanceAfter is gt balanceBefore by at least fee
         BigInteger paid0 = balance0After.subtract(balance0Before);
@@ -1340,7 +1348,7 @@ public class ConvexusPool {
             }
             _protocolFees.token0 = _protocolFees.token0.subtract(amount0);
             this.protocolFees.set(_protocolFees);
-            Context.call(token0, "transfer", recipient, amount0, "collectProtocol".getBytes());
+            pay(token0, recipient, amount0, "collectProtocol");
         }
         if (amount1.compareTo(ZERO) > 0) {
             if (amount1 == _protocolFees.token1) {
@@ -1349,7 +1357,7 @@ public class ConvexusPool {
             }
             _protocolFees.token1 = _protocolFees.token1.subtract(amount1);
             this.protocolFees.set(_protocolFees);
-            Context.call(token1, "transfer", recipient, amount1, "collectProtocol".getBytes());
+            pay(token1, recipient, amount1, "collectProtocol");
         }
 
         this.CollectProtocol(caller, recipient, amount0, amount1);
@@ -1442,5 +1450,15 @@ public class ConvexusPool {
     @External(readonly = true)
     public BigInteger tickSpacing () {
         return BigInteger.valueOf(this.tickSpacing);
+    }
+
+    @External(readonly = true)
+    public BigInteger feeGrowthGlobal0X128 () {
+        return feeGrowthGlobal0X128.get();
+    }
+
+    @External(readonly = true)
+    public BigInteger feeGrowthGlobal1X128 () {
+        return feeGrowthGlobal1X128.get();
     }
 }

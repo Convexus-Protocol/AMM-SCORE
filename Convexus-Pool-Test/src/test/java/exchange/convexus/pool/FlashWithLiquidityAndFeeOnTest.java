@@ -16,8 +16,16 @@
 
 package exchange.convexus.pool;
 
+import static java.math.BigInteger.ONE;
 import static java.math.BigInteger.TEN;
+import static java.math.BigInteger.TWO;
+import static java.math.BigInteger.ZERO;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+
+import java.math.BigInteger;
 
 import com.iconloop.score.test.ServiceManager;
 
@@ -27,7 +35,7 @@ import org.junit.jupiter.api.Test;
 import exchange.convexus.factory.ConvexusFactoryUtils;
 import exchange.convexus.utils.AssertUtils;
 
-class FlashTest extends ConvexusPoolTest {
+class FlashWithLiquidityAndFeeOnTest extends ConvexusPoolTest {
 
   final int TICK_SPACINGS[] = {10, 60, 200};
   final int FEE_AMOUNTS[] = {500, 3000, 10000};
@@ -39,6 +47,9 @@ class FlashTest extends ConvexusPoolTest {
 
   int minTick = getMinTick(tickSpacing);
   int maxTick = getMaxTick(tickSpacing);
+
+  BigInteger balance0;
+  BigInteger balance1;
 
   @BeforeEach
   void setup() throws Exception {
@@ -56,12 +67,35 @@ class FlashTest extends ConvexusPoolTest {
     usdc.invoke(owner, "mintTo", bob.getAddress(), TEN.pow(30).multiply(TEN.pow(18)));
 
     ConvexusFactoryUtils.createPool(factory, alice, sicx.getAddress(), usdc.getAddress(), FEE, pool.getAddress());
+    initializeAtZeroTick();
+
+    balance0 = (BigInteger) sicx.score.call("balanceOf", pool.getAddress());
+    balance1 = (BigInteger) usdc.score.call("balanceOf", pool.getAddress());
+
+    pool.invoke(owner, "setFeeProtocol", 6, 6);
   }
 
   @Test
-  void testFailsIfNotInitialized () {
-    AssertUtils.assertThrowsMessage(AssertionError.class, () ->
-    flash(alice, "100", "200", bob), 
-    "ReentrancyLock: wrong lock state: true");
+  void testEmitsAnEvent () {
+    reset(pool.spy);
+    flash(alice, "1001", "2001", bob, "1005", "2008");
+    verify(pool.spy).Flash(callee.getAddress(), bob.getAddress(), new BigInteger("1001"), new BigInteger("2001"), new BigInteger("4"), new BigInteger("7"));
   }
+
+  @Test
+  void testIncreasesTheFeeGrowthByTheExpectedAmount () {
+    flash(alice, "2002", "4004", bob, "2009", "4017");
+
+    var fees = (ProtocolFees) pool.call("protocolFees");
+    assertEquals(ONE, fees.token0);
+    assertEquals(TWO, fees.token1);
+
+    BigInteger expectedFee0 = BigInteger.valueOf(6).multiply(TWO.pow(128)).divide(expandTo18Decimals(2));
+    assertEquals(expectedFee0, pool.call("feeGrowthGlobal0X128"));
+    
+    BigInteger expectedFee1 = BigInteger.valueOf(11).multiply(TWO.pow(128)).divide(expandTo18Decimals(2));
+    assertEquals(expectedFee1, pool.call("feeGrowthGlobal1X128"));
+  }
+
+  // TODO
 }
