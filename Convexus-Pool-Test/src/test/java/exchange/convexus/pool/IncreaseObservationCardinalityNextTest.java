@@ -28,9 +28,12 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
 import exchange.convexus.factory.ConvexusFactoryUtils;
+import exchange.convexus.librairies.Oracle.Observation;
 import exchange.convexus.utils.AssertUtils;
+import exchange.convexus.utils.TimeUtils;
 
 import static java.math.BigInteger.ONE;
+import static java.math.BigInteger.ZERO;
 
 public class IncreaseObservationCardinalityNextTest extends ConvexusPoolTest {
 
@@ -100,5 +103,47 @@ public class IncreaseObservationCardinalityNextTest extends ConvexusPoolTest {
     Slot0 slot0 = (Slot0) pool.call("slot0");
     assertEquals(1, slot0.observationCardinality);
     assertEquals(2, slot0.observationCardinalityNext);
+  }
+
+  @Test
+  void testOracleStartingStateAfterInitialization () {
+    pool.invoke(alice, "initialize", encodePriceSqrt(ONE, ONE));
+    var slot0 = (Slot0) pool.call("slot0");
+
+    assertEquals(1, slot0.observationCardinality);
+    assertEquals(0, slot0.observationIndex);
+    assertEquals(1, slot0.observationCardinalityNext);
+
+    var observation = (Observation) pool.call("observations", 0);
+
+    assertEquals(ZERO, observation.secondsPerLiquidityCumulativeX128);
+    assertEquals(ZERO, observation.tickCumulative);
+    assertEquals(true, observation.initialized);
+    assertEquals(TimeUtils.nowSeconds(), observation.blockTimestamp);
+  }
+
+  @Test
+  void testIncreasesObservationCardinalityNext () {
+    pool.invoke(alice, "initialize", encodePriceSqrt(ONE, ONE));
+    pool.invoke(alice, "increaseObservationCardinalityNext", 2);
+
+    var slot0 = (Slot0) pool.call("slot0");
+
+    assertEquals(1, slot0.observationCardinality);
+    assertEquals(0, slot0.observationIndex);
+    assertEquals(2, slot0.observationCardinalityNext);
+  }
+
+  @Test
+  void testNoOpIfTargetIsAlreadyExceeded () {
+    pool.invoke(alice, "initialize", encodePriceSqrt(ONE, ONE));
+    pool.invoke(alice, "increaseObservationCardinalityNext", 5);
+    pool.invoke(alice, "increaseObservationCardinalityNext", 3);
+    
+    var slot0 = (Slot0) pool.call("slot0");
+
+    assertEquals(1, slot0.observationCardinality);
+    assertEquals(0, slot0.observationIndex);
+    assertEquals(5, slot0.observationCardinalityNext);
   }
 }

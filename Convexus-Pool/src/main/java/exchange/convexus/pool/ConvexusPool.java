@@ -252,7 +252,7 @@ public class ConvexusPool {
      * @param feeProtocol1New The updated value of the token1 protocol fee
      */    
     @EventLog
-    private void SetFeeProtocol(
+    protected void SetFeeProtocol(
         int feeProtocol0Old, 
         int feeProtocol1Old, 
         int feeProtocol0New, 

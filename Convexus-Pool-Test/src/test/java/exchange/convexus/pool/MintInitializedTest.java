@@ -606,12 +606,6 @@ public class MintInitializedTest extends ConvexusPoolTest {
   }
 
   @Test
-  void testProtocolFeesOnlyOwner () {
-    AssertUtils.assertThrowsMessage(AssertionError.class, () -> pool.invoke(alice, "setFeeProtocol", 6, 6), 
-      "onlyFactoryOwner: Only owner can call this method");
-  }
-
-  @Test
   void testProtocolAccumulateDuringSwap () {
     pool.invoke(owner, "setFeeProtocol", 6, 6);
 
