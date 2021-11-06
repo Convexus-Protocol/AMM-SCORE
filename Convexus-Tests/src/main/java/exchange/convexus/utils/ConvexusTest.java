@@ -29,6 +29,7 @@ import exchange.convexus.ticklens.TickLens;
 import score.Address;
 import exchange.convexus.liquidity.ConvexusLiquidityManagement;
 import exchange.convexus.quoter.Quoter;
+import exchange.convexus.reentrantcallee.ConvexusReentrantCallee;
 import exchange.convexus.pairflash.PairFlash;
 import exchange.convexus.swap.Swap;
 import exchange.convexus.testtokens.Sicx;
@@ -152,5 +153,12 @@ public class ConvexusTest extends TestBase {
         var spy = (ConvexusCallee) spy(score.getInstance());
         score.setInstance(spy);
         return new ScoreSpy<ConvexusCallee>(score, spy);
+    }
+    
+    public ScoreSpy<ConvexusReentrantCallee> deploy_reentrant_callee () throws Exception {
+        Score score = sm.deploy(owner, ConvexusReentrantCallee.class);
+        var spy = (ConvexusReentrantCallee) spy(score.getInstance());
+        score.setInstance(spy);
+        return new ScoreSpy<ConvexusReentrantCallee>(score, spy);
     }
 }

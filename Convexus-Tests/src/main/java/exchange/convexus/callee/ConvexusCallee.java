@@ -24,6 +24,7 @@ import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
 
+import exchange.convexus.utils.IntUtils;
 import score.Address;
 import score.BranchDB;
 import score.ByteArrayObjectWriter;
@@ -219,6 +220,16 @@ public class ConvexusCallee {
   @External
   public void swapExact1For0 (Address pool, BigInteger amount1In, Address recipient, BigInteger sqrtPriceLimitX96) {
     Context.call(pool, "swap", recipient, false, amount1In, sqrtPriceLimitX96, Context.getCaller().toByteArray());
+  }
+
+  @External
+  public void swapToLowerSqrtPrice (Address pool, BigInteger sqrtPriceX96, Address recipient) {
+    Context.call(pool, "swap", recipient, true, IntUtils.MAX_INT256, sqrtPriceX96, Context.getCaller().toByteArray());
+  }
+
+  @External
+  public void swapToHigherSqrtPrice (Address pool, BigInteger sqrtPriceX96, Address recipient) {
+    Context.call(pool, "swap", recipient, false, IntUtils.MAX_INT256, sqrtPriceX96, Context.getCaller().toByteArray());
   }
 
   @External(readonly = true)
