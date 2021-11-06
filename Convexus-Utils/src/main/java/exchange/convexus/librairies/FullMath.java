@@ -61,6 +61,7 @@ public class FullMath {
    * @dev Credit to Remco Bloemen under MIT license https://xn--2-umb.com/21/muldiv
    */
   public static BigInteger mulDiv(BigInteger a, BigInteger b, BigInteger denominator) {
+    return a.multiply(b).divide(denominator); /*
     // 512-bit multiply [prod1 prod0] = a * b
     // Compute the product mod 2**256 and mod 2**256 - 1
     // then use the Chinese Remainder Theorem to reconstruct
@@ -141,6 +142,7 @@ public class FullMath {
     // We don't need to compute the high bits of the result and prod1
     // is no longer required.
     return mulmod256(prod0, inv);
+    */
   }
 
   private static BigInteger sub256 (BigInteger a, BigInteger b) {

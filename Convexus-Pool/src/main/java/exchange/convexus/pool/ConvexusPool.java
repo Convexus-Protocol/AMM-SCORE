@@ -17,6 +17,7 @@
 package exchange.convexus.pool;
 
 import static exchange.convexus.librairies.BlockTimestamp._blockTimestamp;
+import static exchange.convexus.utils.IntUtils.uint256;
 import static java.math.BigInteger.ZERO;
 
 import java.math.BigInteger;
@@ -1271,7 +1272,7 @@ public class ConvexusPool {
                 _protocolFees.token0 = _protocolFees.token0.add(fees0);
                 protocolFees.set(_protocolFees);
             }
-            feeGrowthGlobal0X128.set(feeGrowthGlobal0X128.get().add(FullMath.mulDiv(paid0.subtract(fees0), FixedPoint128.Q128, _liquidity)));
+            feeGrowthGlobal0X128.set(uint256(feeGrowthGlobal0X128.get().add(FullMath.mulDiv(paid0.subtract(fees0), FixedPoint128.Q128, _liquidity))));
         }
         if (paid1.compareTo(ZERO) > 0) {
             int feeProtocol1 = _slot0.feeProtocol >> 4;
@@ -1281,7 +1282,7 @@ public class ConvexusPool {
                 _protocolFees.token1 = _protocolFees.token1.add(fees1);
                 protocolFees.set(_protocolFees);
             }
-            feeGrowthGlobal1X128.set(feeGrowthGlobal1X128.get().add(FullMath.mulDiv(paid1.subtract(fees1), FixedPoint128.Q128, _liquidity)));
+            feeGrowthGlobal1X128.set(uint256(feeGrowthGlobal1X128.get().add(FullMath.mulDiv(paid1.subtract(fees1), FixedPoint128.Q128, _liquidity))));
         }
 
         this.Flash(caller, recipient, amount0, amount1, paid0, paid1);

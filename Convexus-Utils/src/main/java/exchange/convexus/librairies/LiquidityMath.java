@@ -16,9 +16,10 @@
 
 package exchange.convexus.librairies;
 
+import static exchange.convexus.utils.IntUtils.uint128;
+
 import java.math.BigInteger;
 
-import exchange.convexus.utils.IntUtils;
 import score.Context;
 
 public class LiquidityMath {
@@ -33,11 +34,11 @@ public class LiquidityMath {
       BigInteger z;
 
       if (y.compareTo(BigInteger.ZERO) < 0) {
-        z = IntUtils.uint128(x.subtract(y.negate()));
+        z = uint128(x.subtract(y.negate()));
         Context.require(z.compareTo(x) < 0, 
           "addDelta: z < x");
       } else {
-        z = IntUtils.uint128(x.add(y));
+        z = uint128(x.add(y));
         Context.require(z.compareTo(x) >= 0, 
           "addDelta: z >= x");
       }

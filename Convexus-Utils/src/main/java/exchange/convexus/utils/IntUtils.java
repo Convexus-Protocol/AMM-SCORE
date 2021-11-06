@@ -36,4 +36,11 @@ public class IntUtils {
     }
     return n.mod(TWO_POW_128);
   }
+
+  public static BigInteger uint256(BigInteger n) {
+    if (n.compareTo(BigInteger.ZERO) < 0) {
+      return n.add(TWO_POW_256);
+    }
+    return n.mod(TWO_POW_256);
+  }
 }

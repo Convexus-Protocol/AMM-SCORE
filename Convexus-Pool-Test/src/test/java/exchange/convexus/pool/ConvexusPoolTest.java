@@ -177,7 +177,11 @@ public class ConvexusPoolTest extends ConvexusTest {
   }
 
   protected void burn (int minTick, int maxTick, BigInteger amount) {
-    pool.invoke(alice, "burn", minTick, maxTick, amount);
+    burn(alice, minTick, maxTick, amount);
+  }
+  
+  protected void burn (Account from, int minTick, int maxTick, BigInteger amount) {
+    pool.invoke(from, "burn", minTick, maxTick, amount);
   }
   
   protected Position.Info positions (Account account, int minTick, int maxTick) {
@@ -202,8 +206,12 @@ public class ConvexusPoolTest extends ConvexusTest {
   }
   
   protected Fees collectGetFeesOwed (int minTick, int maxTick) {
+    return collectGetFeesOwed(alice, minTick, maxTick);
+  }
+  
+  protected Fees collectGetFeesOwed (Account from, int minTick, int maxTick) {
     reset(pool.spy);
-    pool.invoke(alice, "collect", alice.getAddress(), minTick, maxTick, IntUtils.MAX_UINT128, IntUtils.MAX_UINT128);
+    pool.invoke(from, "collect", from.getAddress(), minTick, maxTick, IntUtils.MAX_UINT128, IntUtils.MAX_UINT128);
 
     // Get Collect event
     ArgumentCaptor<Address> _caller = ArgumentCaptor.forClass(Address.class);
