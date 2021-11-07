@@ -17,9 +17,9 @@
 package exchange.convexus.pool;
 
 import static exchange.convexus.utils.IntUtils.MAX_UINT128;
-import static exchange.convexus.utils.IntUtils.MAX_UINT256;
 import static java.math.BigInteger.ONE;
 import static java.math.BigInteger.TWO;
+import static java.math.BigInteger.TEN;
 import static java.math.BigInteger.ZERO;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.reset;
@@ -32,6 +32,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import exchange.convexus.factory.ConvexusFactoryUtils;
+import score.Context;
 
 class FeeOverflowScenariosTest extends ConvexusPoolTest {
 
@@ -58,11 +59,11 @@ class FeeOverflowScenariosTest extends ConvexusPoolTest {
     reset(pool.spy);
 
     // Transfer some funds to Alice
-    sicx.invoke(owner, "mintTo", alice.getAddress(), MAX_UINT256);
-    usdc.invoke(owner, "mintTo", alice.getAddress(), MAX_UINT256);
+    sicx.invoke(owner, "mintTo", alice.getAddress(), TEN.pow(30).multiply(TEN.pow(18)));
+    usdc.invoke(owner, "mintTo", alice.getAddress(), TEN.pow(30).multiply(TEN.pow(18)));
     // Transfer some funds to Bob
-    sicx.invoke(owner, "mintTo", bob.getAddress(), MAX_UINT256);
-    usdc.invoke(owner, "mintTo", bob.getAddress(), MAX_UINT256);
+    sicx.invoke(owner, "mintTo", bob.getAddress(), TEN.pow(30).multiply(TEN.pow(18)));
+    usdc.invoke(owner, "mintTo", bob.getAddress(), TEN.pow(30).multiply(TEN.pow(18)));
 
     ConvexusFactoryUtils.createPool(factory, alice, sicx.getAddress(), usdc.getAddress(), FEE, pool.getAddress());
   }
@@ -113,9 +114,13 @@ class FeeOverflowScenariosTest extends ConvexusPoolTest {
     pool.invoke(alice, "initialize", encodePriceSqrt(ONE, ONE));
     mint(alice, minTick, maxTick, BigInteger.valueOf(1), "1", "1");
     flash(alice, ZERO, ZERO, alice.getAddress(), MAX_UINT128, MAX_UINT128);
+    Context.println(" ==== ?1");
     burn(minTick, maxTick, ZERO);
+    Context.println(" ==== ?2");
     flash(alice, ZERO, ZERO, alice.getAddress(), ONE, ONE);
+    Context.println(" ==== ?3");
     burn(minTick, maxTick, ZERO);
+    Context.println(" ==== ?4");
 
     // fees burned
     var fees = collectGetFeesOwed(minTick, maxTick);

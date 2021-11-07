@@ -45,6 +45,7 @@ import exchange.convexus.librairies.TickMath;
 import exchange.convexus.librairies.Oracle.Observation;
 import exchange.convexus.liquidity.ConvexusLiquidity;
 import exchange.convexus.reentrantcallee.ConvexusReentrantCallee;
+import exchange.convexus.swappay.ConvexusSwapPay;
 import exchange.convexus.testtokens.Sicx;
 import exchange.convexus.testtokens.Usdc;
 import exchange.convexus.utils.ScoreSpy;
@@ -57,6 +58,7 @@ public class ConvexusPoolTest extends ConvexusTest {
   ScoreSpy<Usdc> usdc;
   ScoreSpy<ConvexusCallee> callee;
   ScoreSpy<ConvexusReentrantCallee> reentrantCallee;
+  ScoreSpy<ConvexusSwapPay> underpay;
 
   void setup_pool (Address factory, int fee, int tickSpacing) throws Exception {
     sicx = deploy_sicx();
@@ -64,6 +66,7 @@ public class ConvexusPoolTest extends ConvexusTest {
     pool = deploy_mock_pool(sicx.getAddress(), usdc.getAddress(), factory, fee, tickSpacing);
     callee = deploy_callee();
     reentrantCallee = deploy_reentrant_callee();
+    underpay = deploy_swap_pay();
   }
 
   void setup_factory () throws Exception {
@@ -297,5 +300,23 @@ public class ConvexusPoolTest extends ConvexusTest {
   
   protected void flash(Account from, String amount0, String amount1, Address recipient, String sicxAmount, String usdcAmount) {
     flash(from, new BigInteger(amount0), new BigInteger(amount1), recipient, new BigInteger(sicxAmount), new BigInteger(usdcAmount));
+  }
+
+  protected void underswap_pay (
+    Account recipient,
+    boolean zeroForOne,
+    BigInteger sqrtPriceX96, 
+    BigInteger amountSpecified, 
+    BigInteger pay0,
+    BigInteger pay1
+  ) {
+    if (pay0.compareTo(ZERO) > 0) {
+      ConvexusLiquidity.deposit(recipient, underpay.getAddress(), sicx.score, pay0);
+    }
+    if (pay1.compareTo(ZERO) > 0) {
+      ConvexusLiquidity.deposit(recipient, underpay.getAddress(), usdc.score, pay1);
+    }
+
+    underpay.invoke(recipient, "swap", pool.getAddress(), recipient.getAddress(), zeroForOne, sqrtPriceX96, amountSpecified, pay0, pay1);
   }
 }

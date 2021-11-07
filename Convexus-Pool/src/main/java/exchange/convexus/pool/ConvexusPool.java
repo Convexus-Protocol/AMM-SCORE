@@ -1021,6 +1021,7 @@ public class ConvexusPool {
             !state.amountSpecifiedRemaining.equals(ZERO) 
          && !state.sqrtPriceX96.equals(sqrtPriceLimitX96)
         ) {
+
             StepComputations step = new StepComputations();
             step.sqrtPriceStartX96 = state.sqrtPriceX96;
 
@@ -1118,8 +1119,6 @@ public class ConvexusPool {
                 // recompute unless we're on a lower tick boundary (i.e. already transitioned ticks), and haven't moved
                 state.tick = TickMath.getTickAtSqrtRatio(state.sqrtPriceX96);
             }
-
-           
         }
 
         // update tick and write an oracle entry if the tick change
@@ -1188,6 +1187,7 @@ public class ConvexusPool {
 
             BigInteger balance0Before = balance0();
             Context.call(caller, "convexusSwapCallback", amount0, amount1, data);
+
             Context.require(balance0Before.add(amount0).compareTo(balance0()) <= 0, 
                 "swap: the callback didn't charge the payment (1)");
         } else {
@@ -1197,6 +1197,7 @@ public class ConvexusPool {
 
             BigInteger balance1Before = balance1();
             Context.call(caller, "convexusSwapCallback", amount0, amount1, data);
+
             Context.require(balance1Before.add(amount1).compareTo(balance1()) <= 0, 
                 "swap: the callback didn't charge the payment (2)");
         }
@@ -1250,11 +1251,9 @@ public class ConvexusPool {
         BigInteger balance0After = balance0();
         BigInteger balance1After = balance1();
 
-        Context.println("[Pool][flash] balance0 = " + balance0Before + " / " + fee0 + " / " + balance0After + " (" + balance0After.subtract(balance0Before) + ")");
         Context.require(balance0Before.add(fee0).compareTo(balance0After) <= 0, 
             "flash: not enough token0 returned");
         
-        Context.println("[Pool][flash] balance1 = " + balance1Before + " / " + fee1 + " / " + balance1After + " (" + balance1After.subtract(balance1Before) + ")");
         Context.require(balance1Before.add(fee1).compareTo(balance1After) <= 0, 
             "flash: not enough token1 returned");
 

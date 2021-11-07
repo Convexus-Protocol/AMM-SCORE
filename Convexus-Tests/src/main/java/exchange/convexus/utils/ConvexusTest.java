@@ -32,6 +32,7 @@ import exchange.convexus.quoter.Quoter;
 import exchange.convexus.reentrantcallee.ConvexusReentrantCallee;
 import exchange.convexus.pairflash.PairFlash;
 import exchange.convexus.swap.Swap;
+import exchange.convexus.swappay.ConvexusSwapPay;
 import exchange.convexus.testtokens.Sicx;
 import exchange.convexus.testtokens.Usdc;
 import exchange.convexus.callee.ConvexusCallee;
@@ -160,5 +161,12 @@ public class ConvexusTest extends TestBase {
         var spy = (ConvexusReentrantCallee) spy(score.getInstance());
         score.setInstance(spy);
         return new ScoreSpy<ConvexusReentrantCallee>(score, spy);
+    }
+    
+    public ScoreSpy<ConvexusSwapPay> deploy_swap_pay () throws Exception {
+        Score score = sm.deploy(owner, ConvexusSwapPay.class);
+        var spy = (ConvexusSwapPay) spy(score.getInstance());
+        score.setInstance(spy);
+        return new ScoreSpy<ConvexusSwapPay>(score, spy);
     }
 }

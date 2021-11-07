@@ -17,11 +17,7 @@
 package exchange.convexus.librairies;
 
 import static exchange.convexus.utils.IntUtils.MAX_UINT256;
-import static exchange.convexus.utils.IntUtils.TWO_POW_256;
-import static exchange.convexus.utils.MathUtils.gt;
-import static exchange.convexus.utils.MathUtils.lt;
 import static java.math.BigInteger.ONE;
-import static java.math.BigInteger.TWO;
 import static java.math.BigInteger.ZERO;
 
 import java.math.BigInteger;
@@ -29,8 +25,6 @@ import java.math.BigInteger;
 import score.Context;
 
 public class FullMath {
-
-  private static final BigInteger THREE = BigInteger.valueOf(3);
 
   public static BigInteger mulDivRoundingUp(BigInteger a, BigInteger b, BigInteger denominator) {
 
@@ -48,10 +42,6 @@ public class FullMath {
     return x.multiply(y).mod(m);
   }
 
-  private static BigInteger mulmod256(BigInteger x, BigInteger y) {
-    return x.multiply(y).mod(TWO_POW_256);
-  }
-
   /**
    * @notice Calculates floor(a×b÷denominator) with full precision. Throws if result overflows a uint256 or denominator == 0
    * @param a The multiplicand
@@ -61,15 +51,23 @@ public class FullMath {
    * @dev Credit to Remco Bloemen under MIT license https://xn--2-umb.com/21/muldiv
    */
   public static BigInteger mulDiv(BigInteger a, BigInteger b, BigInteger denominator) {
-    return a.multiply(b).divide(denominator); /*
+    // BigInteger can reach 512 bits
+    return a.multiply(b).divide(denominator);
+    /*
     // 512-bit multiply [prod1 prod0] = a * b
     // Compute the product mod 2**256 and mod 2**256 - 1
     // then use the Chinese Remainder Theorem to reconstruct
     // the 512 bit result. The result is stored in two 256
     // variables such that product = prod1 * 2**256 + prod0
 
+    final BigInteger THREE = BigInteger.valueOf(3);
+
     BigInteger prod0; // Least significant 256 bits of the product
     BigInteger prod1; // Most significant 256 bits of the product
+
+    a = uint256(a);
+    b = uint256(b);
+    denominator = uint256(denominator);
 
     BigInteger mm = mulmod(a, b, MAX_UINT256);
     prod0 = mulmod256(a, b);
@@ -85,6 +83,8 @@ public class FullMath {
 
     // Make sure the result is less than 2**256.
     // Also prevents denominator == 0
+    Context.println("denominator = " + denominator);
+    Context.println("prod1 = " + prod1);
     Context.require(denominator.compareTo(prod1) > 0,
       "mulDiv: denominator > prod1");
 
@@ -145,17 +145,21 @@ public class FullMath {
     */
   }
 
-  private static BigInteger sub256 (BigInteger a, BigInteger b) {
-    BigInteger c = a.subtract(b);
-    if (c.compareTo(ZERO) < 0) {
-      c = c.add(TWO_POW_256);
-    }
-    return c;
-  }
+  // private static BigInteger mulmod256(BigInteger x, BigInteger y) {
+  //   return x.multiply(y).mod(TWO_POW_256);
+  // }
 
-  private static BigInteger newtonRaphson (BigInteger denominator, BigInteger inv) {
-    BigInteger a = mulmod256(denominator, inv);
-    BigInteger b = sub256(TWO, a);
-    return mulmod256(inv, b);
-  }
+  // private static BigInteger sub256 (BigInteger a, BigInteger b) {
+  //   BigInteger c = a.subtract(b);
+  //   if (c.compareTo(ZERO) < 0) {
+  //     c = c.add(TWO_POW_256);
+  //   }
+  //   return c;
+  // }
+
+  // private static BigInteger newtonRaphson (BigInteger denominator, BigInteger inv) {
+  //   BigInteger a = mulmod256(denominator, inv);
+  //   BigInteger b = sub256(TWO, a);
+  //   return mulmod256(inv, b);
+  // }
 }
