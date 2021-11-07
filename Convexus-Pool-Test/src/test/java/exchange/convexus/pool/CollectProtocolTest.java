@@ -83,7 +83,7 @@ class CollectProtocolTest extends ConvexusPoolTest {
   void testCanCollectFees () {
     pool.invoke(owner, "setFeeProtocol", 6, 6);
 
-    doSwap(minTick, maxTick, expandTo18Decimals(1), "1000000000000000000", true, true);
+    doSwap(minTick, maxTick, expandTo18Decimals(1), true, true);
 
     reset(sicx.spy);
     reset(usdc.spy);
@@ -96,8 +96,8 @@ class CollectProtocolTest extends ConvexusPoolTest {
   void testFeesCollectedCanDifferBetweenToken0AndToken1 () {
     pool.invoke(owner, "setFeeProtocol", 8, 5);
     
-    doSwap(minTick, maxTick, expandTo18Decimals(1), "1000000000000000000", true, false);
-    doSwap(minTick, maxTick, expandTo18Decimals(1), "1000000000000000000", false, false);
+    doSwap(minTick, maxTick, expandTo18Decimals(1), true, false);
+    doSwap(minTick, maxTick, expandTo18Decimals(1), false, false);
     
     reset(sicx.spy);
     reset(usdc.spy);

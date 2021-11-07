@@ -21,7 +21,7 @@ import exchange.convexus.utils.IntUtils;
 import score.Address;
 
 import static java.math.BigInteger.ONE;
-import static java.math.BigInteger.TEN;
+import static java.math.BigInteger.TWO;
 import static java.math.BigInteger.ZERO;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -66,12 +66,11 @@ public class ConvexusPoolTest extends ConvexusTest {
     usdc = deploy_usdc();
     
     // Transfer some funds to Alice
-    sicx.invoke(owner, "mintTo", alice.getAddress(), TEN.pow(30).multiply(TEN.pow(18)));
-    usdc.invoke(owner, "mintTo", alice.getAddress(), TEN.pow(30).multiply(TEN.pow(18)));
+    sicx.invoke(owner, "mintTo", alice.getAddress(), IntUtils.MAX_UINT256);
+    usdc.invoke(owner, "mintTo", alice.getAddress(), IntUtils.MAX_UINT256);
     // Transfer some funds to Bob
-    sicx.invoke(owner, "mintTo", bob.getAddress(), TEN.pow(30).multiply(TEN.pow(18)));
-    usdc.invoke(owner, "mintTo", bob.getAddress(), TEN.pow(30).multiply(TEN.pow(18)));
-
+    sicx.invoke(owner, "mintTo", bob.getAddress(), IntUtils.MAX_UINT256);
+    usdc.invoke(owner, "mintTo", bob.getAddress(), IntUtils.MAX_UINT256);
   }
 
   void setup_pool (Address factory, int fee, int tickSpacing) throws Exception {
@@ -111,42 +110,70 @@ public class ConvexusPoolTest extends ConvexusTest {
     assertEquals(expected.secondsPerLiquidityCumulativeX128, actual.secondsPerLiquidityCumulativeX128);
   }
 
+  protected void swap (
+    Account from,
+    Score inputToken,
+    BigInteger amountIn,
+    BigInteger amountOut,
+    BigInteger sqrtPriceLimitX96
+  ) {
+    boolean exactInput = amountOut.equals(ZERO);
+
+    String method = 
+      inputToken.equals(sicx.score)
+        ? exactInput
+          ? "swapExact0For1"
+          : "swap0ForExact1"
+        : exactInput
+        ? "swapExact1For0"
+        : "swap1ForExact0";
+      
+    if (sqrtPriceLimitX96 == null) {
+      if (inputToken.equals(sicx.score)) {
+        sqrtPriceLimitX96 = TickMath.MIN_SQRT_RATIO.add(ONE);
+      } else {
+        sqrtPriceLimitX96 = TickMath.MAX_SQRT_RATIO.subtract(ONE);
+      }
+    }
+
+    ConvexusLiquidity.deposit(from, callee.getAddress(), inputToken, IntUtils.MAX_UINT160);
+    callee.invoke(from, method, pool.getAddress(), exactInput ? amountIn : amountOut, from.getAddress(), sqrtPriceLimitX96);
+  }
+  
+  protected void swapExact0For1 (BigInteger amount, Account caller, BigInteger sqrtPriceLimitX96) {
+    swap(caller, sicx.score, amount, ZERO, sqrtPriceLimitX96);
+  }
   protected void swapExact0For1 (BigInteger amount, Account caller) {
-    BigInteger sqrtPriceLimitX96 = TickMath.MIN_SQRT_RATIO.add(ONE);
-    callee.invoke(caller, "swapExact0For1", pool.getAddress(), amount, caller.getAddress(), sqrtPriceLimitX96);
+    swap(caller, sicx.score, amount, ZERO, null);
   }
 
-  protected void swapExact0For1 (BigInteger amount, Account caller, BigInteger sicxAmount) {
-    ConvexusLiquidity.deposit(caller, callee.getAddress(), sicx.score, sicxAmount);
-    BigInteger sqrtPriceLimitX96 = TickMath.MIN_SQRT_RATIO.add(ONE);
-    callee.invoke(caller, "swapExact0For1", pool.getAddress(), amount, caller.getAddress(), sqrtPriceLimitX96);
+  protected void swap0ForExact1 (BigInteger amount, Account caller, BigInteger sqrtPriceLimitX96) {
+    swap(caller, sicx.score, ZERO, amount, sqrtPriceLimitX96);
+  }
+  protected void swap0ForExact1 (BigInteger amount, Account caller) {
+    swap(caller, sicx.score, ZERO, amount, null);
   }
 
-  protected void swapExact0For1 (BigInteger amount, Account caller, String sicxAmount) {
-    swapExact0For1(amount, caller, new BigInteger(sicxAmount));
+  protected void swapExact1For0 (BigInteger amount, Account caller, BigInteger sqrtPriceLimitX96) {
+    swap(caller, usdc.score, amount, ZERO, sqrtPriceLimitX96);
+  }
+  protected void swapExact1For0 (BigInteger amount, Account caller) {
+    swap(caller, usdc.score, amount, ZERO, null);
   }
 
-  protected void swapExact1For0(BigInteger amount, Account caller) {
-    BigInteger sqrtPriceLimitX96 = TickMath.MAX_SQRT_RATIO.subtract(ONE);
-    callee.invoke(caller, "swapExact1For0", pool.getAddress(), amount, caller.getAddress(), sqrtPriceLimitX96);
+  protected void swap1ForExact0 (BigInteger amount, Account caller, BigInteger sqrtPriceLimitX96) {
+    swap(caller, usdc.score, ZERO, amount, sqrtPriceLimitX96);
+  }
+  protected void swap1ForExact0 (BigInteger amount, Account caller) {
+    swap(caller, usdc.score, ZERO, amount, null);
   }
 
-  protected void swapExact1For0 (BigInteger amount, Account caller, BigInteger usdcAmount) {
-    ConvexusLiquidity.deposit(caller, callee.getAddress(), usdc.score, usdcAmount);
-    BigInteger sqrtPriceLimitX96 = TickMath.MAX_SQRT_RATIO.subtract(ONE);
-    callee.invoke(caller, "swapExact1For0", pool.getAddress(), amount, caller.getAddress(), sqrtPriceLimitX96);
+  protected void swapToLowerPrice(Account caller, BigInteger sqrtPriceX96, String tokenAmount) {
+    swapToSqrtPrice(caller, sicx.score, sqrtPriceX96, caller.getAddress(), new BigInteger(tokenAmount));
   }
 
-  protected void swapExact1For0 (BigInteger amount, Account caller, String usdcAmount) {
-    swapExact1For0(amount, caller, new BigInteger(usdcAmount));
-  }
-
-  protected void swapToLowerPrice(Account caller, BigInteger sqrtPriceX96, Account to, String tokenAmount) {
-    swapToSqrtPrice(caller, sicx.score, sqrtPriceX96, to.getAddress(), new BigInteger(tokenAmount));
-  }
-
-  protected void swapToHigherPrice(Account caller, BigInteger sqrtPriceX96, Account to, String tokenAmount) {
-    swapToSqrtPrice(caller, usdc.score, sqrtPriceX96, to.getAddress(), new BigInteger(tokenAmount));
+  protected void swapToHigherPrice(Account caller, BigInteger sqrtPriceX96, String tokenAmount) {
+    swapToSqrtPrice(caller, usdc.score, sqrtPriceX96, caller.getAddress(), new BigInteger(tokenAmount));
   }
 
   private void swapToSqrtPrice(Account caller, Score tokenScore, BigInteger targetPrice, Address to, BigInteger tokenAmount) {
@@ -161,7 +188,7 @@ public class ConvexusPoolTest extends ConvexusTest {
   }
 
   protected void initializeAtZeroTick() {
-    BigInteger initializeLiquidityAmount = BigInteger.TEN.pow(18).multiply(BigInteger.TWO);
+    BigInteger initializeLiquidityAmount = BigInteger.TEN.pow(18).multiply(TWO);
     pool.invoke(alice, "initialize", encodePriceSqrt(ONE, ONE));
     int tickSpacing = ((BigInteger) pool.call("tickSpacing")).intValue();
     int min = getMinTick(tickSpacing);
@@ -260,15 +287,14 @@ public class ConvexusPoolTest extends ConvexusTest {
   protected void doSwap (
     int minTick, int maxTick,
     BigInteger amount,
-    String tokenAmount,
     boolean zeroForOne,
     boolean poke
   ) {
     if (zeroForOne) {
-      swapExact0For1(amount, alice, tokenAmount); 
+      swapExact0For1(amount, alice); 
     }
     else {
-      swapExact1For0(amount, alice, tokenAmount);
+      swapExact1For0(amount, alice);
     }
 
     if (poke) {
@@ -279,11 +305,10 @@ public class ConvexusPoolTest extends ConvexusTest {
   protected Fees swapAndGetFeesOwed (
     int minTick, int maxTick,
     BigInteger amount,
-    String tokenAmount,
     boolean zeroForOne,
     boolean poke
   ) {
-    doSwap(minTick, maxTick, amount, tokenAmount, zeroForOne, poke);
+    doSwap(minTick, maxTick, amount, zeroForOne, poke);
     return collectGetFeesOwed(minTick, maxTick);
   }
   
@@ -330,5 +355,11 @@ public class ConvexusPoolTest extends ConvexusTest {
     }
 
     underpay.invoke(recipient, "swap", pool.getAddress(), recipient.getAddress(), zeroForOne, sqrtPriceX96, amountSpecified, pay0, pay1);
+  }
+  
+  protected BigInteger getMaxLiquidityPerTick(int tickSpacing) {
+    return TWO.pow(128).subtract(ONE).divide(
+      BigInteger.valueOf((getMaxTick(tickSpacing) - getMinTick(tickSpacing)) / tickSpacing + 1)
+    );
   }
 }

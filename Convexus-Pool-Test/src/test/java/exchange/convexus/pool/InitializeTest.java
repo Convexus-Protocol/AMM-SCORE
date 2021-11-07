@@ -145,10 +145,4 @@ public class InitializeTest extends ConvexusPoolTest {
     assertEquals(_sqrtPriceX96.getValue(), sqrtPriceX96);
     assertEquals(_tick.getValue(), -6932);
   }
-
-  private BigInteger getMaxLiquidityPerTick(int tickSpacing) {
-    return TWO.pow(128).subtract(ONE).divide(
-      BigInteger.valueOf((getMaxTick(tickSpacing) - getMinTick(tickSpacing)) / tickSpacing + 1)
-    );
-  }
 }

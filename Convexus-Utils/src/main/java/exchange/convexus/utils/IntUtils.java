@@ -28,6 +28,7 @@ public class IntUtils {
   public final static BigInteger MAX_INT256  = new BigInteger("7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff", 16);
   public final static BigInteger MAX_UINT256 = new BigInteger("ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff", 16);
   public final static BigInteger TWO_POW_128 = MAX_UINT128.add(BigInteger.ONE);
+  public final static BigInteger TWO_POW_160 = MAX_UINT160.add(BigInteger.ONE);
   public final static BigInteger TWO_POW_256 = MAX_UINT256.add(BigInteger.ONE);
 
   public static BigInteger uint128(BigInteger n) {

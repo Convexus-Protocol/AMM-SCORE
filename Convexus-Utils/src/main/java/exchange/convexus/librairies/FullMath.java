@@ -83,8 +83,6 @@ public class FullMath {
 
     // Make sure the result is less than 2**256.
     // Also prevents denominator == 0
-    Context.println("denominator = " + denominator);
-    Context.println("prod1 = " + prod1);
     Context.require(denominator.compareTo(prod1) > 0,
       "mulDiv: denominator > prod1");
 

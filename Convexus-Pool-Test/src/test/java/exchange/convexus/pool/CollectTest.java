@@ -61,7 +61,7 @@ class CollectTest extends ConvexusPoolTest {
     mint(alice, minTick, maxTick, expandTo18Decimals(1), "1000000000000000000", "1000000000000000000");
     mint(alice, minTick + tickSpacing, maxTick - tickSpacing, expandTo18Decimals(2), "2000000000000000000", "2000000000000000000");
 
-    swapExact0For1(expandTo18Decimals(1), alice, "1000000000000000000");
+    swapExact0For1(expandTo18Decimals(1), alice);
     
     // poke positions
     burn(minTick, maxTick, ZERO);

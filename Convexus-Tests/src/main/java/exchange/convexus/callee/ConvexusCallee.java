@@ -218,6 +218,16 @@ public class ConvexusCallee {
   }
 
   @External
+  public void swap1ForExact0 (Address pool, BigInteger amount0Out, Address recipient, BigInteger sqrtPriceLimitX96) {
+    Context.call(pool, "swap", recipient, false, amount0Out.negate(), sqrtPriceLimitX96, Context.getCaller().toByteArray());
+  }
+
+  @External
+  public void swap0ForExact1 (Address pool, BigInteger amount1Out, Address recipient, BigInteger sqrtPriceLimitX96) {
+    Context.call(pool, "swap", recipient, true, amount1Out.negate(), sqrtPriceLimitX96, Context.getCaller().toByteArray());
+  }
+
+  @External
   public void swapExact1For0 (Address pool, BigInteger amount1In, Address recipient, BigInteger sqrtPriceLimitX96) {
     Context.call(pool, "swap", recipient, false, amount1In, sqrtPriceLimitX96, Context.getCaller().toByteArray());
   }

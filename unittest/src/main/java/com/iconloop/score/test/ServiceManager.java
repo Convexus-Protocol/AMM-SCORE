@@ -159,6 +159,11 @@ public class ServiceManager {
         return storageClassMap.get(getAddress().toString() + key);
     }
 
+    public void resetStorage () {
+        storageMap.clear();
+        storageClassMap.clear();
+    }
+
     public static class Block {
         private static Block sInstance;
 

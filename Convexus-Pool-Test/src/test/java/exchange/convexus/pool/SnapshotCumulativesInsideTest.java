@@ -126,7 +126,7 @@ class SnapshotCumulativesInsideTest extends ConvexusPoolTest {
   @Test
   void testDoesNotAccountForTimeIncreaseAboveRange () {
     sm.getBlock().increase(5);
-    swapToHigherPrice(alice, encodePriceSqrt(TWO, ONE), alice, "2");
+    swapToHigherPrice(alice, encodePriceSqrt(TWO, ONE), "2");
     sm.getBlock().increase(7);
     
     var result = (SnapshotCumulativesInsideResult) pool.call("snapshotCumulativesInside", tickLower, tickUpper);
@@ -138,7 +138,7 @@ class SnapshotCumulativesInsideTest extends ConvexusPoolTest {
   @Test
   void testDoesNotAccountForTimeIncreaseBelowRange () {
     sm.getBlock().increase(5);
-    swapToLowerPrice(alice, encodePriceSqrt(ONE, TWO), alice, "2");
+    swapToLowerPrice(alice, encodePriceSqrt(ONE, TWO), "2");
     sm.getBlock().increase(7);
     
     var result = (SnapshotCumulativesInsideResult) pool.call("snapshotCumulativesInside", tickLower, tickUpper);
@@ -150,9 +150,9 @@ class SnapshotCumulativesInsideTest extends ConvexusPoolTest {
 
   @Test
   void testTimeIncreaseBelowRangeIsNotCounted () {
-    swapToLowerPrice(alice, encodePriceSqrt(ONE, TWO), alice, "2");
+    swapToLowerPrice(alice, encodePriceSqrt(ONE, TWO), "2");
     sm.getBlock().increase(5);
-    swapToHigherPrice(alice, encodePriceSqrt(ONE, ONE), alice, "2");
+    swapToHigherPrice(alice, encodePriceSqrt(ONE, ONE), "2");
     sm.getBlock().increase(7);
     
     var result = (SnapshotCumulativesInsideResult) pool.call("snapshotCumulativesInside", tickLower, tickUpper);
@@ -164,9 +164,9 @@ class SnapshotCumulativesInsideTest extends ConvexusPoolTest {
 
   @Test
   void testTimeIncreaseAboveRangeIsNotCounted () {
-    swapToHigherPrice(alice, encodePriceSqrt(TWO, ONE), alice, "2");
+    swapToHigherPrice(alice, encodePriceSqrt(TWO, ONE), "2");
     sm.getBlock().increase(5);
-    swapToLowerPrice(alice, encodePriceSqrt(ONE, ONE), alice, "2");
+    swapToLowerPrice(alice, encodePriceSqrt(ONE, ONE), "2");
     sm.getBlock().increase(7);
     
     var result = (SnapshotCumulativesInsideResult) pool.call("snapshotCumulativesInside", tickLower, tickUpper);
@@ -182,7 +182,7 @@ class SnapshotCumulativesInsideTest extends ConvexusPoolTest {
   void testPositionsMintedAfterTimeSpent () {
     sm.getBlock().increase(5);
     mint(alice, tickUpper, getMaxTick(tickSpacing), BigInteger.valueOf(15), "15", "0");
-    swapToHigherPrice(alice, encodePriceSqrt(TWO, ONE), alice, "10");
+    swapToHigherPrice(alice, encodePriceSqrt(TWO, ONE), "10");
     sm.getBlock().increase(8);
 
     var result = (SnapshotCumulativesInsideResult) pool.call("snapshotCumulativesInside", tickUpper, getMaxTick(tickSpacing));
@@ -197,7 +197,7 @@ class SnapshotCumulativesInsideTest extends ConvexusPoolTest {
   void overlappingLiquidityIsAggregated () {
     mint(alice, tickLower, getMaxTick(tickSpacing), BigInteger.valueOf(15), "15", "1");
     sm.getBlock().increase(5);
-    swapToHigherPrice(alice, encodePriceSqrt(TWO, ONE), alice, "10");
+    swapToHigherPrice(alice, encodePriceSqrt(TWO, ONE), "10");
     sm.getBlock().increase(8);
     
     var result = (SnapshotCumulativesInsideResult) pool.call("snapshotCumulativesInside", tickLower, tickUpper);
@@ -215,7 +215,7 @@ class SnapshotCumulativesInsideTest extends ConvexusPoolTest {
     sm.getBlock().increase(8);
     
     // 13 seconds in starting range, then 3 seconds in newly minted range
-    swapToLowerPrice(alice, encodePriceSqrt(ONE, TWO), alice, "10");
+    swapToLowerPrice(alice, encodePriceSqrt(ONE, TWO), "10");
     sm.getBlock().increase(3);
     
     var result = (SnapshotCumulativesInsideResult) pool.call("snapshotCumulativesInside", getMinTick(tickSpacing), tickLower);

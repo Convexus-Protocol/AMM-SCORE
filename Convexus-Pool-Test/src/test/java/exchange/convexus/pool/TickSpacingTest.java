@@ -81,7 +81,7 @@ class TickSpacingTest extends ConvexusPoolTest {
     var liquidityAmount = expandTo18Decimals(1).divide(BigInteger.valueOf(4));
     mint(alice, 120000, 121200, liquidityAmount, "36096898321357", "0");
 
-    swapExact1For0(expandTo18Decimals(1), alice, "1000000000000000000");
+    swapExact1For0(expandTo18Decimals(1), alice);
 
     reset(pool.spy);
     reset(sicx.spy);
@@ -100,7 +100,7 @@ class TickSpacingTest extends ConvexusPoolTest {
     var liquidityAmount = expandTo18Decimals(1).divide(BigInteger.valueOf(4));
     mint(alice, -121200, -120000, liquidityAmount, "0", "36096898321357");
 
-    swapExact0For1(expandTo18Decimals(1), alice, "1000000000000000000");
+    swapExact0For1(expandTo18Decimals(1), alice);
 
     reset(pool.spy);
     reset(sicx.spy);

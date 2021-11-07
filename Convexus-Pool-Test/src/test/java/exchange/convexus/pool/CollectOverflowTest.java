@@ -66,7 +66,7 @@ class CollectOverflowTest extends ConvexusPoolTest {
 
   @Test
   void testToken0 () {
-    swapExact0For1(expandTo18Decimals(1), alice, "1000000000000000000");
+    swapExact0For1(expandTo18Decimals(1), alice);
     burn(minTick, maxTick, ZERO);
 
     reset(pool.spy);
@@ -87,7 +87,7 @@ class CollectOverflowTest extends ConvexusPoolTest {
   
   @Test
   void testToken1 () {
-    swapExact1For0(expandTo18Decimals(1), alice, "1000000000000000000");
+    swapExact1For0(expandTo18Decimals(1), alice);
     burn(minTick, maxTick, ZERO);
 
     reset(pool.spy);
@@ -108,8 +108,8 @@ class CollectOverflowTest extends ConvexusPoolTest {
 
   @Test
   void testToken0AndToken1 () {
-    swapExact0For1(expandTo18Decimals(1), alice, "1000000000000000000");
-    swapExact1For0(expandTo18Decimals(1), alice, "1000000000000000000");
+    swapExact0For1(expandTo18Decimals(1), alice);
+    swapExact1For0(expandTo18Decimals(1), alice);
     burn(minTick, maxTick, ZERO);
 
     reset(pool.spy);

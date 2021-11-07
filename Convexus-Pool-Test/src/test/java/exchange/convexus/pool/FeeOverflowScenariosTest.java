@@ -31,7 +31,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import exchange.convexus.factory.ConvexusFactoryUtils;
-import score.Context;
 
 class FeeOverflowScenariosTest extends ConvexusPoolTest {
 
@@ -107,13 +106,9 @@ class FeeOverflowScenariosTest extends ConvexusPoolTest {
     pool.invoke(alice, "initialize", encodePriceSqrt(ONE, ONE));
     mint(alice, minTick, maxTick, BigInteger.valueOf(1), "1", "1");
     flash(alice, ZERO, ZERO, alice.getAddress(), MAX_UINT128, MAX_UINT128);
-    Context.println(" ==== ?1");
     burn(minTick, maxTick, ZERO);
-    Context.println(" ==== ?2");
     flash(alice, ZERO, ZERO, alice.getAddress(), ONE, ONE);
-    Context.println(" ==== ?3");
     burn(minTick, maxTick, ZERO);
-    Context.println(" ==== ?4");
 
     // fees burned
     var fees = collectGetFeesOwed(minTick, maxTick);

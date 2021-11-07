@@ -100,7 +100,7 @@ class FeeProtocolTest extends ConvexusPoolTest {
 
   @Test
   void testPositionOwnerGetsFullFeesWhenProtocolFeeIsOff () {
-    var fees = swapAndGetFeesOwed(minTick, maxTick, expandTo18Decimals(1), "1000000000000000000", true, true);
+    var fees = swapAndGetFeesOwed(minTick, maxTick, expandTo18Decimals(1), true, true);
     
     // 6 bips * 1e18
     assertEquals(new BigInteger("499999999999999"), fees.token0Fees);
@@ -109,17 +109,17 @@ class FeeProtocolTest extends ConvexusPoolTest {
 
   @Test
   void testSwapFeesAccumulateAsExpected0For1 () {
-    doSwap(minTick, maxTick, expandTo18Decimals(1), "1000000000000000000", true, true);
+    doSwap(minTick, maxTick, expandTo18Decimals(1), true, true);
     var position = (Position.Info) pool.call("positions", Positions.getKey(alice.getAddress(), minTick, maxTick));
     assertEquals(new BigInteger("499999999999999"), position.tokensOwed0);
     assertEquals(new BigInteger("0"), position.tokensOwed1);
 
-    doSwap(minTick, maxTick, expandTo18Decimals(1), "1000000000000000000", true, true);
+    doSwap(minTick, maxTick, expandTo18Decimals(1), true, true);
     position = (Position.Info) pool.call("positions", Positions.getKey(alice.getAddress(), minTick, maxTick));
     assertEquals(new BigInteger("999999999999998"), position.tokensOwed0);
     assertEquals(new BigInteger("0"), position.tokensOwed1);
 
-    doSwap(minTick, maxTick, expandTo18Decimals(1), "1000000000000000000", true, true);
+    doSwap(minTick, maxTick, expandTo18Decimals(1), true, true);
     position = (Position.Info) pool.call("positions", Positions.getKey(alice.getAddress(), minTick, maxTick));
     assertEquals(new BigInteger("1499999999999997"), position.tokensOwed0);
     assertEquals(new BigInteger("0"), position.tokensOwed1);
@@ -127,17 +127,17 @@ class FeeProtocolTest extends ConvexusPoolTest {
 
   @Test
   void testSwapFeesAccumulateAsExpected1For0 () {
-    doSwap(minTick, maxTick, expandTo18Decimals(1), "1000000000000000000", false, true);
+    doSwap(minTick, maxTick, expandTo18Decimals(1), false, true);
     var position = (Position.Info) pool.call("positions", Positions.getKey(alice.getAddress(), minTick, maxTick));
     assertEquals(new BigInteger("0"), position.tokensOwed0);
     assertEquals(new BigInteger("499999999999999"), position.tokensOwed1);
 
-    doSwap(minTick, maxTick, expandTo18Decimals(1), "1000000000000000000", false, true);
+    doSwap(minTick, maxTick, expandTo18Decimals(1), false, true);
     position = (Position.Info) pool.call("positions", Positions.getKey(alice.getAddress(), minTick, maxTick));
     assertEquals(new BigInteger("0"), position.tokensOwed0);
     assertEquals(new BigInteger("999999999999998"), position.tokensOwed1);
 
-    doSwap(minTick, maxTick, expandTo18Decimals(1), "1000000000000000000", false, true);
+    doSwap(minTick, maxTick, expandTo18Decimals(1), false, true);
     position = (Position.Info) pool.call("positions", Positions.getKey(alice.getAddress(), minTick, maxTick));
     assertEquals(new BigInteger("0"), position.tokensOwed0);
     assertEquals(new BigInteger("1499999999999997"), position.tokensOwed1);
@@ -147,7 +147,7 @@ class FeeProtocolTest extends ConvexusPoolTest {
   void testPositionOwnerGetsPartialFeesWhenProtocolFeeIsOn () {
     pool.invoke(owner, "setFeeProtocol", 6, 6);
     
-    var fees = swapAndGetFeesOwed(minTick, maxTick, expandTo18Decimals(1), "1000000000000000000", true, true);
+    var fees = swapAndGetFeesOwed(minTick, maxTick, expandTo18Decimals(1), true, true);
     
     assertEquals(new BigInteger("416666666666666"), fees.token0Fees);
     assertEquals(new BigInteger("0"), fees.token1Fees);
@@ -155,8 +155,8 @@ class FeeProtocolTest extends ConvexusPoolTest {
 
   @Test
   void testFeesCollectedByLpAfterTwoSwapsShouldBeDoubleOneSwap () {
-    doSwap(minTick, maxTick, expandTo18Decimals(1), "1000000000000000000", true, true);
-    var fees = swapAndGetFeesOwed(minTick, maxTick, expandTo18Decimals(1), "1000000000000000000", true, true);
+    doSwap(minTick, maxTick, expandTo18Decimals(1), true, true);
+    var fees = swapAndGetFeesOwed(minTick, maxTick, expandTo18Decimals(1), true, true);
 
     assertEquals(fees.token0Fees, new BigInteger("999999999999998"));
     assertEquals(fees.token1Fees, ZERO);
@@ -164,10 +164,10 @@ class FeeProtocolTest extends ConvexusPoolTest {
 
   @Test
   void testFeesCollectedAfterTwoSwapsWithFeeTurnedOnInMiddleAreFeesFromLastSwap () {
-    doSwap(minTick, maxTick, expandTo18Decimals(1), "1000000000000000000", true, false);
+    doSwap(minTick, maxTick, expandTo18Decimals(1), true, false);
     pool.invoke(owner, "setFeeProtocol", 6, 6);
     
-    var fees = swapAndGetFeesOwed(minTick, maxTick, expandTo18Decimals(1), "1000000000000000000", true, true);
+    var fees = swapAndGetFeesOwed(minTick, maxTick, expandTo18Decimals(1), true, true);
     
     assertEquals(fees.token0Fees, new BigInteger("916666666666666"));
     assertEquals(fees.token1Fees, ZERO);
@@ -177,12 +177,12 @@ class FeeProtocolTest extends ConvexusPoolTest {
   void testFeesCollectedByLpAfterTwoSwapsWithIntermediateWithdrawal () {
     pool.invoke(owner, "setFeeProtocol", 6, 6);
 
-    var fees = swapAndGetFeesOwed(minTick, maxTick, expandTo18Decimals(1), "1000000000000000000", true, true);
+    var fees = swapAndGetFeesOwed(minTick, maxTick, expandTo18Decimals(1), true, true);
     
     assertEquals(fees.token0Fees, new BigInteger("416666666666666"));
     assertEquals(fees.token1Fees, ZERO);
 
-    fees = swapAndGetFeesOwed(minTick, maxTick, expandTo18Decimals(1), "1000000000000000000", true, false);
+    fees = swapAndGetFeesOwed(minTick, maxTick, expandTo18Decimals(1), true, false);
     
     assertEquals(fees.token0Fees, ZERO);
     assertEquals(fees.token1Fees, ZERO);

@@ -94,10 +94,6 @@ public class Position {
             }
 
             // calculate accumulated fees
-            Context.println("feeGrowthInside0X128 = " + feeGrowthInside0X128);
-            Context.println("this.feeGrowthInside0LastX128 = " + this.feeGrowthInside0LastX128);
-            Context.println("this.liquidity = " + this.liquidity);
-            Context.println("=====================================");
             BigInteger tokensOwed0 = uint128(FullMath.mulDiv(feeGrowthInside0X128.subtract(this.feeGrowthInside0LastX128), this.liquidity, FixedPoint128.Q128));
             BigInteger tokensOwed1 = uint128(FullMath.mulDiv(feeGrowthInside1X128.subtract(this.feeGrowthInside1LastX128), this.liquidity, FixedPoint128.Q128));
 
