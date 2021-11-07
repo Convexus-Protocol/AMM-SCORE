@@ -56,15 +56,9 @@ public class MintMiscTest extends ConvexusPoolTest {
     ServiceManager.Block.resetInstance();
     setup_factory();
     reset(factory.spy);
+    setup_tokens();
     setup_pool(factory.getAddress(), FEE, tickSpacing);
     reset(pool.spy);
-
-    // Transfer some funds to Alice
-    sicx.invoke(owner, "mintTo", alice.getAddress(), TEN.pow(30).multiply(TEN.pow(18)));
-    usdc.invoke(owner, "mintTo", alice.getAddress(), TEN.pow(30).multiply(TEN.pow(18)));
-    // Transfer some funds to Bob
-    sicx.invoke(owner, "mintTo", bob.getAddress(), TEN.pow(30).multiply(TEN.pow(18)));
-    usdc.invoke(owner, "mintTo", bob.getAddress(), TEN.pow(30).multiply(TEN.pow(18)));
 
     ConvexusFactoryUtils.createPool(factory, alice, sicx.getAddress(), usdc.getAddress(), FEE, pool.getAddress());
     initializeAtZeroTick();

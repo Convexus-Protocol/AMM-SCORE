@@ -17,7 +17,6 @@
 package exchange.convexus.pool;
 
 import static java.math.BigInteger.ONE;
-import static java.math.BigInteger.TEN;
 import static java.math.BigInteger.TWO;
 import static java.math.BigInteger.ZERO;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -56,15 +55,9 @@ class FlashWithLiquidityTest extends ConvexusPoolTest {
     ServiceManager.Block.resetInstance();
     setup_factory();
     reset(factory.spy);
+    setup_tokens();
     setup_pool(factory.getAddress(), FEE, tickSpacing);
     reset(pool.spy);
-
-    // Transfer some funds to Alice
-    sicx.invoke(owner, "mintTo", alice.getAddress(), TEN.pow(30).multiply(TEN.pow(18)));
-    usdc.invoke(owner, "mintTo", alice.getAddress(), TEN.pow(30).multiply(TEN.pow(18)));
-    // Transfer some funds to Bob
-    sicx.invoke(owner, "mintTo", bob.getAddress(), TEN.pow(30).multiply(TEN.pow(18)));
-    usdc.invoke(owner, "mintTo", bob.getAddress(), TEN.pow(30).multiply(TEN.pow(18)));
 
     ConvexusFactoryUtils.createPool(factory, alice, sicx.getAddress(), usdc.getAddress(), FEE, pool.getAddress());
     initializeAtZeroTick();

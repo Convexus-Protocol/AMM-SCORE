@@ -43,14 +43,15 @@ public class IncreaseObservationCardinalityNextTest extends ConvexusPoolTest {
   final int MEDIUM = 1;
   final int HIGH = 2;
   int FEE = FEE_AMOUNTS[MEDIUM];
-  int TICK_SPACING = TICK_SPACINGS[MEDIUM];
+  int tickSpacing = TICK_SPACINGS[MEDIUM];
 
   @BeforeEach
   void setup() throws Exception {
     ServiceManager.Block.resetInstance();
     setup_factory();
     reset(factory.spy);
-    setup_pool(factory.getAddress(), FEE, TICK_SPACING);
+    setup_tokens();
+    setup_pool(factory.getAddress(), FEE, tickSpacing);
     reset(pool.spy);
 
     ConvexusFactoryUtils.createPool(factory, alice, sicx.getAddress(), usdc.getAddress(), FEE, pool.getAddress());

@@ -18,7 +18,6 @@ package exchange.convexus.pool;
 
 import static exchange.convexus.librairies.TickMath.MAX_SQRT_RATIO;
 import static exchange.convexus.librairies.TickMath.MIN_SQRT_RATIO;
-import static exchange.convexus.utils.IntUtils.MAX_UINT256;
 import static java.math.BigInteger.ONE;
 import static java.math.BigInteger.ZERO;
 import static org.mockito.Mockito.reset;
@@ -54,15 +53,9 @@ class SwapUnderpaymentTest extends ConvexusPoolTest {
     ServiceManager.Block.resetInstance();
     setup_factory();
     reset(factory.spy);
+    setup_tokens();
     setup_pool(factory.getAddress(), FEE, tickSpacing);
     reset(pool.spy);
-
-    // Transfer some funds to Alice
-    sicx.invoke(owner, "mintTo", alice.getAddress(), MAX_UINT256);
-    usdc.invoke(owner, "mintTo", alice.getAddress(), MAX_UINT256);
-    // Transfer some funds to Bob
-    sicx.invoke(owner, "mintTo", bob.getAddress(), MAX_UINT256);
-    usdc.invoke(owner, "mintTo", bob.getAddress(), MAX_UINT256);
 
     ConvexusFactoryUtils.createPool(factory, alice, sicx.getAddress(), usdc.getAddress(), FEE, pool.getAddress());
     pool.invoke(alice, "initialize", encodePriceSqrt(ONE, ONE));
