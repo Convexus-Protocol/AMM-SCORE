@@ -74,7 +74,7 @@ public abstract class IRC3Basic implements IRC3 {
         _approve(_to, _tokenId);
     }
 
-    private void _approve(Address to, BigInteger tokenId) {
+    protected void _approve(Address to, BigInteger tokenId) {
         tokenApprovals.set(tokenId, to);
         Approval(ownerOf(tokenId), to, tokenId);
     }
@@ -158,7 +158,7 @@ public abstract class IRC3Basic implements IRC3 {
         Transfer(owner, ZERO_ADDRESS, tokenId);
     }
 
-    private boolean _tokenExists(BigInteger tokenId) {
+    protected boolean _tokenExists(BigInteger tokenId) {
         return tokenOwners.contains(tokenId);
     }
 

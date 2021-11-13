@@ -28,35 +28,44 @@ import java.math.BigInteger;
 
 public abstract class IRC2Basic implements IRC2 {
     protected static final Address ZERO_ADDRESS = new Address(new byte[Address.LENGTH]);
-    private final String name;
-    private final String symbol;
-    private final int decimals;
-    private final VarDB<BigInteger> totalSupply = Context.newVarDB("totalSupply", BigInteger.class);
+    private final VarDB<String> name = Context.newVarDB("token_name", String.class);
+    private final VarDB<String> symbol = Context.newVarDB("token_symbol", String.class);
+    private final VarDB<BigInteger> decimals = Context.newVarDB("decimals", BigInteger.class);
+    private final VarDB<BigInteger> totalSupply = Context.newVarDB("total_supply", BigInteger.class);
     private final DictDB<Address, BigInteger> balances = Context.newDictDB("balances", BigInteger.class);
 
     public IRC2Basic(String _name, String _symbol, int _decimals) {
-        this.name = _name;
-        this.symbol = _symbol;
-        this.decimals = _decimals;
+        // initialize values only at first deployment
+        if (this.name.get() == null) {
+            this.name.set(ensureNotEmpty(_name));
+            this.symbol.set(ensureNotEmpty(_symbol));
 
-        // decimals must be larger than 0 and less than 21
-        Context.require(this.decimals >= 0, "decimals needs to be positive");
-        Context.require(this.decimals <= 21, "decimals needs to be equal or lower than 21");
+            // decimals must be larger than 0 and less than 21
+            Context.require(_decimals >= 0, "decimals needs to be positive");
+            Context.require(_decimals <= 21, "decimals needs to be equal or lower than 21");
+            this.decimals.set(BigInteger.valueOf(_decimals));
+        }
+    }
+
+    private String ensureNotEmpty(String str) {
+        Context.require(str != null && !str.trim().isEmpty(), "str is null or empty");
+        assert str != null;
+        return str.trim();
     }
 
     @External(readonly=true)
     public String name() {
-        return name;
+        return name.get();
     }
 
     @External(readonly=true)
     public String symbol() {
-        return symbol;
+        return symbol.get();
     }
 
     @External(readonly=true)
     public BigInteger decimals() {
-        return BigInteger.valueOf(decimals);
+        return decimals.get();
     }
 
     @External(readonly=true)

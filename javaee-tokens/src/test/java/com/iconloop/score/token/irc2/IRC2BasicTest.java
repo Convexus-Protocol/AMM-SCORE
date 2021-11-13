@@ -66,7 +66,7 @@ class IRC2BasicTest extends TestBase {
 
     @Test
     void decimals() {
-        assertEquals(decimals, ((BigInteger) tokenScore.call("decimals")).intValue());
+        assertEquals(BigInteger.valueOf(decimals), tokenScore.call("decimals"));
     }
 
     @Test
