@@ -32,5 +32,29 @@ public class AddLiquidityParams {
     public BigInteger amount0Min;
     public BigInteger amount1Min;
 
-    public AddLiquidityParams () {}
+    public AddLiquidityParams() {}
+
+    public AddLiquidityParams(
+        Address token0,
+        Address token1,
+        int fee,
+        Address recipient, 
+        int tickLower,
+        int tickUpper,
+        BigInteger amount0Desired, 
+        BigInteger amount1Desired, 
+        BigInteger amount0Min,
+        BigInteger amount1Min
+    ) {
+        this.token0 = token0;
+        this.token1 = token1;
+        this.fee = fee;
+        this.recipient = recipient;
+        this.tickLower = tickLower;
+        this.tickUpper = tickUpper;
+        this.amount0Desired = amount0Desired;
+        this.amount1Desired = amount1Desired;
+        this.amount0Min = amount0Min;
+        this.amount1Min = amount1Min;
+    }
 }

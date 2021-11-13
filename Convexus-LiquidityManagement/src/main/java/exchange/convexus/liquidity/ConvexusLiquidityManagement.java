@@ -75,8 +75,7 @@ public class ConvexusLiquidityManagement {
      *  @notice Contract constructor
      */
     public ConvexusLiquidityManagement(
-        Address _factory,
-        Address _sICX
+        Address _factory
     ) {
         this.name = "Convexus Liquidity Management";
         this.factory = _factory;

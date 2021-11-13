@@ -166,7 +166,7 @@ public class PairFlash {
 
     /**
      * @param params The parameters necessary for flash and the callback, passed in as FlashParams
-     * @notice Calls the pools flash function with data needed in `uniswapV3FlashCallback`
+     * @notice Calls the pools flash function with data needed in `convexusFlashCallback`
      */
     @External
     public void initFlash (FlashParams params) {

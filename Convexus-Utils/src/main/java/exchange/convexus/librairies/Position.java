@@ -19,6 +19,7 @@ package exchange.convexus.librairies;
 import static exchange.convexus.utils.IntUtils.uint128;
 
 import java.math.BigInteger;
+import java.util.Map;
 
 import score.Context;
 import score.ObjectReader;
@@ -110,6 +111,18 @@ public class Position {
                 this.tokensOwed0 = uint128(this.tokensOwed0.add(tokensOwed0));
                 this.tokensOwed1 = uint128(this.tokensOwed1.add(tokensOwed1));
             }
+        }
+
+        public static Info fromCall(Object call) {
+            @SuppressWarnings("unchecked")
+            Map<String,Object> map = (Map<String,Object>) call;
+            return new Info(
+                (BigInteger) map.get("liquidity"), 
+                (BigInteger) map.get("feeGrowthInside0LastX128"), 
+                (BigInteger) map.get("feeGrowthInside1LastX128"), 
+                (BigInteger) map.get("tokensOwed0"), 
+                (BigInteger) map.get("tokensOwed1")
+            );
         }
     }
     
