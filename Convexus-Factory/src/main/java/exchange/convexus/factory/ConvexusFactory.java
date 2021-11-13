@@ -26,8 +26,8 @@ import score.annotation.EventLog;
 import score.annotation.External;
 
 /**
- * @title Canonical Switch factory
- * @notice Deploys Switch pools and manages ownership and control over pool protocol fees
+ * @title Canonical Convexus factory
+ * @notice Deploys Convexus pools and manages ownership and control over pool protocol fees
  */
 public class ConvexusFactory {
 
