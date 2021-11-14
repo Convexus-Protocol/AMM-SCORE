@@ -16,14 +16,17 @@
 
 package exchange.convexus.initializer;
 
+import exchange.convexus.factory.ConvexusFactory;
 import exchange.convexus.utils.ConvexusTest;
 import exchange.convexus.utils.ScoreSpy;
 
 public class ConvexusPoolInitializerTest extends ConvexusTest {
 
   ScoreSpy<ConvexusPoolInitializer> initializer;
+  ScoreSpy<ConvexusFactory> factory;
 
   void setup_initializer () throws Exception {
-    initializer = deploy_initializer();
+    factory = deploy_factory();
+    initializer = deploy_initializer(factory.getAddress());
   }
 }
