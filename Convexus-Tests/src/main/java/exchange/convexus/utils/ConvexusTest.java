@@ -34,13 +34,17 @@ import exchange.convexus.pairflash.PairFlash;
 import exchange.convexus.swap.Swap;
 import exchange.convexus.swappay.ConvexusSwapPay;
 import exchange.convexus.cvxs.CVXS;
+import exchange.convexus.positionmgr.NonFungiblePositionManager;
+import exchange.convexus.positiondescriptor.NonfungibleTokenPositionDescriptor;
 import exchange.convexus.testtokens.Sicx;
 import exchange.convexus.testtokens.Usdc;
 import exchange.convexus.callee.ConvexusCallee;
 
 import static org.mockito.Mockito.spy;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.MathContext;
 
 public class ConvexusTest extends TestBase {
 
@@ -60,6 +64,11 @@ public class ConvexusTest extends TestBase {
 
     // BigInteger utils
     protected final BigInteger EXA = BigInteger.TEN.pow(18);
+
+    // Encode price
+    protected BigInteger encodePriceSqrt (BigInteger reserve1, BigInteger reserve0) {
+        return new BigDecimal(reserve1).divide(new BigDecimal(reserve0), MathContext.DECIMAL128).sqrt(MathContext.DECIMAL128).multiply(BigDecimal.valueOf(2).pow(96)).toBigInteger();
+    }
 
     // Deployers
     public ScoreSpy<ConvexusPool> deploy_pool (Address token0, Address token1, Address factory, int fee, int tickSpacing) throws Exception {
@@ -86,8 +95,8 @@ public class ConvexusTest extends TestBase {
         return new ScoreSpy<SwapRouter>(score, spy);
     }
     
-    public ScoreSpy<ConvexusPoolInitializer> deploy_initializer () throws Exception {
-        Score score = sm.deploy(owner, ConvexusPoolInitializer.class);
+    public ScoreSpy<ConvexusPoolInitializer> deploy_initializer (Address factory) throws Exception {
+        Score score = sm.deploy(owner, ConvexusPoolInitializer.class, factory);
 
         var spy = (ConvexusPoolInitializer) spy(score.getInstance());
         score.setInstance(spy);
@@ -102,13 +111,28 @@ public class ConvexusTest extends TestBase {
         return new ScoreSpy<ConvexusLiquidityManagement>(score, spy);
     }
     
-    
     public ScoreSpy<CVXS> deploy_cvxs () throws Exception {
         Score score = sm.deploy(owner, CVXS.class);
 
         var spy = (CVXS) spy(score.getInstance());
         score.setInstance(spy);
         return new ScoreSpy<CVXS>(score, spy);
+    }
+    
+    public ScoreSpy<NonFungiblePositionManager> deploy_positionmgr (Address factory, Address tokenDescriptor) throws Exception {
+        Score score = sm.deploy(owner, NonFungiblePositionManager.class, factory, tokenDescriptor);
+
+        var spy = (NonFungiblePositionManager) spy(score.getInstance());
+        score.setInstance(spy);
+        return new ScoreSpy<NonFungiblePositionManager>(score, spy);
+    }
+    
+    public ScoreSpy<NonfungibleTokenPositionDescriptor> deploy_positiondescriptor () throws Exception {
+        Score score = sm.deploy(owner, NonfungibleTokenPositionDescriptor.class);
+
+        var spy = (NonfungibleTokenPositionDescriptor) spy(score.getInstance());
+        score.setInstance(spy);
+        return new ScoreSpy<NonfungibleTokenPositionDescriptor>(score, spy);
     }
     
     public ScoreSpy<TickLens> deploy_ticklens () throws Exception {
