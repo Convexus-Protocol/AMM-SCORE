@@ -23,8 +23,8 @@ import score.ObjectWriter;
 
 // accumulated protocol fees in token0/token1 units
 public class ProtocolFees {
-    BigInteger token0;
-    BigInteger token1;
+    public BigInteger token0;
+    public BigInteger token1;
 
     public ProtocolFees (
         BigInteger token0, 

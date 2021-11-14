@@ -28,9 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 
-import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.math.MathContext;
 
 import com.iconloop.score.test.Account;
 import com.iconloop.score.test.Score;
@@ -90,10 +88,6 @@ public class ConvexusPoolTest extends ConvexusTest {
     var spy = (ConvexusPoolMock) Mockito.spy(score.getInstance());
     score.setInstance(spy);
     return new ScoreSpy<ConvexusPoolMock>(score, spy);
-  }
-
-  protected BigInteger encodePriceSqrt (BigInteger reserve1, BigInteger reserve0) {
-    return new BigDecimal(reserve1).divide(new BigDecimal(reserve0), MathContext.DECIMAL128).sqrt(MathContext.DECIMAL128).multiply(BigDecimal.valueOf(2).pow(96)).toBigInteger();
   }
 
   protected int getMinTick(int tickSpacing) {

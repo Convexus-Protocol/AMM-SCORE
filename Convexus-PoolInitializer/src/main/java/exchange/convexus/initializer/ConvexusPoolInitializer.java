@@ -16,9 +16,12 @@
 
 package exchange.convexus.initializer;
 
+import exchange.convexus.utils.AddressUtils;
+
+import static java.math.BigInteger.ZERO;
+
 import java.math.BigInteger;
 
-import exchange.convexus.utils.AddressUtils;
 import exchange.convexus.pool.Slot0;
 import score.Address;
 import score.Context;
@@ -58,10 +61,9 @@ public class ConvexusPoolInitializer {
         int fee,
         BigInteger sqrtPriceX96
     ) {
-        
         Context.require(AddressUtils.compareTo(token0, token1) < 0, 
-        "createAndInitializePoolIfNecessary: token0 < token1");
-        
+            "createAndInitializePoolIfNecessary: token0 < token1");
+
         Address pool = (Address) Context.call(factory, "getPool", token0, token1, fee);
 
         if (pool == null) {
@@ -69,8 +71,7 @@ public class ConvexusPoolInitializer {
             Context.call(pool, "initialize", sqrtPriceX96);
         } else {
             var slot0 = (Slot0) Context.call(pool, "slot0");
-            BigInteger sqrtPriceX96Existing = slot0.sqrtPriceX96;
-            if (sqrtPriceX96Existing.equals(BigInteger.ZERO)) {
+            if (slot0.sqrtPriceX96.equals(ZERO)) {
                 Context.call(pool, "initialize", sqrtPriceX96);
             }
         }
