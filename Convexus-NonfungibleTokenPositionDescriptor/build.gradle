@@ -11,7 +11,7 @@ dependencies {
 
 optimizedJar {
     mainClassName = 'exchange.convexus.positiondescriptor.NonfungibleTokenPositionDescriptor'
-    setEnableDebug(true)
+    // setEnableDebug(true)
     from {
         configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
     }

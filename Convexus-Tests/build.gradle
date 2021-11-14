@@ -18,6 +18,8 @@ dependencies {
     implementation project(':Convexus-PairFlash')
     implementation project(':Convexus-Swap')
     implementation project(':Convexus-CVXS')
+    implementation project(':Convexus-NonFungiblePositionManager')
+    implementation project(':Convexus-NonfungibleTokenPositionDescriptor')
 
     implementation project(':unittest')
     // implementation 'foundation.icon:javaee-unittest:0.9.1'

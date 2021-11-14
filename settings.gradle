@@ -27,6 +27,5 @@ include (
     'Convexus-Tests',
     'Convexus-Utils',
     'javaee-tokens',
-    'irc2-token',
     'unittest',
     'testinteg')

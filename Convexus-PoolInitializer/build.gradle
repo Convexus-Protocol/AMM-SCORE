@@ -8,7 +8,7 @@ dependencies {
 
 optimizedJar {
     mainClassName = 'exchange.convexus.initializer.ConvexusPoolInitializer'
-    setEnableDebug(true)
+    // setEnableDebug(true)
     from {
         configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
     }
