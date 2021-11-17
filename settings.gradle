@@ -14,6 +14,8 @@ include (
     'Convexus-NonfungibleTokenPositionDescriptor-Test',
     'Convexus-PoolInitializer',
     'Convexus-PoolInitializer-Test',
+    'Convexus-Governor',
+    'Convexus-Governor-Test',
     'Convexus-TickLens',
     'Convexus-TickLens-Test',
     'Convexus-Quoter',

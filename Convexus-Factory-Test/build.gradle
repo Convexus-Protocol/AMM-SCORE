@@ -34,7 +34,7 @@ test {
 
 def pooljar = project(':Convexus-Pool').getTasks().getByName('optimizedJar')
 def factoryjar = project(':Convexus-Factory').getTasks().getByName('optimizedJar')
-def irc2jar = project(':irc2-token').getTasks().getByName('optimizedJar')
+// def irc2jar = project(':irc2-token').getTasks().getByName('optimizedJar')
 
 task integrationTest(type: Test) {
     useJUnitPlatform()
@@ -55,7 +55,7 @@ task integrationTest(type: Test) {
         + '/build/libs/Convexus-Pool-' 
         + '0.9.1'
         + '-optimized.jar')
-    systemProperty(prefix + 'IRC2BasicToken', irc2jar.outputJarName)
+    // systemProperty(prefix + 'IRC2BasicToken', irc2jar.outputJarName)
 }
 
-integrationTest.dependsOn(irc2jar, factoryjar, pooljar)
+integrationTest.dependsOn(/*irc2jar, */factoryjar, pooljar)

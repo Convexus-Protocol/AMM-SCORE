@@ -60,7 +60,7 @@ public class NonFungiblePositionManagerTest extends ConvexusTest {
     Context.println(directory.getAbsolutePath());
     
     factory = deploy_factory();
-    factory.invoke(owner, "setPoolContract", Files.readAllBytes(Paths.get("../Convexus-Pool/build/libs/Convexus-Pool-0.9.1-optimized.jar")));
+    // factory.invoke(owner, "setPoolContract", Files.readAllBytes(Paths.get("../Convexus-Pool/build/libs/Convexus-Pool-0.9.1-optimized.jar")));
     positiondescriptor = deploy_positiondescriptor();
     positionmgr = deploy_positionmgr(factory.getAddress(), positiondescriptor.getAddress());
   }

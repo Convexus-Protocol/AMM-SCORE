@@ -90,7 +90,7 @@ public class ConvexusFactoryIntTest extends TestBase {
         LOG.info("Deploying SICX token");
         var sicx = IRC2BasicToken.install(txHandler, ownerWallet, "Staked ICX", "sICX", BigInteger.valueOf(8), MathUtils.pow10(18));
 
-        LOG.info("Deploying bnUSD token");
+        // LOG.info("Deploying bnUSD token");
         // var bnusd = IRC2BasicToken.install(txHandler, ownerWallet, "Balanced USD", "bnUSD", BigInteger.valueOf(8), MathUtils.pow10(18));
 
         LOG.info("Setting the pool contract bytes to Factory");

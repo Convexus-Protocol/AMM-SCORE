@@ -23,6 +23,7 @@ import com.iconloop.score.test.TestBase;
 
 import exchange.convexus.pool.ConvexusPool;
 import exchange.convexus.factory.ConvexusFactory;
+import exchange.convexus.governor.ConvexusGovernor;
 import exchange.convexus.initializer.ConvexusPoolInitializer;
 import exchange.convexus.router.SwapRouter;
 import exchange.convexus.ticklens.TickLens;
@@ -101,6 +102,14 @@ public class ConvexusTest extends TestBase {
         var spy = (ConvexusPoolInitializer) spy(score.getInstance());
         score.setInstance(spy);
         return new ScoreSpy<ConvexusPoolInitializer>(score, spy);
+    }
+    
+    public ScoreSpy<ConvexusGovernor> deploy_governor () throws Exception {
+        Score score = sm.deploy(owner, ConvexusGovernor.class);
+
+        var spy = (ConvexusGovernor) spy(score.getInstance());
+        score.setInstance(spy);
+        return new ScoreSpy<ConvexusGovernor>(score, spy);
     }
     
     public ScoreSpy<ConvexusLiquidityManagement> deploy_liquidity_management () throws Exception {
