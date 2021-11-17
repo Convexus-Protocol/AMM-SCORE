@@ -18,9 +18,6 @@ package exchange.convexus.staker;
 
 import java.math.BigInteger;
 
-import com.eclipsesource.json.JsonObject;
-
-import exchange.convexus.utils.StringUtils;
 import score.Address;
 import score.ObjectReader;
 import score.ObjectWriter;
