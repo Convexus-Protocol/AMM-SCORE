@@ -177,7 +177,7 @@ public class ConvexusCallee {
     BigInteger pay1
   ) {
     ByteArrayObjectWriter writer = Context.newByteArrayObjectWriter("RLPn");
-    FlashData.writeObject(writer, new FlashData(Context.getCaller(), pay0, pay1));
+    writer.write(new FlashData(Context.getCaller(), pay0, pay1));
     Context.call(pool, "flash", recipient, amount0, amount1, writer.toByteArray());
   }
 
@@ -194,7 +194,7 @@ public class ConvexusCallee {
     final Address caller = Context.getCaller();
 
     ObjectReader reader = Context.newByteArrayObjectReader("RLPn", data);
-    FlashData flashData = FlashData.readObject(reader);
+    FlashData flashData = reader.read(FlashData.class);
 
     Address sender = flashData.sender;
     BigInteger pay0 = flashData.pay0;

@@ -36,7 +36,7 @@ class FlashCallbackData {
         BigInteger amount0 = reader.readBigInteger();
         BigInteger amount1 = reader.readBigInteger();
         Address payer = reader.readAddress();
-        PoolAddress.PoolKey poolKey = PoolAddress.PoolKey.readObject(reader);
+        PoolAddress.PoolKey poolKey = reader.read(PoolAddress.PoolKey.class);
         int poolFee2 = reader.readInt();
         int poolFee3 = reader.readInt();
         return new FlashCallbackData(amount0, amount1, payer, poolKey, poolFee2, poolFee3);

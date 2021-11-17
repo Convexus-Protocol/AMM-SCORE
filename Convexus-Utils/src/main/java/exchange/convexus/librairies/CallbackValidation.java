@@ -36,7 +36,7 @@ public class CallbackValidation {
   /**
    * @notice Returns the address of a valid Convexus Pool
    * @param factory The contract address of the Convexus factory
-   * @param poolKey The identifying key of the V3 pool
+   * @param poolKey The identifying key of the pool
    * @return pool The pool contract address
    */
   public static Address verifyCallback (Address factory, PoolAddress.PoolKey poolKey) {

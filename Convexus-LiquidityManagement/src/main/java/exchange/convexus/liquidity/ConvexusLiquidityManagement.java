@@ -96,7 +96,7 @@ public class ConvexusLiquidityManagement {
         byte[] data
     ) {
         ObjectReader reader = Context.newByteArrayObjectReader("RLPn", data);
-        MintCallbackData decoded = MintCallbackData.readObject(reader);
+        MintCallbackData decoded = reader.read(MintCallbackData.class);
         CallbackValidation.verifyCallback(this.factory, decoded.poolKey);
 
         if (amount0Owed.compareTo(ZERO) > 0) {
@@ -147,7 +147,7 @@ public class ConvexusLiquidityManagement {
         );
 
         ByteArrayObjectWriter writer = Context.newByteArrayObjectWriter("RLPn");
-        MintCallbackData.writeObject(writer, new MintCallbackData(poolKey, Context.getCaller()));
+        writer.write(new MintCallbackData(poolKey, Context.getCaller()));
 
         PairAmounts amounts = (PairAmounts) Context.call(pool, "mint", 
             params.recipient,

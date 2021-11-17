@@ -31,7 +31,7 @@ public class MintCallbackData {
     }
 
     public static MintCallbackData readObject(ObjectReader reader) {
-        PoolAddress.PoolKey poolKey = PoolAddress.PoolKey.readObject(reader);
+        PoolAddress.PoolKey poolKey = reader.read(PoolAddress.PoolKey.class);
         Address payer = reader.readAddress();
         return new MintCallbackData(poolKey, payer);
     }

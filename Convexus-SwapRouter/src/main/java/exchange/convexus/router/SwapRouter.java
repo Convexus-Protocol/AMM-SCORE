@@ -317,7 +317,7 @@ public class SwapRouter {
         boolean zeroForOne = AddressUtils.compareTo(tokenIn, tokenOut) < 0;
 
         ByteArrayObjectWriter writer = Context.newByteArrayObjectWriter("RLPn");
-        SwapCallbackData.writeObject(writer, data);
+        writer.write(data);
         
         var result = (PairAmounts) Context.call(getPool(tokenIn, tokenOut, fee), "swap", 
             recipient,
@@ -359,8 +359,8 @@ public class SwapRouter {
         boolean zeroForOne = AddressUtils.compareTo(tokenIn, tokenOut) < 0;
 
         ByteArrayObjectWriter writer = Context.newByteArrayObjectWriter("RLPn");
-        SwapCallbackData.writeObject(writer, data);
-        
+        writer.write(data);
+
         var result = (PairAmounts) Context.call(getPool(tokenIn, tokenOut, fee), "swap", 
             recipient,
             zeroForOne,

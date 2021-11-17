@@ -3,8 +3,8 @@ package exchange.convexus.callee;
 import java.math.BigInteger;
 
 import score.Address;
-import score.ByteArrayObjectWriter;
 import score.ObjectReader;
+import score.ObjectWriter;
 
 public class FlashData {
 
@@ -22,7 +22,7 @@ public class FlashData {
     this.pay1 = pay1;
   }
 
-  public static void writeObject(ByteArrayObjectWriter writer, FlashData flashData) {
+  public static void writeObject(ObjectWriter writer, FlashData flashData) {
     writer.write(flashData.sender);
     writer.write(flashData.pay0);
     writer.write(flashData.pay1);

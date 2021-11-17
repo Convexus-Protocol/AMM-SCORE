@@ -104,6 +104,8 @@ public abstract class IRC3Basic implements IRC3 {
         _addTokenTo(tokenId, to);
         tokenOwners.set(tokenId, to);
         Transfer(from, to, tokenId);
+
+        _checkOnIRC3Received(from, to, tokenId);
     }
 
     /**
@@ -143,6 +145,8 @@ public abstract class IRC3Basic implements IRC3 {
         _addTokenTo(tokenId, to);
         tokenOwners.set(tokenId, to);
         Transfer(ZERO_ADDRESS, to, tokenId);
+        
+        _checkOnIRC3Received(ZERO_ADDRESS, to, tokenId);
     }
 
     /**
@@ -177,6 +181,12 @@ public abstract class IRC3Basic implements IRC3 {
         tokens.remove(tokenId);
         if (tokens.length() == 0) {
             holderTokens.set(from, null);
+        }
+    }
+
+    private void _checkOnIRC3Received (Address from, Address to, BigInteger tokenId) {
+        if (to.isContract()) {
+            Context.call(to, "onIRC3Received", Context.getCaller(), from, tokenId);
         }
     }
 

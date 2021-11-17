@@ -112,7 +112,7 @@ public class PairFlash {
         byte[] data
     ) {
         ObjectReader reader = Context.newByteArrayObjectReader("RLPn", data);
-        FlashCallbackData decoded = FlashCallbackData.readObject(reader);
+        FlashCallbackData decoded = reader.read(FlashCallbackData.class);
         CallbackValidation.verifyCallback(this.factory, decoded.poolKey);
 
         final Address caller = Context.getCaller();
@@ -176,15 +176,17 @@ public class PairFlash {
         final Address thisAddress = Context.getAddress();
         final Address caller = Context.getCaller();
 
-        ByteArrayObjectWriter writer = Context.newByteArrayObjectWriter("RLPn");
-        FlashCallbackData.writeObject(writer, new FlashCallbackData(
+        var flashData = new FlashCallbackData(
             params.amount0,
             params.amount1,
             caller,
             poolKey,
             params.fee2,
             params.fee3
-        ));
+        );
+
+        ByteArrayObjectWriter writer = Context.newByteArrayObjectWriter("RLPn");
+        writer.write(flashData);
 
         // recipient of borrowed amounts
         // amount of token0 requested to borrow

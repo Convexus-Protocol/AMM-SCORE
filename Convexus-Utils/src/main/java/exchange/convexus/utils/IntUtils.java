@@ -16,6 +16,8 @@
 
 package exchange.convexus.utils;
 
+import static java.math.BigInteger.ZERO;
+
 import java.math.BigInteger;
 
 public class IntUtils {
@@ -23,25 +25,34 @@ public class IntUtils {
   public final static BigInteger MAX_UINT16  = new BigInteger("ffff", 16);
   public final static BigInteger MAX_UINT32  = new BigInteger("ffffffff", 16);
   public final static BigInteger MAX_UINT64  = new BigInteger("ffffffffffffffff", 16);
+  public static final BigInteger MAX_UINT96  = new BigInteger("ffffffffffffffffffffffff", 16);
   public final static BigInteger MAX_UINT128 = new BigInteger("ffffffffffffffffffffffffffffffff", 16);
   public final static BigInteger MAX_UINT160 = new BigInteger("ffffffffffffffffffffffffffffffffffffffff", 16);
   public final static BigInteger MAX_INT256  = new BigInteger("7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff", 16);
   public final static BigInteger MAX_UINT256 = new BigInteger("ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff", 16);
+  public final static BigInteger TWO_POW_96  = MAX_UINT96.add(BigInteger.ONE);
   public final static BigInteger TWO_POW_128 = MAX_UINT128.add(BigInteger.ONE);
   public final static BigInteger TWO_POW_160 = MAX_UINT160.add(BigInteger.ONE);
   public final static BigInteger TWO_POW_256 = MAX_UINT256.add(BigInteger.ONE);
 
   public static BigInteger uint128(BigInteger n) {
-    if (n.compareTo(BigInteger.ZERO) < 0) {
+    if (n.compareTo(ZERO) < 0) {
       return n.add(TWO_POW_128);
     }
     return n.mod(TWO_POW_128);
   }
 
   public static BigInteger uint256(BigInteger n) {
-    if (n.compareTo(BigInteger.ZERO) < 0) {
+    if (n.compareTo(ZERO) < 0) {
       return n.add(TWO_POW_256);
     }
     return n.mod(TWO_POW_256);
+  }
+
+  public static BigInteger uint96(BigInteger n) {
+    if (n.compareTo(ZERO) < 0) {
+      return n.add(TWO_POW_96);
+    }
+    return n.mod(TWO_POW_96);
   }
 }

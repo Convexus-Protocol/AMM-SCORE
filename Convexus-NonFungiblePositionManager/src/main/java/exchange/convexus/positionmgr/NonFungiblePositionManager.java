@@ -21,7 +21,7 @@ import static java.math.BigInteger.ZERO;
 
 import java.math.BigInteger;
 
-import com.iconloop.score.token.irc3.IRC3Basic;
+import com.iconloop.score.token.irc721.IRC721;
 
 import exchange.convexus.librairies.FixedPoint128;
 import exchange.convexus.librairies.FullMath;
@@ -37,6 +37,7 @@ import score.annotation.EventLog;
 import score.annotation.External;
 
 import static exchange.convexus.librairies.BlockTimestamp._blockTimestamp;
+import static exchange.convexus.utils.AddressUtils.ZERO_ADDRESS;
 import static exchange.convexus.utils.IntUtils.uint128;
 
 import exchange.convexus.liquidity.AddLiquidityParams;
@@ -44,7 +45,7 @@ import exchange.convexus.liquidity.ConvexusLiquidityManagement;
 
 // @title NFT positions
 // @notice Wraps Convexus positions in the IRC3 non-fungible token interface
-public class NonFungiblePositionManager extends IRC3Basic {
+public class NonFungiblePositionManager extends IRC721 {
 
     // ================================================
     // Consts
@@ -205,7 +206,7 @@ public class NonFungiblePositionManager extends IRC3Basic {
         this._mint(params.recipient, tokenId);
 
         var positionKey = Positions.getKey(Context.getAddress(), params.tickLower, params.tickUpper);
-        var poolPos = (Position.Info) Position.Info.fromCall(Context.call(pool, "positions", positionKey));
+        var poolPos = Position.Info.fromCall(Context.call(pool, "positions", positionKey));
         
         // idempotent set
         BigInteger poolId = cachePoolKey(pool, PoolAddress.getPoolKey(params.token0, params.token1, params.fee));
@@ -230,7 +231,7 @@ public class NonFungiblePositionManager extends IRC3Basic {
 
     @External(readonly = true)
     public String tokenURI (BigInteger tokenId) {
-        _tokenExists(tokenId);
+        _exists(tokenId);
         return (String) Context.call(this._tokenDescriptor, "tokenURI", Context.getAddress(), tokenId);
     }
 
@@ -274,7 +275,7 @@ public class NonFungiblePositionManager extends IRC3Basic {
         var positionKey = Positions.getKey(Context.getAddress(), positionStorage.tickLower, positionStorage.tickUpper);
 
         // this is now updated to the current transaction
-        var poolPos = (Position.Info) Position.Info.fromCall(Context.call(pool, "positions", positionKey));
+        var poolPos = Position.Info.fromCall(Context.call(pool, "positions", positionKey));
 
         BigInteger feeGrowthInside0LastX128 = poolPos.feeGrowthInside0LastX128;
         BigInteger feeGrowthInside1LastX128 = poolPos.feeGrowthInside1LastX128;
@@ -332,7 +333,7 @@ public class NonFungiblePositionManager extends IRC3Basic {
 
         var positionKey = Positions.getKey(Context.getAddress(), positionStorage.tickLower, positionStorage.tickUpper);
         // this is now updated to the current transaction
-        var poolPos = (Position.Info) Position.Info.fromCall(Context.call(pool, "positions", positionKey));
+        var poolPos = Position.Info.fromCall(Context.call(pool, "positions", positionKey));
 
         BigInteger feeGrowthInside0LastX128 = poolPos.feeGrowthInside0LastX128;
         BigInteger feeGrowthInside1LastX128 = poolPos.feeGrowthInside1LastX128;
@@ -374,7 +375,7 @@ public class NonFungiblePositionManager extends IRC3Basic {
         if (positionStorage.liquidity.compareTo(ZERO) > 0) {
             Context.call(pool, "burn", positionStorage.tickLower, positionStorage.tickUpper, ZERO);
             var positionKey = Positions.getKey(Context.getAddress(), positionStorage.tickLower, positionStorage.tickUpper);
-            var poolPos = (Position.Info) Position.Info.fromCall(Context.call(pool, "positions", positionKey));
+            var poolPos = Position.Info.fromCall(Context.call(pool, "positions", positionKey));
             BigInteger feeGrowthInside0LastX128 = poolPos.feeGrowthInside0LastX128;
             BigInteger feeGrowthInside1LastX128 = poolPos.feeGrowthInside1LastX128;
 
@@ -451,7 +452,7 @@ public class NonFungiblePositionManager extends IRC3Basic {
     @Override
     @External(readonly=true)
     public Address getApproved(BigInteger tokenId) {
-        Context.require(this._tokenExists(tokenId), 
+        Context.require(this._exists(tokenId), 
             "getApproved: approved query for nonexistent token");
         return this._positions.get(tokenId).operator;
     }
@@ -471,10 +472,6 @@ public class NonFungiblePositionManager extends IRC3Basic {
     private void isAuthorizedForToken (BigInteger tokenId) {
         Context.require(_isApprovedOrOwner(Context.getCaller(), tokenId), 
             "checkAuthorizedForToken: Not approved");
-    }
-
-    private boolean _isApprovedOrOwner (Address spender, BigInteger tokenId) {
-        return getApproved(tokenId).equals(spender) || ownerOf(tokenId).equals(spender);
     }
 
     // ================================================
