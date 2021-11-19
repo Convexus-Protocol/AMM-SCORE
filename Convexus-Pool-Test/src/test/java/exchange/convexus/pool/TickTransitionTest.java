@@ -34,7 +34,7 @@ import org.junit.jupiter.api.Test;
 import exchange.convexus.factory.ConvexusFactoryUtils;
 import exchange.convexus.librairies.TickMath;
 
-class TickTransitionTest extends ConvexusPoolTest {
+public class TickTransitionTest extends ConvexusPoolTest {
 
   final int TICK_SPACINGS[] = {10, 60, 200};
   final int FEE_AMOUNTS[] = {500, 3000, 10000};
@@ -68,7 +68,7 @@ class TickTransitionTest extends ConvexusPoolTest {
 
     assertEquals(ZERO, pool.call("liquidity"));
 
-    Slot0 slot0 = (Slot0) pool.call("slot0");
+    var slot0 = Slot0.fromMap(pool.call("slot0"));
     assertEquals(slot0.tick, -24081);
 
     // add a bunch of liquidity around current price
@@ -81,7 +81,7 @@ class TickTransitionTest extends ConvexusPoolTest {
 
     // check the math works out to moving the price down 1, sending no amount out, and having some amount remaining
     BigInteger THREE = BigInteger.valueOf(3);
-    var result = SwapMath.computeSwapStep(p0, p0.subtract(ONE), liquidity, THREE, FEE_AMOUNTS[MEDIUM]);
+    ComputeSwapStepResult result = SwapMath.computeSwapStep(p0, p0.subtract(ONE), liquidity, THREE, FEE_AMOUNTS[MEDIUM]);
     assertEquals(p0.subtract(ONE), result.sqrtRatioNextX96);
     assertEquals(ONE, result.feeAmount);
     assertEquals(ONE, result.amountIn);
@@ -94,7 +94,7 @@ class TickTransitionTest extends ConvexusPoolTest {
     verify(sicx.spy).Transfer(callee.getAddress(), pool.getAddress(), THREE, "pay".getBytes());
     verifyNoInteractions(usdc.spy);
 
-    slot0 = (Slot0) pool.call("slot0");
+    slot0 = Slot0.fromMap(pool.call("slot0"));
 
     assertEquals(-24082, slot0.tick);
     assertEquals(p0.subtract(ONE), result.sqrtRatioNextX96);

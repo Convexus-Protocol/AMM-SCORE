@@ -33,10 +33,12 @@ import exchange.convexus.quoter.Quoter;
 import exchange.convexus.reentrantcallee.ConvexusReentrantCallee;
 import exchange.convexus.pairflash.PairFlash;
 import exchange.convexus.swap.Swap;
+import exchange.convexus.staker.ConvexusStaker;
 import exchange.convexus.swappay.ConvexusSwapPay;
 import exchange.convexus.cvxs.CVXS;
 import exchange.convexus.positionmgr.NonFungiblePositionManager;
 import exchange.convexus.positiondescriptor.NonfungibleTokenPositionDescriptor;
+import exchange.convexus.testtokens.RewardToken;
 import exchange.convexus.testtokens.Sicx;
 import exchange.convexus.testtokens.Usdc;
 import exchange.convexus.callee.ConvexusCallee;
@@ -70,6 +72,16 @@ public class ConvexusTest extends TestBase {
     protected BigInteger encodePriceSqrt (BigInteger reserve1, BigInteger reserve0) {
         return new BigDecimal(reserve1).divide(new BigDecimal(reserve0), MathContext.DECIMAL128).sqrt(MathContext.DECIMAL128).multiply(BigDecimal.valueOf(2).pow(96)).toBigInteger();
     }
+
+    // Tick
+    protected int getMinTick(int tickSpacing) {
+        return ((int) Math.ceil(-887272 / tickSpacing)) * tickSpacing;
+    }
+
+    protected int getMaxTick(int tickSpacing) {
+        return ((int) Math.floor(887272 / tickSpacing)) * tickSpacing;
+    }
+
 
     // Deployers
     public ScoreSpy<ConvexusPool> deploy_pool (Address token0, Address token1, Address factory, int fee, int tickSpacing) throws Exception {
@@ -175,6 +187,19 @@ public class ConvexusTest extends TestBase {
         score.setInstance(spy);
         return new ScoreSpy<Swap>(score, spy);
     }
+    
+    public ScoreSpy<ConvexusStaker> deploy_staker (
+        Address _factory,
+        Address _nonfungiblePositionManager,
+        BigInteger _maxIncentiveStartLeadTime,
+        BigInteger _maxIncentiveDuration
+    ) throws Exception {
+        Score score = sm.deploy(owner, ConvexusStaker.class, _factory, _nonfungiblePositionManager, _maxIncentiveStartLeadTime, _maxIncentiveDuration);
+
+        var spy = (ConvexusStaker) spy(score.getInstance());
+        score.setInstance(spy);
+        return new ScoreSpy<ConvexusStaker>(score, spy);
+    }
 
     public ScoreSpy<Sicx> deploy_sicx () throws Exception {
         Score score = sm.deploy(owner, Sicx.class, "Staked ICX", "sICX", 18);
@@ -190,6 +215,14 @@ public class ConvexusTest extends TestBase {
         var spy = (Usdc) spy(score.getInstance());
         score.setInstance(spy);
         return new ScoreSpy<Usdc>(score, spy);
+    }
+    
+    public ScoreSpy<RewardToken> deploy_reward_token () throws Exception {
+        Score score = sm.deploy(owner, RewardToken.class, "RewardToken", "RWT", 18);
+
+        var spy = (RewardToken) spy(score.getInstance());
+        score.setInstance(spy);
+        return new ScoreSpy<RewardToken>(score, spy);
     }
     
     public ScoreSpy<ConvexusCallee> deploy_callee () throws Exception {

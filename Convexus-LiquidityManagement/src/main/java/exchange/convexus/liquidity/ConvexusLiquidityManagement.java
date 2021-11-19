@@ -132,7 +132,7 @@ public class ConvexusLiquidityManagement {
         Address pool = PoolAddress.getPool(this.factory, poolKey);
         
         // compute the liquidity amount
-        var result = Slot0.fromCall(Context.call(pool, "slot0"));
+        var result = Slot0.fromMap(Context.call(pool, "slot0"));
 
         BigInteger sqrtPriceX96 = result.sqrtPriceX96;
         BigInteger sqrtRatioAX96 = TickMath.getSqrtRatioAtTick(params.tickLower);

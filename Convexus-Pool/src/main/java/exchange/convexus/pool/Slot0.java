@@ -60,7 +60,7 @@ public class Slot0 {
         );
     }
 
-    public static Slot0 fromCall(Object call) {
+    public static Slot0 fromMap(Object call) {
         @SuppressWarnings("unchecked")
         Map<String,Object> map = (Map<String,Object>) call;
         return new Slot0(

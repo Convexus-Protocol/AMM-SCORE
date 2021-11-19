@@ -21,6 +21,7 @@ dependencies {
     implementation project(':Convexus-NonFungiblePositionManager')
     implementation project(':Convexus-NonfungibleTokenPositionDescriptor')
     implementation project(':Convexus-Governor')
+    implementation project(':Convexus-Staker')
 
     implementation project(':unittest')
     // implementation 'foundation.icon:javaee-unittest:0.9.1'

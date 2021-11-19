@@ -20,7 +20,7 @@ import score.Address;
 import score.ObjectReader;
 import score.ObjectWriter;
 
-class SwapCallbackData {
+public class SwapCallbackData {
     public byte[] path;
     public Address payer;
 

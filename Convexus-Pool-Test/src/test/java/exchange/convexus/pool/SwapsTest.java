@@ -38,7 +38,7 @@ import exchange.convexus.librairies.TickMath;
 import exchange.convexus.utils.AssertUtils;
 import exchange.convexus.utils.IntUtils;
 
-class SwapsTest extends ConvexusPoolTest {
+public class SwapsTest extends ConvexusPoolTest {
 
   final int TICK_SPACINGS[] = {10, 60, 200};
   final int FEE_AMOUNTS[] = {500, 3000, 10000};
@@ -534,10 +534,10 @@ class SwapsTest extends ConvexusPoolTest {
 
               executeSwap(testCase);
               
-              // var slot0 = (Slot0) pool.call("slot0");
+              // var slot0 = Slot0.fromMap(pool.call("slot0"));
               // BigInteger poolBalance0After = (BigInteger) sicx.call("balanceOf", pool.getAddress());
               // BigInteger poolBalance1After = (BigInteger) usdc.call("balanceOf", pool.getAddress());
-              // Slot0 slot0After = (Slot0) pool.call("slot0");
+              // Slot0 slot0After = Slot0.fromMap(pool.call("slot0"));
               // BigInteger liquidityAfter = (BigInteger) pool.call("liquidity");
               // BigInteger feeGrowthGlobal0X128 = (BigInteger) pool.call("feeGrowthGlobal0X128");
               // BigInteger feeGrowthGlobal1X128 = (BigInteger) pool.call("feeGrowthGlobal1X128");              

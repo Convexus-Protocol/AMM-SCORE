@@ -93,7 +93,7 @@ public class FeeIsOnTest extends ConvexusPoolTest {
       new BigInteger("6032823873303666"), 
       "collect".getBytes());
 
-    assertTrue(((Slot0) pool.call("slot0")).tick >= 120);
+    assertTrue(Slot0.fromMap(pool.call("slot0")).tick >= 120);
   }
 
   @Test
@@ -127,6 +127,6 @@ public class FeeIsOnTest extends ConvexusPoolTest {
       new BigInteger("6032823873303666"), 
       "collect".getBytes());
       
-    assertTrue(((Slot0) pool.call("slot0")).tick < -120);
+    assertTrue(Slot0.fromMap(pool.call("slot0")).tick < -120);
   }
 }

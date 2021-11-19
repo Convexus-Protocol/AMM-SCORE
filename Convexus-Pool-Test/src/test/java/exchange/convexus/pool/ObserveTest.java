@@ -30,7 +30,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import exchange.convexus.factory.ConvexusFactoryUtils;
-import exchange.convexus.librairies.Oracle;
+import exchange.convexus.librairies.ObserveResult;
 import exchange.convexus.liquidity.ConvexusLiquidity;
 
 public class ObserveTest extends ConvexusPoolTest {
@@ -65,12 +65,12 @@ public class ObserveTest extends ConvexusPoolTest {
   void testCurrentTickAccumulatorIncreasesByTickOverTime () {
     BigInteger[] secondsAgos = { ZERO };
 
-    var observation = (Oracle.Observations.ObserveResult) pool.call("observe", new Object[] {secondsAgos});
+    var observation = ObserveResult.fromMap(pool.call("observe", new Object[] {secondsAgos}));
     assertEquals(ZERO, observation.tickCumulatives[0]);
     
     sm.getBlock().increase(10);
     
-    observation = (Oracle.Observations.ObserveResult) pool.call("observe", new Object[] {secondsAgos});
+    observation = ObserveResult.fromMap(pool.call("observe", new Object[] {secondsAgos}));
     assertEquals(ZERO, observation.tickCumulatives[0]);
   }
 
@@ -82,7 +82,7 @@ public class ObserveTest extends ConvexusPoolTest {
     sm.getBlock().increase(4);
     
     BigInteger[] secondsAgos = { ZERO };
-    var observation = (Oracle.Observations.ObserveResult) pool.call("observe", new Object[] {secondsAgos});
+    var observation = ObserveResult.fromMap(pool.call("observe", new Object[] {secondsAgos}));
     assertEquals(BigInteger.valueOf(-4), observation.tickCumulatives[0]);
   }
 
@@ -90,20 +90,20 @@ public class ObserveTest extends ConvexusPoolTest {
   void testCurrentTickAccumulatorAfterTwoSwaps () {
     ConvexusLiquidity.deposit(alice, callee.getAddress(), sicx.score, new BigInteger("500000000000000000"));
     swapExact0For1(TEN.pow(18).divide(TWO), alice);
-    var slot0 = (Slot0) pool.call("slot0");
+    var slot0 = Slot0.fromMap(pool.call("slot0"));
     assertEquals(-4452, slot0.tick);
     
     sm.getBlock().increase(4);
 
     ConvexusLiquidity.deposit(alice, callee.getAddress(), usdc.score, new BigInteger("250000000000000000"));
     swapExact1For0(TEN.pow(18).divide(BigInteger.valueOf(4)), alice);
-    slot0 = (Slot0) pool.call("slot0");
+    slot0 = Slot0.fromMap(pool.call("slot0"));
     assertEquals(-1558, slot0.tick);
 
     sm.getBlock().increase(6);
     
     BigInteger[] secondsAgos = { ZERO };
-    var observation = (Oracle.Observations.ObserveResult) pool.call("observe", new Object[] {secondsAgos});
+    var observation = ObserveResult.fromMap(pool.call("observe", new Object[] {secondsAgos}));
     // -27156 = -4452*4 + -1558*6
     assertEquals(BigInteger.valueOf(-27156), observation.tickCumulatives[0]);
   }

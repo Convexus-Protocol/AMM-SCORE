@@ -29,7 +29,7 @@ import java.math.BigInteger;
 import static java.math.BigInteger.TEN;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class IRC2BasicTest extends TestBase {
+public class IRC2BasicTest extends TestBase {
     private static final String name = "MyIRC2Token";
     private static final String symbol = "MIT";
     private static final int decimals = 18;

@@ -33,7 +33,7 @@ import org.junit.jupiter.api.Test;
 import exchange.convexus.factory.ConvexusFactoryUtils;
 import exchange.convexus.utils.AddressUtils;
 
-class FlashWithLiquidityAndFeeOnTest extends ConvexusPoolTest {
+public class FlashWithLiquidityAndFeeOnTest extends ConvexusPoolTest {
 
   final int TICK_SPACINGS[] = {10, 60, 200};
   final int FEE_AMOUNTS[] = {500, 3000, 10000};
@@ -78,7 +78,7 @@ class FlashWithLiquidityAndFeeOnTest extends ConvexusPoolTest {
   void testIncreasesTheFeeGrowthByTheExpectedAmount () {
     flash(alice, "2002", "4004", bob, "2009", "4017");
 
-    var fees = (ProtocolFees) pool.call("protocolFees");
+    var fees = ProtocolFees.fromMap(pool.call("protocolFees"));
     assertEquals(ONE, fees.token0);
     assertEquals(TWO, fees.token1);
 
@@ -98,7 +98,7 @@ class FlashWithLiquidityAndFeeOnTest extends ConvexusPoolTest {
     verify(sicx.spy).Transfer(callee.getAddress(), pool.getAddress(), new BigInteger("567"), "pay".getBytes());
     verify(usdc.spy, times(2)).balanceOf(pool.getAddress());
 
-    var fees = (ProtocolFees) pool.call("protocolFees");
+    var fees = ProtocolFees.fromMap(pool.call("protocolFees"));
 
     assertEquals(fees.token0, new BigInteger("94"));
     BigInteger expectedFee0 = BigInteger.valueOf(473).multiply(TWO.pow(128)).divide(expandTo18Decimals(2));
@@ -114,7 +114,7 @@ class FlashWithLiquidityAndFeeOnTest extends ConvexusPoolTest {
     verify(usdc.spy).Transfer(callee.getAddress(), pool.getAddress(), new BigInteger("678"), "pay".getBytes());
     verify(sicx.spy, times(2)).balanceOf(pool.getAddress());
 
-    var fees = (ProtocolFees) pool.call("protocolFees");
+    var fees = ProtocolFees.fromMap(pool.call("protocolFees"));
 
     assertEquals(fees.token1, new BigInteger("113"));
     BigInteger expectedFee1 = BigInteger.valueOf(565).multiply(TWO.pow(128)).divide(expandTo18Decimals(2));
@@ -130,7 +130,7 @@ class FlashWithLiquidityAndFeeOnTest extends ConvexusPoolTest {
     verify(sicx.spy).Transfer(callee.getAddress(), pool.getAddress(), new BigInteger("789"), "pay".getBytes());
     verify(usdc.spy).Transfer(callee.getAddress(), pool.getAddress(), new BigInteger("1234"), "pay".getBytes());
     
-    var fees = (ProtocolFees) pool.call("protocolFees");
+    var fees = ProtocolFees.fromMap(pool.call("protocolFees"));
     assertEquals(fees.token0, new BigInteger("131"));
     assertEquals(fees.token1, new BigInteger("205"));
 

@@ -17,6 +17,7 @@
 package exchange.convexus.pool;
 
 import java.math.BigInteger;
+import java.util.Map;
 
 public class SnapshotCumulativesInsideResult {
     public BigInteger tickCumulativeInside;
@@ -27,5 +28,15 @@ public class SnapshotCumulativesInsideResult {
       this.tickCumulativeInside = tickCumulativeInside;
       this.secondsPerLiquidityInsideX128 = secondsPerLiquidityInsideX128;
       this.secondsInside = secondsInside;
+    }
+
+    public static SnapshotCumulativesInsideResult fromMap(Object call) {
+      @SuppressWarnings("unchecked")
+      Map<String,Object> map = (Map<String,Object>) call;
+      return new SnapshotCumulativesInsideResult (
+          (BigInteger) map.get("tickCumulativeInside"), 
+          (BigInteger) map.get("secondsPerLiquidityInsideX128"), 
+          (BigInteger) map.get("secondsInside")
+      );
     }
 }

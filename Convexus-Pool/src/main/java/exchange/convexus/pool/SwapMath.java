@@ -24,24 +24,6 @@ import exchange.convexus.librairies.FullMath;
 import exchange.convexus.librairies.SqrtPriceMath;
 import exchange.convexus.utils.IntUtils;
 
-class ComputeSwapStepResult {
-  public BigInteger sqrtRatioNextX96;
-  public BigInteger amountIn;
-  public BigInteger amountOut;
-  public BigInteger feeAmount;
-  public ComputeSwapStepResult (
-    BigInteger sqrtRatioNextX96,
-    BigInteger amountIn,
-    BigInteger amountOut,
-    BigInteger feeAmount
-  ) {
-    this.sqrtRatioNextX96 = sqrtRatioNextX96;
-    this.amountIn = amountIn;
-    this.amountOut = amountOut;
-    this.feeAmount = feeAmount;
-  }
-}
-
 public class SwapMath {
 
   /**

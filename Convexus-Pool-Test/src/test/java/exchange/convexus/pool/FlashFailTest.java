@@ -27,7 +27,7 @@ import org.junit.jupiter.api.Test;
 import exchange.convexus.factory.ConvexusFactoryUtils;
 import exchange.convexus.utils.AssertUtils;
 
-class FlashFailTest extends ConvexusPoolTest {
+public class FlashFailTest extends ConvexusPoolTest {
 
   final int TICK_SPACINGS[] = {10, 60, 200};
   final int FEE_AMOUNTS[] = {500, 3000, 10000};

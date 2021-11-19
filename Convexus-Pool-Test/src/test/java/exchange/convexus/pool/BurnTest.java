@@ -50,7 +50,7 @@ public class BurnTest extends ConvexusPoolTest {
   int maxTick = getMaxTick(tickSpacing);
 
   private void checkTickIsClear(int tick) {
-    var tickInfo = (Tick.Info) pool.call("ticks", tick);
+    var tickInfo = Tick.Info.fromMap(pool.call("ticks", tick));
     assertEquals(ZERO, tickInfo.liquidityGross);
     assertEquals(ZERO, tickInfo.feeGrowthOutside0X128);
     assertEquals(ZERO, tickInfo.feeGrowthOutside1X128);
@@ -58,7 +58,7 @@ public class BurnTest extends ConvexusPoolTest {
   }
 
   private void checkTickIsNotClear(int tick) {
-    var tickInfo = (Tick.Info) pool.call("ticks", tick);
+    var tickInfo = Tick.Info.fromMap(pool.call("ticks", tick));
     assertNotEquals(ZERO, tickInfo.liquidityGross);
   }
 
@@ -93,7 +93,7 @@ public class BurnTest extends ConvexusPoolTest {
       swapExact1For0(TEN.pow(18), alice);
 
       pool.invoke(bob, "burn", minTick, maxTick, TEN.pow(18));
-      var position = (Position.Info) pool.call("positions", Positions.getKey(bob.getAddress(), minTick, maxTick));
+      var position = Position.Info.fromMap(pool.call("positions", Positions.getKey(bob.getAddress(), minTick, maxTick)));
       assertEquals(ZERO, position.liquidity);
       assertNotEquals(ZERO, position.tokensOwed0);
       assertNotEquals(ZERO, position.tokensOwed1);

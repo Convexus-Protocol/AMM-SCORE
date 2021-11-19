@@ -20,6 +20,7 @@ import org.mockito.ArgumentCaptor;
 
 import exchange.convexus.utils.ScoreSpy;
 
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 
 import com.iconloop.score.test.Account;
@@ -37,6 +38,7 @@ public class ConvexusFactoryUtils {
     // TODO: UNPATCHME:
     Address pool
   ) {
+    reset(factory.spy);
     factory.invoke(from, "createPool", tokenA, tokenB, fee, pool);
     // Get pool address from PoolCreated event
     ArgumentCaptor<Address> _token0 = ArgumentCaptor.forClass(Address.class);

@@ -106,20 +106,20 @@ public class InitializeTest extends ConvexusPoolTest {
   @Test
   void testCanInitializeMinRatio () {
     pool.invoke(alice, "initialize", MIN_SQRT_RATIO);
-    assertEquals(((Slot0) pool.call("slot0")).tick, getMinTick(1));
+    assertEquals((Slot0.fromMap(pool.call("slot0"))).tick, getMinTick(1));
   }
 
   @Test
   void testCanInitializeMaxRatio () {
     pool.invoke(alice, "initialize", MAX_SQRT_RATIO.subtract(ONE));
-    assertEquals(((Slot0) pool.call("slot0")).tick, getMaxTick(1) - 1);
+    assertEquals((Slot0.fromMap(pool.call("slot0"))).tick, getMaxTick(1) - 1);
   }
 
   @Test
   void testInitialVariables () {
     final BigInteger price = encodePriceSqrt(ONE, TWO);
     pool.invoke(alice, "initialize", price);
-    Slot0 slot0 = (Slot0) pool.call("slot0");
+    var slot0 = Slot0.fromMap(pool.call("slot0"));
     assertEquals(price, slot0.sqrtPriceX96);
     assertEquals(0, slot0.observationIndex);
     assertEquals(-6932, slot0.tick);
@@ -129,7 +129,7 @@ public class InitializeTest extends ConvexusPoolTest {
   void testFirstObservationsSlot () {
     pool.invoke(alice, "initialize", encodePriceSqrt(ONE, ONE));
 
-    Oracle.Observation observation = (Oracle.Observation) pool.call("observations", 0);
+    Oracle.Observation observation = Oracle.Observation.fromMap(pool.call("observations", 0));
     Oracle.Observation expected = new Oracle.Observation(TimeUtils.nowSeconds(), ZERO, ZERO, true);
     assertObservationEquals(expected, observation);
   }

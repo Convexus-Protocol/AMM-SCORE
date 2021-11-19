@@ -21,15 +21,17 @@ import java.math.BigInteger;
 import score.Address;
 
 public class MintParams {
-    Address token0;
-    Address token1;
-    int fee;
-    int tickLower;
-    int tickUpper;
-    BigInteger amount0Desired;
-    BigInteger amount1Desired;
-    BigInteger amount0Min;
-    BigInteger amount1Min;
-    Address recipient;
-    BigInteger deadline;
+    public Address token0;
+    public Address token1;
+    public int fee;
+    public int tickLower;
+    public int tickUpper;
+    public BigInteger amount0Desired;
+    public BigInteger amount1Desired;
+    public BigInteger amount0Min;
+    public BigInteger amount1Min;
+    public Address recipient;
+    public BigInteger deadline;
+
+    public MintParams() {}
 }

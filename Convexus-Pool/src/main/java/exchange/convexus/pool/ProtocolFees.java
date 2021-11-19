@@ -17,6 +17,7 @@
 package exchange.convexus.pool;
 
 import java.math.BigInteger;
+import java.util.Map;
 
 import score.ObjectReader;
 import score.ObjectWriter;
@@ -43,6 +44,15 @@ public class ProtocolFees {
         return new ProtocolFees(
             r.readBigInteger(), // token0
             r.readBigInteger() // token1
+        );
+    }
+
+    public static ProtocolFees fromMap(Object call) {
+        @SuppressWarnings("unchecked")
+        Map<String,Object> map = (Map<String,Object>) call;
+        return new ProtocolFees (
+            (BigInteger) map.get("token0"), 
+            (BigInteger) map.get("token1")
         );
     }
 }

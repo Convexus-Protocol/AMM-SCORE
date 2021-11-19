@@ -26,6 +26,8 @@ import exchange.convexus.factory.ConvexusPoolDeployerParameters;
 import exchange.convexus.librairies.FixedPoint128;
 import exchange.convexus.librairies.FullMath;
 import exchange.convexus.librairies.LiquidityMath;
+import exchange.convexus.librairies.Observations;
+import exchange.convexus.librairies.ObserveResult;
 import exchange.convexus.librairies.Oracle;
 import exchange.convexus.librairies.PairAmounts;
 import exchange.convexus.librairies.Position;
@@ -35,7 +37,6 @@ import exchange.convexus.librairies.Tick;
 import exchange.convexus.librairies.TickBitmap;
 import exchange.convexus.librairies.TickMath;
 import exchange.convexus.librairies.Ticks;
-import exchange.convexus.librairies.Position.Info;
 import exchange.convexus.utils.ReentrancyLock;
 import score.Address;
 import score.Context;
@@ -115,7 +116,7 @@ public class ConvexusPool {
     private final Positions positions = new Positions();
 
     // Returns data about a specific observation index
-    private final Oracle.Observations observations = new Oracle.Observations();
+    private final Observations observations = new Observations();
 
     // ================================================
     // Event Logs
@@ -398,7 +399,7 @@ public class ConvexusPool {
             );
         } else if (_slot0.tick < tickUpper) {
             BigInteger time = _blockTimestamp();
-            Oracle.Observations.ObserveSingleResult result = observations.observeSingle(
+            Observations.ObserveSingleResult result = observations.observeSingle(
                 time, 
                 ZERO, 
                 _slot0.tick, 
@@ -436,7 +437,7 @@ public class ConvexusPool {
      * timestamp
      */
     @External(readonly = true)
-    public Oracle.Observations.ObserveResult observe (BigInteger[] secondsAgos) {
+    public ObserveResult observe (BigInteger[] secondsAgos) {
         Slot0 _slot0 = this.slot0.get();
         return observations.observe(
             _blockTimestamp(), 
@@ -500,15 +501,6 @@ public class ConvexusPool {
         this.poolLock.lock(false);
 
         this.Initialize(sqrtPriceX96, tick);
-    }
-
-    class PositionStorage {
-        public PositionStorage(Info position, byte[] positionKey) {
-            this.position = position;
-            this.key = positionKey;
-        }
-        public Position.Info position;
-        public byte[] key;
     }
 
     /**
@@ -601,35 +593,6 @@ public class ConvexusPool {
 
         this.positions.set(positionKey, position);
         return new PositionStorage(position, positionKey);
-    }
-
-    class ModifyPositionParams {
-        // the address that owns the position
-        public Address owner;
-        // the lower and upper tick of the position
-        public int tickLower;
-        public int tickUpper;
-        // any change in liquidity
-        public BigInteger liquidityDelta;
-        
-        public ModifyPositionParams(Address recipient, int tickLower, int tickUpper, BigInteger amount) {
-            this.owner = recipient;
-            this.tickLower = tickLower;
-            this.tickUpper = tickUpper;
-            this.liquidityDelta = amount;
-        }
-    }
-
-    class ModifyPositionResult {
-        public PositionStorage positionStorage;
-        public BigInteger amount0;
-        public BigInteger amount1;
-        
-        public ModifyPositionResult (PositionStorage positionStorage, BigInteger amount0, BigInteger amount1) {
-            this.positionStorage = positionStorage;
-            this.amount0 = amount0;
-            this.amount1 = amount1;
-        }
     }
 
     /**
@@ -874,88 +837,6 @@ public class ConvexusPool {
 
         this.poolLock.lock(false);
         return new PairAmounts(amount0, amount1);
-    }
-
-    class SwapCache {
-        public SwapCache(
-            BigInteger liquidityStart, 
-            BigInteger blockTimestamp, 
-            int feeProtocol, 
-            BigInteger secondsPerLiquidityCumulativeX128, 
-            BigInteger tickCumulative, 
-            boolean computedLatestObservation
-        ) {
-            this.liquidityStart = liquidityStart;
-            this.blockTimestamp = blockTimestamp;
-            this.feeProtocol = feeProtocol;
-            this.secondsPerLiquidityCumulativeX128 = secondsPerLiquidityCumulativeX128;
-            this.tickCumulative = tickCumulative;
-            this.computedLatestObservation = computedLatestObservation;
-        }
-        // the protocol fee for the input token
-        int feeProtocol;
-        // liquidity at the beginning of the swap
-        BigInteger liquidityStart;
-        // the timestamp of the current block
-        BigInteger blockTimestamp;
-        // the current value of the tick accumulator, computed only if we cross an initialized tick
-        BigInteger tickCumulative;
-        // the current value of seconds per liquidity accumulator, computed only if we cross an initialized tick
-        BigInteger secondsPerLiquidityCumulativeX128;
-        // whether we've computed and cached the above two accumulators
-        boolean computedLatestObservation;
-    }
-
-    // the top level state of the swap, the results of which are recorded in storage at the end
-    class SwapState {
-        public SwapState(
-            BigInteger amountSpecifiedRemaining,
-            BigInteger amountCalculated,
-            BigInteger sqrtPriceX96,
-            int tick,
-            BigInteger feeGrowthGlobalX128,
-            BigInteger protocolFee,
-            BigInteger liquidity
-        ) {
-            this.amountSpecifiedRemaining = amountSpecifiedRemaining;
-            this.amountCalculated = amountCalculated;
-            this.sqrtPriceX96 = sqrtPriceX96;
-            this.tick = tick;
-            this.feeGrowthGlobalX128 = feeGrowthGlobalX128;
-            this.protocolFee = protocolFee;
-            this.liquidity = liquidity;
-        }
-        // the amount remaining to be swapped in/out of the input/output asset
-        BigInteger amountSpecifiedRemaining;
-        // the amount already swapped out/in of the output/input asset
-        BigInteger amountCalculated;
-        // current sqrt(price)
-        BigInteger sqrtPriceX96;
-        // the tick associated with the current price
-        int tick;
-        // the global fee growth of the input token
-        BigInteger feeGrowthGlobalX128;
-        // amount of input token paid as protocol fee
-        BigInteger protocolFee;
-        // the current liquidity in range
-        BigInteger liquidity;
-    }
-
-    class StepComputations {
-        // the price at the beginning of the step
-        BigInteger sqrtPriceStartX96;
-        // the next tick to swap to from the current tick in the swap direction
-        int tickNext;
-        // whether tickNext is initialized or not
-        boolean initialized;
-        // sqrt(price) for the next tick (1/0)
-        BigInteger sqrtPriceNextX96;
-        // how much is being swapped in in this step
-        BigInteger amountIn;
-        // how much is being swapped out
-        BigInteger amountOut;
-        // how much fee is being paid in
-        BigInteger feeAmount;
     }
 
     /**

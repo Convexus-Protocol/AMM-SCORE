@@ -24,7 +24,7 @@ import score.ObjectReader;
 import score.ObjectWriter;
 
 /// @notice the ordered list of target addresses for calls to be made
-class MethodCall {
+public class MethodCall {
   /// @notice The ordered list of values (i.e. msg.value) to be passed to the calls to be made
   public Address target;
   /// @notice The ordered list of function methods names to be called

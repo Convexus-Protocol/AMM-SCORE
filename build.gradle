@@ -66,10 +66,10 @@ task generateMergedReport(type: JacocoReport) {
         classDirectories.setFrom files(classDirectories.files.collect {
             fileTree(dir: it,
                     exclude: ['score/**',
-                              'exchange/equality/utils/**',
+                              'exchange/convexus/utils/**',
                               'com/iconloop/score/test/**',
-                              'exchange/equality/testtokens/**',
-                              'exchange/equality/testgauges/**',
+                              'exchange/convexus/testtokens/**',
+                              'exchange/convexus/testgauges/**',
                               'com/iconloop/score/util/**',
                               'com/iconloop/score/token/irc31/**',
                               'com/iconloop/score/token/irc3/**',

@@ -34,7 +34,7 @@ import org.junit.jupiter.api.Test;
 import exchange.convexus.factory.ConvexusFactoryUtils;
 import exchange.convexus.utils.AssertUtils;
 
-class SnapshotCumulativesInsideTest extends ConvexusPoolTest {
+public class SnapshotCumulativesInsideTest extends ConvexusPoolTest {
 
   final int TICK_SPACINGS[] = {10, 60, 200};
   final int FEE_AMOUNTS[] = {500, 3000, 10000};
@@ -108,7 +108,7 @@ class SnapshotCumulativesInsideTest extends ConvexusPoolTest {
 
   @Test
   void testIsZeroImmediatelyAfterInitialize () {
-    var result = (SnapshotCumulativesInsideResult) pool.call("snapshotCumulativesInside", tickLower, tickUpper);
+    var result = SnapshotCumulativesInsideResult.fromMap(pool.call("snapshotCumulativesInside", tickLower, tickUpper));
     assertEquals(ZERO, result.secondsPerLiquidityInsideX128);
     assertEquals(ZERO, result.tickCumulativeInside);
     assertEquals(ZERO, result.secondsInside);
@@ -117,7 +117,7 @@ class SnapshotCumulativesInsideTest extends ConvexusPoolTest {
   @Test
   void testIncreasesByExpectedAmountWhenTimeElapsesInTheRage () {
     sm.getBlock().increase(5);
-    var result = (SnapshotCumulativesInsideResult) pool.call("snapshotCumulativesInside", tickLower, tickUpper);
+    var result = SnapshotCumulativesInsideResult.fromMap(pool.call("snapshotCumulativesInside", tickLower, tickUpper));
     assertEquals(BigInteger.valueOf(5).shiftLeft(128).divide(TEN), result.secondsPerLiquidityInsideX128);
     assertEquals(ZERO, result.tickCumulativeInside);
     assertEquals(BigInteger.valueOf(5), result.secondsInside);
@@ -129,7 +129,7 @@ class SnapshotCumulativesInsideTest extends ConvexusPoolTest {
     swapToHigherPrice(alice, encodePriceSqrt(TWO, ONE), "2");
     sm.getBlock().increase(7);
     
-    var result = (SnapshotCumulativesInsideResult) pool.call("snapshotCumulativesInside", tickLower, tickUpper);
+    var result = SnapshotCumulativesInsideResult.fromMap(pool.call("snapshotCumulativesInside", tickLower, tickUpper));
     assertEquals(BigInteger.valueOf(5).shiftLeft(128).divide(TEN), result.secondsPerLiquidityInsideX128);
     assertEquals(ZERO, result.tickCumulativeInside);
     assertEquals(BigInteger.valueOf(5), result.secondsInside);
@@ -141,7 +141,7 @@ class SnapshotCumulativesInsideTest extends ConvexusPoolTest {
     swapToLowerPrice(alice, encodePriceSqrt(ONE, TWO), "2");
     sm.getBlock().increase(7);
     
-    var result = (SnapshotCumulativesInsideResult) pool.call("snapshotCumulativesInside", tickLower, tickUpper);
+    var result = SnapshotCumulativesInsideResult.fromMap(pool.call("snapshotCumulativesInside", tickLower, tickUpper));
     assertEquals(BigInteger.valueOf(5).shiftLeft(128).divide(TEN), result.secondsPerLiquidityInsideX128);
     // tick is 0 for 5 seconds, then not in range
     assertEquals(ZERO, result.tickCumulativeInside);
@@ -155,7 +155,7 @@ class SnapshotCumulativesInsideTest extends ConvexusPoolTest {
     swapToHigherPrice(alice, encodePriceSqrt(ONE, ONE), "2");
     sm.getBlock().increase(7);
     
-    var result = (SnapshotCumulativesInsideResult) pool.call("snapshotCumulativesInside", tickLower, tickUpper);
+    var result = SnapshotCumulativesInsideResult.fromMap(pool.call("snapshotCumulativesInside", tickLower, tickUpper));
     assertEquals(BigInteger.valueOf(7).shiftLeft(128).divide(TEN), result.secondsPerLiquidityInsideX128);
     // tick is not in range then tick is 0 for 7 seconds
     assertEquals(ZERO, result.tickCumulativeInside);
@@ -169,9 +169,9 @@ class SnapshotCumulativesInsideTest extends ConvexusPoolTest {
     swapToLowerPrice(alice, encodePriceSqrt(ONE, ONE), "2");
     sm.getBlock().increase(7);
     
-    var result = (SnapshotCumulativesInsideResult) pool.call("snapshotCumulativesInside", tickLower, tickUpper);
+    var result = SnapshotCumulativesInsideResult.fromMap(pool.call("snapshotCumulativesInside", tickLower, tickUpper));
     assertEquals(BigInteger.valueOf(7).shiftLeft(128).divide(TEN), result.secondsPerLiquidityInsideX128);
-    var slot0 = (Slot0) pool.call("slot0");
+    var slot0 = Slot0.fromMap(pool.call("slot0"));
     // justify the -7 tick cumulative inside value
     assertEquals(-1, slot0.tick);
     assertEquals(BigInteger.valueOf(-7), result.tickCumulativeInside);
@@ -185,7 +185,7 @@ class SnapshotCumulativesInsideTest extends ConvexusPoolTest {
     swapToHigherPrice(alice, encodePriceSqrt(TWO, ONE), "10");
     sm.getBlock().increase(8);
 
-    var result = (SnapshotCumulativesInsideResult) pool.call("snapshotCumulativesInside", tickUpper, getMaxTick(tickSpacing));
+    var result = SnapshotCumulativesInsideResult.fromMap(pool.call("snapshotCumulativesInside", tickUpper, getMaxTick(tickSpacing)));
     assertEquals(BigInteger.valueOf(8).shiftLeft(128).divide(BigInteger.valueOf(15)), result.secondsPerLiquidityInsideX128);
     // the tick of 2/1 is 6931
     // 8 seconds * 6931 = 55448
@@ -200,7 +200,7 @@ class SnapshotCumulativesInsideTest extends ConvexusPoolTest {
     swapToHigherPrice(alice, encodePriceSqrt(TWO, ONE), "10");
     sm.getBlock().increase(8);
     
-    var result = (SnapshotCumulativesInsideResult) pool.call("snapshotCumulativesInside", tickLower, tickUpper);
+    var result = SnapshotCumulativesInsideResult.fromMap(pool.call("snapshotCumulativesInside", tickLower, tickUpper));
     assertEquals(BigInteger.valueOf(5).shiftLeft(128).divide(BigInteger.valueOf(25)), result.secondsPerLiquidityInsideX128);
     assertEquals(BigInteger.valueOf(0), result.tickCumulativeInside);
     assertEquals(BigInteger.valueOf(5), result.secondsInside);
@@ -211,14 +211,14 @@ class SnapshotCumulativesInsideTest extends ConvexusPoolTest {
     sm.getBlock().increase(5);
     mint(alice, getMinTick(tickSpacing), tickLower, BigInteger.valueOf(15), "0", "15");
 
-    var start = (SnapshotCumulativesInsideResult) pool.call("snapshotCumulativesInside", getMinTick(tickSpacing), tickLower);
+    var start = SnapshotCumulativesInsideResult.fromMap(pool.call("snapshotCumulativesInside", getMinTick(tickSpacing), tickLower));
     sm.getBlock().increase(8);
     
     // 13 seconds in starting range, then 3 seconds in newly minted range
     swapToLowerPrice(alice, encodePriceSqrt(ONE, TWO), "10");
     sm.getBlock().increase(3);
     
-    var result = (SnapshotCumulativesInsideResult) pool.call("snapshotCumulativesInside", getMinTick(tickSpacing), tickLower);
+    var result = SnapshotCumulativesInsideResult.fromMap(pool.call("snapshotCumulativesInside", getMinTick(tickSpacing), tickLower));
 
     BigInteger expectedDiffSecondsPerLiquidity = BigInteger.valueOf(3).shiftLeft(128).divide(BigInteger.valueOf(15));
     assertEquals(expectedDiffSecondsPerLiquidity, result.secondsPerLiquidityInsideX128.subtract(start.secondsPerLiquidityInsideX128));

@@ -113,7 +113,7 @@ public class Position {
             }
         }
 
-        public static Info fromCall(Object call) {
+        public static Info fromMap(Object call) {
             @SuppressWarnings("unchecked")
             Map<String,Object> map = (Map<String,Object>) call;
             return new Info(

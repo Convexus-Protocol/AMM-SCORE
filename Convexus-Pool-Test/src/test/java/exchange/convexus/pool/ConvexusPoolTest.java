@@ -90,14 +90,6 @@ public class ConvexusPoolTest extends ConvexusTest {
     return new ScoreSpy<ConvexusPoolMock>(score, spy);
   }
 
-  protected int getMinTick(int tickSpacing) {
-    return ((int) Math.ceil(-887272 / tickSpacing)) * tickSpacing;
-  }
-
-  protected int getMaxTick(int tickSpacing) {
-    return ((int) Math.floor(887272 / tickSpacing)) * tickSpacing;
-  }
-
   protected void assertObservationEquals(Observation expected, Observation actual) {
     assertEquals(expected.initialized, actual.initialized);
     assertEquals(expected.tickCumulative, actual.tickCumulative);
@@ -221,7 +213,7 @@ public class ConvexusPoolTest extends ConvexusTest {
   }
   
   protected Position.Info positions (Account account, int minTick, int maxTick) {
-    return (Position.Info) pool.call("positions", Positions.getKey(account.getAddress(), minTick, maxTick));
+    return Position.Info.fromMap(pool.call("positions", Positions.getKey(account.getAddress(), minTick, maxTick)));
   }
 
   protected void setFeeGrowthGlobal0X128(BigInteger _feeGrowthGlobal0X128) {
@@ -230,15 +222,6 @@ public class ConvexusPoolTest extends ConvexusTest {
 
   protected void setFeeGrowthGlobal1X128(BigInteger _feeGrowthGlobal1X128) {
     pool.invoke(owner, "setFeeGrowthGlobal1X128", _feeGrowthGlobal1X128);
-  }
-  
-  class Fees {
-    public Fees(BigInteger token0Fees, BigInteger token1Fees) {
-      this.token0Fees = token0Fees;
-      this.token1Fees = token1Fees;
-    }
-    public BigInteger token0Fees;
-    public BigInteger token1Fees;
   }
   
   protected Fees collectGetFeesOwed (int minTick, int maxTick) {

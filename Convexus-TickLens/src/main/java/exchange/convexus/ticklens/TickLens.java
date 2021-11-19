@@ -23,22 +23,6 @@ import score.Address;
 import score.Context;
 import score.annotation.External;
 
-class PopulatedTick {
-    int tick;
-    BigInteger liquidityNet;
-    BigInteger liquidityGross;
-
-    public PopulatedTick (
-        int tick,
-        BigInteger liquidityNet,
-        BigInteger liquidityGross
-    ) {
-        this.tick = tick;
-        this.liquidityNet = liquidityNet;
-        this.liquidityGross = liquidityGross;
-    }
-}
-
 /**
  * @title Creates and initializes Convexus Pools
  */

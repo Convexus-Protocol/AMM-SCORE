@@ -32,7 +32,7 @@ import org.junit.jupiter.api.Test;
 import exchange.convexus.factory.ConvexusFactoryUtils;
 import exchange.convexus.utils.AssertUtils;
 
-class TickSpacingTest extends ConvexusPoolTest {
+public class TickSpacingTest extends ConvexusPoolTest {
 
   final int TICK_SPACINGS[] = {10, 60, 200};
   final int FEE_AMOUNTS[] = {500, 3000, 10000};
@@ -91,7 +91,7 @@ class TickSpacingTest extends ConvexusPoolTest {
     verifyNoInteractions(sicx.spy);
     verifyNoInteractions(usdc.spy);
 
-    Slot0 slot0 = (Slot0) pool.call("slot0");
+    var slot0 = Slot0.fromMap(pool.call("slot0"));
     assertEquals(slot0.tick, 120196);
   }
 
@@ -110,7 +110,7 @@ class TickSpacingTest extends ConvexusPoolTest {
     verifyNoInteractions(sicx.spy);
     verifyNoInteractions(usdc.spy);
 
-    Slot0 slot0 = (Slot0) pool.call("slot0");
+    var slot0 = Slot0.fromMap(pool.call("slot0"));
     assertEquals(slot0.tick, -120197);
   }
 }

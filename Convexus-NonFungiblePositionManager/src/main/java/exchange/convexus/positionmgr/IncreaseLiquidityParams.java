@@ -18,11 +18,13 @@ package exchange.convexus.positionmgr;
 
 import java.math.BigInteger;
 
-class IncreaseLiquidityParams {
-    BigInteger tokenId;
-    BigInteger amount0Desired;
-    BigInteger amount1Desired;
-    BigInteger amount0Min;
-    BigInteger amount1Min;
-    BigInteger deadline;
+public class IncreaseLiquidityParams {
+    public BigInteger tokenId;
+    public BigInteger amount0Desired;
+    public BigInteger amount1Desired;
+    public BigInteger amount0Min;
+    public BigInteger amount1Min;
+    public BigInteger deadline;
+
+    public IncreaseLiquidityParams () {}
 }

@@ -39,12 +39,6 @@ import score.VarDB;
 import score.annotation.External;
 import scorex.util.StringTokenizer;
 
-class ConvexusSwapCallbackException extends Exception {
-    ConvexusSwapCallbackException (String error) {
-        super(error);
-    }
-}
-
 /**
  * @title Provides quotes for swaps
  * @notice Allows getting the expected amount out or amount in for a given swap without executing the swap
@@ -143,21 +137,6 @@ public class Quoter {
         }
     }
 
-    class RevertReason {
-        public BigInteger amount;
-        public BigInteger sqrtPriceX96After;
-        public int tickAfter;
-        public RevertReason (
-            BigInteger amount,
-            BigInteger sqrtPriceX96After,
-            int tickAfter
-        ) {
-            this.amount = amount;
-            this.sqrtPriceX96After = sqrtPriceX96After;
-            this.tickAfter = tickAfter;
-        }
-    }
-
     /**
      * @dev Parses a revert reason that should contain the numeric quote
      */
@@ -167,38 +146,6 @@ public class Quoter {
         BigInteger sqrtPriceX96After = StringUtils.toBigInt(scanner.nextToken());
         int tickAfter = StringUtils.toBigInt(scanner.nextToken()).intValue();
         return new RevertReason(amountReceived, sqrtPriceX96After, tickAfter);
-    }
-
-    class QuoteResult {
-        public BigInteger amount;
-        public BigInteger sqrtPriceX96After;
-        public int initializedTicksCrossed;
-
-        public QuoteResult(
-            BigInteger amount,
-            BigInteger sqrtPriceX96After,
-            int initializedTicksCrossed
-        ) {
-            this.amount = amount;
-            this.sqrtPriceX96After = sqrtPriceX96After;
-            this.initializedTicksCrossed = initializedTicksCrossed;
-        }
-    }
-
-    class QuoteMultiResult {
-        public BigInteger amount;
-        public BigInteger[] sqrtPriceX96AfterList;
-        public int[] initializedTicksCrossedList;
-
-        public QuoteMultiResult(
-            BigInteger amount,
-            BigInteger[] sqrtPriceX96AfterList,
-            int[] initializedTicksCrossedList
-        ) {
-            this.amount = amount;
-            this.sqrtPriceX96AfterList = sqrtPriceX96AfterList;
-            this.initializedTicksCrossedList = initializedTicksCrossedList;
-        }
     }
 
     private QuoteResult handleRevert (
@@ -307,33 +254,6 @@ public class Quoter {
         return bits;
     }
 
-    class QuoteExactInputSingleParams {
-        // The token being swapped in
-        public Address tokenIn;
-        // The token being swapped out
-        public Address tokenOut;
-        // The desired input amount
-        public BigInteger amountIn;
-        // The fee of the token pool to consider for the pair
-        public int fee;
-        // The price limit of the pool that cannot be exceeded by the swap
-        public BigInteger sqrtPriceLimitX96;
-
-        public QuoteExactInputSingleParams (
-            Address tokenIn,
-            Address tokenOut,
-            BigInteger amountIn,
-            int fee,
-            BigInteger sqrtPriceLimitX96
-        ) {
-            this.tokenIn = tokenIn;
-            this.tokenOut = tokenOut;
-            this.amountIn = amountIn;
-            this.fee = fee;
-            this.sqrtPriceLimitX96 = sqrtPriceLimitX96;
-        }
-    }
-
     /**
      * @notice Returns the amount out received for a given exact input but for a swap of a single pool
      * @param params The params for the quote, encoded as `QuoteExactInputSingleParams`
@@ -416,33 +336,6 @@ public class Quoter {
             } else {
                 return new QuoteMultiResult(amountIn, sqrtPriceX96AfterList, initializedTicksCrossedList);
             }
-        }
-    }
-
-    class QuoteExactOutputSingleParams {
-        // The token being swapped in
-        public Address tokenIn;
-        // The token being swapped out
-        public Address tokenOut;
-        // The desired output amount
-        public BigInteger amount;
-        // The fee of the token pool to consider for the pair
-        public int fee;
-        // The price limit of the pool that cannot be exceeded by the swap
-        public BigInteger sqrtPriceLimitX96;
-
-        public QuoteExactOutputSingleParams (
-            Address tokenIn,
-            Address tokenOut,
-            BigInteger amount,
-            int fee,
-            BigInteger sqrtPriceLimitX96
-        ) {
-            this.tokenIn = tokenIn;
-            this.tokenOut = tokenOut;
-            this.amount = amount;
-            this.fee = fee;
-            this.sqrtPriceLimitX96 = sqrtPriceLimitX96;
         }
     }
 

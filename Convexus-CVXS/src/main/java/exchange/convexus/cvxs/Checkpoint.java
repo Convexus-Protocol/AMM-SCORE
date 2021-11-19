@@ -24,7 +24,7 @@ import score.ObjectReader;
 import score.ObjectWriter;
 
 /// A checkpoint for marking number of votes from a given block
-class Checkpoint {
+public class Checkpoint {
     public long fromBlock;
     public BigInteger votes;
 

@@ -9,9 +9,8 @@ out
 *.jar
 !gradle/wrapper/gradle-wrapper.jar
 
-config/equality/gangnam
-config/equality/mainnet
-config/equality/yeouido
+config/keystores
+!config/keystores/localhost
 
 testsvc/
 

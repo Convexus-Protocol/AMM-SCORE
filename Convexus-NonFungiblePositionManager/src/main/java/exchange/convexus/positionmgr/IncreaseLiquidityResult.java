@@ -18,7 +18,7 @@ package exchange.convexus.positionmgr;
 
 import java.math.BigInteger;
 
-class IncreaseLiquidityResult {
+public class IncreaseLiquidityResult {
     
     public BigInteger liquidity;
     public BigInteger amount0;

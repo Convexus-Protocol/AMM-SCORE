@@ -92,7 +92,7 @@ public class LimitOrderTest extends ConvexusPoolTest {
       new BigInteger("6035841794200767"), 
       "collect".getBytes());
     
-    assertTrue(((Slot0) pool.call("slot0")).tick >= 120);
+    assertTrue(Slot0.fromMap(pool.call("slot0")).tick >= 120);
   }
 
   @Test
@@ -126,6 +126,6 @@ public class LimitOrderTest extends ConvexusPoolTest {
       new BigInteger("6035841794200767"), 
       "collect".getBytes());
       
-    assertTrue(((Slot0) pool.call("slot0")).tick < -120);
+      assertTrue(Slot0.fromMap(pool.call("slot0")).tick < -120);
   }
 }

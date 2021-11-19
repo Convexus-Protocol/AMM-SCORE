@@ -8,7 +8,7 @@ import score.ObjectReader;
 import score.ObjectWriter;
 
 // fee2 and fee3 are the two other fees associated with the two other pools of token0 and token1
-class FlashCallbackData {
+public class FlashCallbackData {
     BigInteger amount0;
     BigInteger amount1;
     Address payer;

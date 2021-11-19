@@ -206,7 +206,7 @@ public class NonFungiblePositionManager extends IRC721 {
         this._mint(params.recipient, tokenId);
 
         var positionKey = Positions.getKey(Context.getAddress(), params.tickLower, params.tickUpper);
-        var poolPos = Position.Info.fromCall(Context.call(pool, "positions", positionKey));
+        var poolPos = Position.Info.fromMap(Context.call(pool, "positions", positionKey));
         
         // idempotent set
         BigInteger poolId = cachePoolKey(pool, PoolAddress.getPoolKey(params.token0, params.token1, params.fee));
@@ -275,7 +275,7 @@ public class NonFungiblePositionManager extends IRC721 {
         var positionKey = Positions.getKey(Context.getAddress(), positionStorage.tickLower, positionStorage.tickUpper);
 
         // this is now updated to the current transaction
-        var poolPos = Position.Info.fromCall(Context.call(pool, "positions", positionKey));
+        var poolPos = Position.Info.fromMap(Context.call(pool, "positions", positionKey));
 
         BigInteger feeGrowthInside0LastX128 = poolPos.feeGrowthInside0LastX128;
         BigInteger feeGrowthInside1LastX128 = poolPos.feeGrowthInside1LastX128;
@@ -333,7 +333,7 @@ public class NonFungiblePositionManager extends IRC721 {
 
         var positionKey = Positions.getKey(Context.getAddress(), positionStorage.tickLower, positionStorage.tickUpper);
         // this is now updated to the current transaction
-        var poolPos = Position.Info.fromCall(Context.call(pool, "positions", positionKey));
+        var poolPos = Position.Info.fromMap(Context.call(pool, "positions", positionKey));
 
         BigInteger feeGrowthInside0LastX128 = poolPos.feeGrowthInside0LastX128;
         BigInteger feeGrowthInside1LastX128 = poolPos.feeGrowthInside1LastX128;
@@ -375,7 +375,7 @@ public class NonFungiblePositionManager extends IRC721 {
         if (positionStorage.liquidity.compareTo(ZERO) > 0) {
             Context.call(pool, "burn", positionStorage.tickLower, positionStorage.tickUpper, ZERO);
             var positionKey = Positions.getKey(Context.getAddress(), positionStorage.tickLower, positionStorage.tickUpper);
-            var poolPos = Position.Info.fromCall(Context.call(pool, "positions", positionKey));
+            var poolPos = Position.Info.fromMap(Context.call(pool, "positions", positionKey));
             BigInteger feeGrowthInside0LastX128 = poolPos.feeGrowthInside0LastX128;
             BigInteger feeGrowthInside1LastX128 = poolPos.feeGrowthInside1LastX128;
 

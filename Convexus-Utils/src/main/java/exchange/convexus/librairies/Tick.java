@@ -17,6 +17,7 @@
 package exchange.convexus.librairies;
 
 import java.math.BigInteger;
+import java.util.Map;
 
 import score.ObjectReader;
 import score.ObjectWriter;
@@ -93,6 +94,21 @@ public class Tick {
           r.readBigInteger(), // secondsPerLiquidityOutsideX128
           r.readBigInteger(), // secondsOutside
           r.readBoolean()  // initialized
+        );
+      }
+
+      public static Info fromMap(Object call) {
+        @SuppressWarnings("unchecked")
+        Map<String,Object> map = (Map<String,Object>) call;
+        return new Info(
+          (BigInteger) map.get("liquidityGross"), 
+          (BigInteger) map.get("liquidityNet"), 
+          (BigInteger) map.get("feeGrowthOutside0X128"), 
+          (BigInteger) map.get("feeGrowthOutside1X128"), 
+          (BigInteger) map.get("tickCumulativeOutside"), 
+          (BigInteger) map.get("secondsPerLiquidityOutsideX128"), 
+          (BigInteger) map.get("secondsOutside"), 
+          (Boolean) map.get("initialized")
         );
       }
     }

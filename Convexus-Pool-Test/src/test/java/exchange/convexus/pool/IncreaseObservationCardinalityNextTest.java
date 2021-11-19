@@ -93,7 +93,7 @@ public class IncreaseObservationCardinalityNextTest extends ConvexusPoolTest {
     pool.invoke(alice, "initialize", encodePriceSqrt(ONE, ONE));
     pool.invoke(alice, "increaseObservationCardinalityNext", 3);
     pool.invoke(alice, "increaseObservationCardinalityNext", 2);
-    Slot0 slot0 = (Slot0) pool.call("slot0");
+    var slot0 = Slot0.fromMap(pool.call("slot0"));
     assertEquals(3, slot0.observationCardinalityNext);
   }
 
@@ -101,7 +101,7 @@ public class IncreaseObservationCardinalityNextTest extends ConvexusPoolTest {
   void testIncreasesCardinalityAndNextFirstTime () {
     pool.invoke(alice, "initialize", encodePriceSqrt(ONE, ONE));
     pool.invoke(alice, "increaseObservationCardinalityNext", 2);
-    Slot0 slot0 = (Slot0) pool.call("slot0");
+    var slot0 = Slot0.fromMap(pool.call("slot0"));
     assertEquals(1, slot0.observationCardinality);
     assertEquals(2, slot0.observationCardinalityNext);
   }
@@ -109,13 +109,13 @@ public class IncreaseObservationCardinalityNextTest extends ConvexusPoolTest {
   @Test
   void testOracleStartingStateAfterInitialization () {
     pool.invoke(alice, "initialize", encodePriceSqrt(ONE, ONE));
-    var slot0 = (Slot0) pool.call("slot0");
+    var slot0 = Slot0.fromMap(pool.call("slot0"));
 
     assertEquals(1, slot0.observationCardinality);
     assertEquals(0, slot0.observationIndex);
     assertEquals(1, slot0.observationCardinalityNext);
 
-    var observation = (Observation) pool.call("observations", 0);
+    var observation = Observation.fromMap(pool.call("observations", 0));
 
     assertEquals(ZERO, observation.secondsPerLiquidityCumulativeX128);
     assertEquals(ZERO, observation.tickCumulative);
@@ -128,7 +128,7 @@ public class IncreaseObservationCardinalityNextTest extends ConvexusPoolTest {
     pool.invoke(alice, "initialize", encodePriceSqrt(ONE, ONE));
     pool.invoke(alice, "increaseObservationCardinalityNext", 2);
 
-    var slot0 = (Slot0) pool.call("slot0");
+    var slot0 = Slot0.fromMap(pool.call("slot0"));
 
     assertEquals(1, slot0.observationCardinality);
     assertEquals(0, slot0.observationIndex);
@@ -141,7 +141,7 @@ public class IncreaseObservationCardinalityNextTest extends ConvexusPoolTest {
     pool.invoke(alice, "increaseObservationCardinalityNext", 5);
     pool.invoke(alice, "increaseObservationCardinalityNext", 3);
     
-    var slot0 = (Slot0) pool.call("slot0");
+    var slot0 = Slot0.fromMap(pool.call("slot0"));
 
     assertEquals(1, slot0.observationCardinality);
     assertEquals(0, slot0.observationIndex);

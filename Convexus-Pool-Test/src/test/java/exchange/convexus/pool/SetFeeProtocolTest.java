@@ -29,7 +29,7 @@ import org.junit.jupiter.api.Test;
 import exchange.convexus.factory.ConvexusFactoryUtils;
 import exchange.convexus.utils.AssertUtils;
 
-class SetFeeProtocolTest extends ConvexusPoolTest {
+public class SetFeeProtocolTest extends ConvexusPoolTest {
 
   final int TICK_SPACINGS[] = {10, 60, 200};
   final int FEE_AMOUNTS[] = {500, 3000, 10000};
@@ -112,7 +112,7 @@ class SetFeeProtocolTest extends ConvexusPoolTest {
   void testSetsProtocolFee () {
     pool.invoke(owner, "setFeeProtocol", 7, 7);
     
-    var slot0 = (Slot0) pool.call("slot0");
+    var slot0 = Slot0.fromMap(pool.call("slot0"));
     assertEquals(119, slot0.feeProtocol);
   }
 
@@ -121,7 +121,7 @@ class SetFeeProtocolTest extends ConvexusPoolTest {
     pool.invoke(owner, "setFeeProtocol", 7, 7);
     pool.invoke(owner, "setFeeProtocol", 5, 8);
 
-    var slot0 = (Slot0) pool.call("slot0");
+    var slot0 = Slot0.fromMap(pool.call("slot0"));
     assertEquals(133, slot0.feeProtocol);
   }
 
@@ -129,7 +129,7 @@ class SetFeeProtocolTest extends ConvexusPoolTest {
   void testCanTurnOffProtocolFee () {
     pool.invoke(owner, "setFeeProtocol", 4, 4);
     pool.invoke(owner, "setFeeProtocol", 0, 0);
-    var slot0 = (Slot0) pool.call("slot0");
+    var slot0 = Slot0.fromMap(pool.call("slot0"));
     assertEquals(0, slot0.feeProtocol);
   }
 

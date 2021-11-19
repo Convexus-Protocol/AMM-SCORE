@@ -177,15 +177,19 @@ public class ConvexusStaker {
         Context.require(key.startTime.subtract(now).compareTo(maxIncentiveStartLeadTime) <= 0,
             "createIncentive: start time too far into future");
 
+        Context.println("key.startTime = " + key.startTime);
+        Context.println("key.endTime = " + key.endTime);
         Context.require(key.startTime.compareTo(key.endTime) < 0,
             "createIncentive: start time must be before end time");
 
+        Context.println("key.endTime.subtract(key.startTime) = " + key.endTime.subtract(key.startTime));
+        Context.println("maxIncentiveDuration = " + maxIncentiveDuration);
         Context.require(key.endTime.subtract(key.startTime).compareTo(maxIncentiveDuration) <= 0,
             "createIncentive: incentive duration is too long");
 
         byte[] incentiveId = IncentiveId.compute(key);
 
-        var incentive = this.incentives.get(incentiveId);
+        var incentive = this.incentives.getOrDefault(incentiveId, Incentive.empty());
         incentive.totalRewardUnclaimed = incentive.totalRewardUnclaimed.add(reward);
         this.incentives.set(incentiveId, incentive);
 
@@ -204,7 +208,7 @@ public class ConvexusStaker {
             "endIncentive: cannot end incentive before end time");
 
         byte[] incentiveId = IncentiveId.compute(key);
-        Incentive incentiveStorage = this.incentives.get(incentiveId);
+        Incentive incentiveStorage = this.incentives.getOrDefault(incentiveId, Incentive.empty());
 
         BigInteger refund = incentiveStorage.totalRewardUnclaimed;
         Context.require(refund.compareTo(ZERO) > 0,
@@ -507,7 +511,7 @@ public class ConvexusStaker {
                     token, // the reward token is the one sent
                     Address.fromString(params.get("pool").asString()),
                     StringUtils.toBigInt(params.get("startTime").asString()),
-                    StringUtils.toBigInt(params.get("startTime").asString()),
+                    StringUtils.toBigInt(params.get("endTime").asString()),
                     Address.fromString(params.get("refundee").asString())
                   );
                 BigInteger reward = _value;

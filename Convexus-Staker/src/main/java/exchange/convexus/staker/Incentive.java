@@ -16,12 +16,27 @@
 
 package exchange.convexus.staker;
 
+import static java.math.BigInteger.ZERO;
+
 import java.math.BigInteger;
 
 /// @notice Represents a staking incentive
 public class Incentive {
-    BigInteger totalRewardUnclaimed;
-    BigInteger totalSecondsClaimedX128;
-    BigInteger numberOfStakes;
-    public Incentive () {}
+    public BigInteger totalRewardUnclaimed;
+    public BigInteger totalSecondsClaimedX128;
+    public BigInteger numberOfStakes;
+
+    public Incentive (
+        BigInteger totalRewardUnclaimed,
+        BigInteger totalSecondsClaimedX128,
+        BigInteger numberOfStakes
+    ) {
+        this.totalRewardUnclaimed = totalRewardUnclaimed;
+        this.totalSecondsClaimedX128 = totalSecondsClaimedX128;
+        this.numberOfStakes = numberOfStakes;
+    }
+
+    public static Incentive empty() {
+      return new Incentive(ZERO, ZERO, ZERO);
+    }
 }

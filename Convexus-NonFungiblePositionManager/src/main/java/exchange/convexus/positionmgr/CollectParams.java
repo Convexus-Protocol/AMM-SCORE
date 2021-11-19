@@ -21,8 +21,10 @@ import java.math.BigInteger;
 import score.Address;
 
 public class CollectParams {
-    BigInteger tokenId;
-    Address recipient;
-    BigInteger amount0Max;
-    BigInteger amount1Max;
+    public BigInteger tokenId;
+    public Address recipient;
+    public BigInteger amount0Max;
+    public BigInteger amount1Max;
+
+    public CollectParams() {}
 }

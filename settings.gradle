@@ -27,6 +27,7 @@ include (
     'Convexus-CVXS',
     'Convexus-CVXS-Test',
     'Convexus-Staker',
+    'Convexus-Staker-Test',
     'Convexus-Tests',
     'Convexus-Utils',
     'javaee-tokens',

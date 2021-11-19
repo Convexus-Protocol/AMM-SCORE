@@ -35,7 +35,7 @@ import exchange.convexus.librairies.Positions;
 import exchange.convexus.utils.AssertUtils;
 import exchange.convexus.utils.IntUtils;
 
-class FeeProtocolTest extends ConvexusPoolTest {
+public class FeeProtocolTest extends ConvexusPoolTest {
 
   final int TICK_SPACINGS[] = {10, 60, 200};
   final int FEE_AMOUNTS[] = {500, 3000, 10000};
@@ -66,14 +66,14 @@ class FeeProtocolTest extends ConvexusPoolTest {
 
   @Test
   void testInitiallySetTo0 () {
-    Slot0 slot0 = (Slot0) pool.call("slot0");
+    var slot0 = Slot0.fromMap(pool.call("slot0"));
     assertEquals(slot0.feeProtocol, 0);
   }
 
   @Test
   void testCanBeChangedByTheOwner () {
     pool.invoke(owner, "setFeeProtocol", 6, 6);
-    Slot0 slot0 = (Slot0) pool.call("slot0");
+    var slot0 = Slot0.fromMap(pool.call("slot0"));
     assertEquals(slot0.feeProtocol, 102);
   }
 
@@ -110,17 +110,17 @@ class FeeProtocolTest extends ConvexusPoolTest {
   @Test
   void testSwapFeesAccumulateAsExpected0For1 () {
     doSwap(minTick, maxTick, expandTo18Decimals(1), true, true);
-    var position = (Position.Info) pool.call("positions", Positions.getKey(alice.getAddress(), minTick, maxTick));
+    var position = Position.Info.fromMap(pool.call("positions", Positions.getKey(alice.getAddress(), minTick, maxTick)));
     assertEquals(new BigInteger("499999999999999"), position.tokensOwed0);
     assertEquals(new BigInteger("0"), position.tokensOwed1);
 
     doSwap(minTick, maxTick, expandTo18Decimals(1), true, true);
-    position = (Position.Info) pool.call("positions", Positions.getKey(alice.getAddress(), minTick, maxTick));
+    position = Position.Info.fromMap(pool.call("positions", Positions.getKey(alice.getAddress(), minTick, maxTick)));
     assertEquals(new BigInteger("999999999999998"), position.tokensOwed0);
     assertEquals(new BigInteger("0"), position.tokensOwed1);
 
     doSwap(minTick, maxTick, expandTo18Decimals(1), true, true);
-    position = (Position.Info) pool.call("positions", Positions.getKey(alice.getAddress(), minTick, maxTick));
+    position = Position.Info.fromMap(pool.call("positions", Positions.getKey(alice.getAddress(), minTick, maxTick)));
     assertEquals(new BigInteger("1499999999999997"), position.tokensOwed0);
     assertEquals(new BigInteger("0"), position.tokensOwed1);
   }
@@ -128,17 +128,17 @@ class FeeProtocolTest extends ConvexusPoolTest {
   @Test
   void testSwapFeesAccumulateAsExpected1For0 () {
     doSwap(minTick, maxTick, expandTo18Decimals(1), false, true);
-    var position = (Position.Info) pool.call("positions", Positions.getKey(alice.getAddress(), minTick, maxTick));
+    var position = Position.Info.fromMap(pool.call("positions", Positions.getKey(alice.getAddress(), minTick, maxTick)));
     assertEquals(new BigInteger("0"), position.tokensOwed0);
     assertEquals(new BigInteger("499999999999999"), position.tokensOwed1);
 
     doSwap(minTick, maxTick, expandTo18Decimals(1), false, true);
-    position = (Position.Info) pool.call("positions", Positions.getKey(alice.getAddress(), minTick, maxTick));
+    position = Position.Info.fromMap(pool.call("positions", Positions.getKey(alice.getAddress(), minTick, maxTick)));
     assertEquals(new BigInteger("0"), position.tokensOwed0);
     assertEquals(new BigInteger("999999999999998"), position.tokensOwed1);
 
     doSwap(minTick, maxTick, expandTo18Decimals(1), false, true);
-    position = (Position.Info) pool.call("positions", Positions.getKey(alice.getAddress(), minTick, maxTick));
+    position = Position.Info.fromMap(pool.call("positions", Positions.getKey(alice.getAddress(), minTick, maxTick)));
     assertEquals(new BigInteger("0"), position.tokensOwed0);
     assertEquals(new BigInteger("1499999999999997"), position.tokensOwed1);
   }
@@ -187,17 +187,17 @@ class FeeProtocolTest extends ConvexusPoolTest {
     assertEquals(fees.token0Fees, ZERO);
     assertEquals(fees.token1Fees, ZERO);
 
-    var protocolFees = (ProtocolFees) pool.call("protocolFees");
+    var protocolFees = ProtocolFees.fromMap(pool.call("protocolFees"));
     assertEquals(new BigInteger("166666666666666"), protocolFees.token0);
     assertEquals(ZERO, protocolFees.token1);
-    
+
     burn(minTick, maxTick, ZERO); // poke to update fees
-    
+
     reset(sicx.spy);
     pool.invoke(alice, "collect", alice.getAddress(), minTick, maxTick, IntUtils.MAX_UINT128, IntUtils.MAX_UINT128);
     verify(sicx.spy).Transfer(pool.getAddress(), alice.getAddress(), new BigInteger ("416666666666666"), "collect".getBytes());
 
-    protocolFees = (ProtocolFees) pool.call("protocolFees");
+    protocolFees = ProtocolFees.fromMap(pool.call("protocolFees"));
     assertEquals(new BigInteger("166666666666666"), protocolFees.token0);
     assertEquals(ZERO, protocolFees.token1);
   }
