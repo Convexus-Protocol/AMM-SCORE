@@ -18,7 +18,6 @@ package exchange.convexus.governor;
 
 import exchange.convexus.utils.ConvexusTest;
 import exchange.convexus.utils.ScoreSpy;
-import score.Context;
 
 public class ConvexusGovernorTest extends ConvexusTest {
 

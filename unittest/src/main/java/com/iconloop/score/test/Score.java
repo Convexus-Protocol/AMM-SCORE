@@ -17,10 +17,8 @@
 package com.iconloop.score.test;
 
 import score.Address;
-import score.Context;
 
 import java.lang.reflect.Array;
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigInteger;
 import java.util.HashMap;
