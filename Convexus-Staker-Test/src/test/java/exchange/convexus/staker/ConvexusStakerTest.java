@@ -45,7 +45,6 @@ import exchange.convexus.utils.ConvexusTest;
 import exchange.convexus.utils.IntUtils;
 import exchange.convexus.utils.ScoreSpy;
 import exchange.convexus.utils.TimeUtils;
-import score.Context;
 
 public class ConvexusStakerTest extends ConvexusTest {
 
