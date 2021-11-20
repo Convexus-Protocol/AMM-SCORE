@@ -20,19 +20,24 @@ import static exchange.convexus.utils.TimeUtils.ONE_SECOND;
 import static java.math.BigInteger.ONE;
 import static java.math.BigInteger.TWO;
 import static java.math.BigInteger.ZERO;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.verify;
 
 import java.math.BigInteger;
 
 import com.iconloop.score.test.Account;
 import com.iconloop.score.test.Score;
 
+import org.mockito.ArgumentCaptor;
+
 import exchange.convexus.factory.ConvexusFactory;
 import exchange.convexus.factory.ConvexusFactoryUtils;
+import exchange.convexus.liquidity.ConvexusLiquidity;
 import exchange.convexus.pool.ConvexusPool;
 import exchange.convexus.positiondescriptor.NonfungibleTokenPositionDescriptor;
 import exchange.convexus.positionmgr.MintParams;
 import exchange.convexus.positionmgr.NonFungiblePositionManager;
+import exchange.convexus.staker.pools.Pool01;
+import exchange.convexus.staker.pools.Pool12;
 import exchange.convexus.testtokens.RewardToken;
 import exchange.convexus.testtokens.Sicx;
 import exchange.convexus.testtokens.Usdc;
@@ -40,6 +45,7 @@ import exchange.convexus.utils.ConvexusTest;
 import exchange.convexus.utils.IntUtils;
 import exchange.convexus.utils.ScoreSpy;
 import exchange.convexus.utils.TimeUtils;
+import score.Context;
 
 public class ConvexusStakerTest extends ConvexusTest {
 
@@ -76,10 +82,26 @@ public class ConvexusStakerTest extends ConvexusTest {
     params.amount1Desired = amountsToStake[1];
     params.amount0Min = ZERO;
     params.amount1Min = ZERO;
-    params.recipient = alice.getAddress();
+    params.recipient = lp.getAddress();
     params.deadline = now;
 
+    ConvexusLiquidity.deposit(lp, nonfungiblePositionManager.getAddress(), sicx.score, new BigInteger("999999999999999999891"));
+    ConvexusLiquidity.deposit(lp, nonfungiblePositionManager.getAddress(), usdc.score, new BigInteger("999999999999999999891"));
     nonfungiblePositionManager.invoke(lp, "mint", params);
+    
+    // Get IncreaseLiquidity event
+    ArgumentCaptor<BigInteger> _tokenId = ArgumentCaptor.forClass(BigInteger.class);
+    ArgumentCaptor<BigInteger> _liquidity = ArgumentCaptor.forClass(BigInteger.class);
+    ArgumentCaptor<BigInteger> _amount0 = ArgumentCaptor.forClass(BigInteger.class);
+    ArgumentCaptor<BigInteger> _amount1 = ArgumentCaptor.forClass(BigInteger.class);
+    verify(nonfungiblePositionManager.spy).IncreaseLiquidity(_tokenId.capture(), _liquidity.capture(), _amount0.capture(), _amount1.capture());
+    BigInteger tokenId = _tokenId.getValue();
+
+    // The LP approves and stakes their NFT
+    nonfungiblePositionManager.invoke(lp, "approve", staker.getAddress(), tokenId);
+
+    // Deposit
+    nonfungiblePositionManager.invoke(lp, "safeTransferFrom", lp.getAddress(), staker.getAddress(), tokenId, "safeTransferFrom".getBytes());
   }
 
   void setup_tokens () throws Exception {
@@ -111,13 +133,13 @@ public class ConvexusStakerTest extends ConvexusTest {
   }
 
   void setup_pool01 () throws Exception {
-    pool = deploy_pool(sicx.getAddress(), usdc.getAddress(), factory.getAddress(), FEE, tickSpacing);
+    pool = deploy(Pool01.class, sicx.getAddress(), usdc.getAddress(), factory.getAddress(), FEE, tickSpacing);
     pool.invoke(alice, "initialize", encodePriceSqrt(ONE, ONE));
     ConvexusFactoryUtils.createPool(factory, alice, sicx.getAddress(), usdc.getAddress(), FEE, pool.getAddress());
   }
 
   void setup_pool12 () throws Exception {
-    pool = deploy_pool(usdc.getAddress(), rwtk.getAddress(), factory.getAddress(), FEE, tickSpacing);
+    pool = deploy(Pool12.class, usdc.getAddress(), rwtk.getAddress(), factory.getAddress(), FEE, tickSpacing);
     pool.invoke(alice, "initialize", encodePriceSqrt(ONE, ONE));
     ConvexusFactoryUtils.createPool(factory, alice, usdc.getAddress(), rwtk.getAddress(), FEE, pool.getAddress());
   }

@@ -21,6 +21,9 @@ import static java.math.BigInteger.ZERO;
 
 import java.math.BigInteger;
 
+import com.eclipsesource.json.Json;
+import com.eclipsesource.json.JsonObject;
+import com.eclipsesource.json.JsonValue;
 import com.iconloop.score.token.irc721.IRC721;
 
 import exchange.convexus.librairies.FixedPoint128;
@@ -35,12 +38,16 @@ import score.DictDB;
 import score.VarDB;
 import score.annotation.EventLog;
 import score.annotation.External;
+import score.annotation.Optional;
+import scorex.io.Reader;
+import scorex.io.StringReader;
 
 import static exchange.convexus.librairies.BlockTimestamp._blockTimestamp;
 import static exchange.convexus.utils.AddressUtils.ZERO_ADDRESS;
 import static exchange.convexus.utils.IntUtils.uint128;
 
 import exchange.convexus.liquidity.AddLiquidityParams;
+import exchange.convexus.liquidity.AddLiquidityResult;
 import exchange.convexus.liquidity.ConvexusLiquidityManagement;
 
 // @title NFT positions
@@ -92,7 +99,7 @@ public class NonFungiblePositionManager extends IRC721 {
     /// @param amount0 The amount of token0 that was paid for the increase in liquidity
     /// @param amount1 The amount of token1 that was paid for the increase in liquidity
     @EventLog
-    protected void IncreaseLiquidity(BigInteger tokenId, BigInteger liquidity, BigInteger amount0, BigInteger amount1) {}
+    public void IncreaseLiquidity(BigInteger tokenId, BigInteger liquidity, BigInteger amount0, BigInteger amount1) {}
     
     /// @notice Emitted when liquidity is decreased for a position NFT
     /// @param tokenId The ID of the token for which liquidity was decreased
@@ -121,10 +128,10 @@ public class NonFungiblePositionManager extends IRC721 {
         Address _factory,
         Address _tokenDescriptor_
     ) {
-        super("Convexus Positions NFT-V1", "CXS-POS");
+        super("Convexus Positions NFT-V1", "CVXS-POS");
 
         this.liquidityMgr = new ConvexusLiquidityManagement(_factory);
-        this.name = "Convexus Position Manager";
+        this.name = "Convexus NFT Position Manager";
         this.factory = _factory;
         this._tokenDescriptor = _tokenDescriptor_;
 
@@ -435,6 +442,71 @@ public class NonFungiblePositionManager extends IRC721 {
 
         this._positions.set(tokenId, null);
         this._burn(tokenId);
+    }
+
+    // ================================================
+    // Implements LiquidityManager
+    // ================================================
+    /**
+     * @notice Called to `msg.sender` after minting liquidity to a position from ConvexusPool#mint.
+     * @dev In the implementation you must pay the pool tokens owed for the minted liquidity.
+     * The caller of this method must be checked to be a ConvexusPool deployed by the canonical ConvexusFactory.
+     * @param amount0Owed The amount of token0 due to the pool for the minted liquidity
+     * @param amount1Owed The amount of token1 due to the pool for the minted liquidity
+     * @param data Any data passed through by the caller via the mint call
+     */
+    @External
+    public void convexusMintCallback (
+        BigInteger amount0Owed,
+        BigInteger amount1Owed,
+        byte[] data
+    ) {
+        this.liquidityMgr.convexusMintCallback(amount0Owed, amount1Owed, data);
+    }
+
+    /**
+     * @notice Add liquidity to an initialized pool
+     * @dev Liquidity must have been provided beforehand
+     */
+    @External
+    public AddLiquidityResult addLiquidity (AddLiquidityParams params) {
+        return this.liquidityMgr.addLiquidity(params);
+    }
+
+    /**
+     * @notice Remove funds from the liquidity manager
+     */
+    @External
+    public void withdraw (Address token) {
+        this.liquidityMgr.withdraw(token);
+    }
+
+    @External
+    public void tokenFallback (Address _from, BigInteger _value, @Optional byte[] _data) throws Exception {
+        Reader reader = new StringReader(new String(_data));
+        JsonValue input = Json.parse(reader);
+        JsonObject root = input.asObject();
+        String method = root.get("method").asString();
+        Address token = Context.getCaller();
+
+        switch (method)
+        {
+            /**
+             * @notice Add funds to the liquidity manager
+             */
+            case "deposit": {
+                this.liquidityMgr.deposit(_from, token, _value);
+                break;
+            }
+
+            default:
+                Context.revert("tokenFallback: Unimplemented tokenFallback action");
+        }
+    }
+
+    @External(readonly = true)
+    public BigInteger deposited(Address user, Address token) {
+        return this.liquidityMgr.deposited(user, token);
     }
 
     // ================================================

@@ -21,19 +21,19 @@ import java.math.BigInteger;
 // the top level state of the swap, the results of which are recorded in storage at the end
 public class SwapState {
     // the amount remaining to be swapped in/out of the input/output asset
-    BigInteger amountSpecifiedRemaining;
+    public BigInteger amountSpecifiedRemaining;
     // the amount already swapped out/in of the output/input asset
-    BigInteger amountCalculated;
+    public BigInteger amountCalculated;
     // current sqrt(price)
-    BigInteger sqrtPriceX96;
+    public BigInteger sqrtPriceX96;
     // the tick associated with the current price
-    int tick;
+    public int tick;
     // the global fee growth of the input token
-    BigInteger feeGrowthGlobalX128;
+    public BigInteger feeGrowthGlobalX128;
     // amount of input token paid as protocol fee
-    BigInteger protocolFee;
+    public BigInteger protocolFee;
     // the current liquidity in range
-    BigInteger liquidity;
+    public BigInteger liquidity;
 
     public SwapState(
         BigInteger amountSpecifiedRemaining,

@@ -14,16 +14,15 @@
  * limitations under the License.
  */
 
-package exchange.convexus.liquidity;
+package exchange.convexus.librairies;
 
-import exchange.convexus.librairies.PoolAddress;
 import score.Address;
 import score.ObjectReader;
 import score.ObjectWriter;
 
 public class MintCallbackData {
-    PoolAddress.PoolKey poolKey;
-    Address payer;
+    public PoolAddress.PoolKey poolKey;
+    public Address payer;
 
     public MintCallbackData (PoolAddress.PoolKey poolKey, Address payer) {
         this.poolKey = poolKey;

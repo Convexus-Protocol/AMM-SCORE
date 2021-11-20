@@ -29,7 +29,7 @@ import score.Context;
 public class NonfungibleTokenPositionDescriptor {
 
   public String tokenURI (Address positionManager, BigInteger tokenId) {
-    var position = PositionInformation.fromCall(Context.call(positionManager, "positions", tokenId));
+    var position = PositionInformation.fromMap(Context.call(positionManager, "positions", tokenId));
     var factory = (Address) Context.call(positionManager, "factory");
 
     PoolAddress.PoolKey poolKey = new PoolAddress.PoolKey(position.token0, position.token1, position.fee);

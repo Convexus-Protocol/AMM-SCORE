@@ -18,6 +18,7 @@ package exchange.convexus.liquidity;
 
 import exchange.convexus.librairies.CallbackValidation;
 import exchange.convexus.librairies.LiquidityAmounts;
+import exchange.convexus.librairies.MintCallbackData;
 import exchange.convexus.librairies.PairAmounts;
 import exchange.convexus.librairies.PeripheryPayments;
 import exchange.convexus.librairies.PoolAddress;
@@ -28,21 +29,12 @@ import score.ByteArrayObjectWriter;
 import score.Context;
 import score.DictDB;
 import score.ObjectReader;
-import score.annotation.External;
 
 import exchange.convexus.pool.Slot0;
 
 import static java.math.BigInteger.ZERO;
 
 import java.math.BigInteger;
-
-import com.eclipsesource.json.Json;
-import com.eclipsesource.json.JsonObject;
-import com.eclipsesource.json.JsonValue;
-
-import score.annotation.Optional;
-import scorex.io.Reader;
-import scorex.io.StringReader;
 
 public class ConvexusLiquidityManagement {
 
@@ -51,9 +43,6 @@ public class ConvexusLiquidityManagement {
     // ================================================
     // Contract class name
     private static final String NAME = "ConvexusLiquidityManagement";
-
-    // Contract name
-    private final String name;
 
     // address of the Convexus factory
     public final Address factory;
@@ -77,7 +66,6 @@ public class ConvexusLiquidityManagement {
     public ConvexusLiquidityManagement(
         Address _factory
     ) {
-        this.name = "Convexus Liquidity Management";
         this.factory = _factory;
     }
 
@@ -89,7 +77,7 @@ public class ConvexusLiquidityManagement {
      * @param amount1Owed The amount of token1 due to the pool for the minted liquidity
      * @param data Any data passed through by the caller via the mint call
      */
-    @External
+    // @External
     public void convexusMintCallback (
         BigInteger amount0Owed,
         BigInteger amount1Owed,
@@ -125,7 +113,6 @@ public class ConvexusLiquidityManagement {
      * @notice Add liquidity to an initialized pool
      * @dev Liquidity must have been provided beforehand
      */
-    @External
     public AddLiquidityResult addLiquidity (AddLiquidityParams params) {
         PoolAddress.PoolKey poolKey = new PoolAddress.PoolKey(params.token0, params.token1, params.fee);
 
@@ -149,13 +136,14 @@ public class ConvexusLiquidityManagement {
         ByteArrayObjectWriter writer = Context.newByteArrayObjectWriter("RLPn");
         writer.write(new MintCallbackData(poolKey, Context.getCaller()));
 
-        PairAmounts amounts = (PairAmounts) Context.call(pool, "mint", 
+        Context.println("pool = " + Context.call(pool, "name"));
+        PairAmounts amounts = PairAmounts.fromMap(Context.call(pool, "mint", 
             params.recipient,
             params.tickLower,
             params.tickUpper,
             liquidity,
             writer.toByteArray()
-        );
+        ));
 
         Context.require(
             amounts.amount0.compareTo(params.amount0Min) >= 0
@@ -166,8 +154,11 @@ public class ConvexusLiquidityManagement {
         return new AddLiquidityResult (liquidity, amounts.amount0, amounts.amount1, pool);
     }
 
+    /**
+     * @notice Add funds to the liquidity manager
+     */
     // @External - this method is external through tokenFallback
-    private void deposit (Address caller, Address tokenIn, BigInteger amountIn) {
+    public void deposit (Address caller, Address tokenIn, BigInteger amountIn) {
         // --- Checks ---
         Context.require(amountIn.compareTo(ZERO) > 0, 
             "deposit: Deposit amount cannot be less or equal to 0");
@@ -176,10 +167,13 @@ public class ConvexusLiquidityManagement {
         var depositedUser = this.deposited.at(caller);
         BigInteger oldBalance = depositedUser.getOrDefault(tokenIn, ZERO);
         depositedUser.set(tokenIn, oldBalance.add(amountIn));
-        Context.println("LM: deposit("+caller+")("+tokenIn+") = " + this.deposited.at(caller).get(tokenIn));
+        Context.println("LM: deposit(" + caller + ")(" + Context.call(tokenIn, "symbol") + ") = " + this.deposited.at(caller).get(tokenIn));
     }
 
-    @External
+    /**
+     * @notice Remove funds from the liquidity manager
+     */
+    // @External
     public void withdraw (Address token) {
         final Address caller = Context.getCaller();
 
@@ -192,32 +186,13 @@ public class ConvexusLiquidityManagement {
         }
     }
 
-    @External
-    public void tokenFallback (Address _from, BigInteger _value, @Optional byte[] _data) throws Exception {
-        Reader reader = new StringReader(new String(_data));
-        JsonValue input = Json.parse(reader);
-        JsonObject root = input.asObject();
-        String method = root.get("method").asString();
-        Address token = Context.getCaller();
-
-        switch (method)
-        {
-            case "deposit": {
-                deposit(_from, token, _value);
-                break;
-            }
-
-            default:
-                Context.revert("tokenFallback: Unimplemented tokenFallback action");
-        }
-    }
-
     // ================================================
     // Checks
     // ================================================
     private void checkEnoughDeposited (Address address, Address token, BigInteger amount) {
         var depositedUser = this.deposited.at(address);
         BigInteger userBalance = depositedUser.getOrDefault(token, ZERO);
+        Context.println("[Callee][checkEnoughDeposited][" + Context.call(token, "symbol") + "] " + userBalance + " / " + amount);
         Context.require(userBalance.compareTo(amount) >= 0,
             "checkEnoughDeposited: user didn't deposit enough funds");
     }
@@ -225,12 +200,7 @@ public class ConvexusLiquidityManagement {
     // ================================================
     // Public variable getters
     // ================================================
-    @External(readonly = true)
-    public String name() {
-        return this.name;
-    }
-    
-    @External(readonly = true)
+    // @External(readonly = true)
     public BigInteger deposited(Address user, Address token) {
         return this.deposited.at(user).get(token);
     }

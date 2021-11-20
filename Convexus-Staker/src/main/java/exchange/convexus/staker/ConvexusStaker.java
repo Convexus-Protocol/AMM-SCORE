@@ -238,7 +238,7 @@ public class ConvexusStaker {
         Context.require(Context.getCaller().equals(this.nonfungiblePositionManager),
             "onIRC721Received: not a Convexus NFT");
         
-        var position = PositionInformation.fromCall(Context.call(this.nonfungiblePositionManager, "positions", tokenId));
+        var position = PositionInformation.fromMap(Context.call(this.nonfungiblePositionManager, "positions", tokenId));
         var deposit = new Deposit(from, ZERO, position.tickLower, position.tickUpper);
         this.deposits.set(tokenId, deposit);
 

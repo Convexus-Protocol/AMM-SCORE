@@ -17,13 +17,23 @@
 package exchange.convexus.librairies;
 
 import java.math.BigInteger;
+import java.util.Map;
 
 public class PairAmounts {
     public BigInteger amount0;
     public BigInteger amount1;
-    
-    public PairAmounts(BigInteger amount0, BigInteger amount1) {
+
+    public PairAmounts (BigInteger amount0, BigInteger amount1) {
         this.amount0 = amount0;
         this.amount1 = amount1;
+    }
+
+    public static PairAmounts fromMap (Object call) {
+        @SuppressWarnings("unchecked")
+        Map<String,Object> map = (Map<String,Object>) call;
+        return new PairAmounts (
+          (BigInteger) map.get("amount0"),
+          (BigInteger) map.get("amount1")
+        );
     }
 }

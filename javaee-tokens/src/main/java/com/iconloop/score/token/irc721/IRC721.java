@@ -83,8 +83,7 @@ public class IRC721 {
     require(to != owner, "IRC721: approval to current owner");
     final Address caller = Context.getCaller();
 
-    require(
-      caller.equals(owner) || isApprovedForAll(owner, caller),
+    require(caller.equals(owner) || isApprovedForAll(owner, caller),
         "IRC721: approve caller is not owner nor approved for all"
     );
 

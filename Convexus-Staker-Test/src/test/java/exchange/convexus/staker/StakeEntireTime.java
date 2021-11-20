@@ -22,16 +22,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.math.BigInteger;
 
-import com.eclipsesource.json.Json;
-import com.iconloop.score.test.Account;
 import com.iconloop.score.test.Score;
 import com.iconloop.score.test.ServiceManager;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import exchange.convexus.factory.ConvexusFactoryUtils;
-import exchange.convexus.utils.MathUtils;
 import exchange.convexus.utils.TimeUtils;
 import score.Context;
 

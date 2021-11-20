@@ -82,8 +82,16 @@ public class ConvexusTest extends TestBase {
         return ((int) Math.floor(887272 / tickSpacing)) * tickSpacing;
     }
 
-
     // Deployers
+    public <T> ScoreSpy<T> deploy (Class<?> clazz, Object... params) throws Exception {
+        Score score = sm.deploy(owner, clazz, params);
+
+        @SuppressWarnings("unchecked")
+        var spy = (T) spy(score.getInstance());
+        score.setInstance(spy);
+        return new ScoreSpy<T>(score, spy);
+    }
+
     public ScoreSpy<ConvexusPool> deploy_pool (Address token0, Address token1, Address factory, int fee, int tickSpacing) throws Exception {
         Score score = sm.deploy(owner, ConvexusPool.class, token0, token1, factory, fee, tickSpacing);
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package exchange.convexus.pool;
+package exchange.convexus.staker.pools;
 
 import static exchange.convexus.librairies.BlockTimestamp._blockTimestamp;
 import static exchange.convexus.utils.IntUtils.uint256;
@@ -37,6 +37,16 @@ import exchange.convexus.librairies.Tick;
 import exchange.convexus.librairies.TickBitmap;
 import exchange.convexus.librairies.TickMath;
 import exchange.convexus.librairies.Ticks;
+import exchange.convexus.pool.ModifyPositionParams;
+import exchange.convexus.pool.ModifyPositionResult;
+import exchange.convexus.pool.PositionStorage;
+import exchange.convexus.pool.ProtocolFees;
+import exchange.convexus.pool.Slot0;
+import exchange.convexus.pool.SnapshotCumulativesInsideResult;
+import exchange.convexus.pool.StepComputations;
+import exchange.convexus.pool.SwapCache;
+import exchange.convexus.pool.SwapMath;
+import exchange.convexus.pool.SwapState;
 import exchange.convexus.utils.ReentrancyLock;
 import score.Address;
 import score.Context;
@@ -45,7 +55,7 @@ import score.annotation.EventLog;
 import score.annotation.External;
 import score.annotation.Optional;
 
-public class ConvexusPool {
+public class Pool01 {
 
     // ================================================
     // Consts
@@ -283,7 +293,7 @@ public class ConvexusPool {
     /**
      *  @notice Contract constructor
      */
-    public ConvexusPool(
+    public Pool01(
         // TODO: PATCH PATCH PATCH: REMOVE ME
         Address _token0,
         Address _token1,

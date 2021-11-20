@@ -37,7 +37,7 @@ public class NFTPositionInfo {
     Address nonfungiblePositionManager, 
     BigInteger tokenId
   ) {
-    var position = PositionInformation.fromCall(Context.call(nonfungiblePositionManager, "positions", tokenId));
+    var position = PositionInformation.fromMap(Context.call(nonfungiblePositionManager, "positions", tokenId));
     PoolAddress.PoolKey poolKey = new PoolAddress.PoolKey(position.token0, position.token1, position.fee);
     return new NFTPosition(PoolAddress.getPool(factory, poolKey), position.tickLower, position.tickUpper, position.liquidity);
   }
