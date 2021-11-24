@@ -42,7 +42,7 @@ import exchange.convexus.librairies.Position;
 import exchange.convexus.librairies.Positions;
 import exchange.convexus.librairies.TickMath;
 import exchange.convexus.librairies.Oracle.Observation;
-import exchange.convexus.liquidity.ConvexusLiquidity;
+import exchange.convexus.liquidity.ConvexusLiquidityUtils;
 import exchange.convexus.reentrantcallee.ConvexusReentrantCallee;
 import exchange.convexus.swappay.ConvexusSwapPay;
 import exchange.convexus.testtokens.Sicx;
@@ -122,7 +122,7 @@ public class ConvexusPoolTest extends ConvexusTest {
       }
     }
 
-    ConvexusLiquidity.deposit(from, callee.getAddress(), inputToken, IntUtils.MAX_UINT160);
+    ConvexusLiquidityUtils.deposit(from, callee.getAddress(), inputToken, IntUtils.MAX_UINT160);
     callee.invoke(from, method, pool.getAddress(), exactInput ? amountIn : amountOut, from.getAddress(), sqrtPriceLimitX96);
   }
   
@@ -164,7 +164,7 @@ public class ConvexusPoolTest extends ConvexusTest {
 
   private void swapToSqrtPrice(Account caller, Score tokenScore, BigInteger targetPrice, Address to, BigInteger tokenAmount) {
     if (tokenAmount.compareTo(ZERO) > 0) {
-      ConvexusLiquidity.deposit(caller, callee.getAddress(), tokenScore, tokenAmount);
+      ConvexusLiquidityUtils.deposit(caller, callee.getAddress(), tokenScore, tokenAmount);
     }
     if (tokenScore.getAddress().equals(sicx.getAddress())) {
       callee.invoke(caller, "swapToLowerSqrtPrice", pool.getAddress(), targetPrice, to);
@@ -179,8 +179,8 @@ public class ConvexusPoolTest extends ConvexusTest {
     int tickSpacing = ((BigInteger) pool.call("tickSpacing")).intValue();
     int min = getMinTick(tickSpacing);
     int max = getMaxTick(tickSpacing);
-    ConvexusLiquidity.deposit(alice, callee.getAddress(), usdc.score, new BigInteger("2000000000000000000"));
-    ConvexusLiquidity.deposit(alice, callee.getAddress(), sicx.score, new BigInteger("2000000000000000000"));
+    ConvexusLiquidityUtils.deposit(alice, callee.getAddress(), usdc.score, new BigInteger("2000000000000000000"));
+    ConvexusLiquidityUtils.deposit(alice, callee.getAddress(), sicx.score, new BigInteger("2000000000000000000"));
     callee.invoke(alice, "mint", pool.getAddress(), alice.getAddress(), min, max, initializeLiquidityAmount);
   }
 
@@ -194,11 +194,11 @@ public class ConvexusPoolTest extends ConvexusTest {
 
   protected void mint(Account account, int minTick, int maxTick, BigInteger amount, BigInteger sicxAmount, BigInteger usdcAmount) {
     if (sicxAmount.compareTo(ZERO) > 0) {
-      ConvexusLiquidity.deposit(account, callee.getAddress(), sicx.score, sicxAmount);
+      ConvexusLiquidityUtils.deposit(account, callee.getAddress(), sicx.score, sicxAmount);
     }
     
     if (usdcAmount.compareTo(ZERO) > 0) {
-      ConvexusLiquidity.deposit(account, callee.getAddress(), usdc.score, usdcAmount);
+      ConvexusLiquidityUtils.deposit(account, callee.getAddress(), usdc.score, usdcAmount);
     }
 
     callee.invoke(account, "mint", pool.getAddress(), account.getAddress(), minTick, maxTick, amount);
@@ -291,10 +291,10 @@ public class ConvexusPoolTest extends ConvexusTest {
   
   protected void flash(Account from, BigInteger amount0, BigInteger amount1, Address recipient, BigInteger sicxAmount, BigInteger usdcAmount) {
     if (sicxAmount.compareTo(ZERO) > 0) {
-      ConvexusLiquidity.deposit(from, callee.getAddress(), sicx.score, sicxAmount);
+      ConvexusLiquidityUtils.deposit(from, callee.getAddress(), sicx.score, sicxAmount);
     }
     if (usdcAmount.compareTo(ZERO) > 0) {
-      ConvexusLiquidity.deposit(from, callee.getAddress(), usdc.score, usdcAmount);
+      ConvexusLiquidityUtils.deposit(from, callee.getAddress(), usdc.score, usdcAmount);
     }
 
     callee.invoke(from, "flash", pool.getAddress(), recipient, amount0, amount1, sicxAmount, usdcAmount);
@@ -325,10 +325,10 @@ public class ConvexusPoolTest extends ConvexusTest {
     BigInteger pay1
   ) {
     if (pay0.compareTo(ZERO) > 0) {
-      ConvexusLiquidity.deposit(recipient, underpay.getAddress(), sicx.score, pay0);
+      ConvexusLiquidityUtils.deposit(recipient, underpay.getAddress(), sicx.score, pay0);
     }
     if (pay1.compareTo(ZERO) > 0) {
-      ConvexusLiquidity.deposit(recipient, underpay.getAddress(), usdc.score, pay1);
+      ConvexusLiquidityUtils.deposit(recipient, underpay.getAddress(), usdc.score, pay1);
     }
 
     underpay.invoke(recipient, "swap", pool.getAddress(), recipient.getAddress(), zeroForOne, sqrtPriceX96, amountSpecified, pay0, pay1);

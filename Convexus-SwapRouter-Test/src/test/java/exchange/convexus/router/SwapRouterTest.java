@@ -16,14 +16,17 @@
 
 package exchange.convexus.router;
 
+import exchange.convexus.factory.ConvexusFactory;
 import exchange.convexus.utils.ConvexusTest;
 import exchange.convexus.utils.ScoreSpy;
 
 public class SwapRouterTest extends ConvexusTest {
 
   ScoreSpy<SwapRouter> router;
+  ScoreSpy<ConvexusFactory> factory;
 
   void setup_router () throws Exception {
-    router = deploy_router();
+    factory = deploy_factory();
+    router = deploy_router(factory.getAddress());
   }
 }

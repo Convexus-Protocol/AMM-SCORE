@@ -72,6 +72,9 @@ public class ConvexusTest extends TestBase {
     protected BigInteger encodePriceSqrt (BigInteger reserve1, BigInteger reserve0) {
         return new BigDecimal(reserve1).divide(new BigDecimal(reserve0), MathContext.DECIMAL128).sqrt(MathContext.DECIMAL128).multiply(BigDecimal.valueOf(2).pow(96)).toBigInteger();
     }
+    protected BigInteger encodePriceSqrt (int reserve1, int reserve0) {
+        return encodePriceSqrt(BigInteger.valueOf(reserve1), BigInteger.valueOf(reserve0));
+    }
 
     // Tick
     protected int getMinTick(int tickSpacing) {
@@ -108,8 +111,8 @@ public class ConvexusTest extends TestBase {
         return new ScoreSpy<ConvexusFactory>(score, spy);
     }
     
-    public ScoreSpy<SwapRouter> deploy_router () throws Exception {
-        Score score = sm.deploy(owner, SwapRouter.class);
+    public ScoreSpy<SwapRouter> deploy_router (Address factory) throws Exception {
+        Score score = sm.deploy(owner, SwapRouter.class, factory);
 
         var spy = (SwapRouter) spy(score.getInstance());
         score.setInstance(spy);
@@ -172,16 +175,16 @@ public class ConvexusTest extends TestBase {
         return new ScoreSpy<TickLens>(score, spy);
     }
     
-    public ScoreSpy<Quoter> deploy_quoter () throws Exception {
-        Score score = sm.deploy(owner, Quoter.class);
+    public ScoreSpy<Quoter> deploy_quoter (Address factory) throws Exception {
+        Score score = sm.deploy(owner, Quoter.class, factory);
 
         var spy = (Quoter) spy(score.getInstance());
         score.setInstance(spy);
         return new ScoreSpy<Quoter>(score, spy);
     }
     
-    public ScoreSpy<PairFlash> deploy_pairflash () throws Exception {
-        Score score = sm.deploy(owner, PairFlash.class);
+    public ScoreSpy<PairFlash> deploy_flash (Address router, Address factory) throws Exception {
+        Score score = sm.deploy(owner, PairFlash.class, router, factory);
 
         var spy = (PairFlash) spy(score.getInstance());
         score.setInstance(spy);

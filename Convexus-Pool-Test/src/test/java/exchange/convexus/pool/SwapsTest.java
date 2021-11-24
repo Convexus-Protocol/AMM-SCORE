@@ -548,7 +548,7 @@ public class SwapsTest extends ConvexusPoolTest {
             } else {
               AssertUtils.assertThrowsMessage(AssertionError.class, () ->
                 executeSwap(testCase), 
-                "swap: SPL"
+                "swap: Wrong sqrtPriceLimitX96"
               );
             }
           }

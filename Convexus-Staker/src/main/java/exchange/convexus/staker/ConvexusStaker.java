@@ -177,13 +177,9 @@ public class ConvexusStaker {
         Context.require(key.startTime.subtract(now).compareTo(maxIncentiveStartLeadTime) <= 0,
             "createIncentive: start time too far into future");
 
-        Context.println("key.startTime = " + key.startTime);
-        Context.println("key.endTime = " + key.endTime);
         Context.require(key.startTime.compareTo(key.endTime) < 0,
             "createIncentive: start time must be before end time");
 
-        Context.println("key.endTime.subtract(key.startTime) = " + key.endTime.subtract(key.startTime));
-        Context.println("maxIncentiveDuration = " + maxIncentiveDuration);
         Context.require(key.endTime.subtract(key.startTime).compareTo(maxIncentiveDuration) <= 0,
             "createIncentive: incentive duration is too long");
 
@@ -191,6 +187,7 @@ public class ConvexusStaker {
 
         var incentive = this.incentives.getOrDefault(incentiveId, Incentive.empty());
         incentive.totalRewardUnclaimed = incentive.totalRewardUnclaimed.add(reward);
+
         this.incentives.set(incentiveId, incentive);
 
         this.IncentiveCreated(key.rewardToken, key.pool, key.startTime, key.endTime, key.refundee, reward);
@@ -330,8 +327,8 @@ public class ConvexusStaker {
         var stakes = stakes(tokenId, incentiveId);
         BigInteger secondsPerLiquidityInsideInitialX128 = stakes[0];
         BigInteger liquidity = stakes[1];
-
-        Context.require(!liquidity.equals(ZERO), 
+        
+        Context.require(liquidity.compareTo(ZERO) > 0,
             "unstakeToken: stake does not exist");
 
         Incentive incentive = incentives.get(incentiveId);
@@ -341,7 +338,7 @@ public class ConvexusStaker {
         incentive.numberOfStakes = incentive.numberOfStakes.subtract(ONE);
         incentives.set(incentiveId, incentive);
 
-        var snapshot = (SnapshotCumulativesInsideResult) Context.call(key.pool, "snapshotCumulativesInside", deposit.tickLower, deposit.tickUpper);
+        var snapshot = SnapshotCumulativesInsideResult.fromMap(Context.call(key.pool, "snapshotCumulativesInside", deposit.tickLower, deposit.tickUpper));
         BigInteger secondsPerLiquidityInsideX128 = snapshot.secondsPerLiquidityInsideX128;
 
         var result =
@@ -368,7 +365,7 @@ public class ConvexusStaker {
 
         // this only overflows if a token has a total supply greater than type(uint256).max
         var rewardToken = rewards.at(key.rewardToken);
-        rewardToken.set(deposit.owner, rewardToken.get(deposit.owner).add(rewardAmount));
+        rewardToken.set(deposit.owner, rewardToken.getOrDefault(deposit.owner, ZERO).add(rewardAmount));
 
         Stake stake = _stakes.at(tokenId).get(incentiveId);
         stake.secondsPerLiquidityInsideInitialX128 = null;
@@ -428,7 +425,7 @@ public class ConvexusStaker {
         Deposit deposit = deposits.get(tokenId);
         Incentive incentive = incentives.get(incentiveId);
 
-        var snapshot = (SnapshotCumulativesInsideResult) Context.call(key.pool, "snapshotCumulativesInside", deposit.tickLower, deposit.tickUpper);
+        var snapshot = SnapshotCumulativesInsideResult.fromMap(Context.call(key.pool, "snapshotCumulativesInside", deposit.tickLower, deposit.tickUpper));
         BigInteger secondsPerLiquidityInsideX128 = snapshot.secondsPerLiquidityInsideX128;
         
         return RewardMath.computeRewardAmount (
@@ -453,11 +450,12 @@ public class ConvexusStaker {
             "stakeToken: incentive ended");
 
         byte[] incentiveId = IncentiveId.compute(key);
+        var incentive = incentives.getOrDefault(incentiveId, Incentive.empty());
 
-        Context.require(incentives.get(incentiveId).totalRewardUnclaimed.compareTo(ZERO) > 0,
+        Context.require(incentive.totalRewardUnclaimed.compareTo(ZERO) > 0,
              "stakeToken: non-existent incentive"
         );
-        Context.require(_stakes.at(tokenId).get(incentiveId).liquidityNoOverflow.equals(ZERO),
+        Context.require(_stakes.at(tokenId).getOrDefault(incentiveId, Stake.empty()).liquidityNoOverflow.equals(ZERO),
             "stakeToken: token already staked"
         );
 
@@ -475,18 +473,17 @@ public class ConvexusStaker {
         var deposit = deposits.get(tokenId);
         deposit.numberOfStakes = deposit.numberOfStakes.add(ONE);
         deposits.set(tokenId, deposit);
-        var incentive = incentives.get(incentiveId);
         incentive.numberOfStakes = incentive.numberOfStakes.add(ONE);
         incentives.set(incentiveId, incentive);
 
-        var snapshot = (SnapshotCumulativesInsideResult) Context.call(key.pool, "snapshotCumulativesInside", tickLower, tickUpper);
+        var snapshot = SnapshotCumulativesInsideResult.fromMap(Context.call(key.pool, "snapshotCumulativesInside", tickLower, tickUpper));
         BigInteger secondsPerLiquidityInsideX128 = snapshot.secondsPerLiquidityInsideX128;
 
         if (liquidity.compareTo(MAX_UINT96) >= 0) {
             var stake = new Stake(secondsPerLiquidityInsideX128, MAX_UINT96, liquidity);
             this._stakes.at(tokenId).set(incentiveId, stake);
         } else {
-            var stake = _stakes.at(tokenId).get(incentiveId);
+            var stake = _stakes.at(tokenId).getOrDefault(incentiveId, Stake.empty());
             stake.secondsPerLiquidityInsideInitialX128 = secondsPerLiquidityInsideX128;
             stake.liquidityNoOverflow = uint96(liquidity);
             this._stakes.at(tokenId).set(incentiveId, stake);
@@ -578,7 +575,7 @@ public class ConvexusStaker {
     @External(readonly = true)
     public BigInteger[] stakes(BigInteger tokenId, byte[] incentiveId) {
         BigInteger[] result = new BigInteger[2];
-        Stake stake = this._stakes.at(tokenId).get(incentiveId);
+        Stake stake = this._stakes.at(tokenId).getOrDefault(incentiveId, Stake.empty());
         result[0] = stake.secondsPerLiquidityInsideInitialX128;
         result[1] = stake.liquidityNoOverflow;
         

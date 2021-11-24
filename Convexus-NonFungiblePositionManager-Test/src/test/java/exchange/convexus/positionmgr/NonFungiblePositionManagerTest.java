@@ -16,28 +16,48 @@
 
 package exchange.convexus.positionmgr;
 
-import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.verify;
+
+import java.math.BigInteger;
+
+import com.iconloop.score.test.Account;
+
+import org.mockito.ArgumentCaptor;
 
 import exchange.convexus.factory.ConvexusFactory;
+import exchange.convexus.factory.ConvexusFactoryUtils;
 import exchange.convexus.initializer.ConvexusPoolInitializer;
+import exchange.convexus.librairies.PairAmounts;
+import exchange.convexus.pool.ConvexusPool;
 import exchange.convexus.positiondescriptor.NonfungibleTokenPositionDescriptor;
+import exchange.convexus.router.SwapRouter;
 import exchange.convexus.testtokens.Sicx;
 import exchange.convexus.testtokens.Usdc;
 import exchange.convexus.utils.ConvexusTest;
 import exchange.convexus.utils.IntUtils;
 import exchange.convexus.utils.ScoreSpy;
-import score.Context;
+import score.Address;
 
 public class NonFungiblePositionManagerTest extends ConvexusTest {
 
   ScoreSpy<NonfungibleTokenPositionDescriptor> positiondescriptor;
-  ScoreSpy<NonFungiblePositionManager> positionmgr;
   ScoreSpy<ConvexusFactory> factory;
   ScoreSpy<ConvexusPoolInitializer> initializer;
   ScoreSpy<Sicx> sicx;
   ScoreSpy<Usdc> usdc;
+  ScoreSpy<NonFungiblePositionManager> nft;
+  ScoreSpy<ConvexusPool> pool;
+  ScoreSpy<SwapRouter> router;
+
+  final int TICK_SPACINGS[] = {10, 60, 200};
+  final int FEE_AMOUNTS[] = {500, 3000, 10000};
+  final int LOW = 0;
+  final int MEDIUM = 1;
+  final int HIGH = 2;
+  int FEE = FEE_AMOUNTS[MEDIUM];
+  int tickSpacing = TICK_SPACINGS[MEDIUM];
 
   void setup_tokens () throws Exception {
     sicx = deploy_sicx();
@@ -56,12 +76,108 @@ public class NonFungiblePositionManagerTest extends ConvexusTest {
   }
 
   void setup_positionmgr () throws Exception {
-    File directory = new File("./");
-    Context.println(directory.getAbsolutePath());
-    
     factory = deploy_factory();
     // factory.invoke(owner, "setPoolContract", Files.readAllBytes(Paths.get("../Convexus-Pool/build/libs/Convexus-Pool-0.9.1-optimized.jar")));
+    router = deploy_router(factory.getAddress());
     positiondescriptor = deploy_positiondescriptor();
-    positionmgr = deploy_positionmgr(factory.getAddress(), positiondescriptor.getAddress());
+    nft = deploy_positionmgr(factory.getAddress(), positiondescriptor.getAddress());
+  }
+  
+  // Mock createAndInitializePoolIfNecessary until SCORE deployers supported by unittest
+  protected void createAndInitializePoolIfNecessary (Address token0, Address token1, int fee, BigInteger price, int tickSpacing) {
+    // initializer.invoke(owner, "createAndInitializePoolIfNecessary", 
+    //   sicx.getAddress(),
+    //   usdc.getAddress(),
+    //   fee,
+    //   price
+    // );
+    try {
+      pool = deploy(ConvexusPool.class, token0, token1, factory.getAddress(), fee, tickSpacing);
+      pool.invoke(alice, "initialize", price);
+      ConvexusFactoryUtils.createPool(factory, alice, token0, token1, fee, pool.getAddress());
+    } catch (Exception e) {
+      assertTrue(false);
+    }
+  }
+
+  protected void increaseLiquidity (
+    Account from,
+    BigInteger tokenId, 
+    BigInteger amount0Desired, 
+    BigInteger amount1Desired, 
+    BigInteger amount0Min,
+    BigInteger amount1Min, 
+    BigInteger deadline
+  ) {
+    nft.invoke(from, "increaseLiquidity", new IncreaseLiquidityParams(
+      tokenId,
+      amount0Desired,
+      amount1Desired,
+      amount0Min,
+      amount1Min,
+      deadline
+    ));
+  }
+  
+  protected void decreaseLiquidity (
+    Account from,
+    BigInteger tokenId,
+    BigInteger liquidity,
+    BigInteger amount0Min,
+    BigInteger amount1Min,
+    BigInteger deadline
+  ) {
+    nft.invoke(from, "decreaseLiquidity", new DecreaseLiquidityParams(
+      tokenId,
+      liquidity,
+      amount0Min,
+      amount1Min,
+      deadline
+    ));
+  }
+  
+  protected PairAmounts collect (
+    Account from,
+    BigInteger tokenId,
+    Address recipient,
+    BigInteger amount0Max,
+    BigInteger amount1Max
+  ) {
+    reset(nft.spy);
+    nft.invoke(from, "collect", new CollectParams(
+      tokenId,
+      recipient,
+      amount0Max,
+      amount1Max
+    ));
+    
+    // Get Collect event
+    ArgumentCaptor<BigInteger> _tokenId = ArgumentCaptor.forClass(BigInteger.class);
+    ArgumentCaptor<Address> _recipient = ArgumentCaptor.forClass(Address.class);
+    ArgumentCaptor<BigInteger> _amount0Collect = ArgumentCaptor.forClass(BigInteger.class);
+    ArgumentCaptor<BigInteger> _amount1Collect = ArgumentCaptor.forClass(BigInteger.class);
+    verify(nft.spy).Collect(_tokenId.capture(), _recipient.capture(), _amount0Collect.capture(), _amount1Collect.capture());
+
+    return new PairAmounts(_amount0Collect.getValue(), _amount1Collect.getValue());
+  }
+  
+  protected void burn (
+    Account from,
+    BigInteger tokenId
+  ) {
+    nft.invoke(from, "burn", tokenId);
+  }
+  
+  protected void transferFrom (
+    Account caller,
+    Address from,
+    Address to,
+    BigInteger tokenId
+  ) {
+    nft.invoke(caller, "transferFrom", from, to, tokenId);
+  }
+  
+  protected void approve (Account caller, Address to, BigInteger tokenId) {
+    nft.invoke(caller, "approve", to, tokenId);
   }
 }

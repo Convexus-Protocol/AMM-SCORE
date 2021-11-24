@@ -31,7 +31,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import exchange.convexus.factory.ConvexusFactoryUtils;
-import exchange.convexus.liquidity.ConvexusLiquidity;
+import exchange.convexus.liquidity.ConvexusLiquidityUtils;
 
 public class PostInitializeMediumFeeTest extends ConvexusPoolTest {
 
@@ -75,8 +75,8 @@ public class PostInitializeMediumFeeTest extends ConvexusPoolTest {
   void testReturnsInSupplyInRange () {
     initializeAtZeroTick();
     
-    ConvexusLiquidity.deposit(alice, callee.getAddress(), sicx.score, new BigInteger("1499550104979004"));
-    ConvexusLiquidity.deposit(alice, callee.getAddress(), usdc.score, new BigInteger("1499550104979004"));
+    ConvexusLiquidityUtils.deposit(alice, callee.getAddress(), sicx.score, new BigInteger("1499550104979004"));
+    ConvexusLiquidityUtils.deposit(alice, callee.getAddress(), usdc.score, new BigInteger("1499550104979004"));
     callee.invoke(alice, "mint", pool.getAddress(), alice.getAddress(), -tickSpacing, tickSpacing, TEN.pow(18).multiply(THREE));
     
     assertEquals(TEN.pow(18).multiply(FIVE), pool.call("liquidity"));
@@ -85,7 +85,7 @@ public class PostInitializeMediumFeeTest extends ConvexusPoolTest {
   @Test
   void testExcludesSupplyAtTickAboveCurrentTick () {
     initializeAtZeroTick();
-    ConvexusLiquidity.deposit(alice, callee.getAddress(), sicx.score, new BigInteger("1498800554806557"));
+    ConvexusLiquidityUtils.deposit(alice, callee.getAddress(), sicx.score, new BigInteger("1498800554806557"));
     callee.invoke(alice, "mint", pool.getAddress(), alice.getAddress(), tickSpacing, tickSpacing * 2, TEN.pow(18).multiply(THREE));
 
     assertEquals(TEN.pow(18).multiply(TWO), pool.call("liquidity"));
@@ -103,7 +103,7 @@ public class PostInitializeMediumFeeTest extends ConvexusPoolTest {
     int lowerTick = 0;
     int upperTick = tickSpacing;
 
-    ConvexusLiquidity.deposit(alice, callee.getAddress(), sicx.score, new BigInteger("499850034993002"));
+    ConvexusLiquidityUtils.deposit(alice, callee.getAddress(), sicx.score, new BigInteger("499850034993002"));
     callee.invoke(alice, "mint", pool.getAddress(), alice.getAddress(), lowerTick, upperTick, liquidityDelta);
     
     // ensure virtual supply has increased appropriately
@@ -111,7 +111,7 @@ public class PostInitializeMediumFeeTest extends ConvexusPoolTest {
     assertEquals(TEN.pow(18).multiply(THREE), kAfter);
     
     // swap toward the left (just enough for the tick transition function to trigger)
-    ConvexusLiquidity.deposit(alice, callee.getAddress(), sicx.score, new BigInteger("1"));
+    ConvexusLiquidityUtils.deposit(alice, callee.getAddress(), sicx.score, new BigInteger("1"));
     swapExact0For1(ONE, alice);
     var slot0 = Slot0.fromMap(pool.call("slot0"));
     assertEquals(-1, slot0.tick);
@@ -132,7 +132,7 @@ public class PostInitializeMediumFeeTest extends ConvexusPoolTest {
     int lowerTick = -tickSpacing;
     int upperTick = 0;
 
-    ConvexusLiquidity.deposit(alice, callee.getAddress(), usdc.score, new BigInteger("499850034993002"));
+    ConvexusLiquidityUtils.deposit(alice, callee.getAddress(), usdc.score, new BigInteger("499850034993002"));
     callee.invoke(alice, "mint", pool.getAddress(), alice.getAddress(), lowerTick, upperTick, liquidityDelta);
     
     // ensure virtual supply hasn't changed
@@ -140,7 +140,7 @@ public class PostInitializeMediumFeeTest extends ConvexusPoolTest {
     assertEquals(kBefore, kAfter);
     
     // swap toward the left (just enough for the tick transition function to trigger)
-    ConvexusLiquidity.deposit(alice, callee.getAddress(), sicx.score, new BigInteger("1"));
+    ConvexusLiquidityUtils.deposit(alice, callee.getAddress(), sicx.score, new BigInteger("1"));
     swapExact0For1(ONE, alice);
     var slot0 = Slot0.fromMap(pool.call("slot0"));
     assertEquals(-1, slot0.tick);

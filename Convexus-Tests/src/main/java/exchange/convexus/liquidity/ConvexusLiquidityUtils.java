@@ -25,7 +25,7 @@ import com.iconloop.score.test.Score;
 
 import score.Address;
 
-public class ConvexusLiquidity {
+public class ConvexusLiquidityUtils {
   
   public static void deposit (Account from, Address pool, Score token, BigInteger _value) {
 

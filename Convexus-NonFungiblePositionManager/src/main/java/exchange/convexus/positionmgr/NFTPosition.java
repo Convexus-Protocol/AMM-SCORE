@@ -16,6 +16,9 @@
 
 package exchange.convexus.positionmgr;
 
+import static exchange.convexus.utils.AddressUtils.ZERO_ADDRESS;
+import static java.math.BigInteger.ZERO;
+
 import java.math.BigInteger;
 
 import score.Address;
@@ -93,4 +96,18 @@ public class NFTPosition {
         w.write(obj.tokensOwed0);
         w.write(obj.tokensOwed1);
       }
+
+    public static NFTPosition empty() {
+        return new NFTPosition (
+            ZERO,
+            ZERO_ADDRESS,
+            ZERO,
+            0, 0,
+            ZERO,
+            ZERO,
+            ZERO,
+            ZERO,
+            ZERO
+        );
+    }
 }

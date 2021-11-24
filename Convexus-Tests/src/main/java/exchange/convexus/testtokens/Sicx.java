@@ -86,7 +86,7 @@ public class Sicx {
         Context.require(_value.compareTo(BigInteger.ZERO) >= 0, "_value needs to be positive");
         if (safeGetBalance(_from).compareTo(_value) < 0) {
             Context.println(String.format("[%s] %s: Insufficient balance (%s < %s)", 
-            this.symbol, _from.isContract() ? Context.call(_from, "name") : _from, safeGetBalance(_from), _value));
+            this.symbol.get(), _from.isContract() ? Context.call(_from, "name") : _from, safeGetBalance(_from), _value));
         }
         Context.require(safeGetBalance(_from).compareTo(_value) >= 0, "Insufficient balance");
 

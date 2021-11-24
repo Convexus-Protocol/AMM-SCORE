@@ -68,7 +68,7 @@ public class TickLens {
         for (int i = 0; i < 256; i++) {
             if (hit(bitmap, i)) {
                 int populatedTick = ((tickBitmapIndex << 8) + i) * tickSpacing;
-                Tick.Info result = (Tick.Info) Context.call(pool, "ticks", populatedTick);
+                Tick.Info result = Tick.Info.fromMap(Context.call(pool, "ticks", populatedTick));
                 populatedTicks[--numberOfPopulatedTicks] = new PopulatedTick(
                     populatedTick, 
                     result.liquidityNet, 

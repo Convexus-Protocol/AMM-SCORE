@@ -18,6 +18,8 @@
 package exchange.convexus.librairies;
 
 import score.Address;
+import score.ObjectReader;
+import score.ObjectWriter;
 
 public class PoolData {
   // The first token of the given pool
@@ -32,4 +34,17 @@ public class PoolData {
     this.tokenB = tokenB;
     this.fee = fee;
   }
+
+  public static PoolData readObject (ObjectReader reader) {
+    Address tokenA = reader.readAddress();
+    int fee = reader.readInt();
+    Address tokenB = reader.readAddress();
+    return new PoolData(tokenA, tokenB, fee);
+  }
+
+  public static void writeObject(ObjectWriter w, PoolData obj) {
+    w.write(obj.tokenA);
+    w.write(obj.fee);
+    w.write(obj.tokenB);
+}
 }

@@ -16,6 +16,8 @@
 
 package exchange.convexus.librairies;
 
+import static exchange.convexus.utils.IntUtils.uint128;
+
 import java.math.BigInteger;
 
 public class LiquidityAmounts {
@@ -68,7 +70,7 @@ public class LiquidityAmounts {
   private static BigInteger getLiquidityForAmount0(
     BigInteger sqrtRatioAX96, 
     BigInteger sqrtRatioBX96,
-    BigInteger liquidity
+    BigInteger amount0
   ) {
     if (sqrtRatioAX96.compareTo(sqrtRatioBX96) > 0) {
       BigInteger tmp = sqrtRatioAX96;
@@ -76,11 +78,8 @@ public class LiquidityAmounts {
       sqrtRatioBX96 = tmp;
     }
 
-    return FullMath.mulDiv(
-            liquidity.shiftLeft(FixedPoint96.RESOLUTION),
-            sqrtRatioBX96.subtract(sqrtRatioAX96),
-            sqrtRatioBX96
-          ).divide(sqrtRatioAX96);
+    BigInteger intermediate = FullMath.mulDiv(sqrtRatioAX96, sqrtRatioBX96, FixedPoint96.Q96);
+    return uint128(FullMath.mulDiv(amount0, intermediate, sqrtRatioBX96.subtract(sqrtRatioAX96)));
   }
 
   /**
@@ -93,7 +92,7 @@ public class LiquidityAmounts {
   private static BigInteger getLiquidityForAmount1(
     BigInteger sqrtRatioAX96,
     BigInteger sqrtRatioBX96,
-    BigInteger liquidity
+    BigInteger amount1
   ) {
     if (sqrtRatioAX96.compareTo(sqrtRatioBX96) > 0) {
       BigInteger tmp = sqrtRatioAX96;
@@ -101,6 +100,6 @@ public class LiquidityAmounts {
       sqrtRatioBX96 = tmp;
     }
 
-    return FullMath.mulDiv(liquidity, sqrtRatioBX96.subtract(sqrtRatioAX96), FixedPoint96.Q96);
+    return uint128(FullMath.mulDiv(amount1, FixedPoint96.Q96, sqrtRatioBX96.subtract(sqrtRatioAX96)));
   }
 }

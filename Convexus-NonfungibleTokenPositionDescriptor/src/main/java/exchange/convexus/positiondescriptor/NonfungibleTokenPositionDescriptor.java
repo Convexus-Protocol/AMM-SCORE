@@ -24,6 +24,9 @@ import exchange.convexus.positionmgr.PositionInformation;
 import score.Address;
 import score.Context;
 
+import com.eclipsesource.json.Json;
+import com.eclipsesource.json.JsonObject;
+
 /// @title Describes NFT token positions
 /// @notice Produces a string containing the data URI for a JSON metadata string
 public class NonfungibleTokenPositionDescriptor {
@@ -38,16 +41,25 @@ public class NonfungibleTokenPositionDescriptor {
     Boolean _flipRatio = false; // TODO: flipRatio implementation
     Address quoteTokenAddress = !_flipRatio ? position.token1 : position.token0;
     Address baseTokenAddress = !_flipRatio ? position.token0 : position.token1;
-    var slot0 = (Slot0) Context.call(pool, "slot0");
+    var slot0 = Slot0.fromMap(Context.call(pool, "slot0"));
 
-    return tokenId.toString(10) + "|" 
-         + quoteTokenAddress.toString() + "|" 
-         + baseTokenAddress.toString() + "|"
-         + _flipRatio.toString() + "|"
-         + Integer.toString(position.tickLower) + "|"
-         + Integer.toString(position.tickUpper) + "|"
-         + Integer.toString(slot0.tick) + "|"
-         + Integer.toString(position.fee) + "|"
-         + pool.toString() + "|";
+    JsonObject tokenURI = Json.object()
+      .add("tokenId", tokenId.toString(10))
+      .add("quoteTokenAddress", quoteTokenAddress.toString())
+      .add("baseTokenAddress", baseTokenAddress.toString())
+      .add("quoteTokenSymbol", (String) Context.call(quoteTokenAddress, "symbol"))
+      .add("baseTokenSymbol", (String) Context.call(baseTokenAddress, "symbol"))
+      .add("quoteTokenDecimals", ((BigInteger) Context.call(quoteTokenAddress, "decimals")).toString(10))
+      .add("baseTokenDecimals", ((BigInteger) Context.call(baseTokenAddress, "decimals")).toString(10))
+      .add("flipRatio", _flipRatio.toString())
+      .add("tickLower", Integer.toString(position.tickLower))
+      .add("tickUpper", Integer.toString(position.tickUpper))
+      .add("tickCurrent", Integer.toString(slot0.tick))
+      .add("tickSpacing", ((BigInteger) Context.call(pool, "tickSpacing")).toString(10))
+      .add("fee",       Integer.toString(position.fee))
+      .add("poolAddress", pool.toString())
+    ;
+
+    return tokenURI.toString();
   }
 }

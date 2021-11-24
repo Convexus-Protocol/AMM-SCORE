@@ -20,7 +20,6 @@ import java.util.Arrays;
 
 import exchange.convexus.utils.BytesUtils;
 import score.Address;
-import score.ObjectReader;
 
 public class Path {
   
@@ -36,7 +35,7 @@ public class Path {
   final private static int MULTIPLE_POOLS_MIN_LENGTH = POP_OFFSET + NEXT_OFFSET;
 
   /**
-   * @notice Returns true iff the path contains two or more pools
+   * @notice Returns true if the path contains two or more pools
    * @param path The encoded swap path
    * @return True if path contains two or more pools, otherwise false
    */
@@ -62,11 +61,20 @@ public class Path {
    *  tokenB The second token of the given pool
    *  fee The fee level of the pool
    */
-  public static PoolData decodeFirstPool (ObjectReader reader) {
-    Address tokenA = reader.readAddress();
-    int fee = reader.readInt();
-    Address tokenB = reader.readAddress();
-    return new PoolData(tokenA, tokenB, fee);
+  public static PoolData decodeFirstPool (byte[] path) {
+    return new PoolData(
+      new Address(Arrays.copyOfRange(path, 0, ADDR_SIZE)),
+      new Address(Arrays.copyOfRange(path, NEXT_OFFSET, POP_OFFSET)),
+      BytesUtils.getBigEndianInt(Arrays.copyOfRange(path, ADDR_SIZE, NEXT_OFFSET))
+    );
+  }
+
+  public static byte[] encodePath (PoolData obj) {
+    return BytesUtils.concat(
+      obj.tokenA.toByteArray(),
+      BytesUtils.intToBytes(obj.fee),
+      obj.tokenB.toByteArray()
+    );
   }
 
   /**

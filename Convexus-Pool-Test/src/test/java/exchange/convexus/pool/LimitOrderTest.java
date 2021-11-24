@@ -32,7 +32,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import exchange.convexus.factory.ConvexusFactoryUtils;
-import exchange.convexus.liquidity.ConvexusLiquidity;
+import exchange.convexus.liquidity.ConvexusLiquidityUtils;
 import exchange.convexus.utils.IntUtils;
 
 public class LimitOrderTest extends ConvexusPoolTest {
@@ -63,14 +63,14 @@ public class LimitOrderTest extends ConvexusPoolTest {
 
   @Test
   void testLimitSelling0For1AtTick0Thru1() {
-    ConvexusLiquidity.deposit(alice, callee.getAddress(), sicx.score, new BigInteger("5981737760509663"));
+    ConvexusLiquidityUtils.deposit(alice, callee.getAddress(), sicx.score, new BigInteger("5981737760509663"));
 
     reset(sicx.spy);
     callee.invoke(alice, "mint", pool.getAddress(), alice.getAddress(), 0, 120, TEN.pow(18));
     verify(sicx.spy).Transfer(callee.getAddress(), pool.getAddress(), new BigInteger("5981737760509663"), "pay".getBytes());
 
     // somebody takes the limit order
-    ConvexusLiquidity.deposit(bob, callee.getAddress(), usdc.score, new BigInteger("2000000000000000000"));
+    ConvexusLiquidityUtils.deposit(bob, callee.getAddress(), usdc.score, new BigInteger("2000000000000000000"));
     swapExact1For0(TEN.pow(18).multiply(TWO), bob);
 
     reset(sicx.spy);
@@ -97,14 +97,14 @@ public class LimitOrderTest extends ConvexusPoolTest {
 
   @Test
   void testLimitSelling1For0AtTick0ThruMinus1 () {
-    ConvexusLiquidity.deposit(alice, callee.getAddress(), usdc.score, new BigInteger("5981737760509663"));
+    ConvexusLiquidityUtils.deposit(alice, callee.getAddress(), usdc.score, new BigInteger("5981737760509663"));
 
     reset(usdc.spy);
     callee.invoke(alice, "mint", pool.getAddress(), alice.getAddress(), -120, 0, TEN.pow(18));
     verify(usdc.spy).Transfer(callee.getAddress(), pool.getAddress(), new BigInteger("5981737760509663"), "pay".getBytes());
 
     // somebody takes the limit order
-    ConvexusLiquidity.deposit(bob, callee.getAddress(), sicx.score, new BigInteger("2000000000000000000"));
+    ConvexusLiquidityUtils.deposit(bob, callee.getAddress(), sicx.score, new BigInteger("2000000000000000000"));
     swapExact0For1(TEN.pow(18).multiply(TWO), bob);
 
     reset(sicx.spy);

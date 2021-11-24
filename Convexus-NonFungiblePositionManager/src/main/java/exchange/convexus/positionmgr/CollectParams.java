@@ -27,4 +27,16 @@ public class CollectParams {
     public BigInteger amount1Max;
 
     public CollectParams() {}
+
+    public CollectParams (
+        BigInteger tokenId,
+        Address recipient,
+        BigInteger amount0Max,
+        BigInteger amount1Max
+    ) {
+        this.tokenId = tokenId;
+        this.recipient = recipient;
+        this.amount0Max = amount0Max;
+        this.amount1Max = amount1Max;
+    }
 }

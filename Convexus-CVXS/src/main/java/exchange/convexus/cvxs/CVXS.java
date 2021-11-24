@@ -58,7 +58,7 @@ public class CVXS {
 
     // Cap on the percentage of totalSupply that can be minted at each mint
     private final BigInteger mintCap = TWO;
-
+ 
     // ================================================
     // SCORE DB
     // ================================================

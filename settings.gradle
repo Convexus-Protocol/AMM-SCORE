@@ -30,6 +30,7 @@ include (
     'Convexus-Staker-Test',
     'Convexus-Tests',
     'Convexus-Utils',
+    'Convexus-Utils-Test',
     'javaee-tokens',
     'unittest',
     'testinteg')

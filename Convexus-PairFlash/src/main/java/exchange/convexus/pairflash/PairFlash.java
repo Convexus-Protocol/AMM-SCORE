@@ -30,9 +30,17 @@ import score.ByteArrayObjectWriter;
 import score.Context;
 import score.ObjectReader;
 import score.annotation.External;
+import score.annotation.Optional;
+import scorex.io.Reader;
+import scorex.io.StringReader;
 
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonObject;
+import com.eclipsesource.json.JsonValue;
+
+import exchange.convexus.liquidity.AddLiquidityParams;
+import exchange.convexus.liquidity.AddLiquidityResult;
+import exchange.convexus.liquidity.ConvexusLiquidityManagement;
 
 /**
  * @title Flash contract implementation
@@ -51,6 +59,9 @@ public class PairFlash {
     private final Address factory;
     private final Address swapRouter;
 
+    // Liquidity Manager
+    private final ConvexusLiquidityManagement liquidityMgr;
+
     // ================================================
     // DB Variables
     // ================================================
@@ -68,6 +79,8 @@ public class PairFlash {
         this.name = "Convexus Pair Flash";
         this.swapRouter = _swapRouter;
         this.factory = _factory;
+        
+        this.liquidityMgr = new ConvexusLiquidityManagement(_factory);
     }
 
     private BigInteger routerExactInputSingle (Address tokenIn, BigInteger amountIn, Address tokenOut, BigInteger amountOutMinimum, int poolFee) {
@@ -151,19 +164,6 @@ public class PairFlash {
         }
     }
 
-    //fee1 is the fee of the pool from the initial borrow
-    //fee2 is the fee of the first pool to arb from
-    //fee3 is the fee of the second pool to arb from
-    class FlashParams {
-        Address token0;
-        Address token1;
-        int fee1;
-        BigInteger amount0;
-        BigInteger amount1;
-        int fee2;
-        int fee3;
-    }
-
     /**
      * @param params The parameters necessary for flash and the callback, passed in as FlashParams
      * @notice Calls the pools flash function with data needed in `convexusFlashCallback`
@@ -201,6 +201,79 @@ public class PairFlash {
         );
     }
  
+    // ================================================
+    // Implements LiquidityManager
+    // ================================================
+    /**
+     * @notice Called to `msg.sender` after minting liquidity to a position from ConvexusPool#mint.
+     * @dev In the implementation you must pay the pool tokens owed for the minted liquidity.
+     * The caller of this method must be checked to be a ConvexusPool deployed by the canonical ConvexusFactory.
+     * @param amount0Owed The amount of token0 due to the pool for the minted liquidity
+     * @param amount1Owed The amount of token1 due to the pool for the minted liquidity
+     * @param data Any data passed through by the caller via the mint call
+     */
+    @External
+    public void convexusMintCallback (
+        BigInteger amount0Owed,
+        BigInteger amount1Owed,
+        byte[] data
+    ) {
+        this.liquidityMgr.convexusMintCallback(amount0Owed, amount1Owed, data);
+    }
+
+    /**
+     * @notice Add liquidity to an initialized pool
+     * @dev Liquidity must have been provided beforehand
+     */
+    @External
+    public AddLiquidityResult addLiquidity (AddLiquidityParams params) {
+        return this.liquidityMgr.addLiquidity(params);
+    }
+
+    /**
+     * @notice Remove funds from the liquidity manager
+     */
+    @External
+    public void withdraw (Address token) {
+        this.liquidityMgr.withdraw(token);
+    }
+
+    @External
+    public void tokenFallback (Address _from, BigInteger _value, @Optional byte[] _data) throws Exception {
+
+        String data = new String(_data);
+        Address token = Context.getCaller();
+
+        if (data.equals("flash")) {
+            this.liquidityMgr.deposit(_from, token, _value);
+            return;
+        }
+
+        Reader reader = new StringReader(data);
+        JsonValue input = Json.parse(reader);
+        JsonObject root = input.asObject();
+        String method = root.get("method").asString();
+
+        switch (method)
+        {
+            /**
+             * @notice Add funds to the liquidity manager
+             */
+            case "deposit": {
+                this.liquidityMgr.deposit(_from, token, _value);
+                break;
+            }
+
+            default:
+                Context.revert("tokenFallback: Unimplemented tokenFallback action");
+        }
+    }
+
+    @External(readonly = true)
+    public BigInteger deposited(Address user, Address token) {
+        return this.liquidityMgr.deposited(user, token);
+    }
+
     // ================================================
     // Public variable getters
     // ================================================

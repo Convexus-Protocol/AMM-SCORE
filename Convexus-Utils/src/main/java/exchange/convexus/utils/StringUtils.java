@@ -26,12 +26,7 @@ public class StringUtils {
         if (input.startsWith("0x")) {
             return new BigInteger(input.substring(2), 16);
         } else {
-            try {
-                return new BigInteger(input, 10);
-            } catch (NumberFormatException e) {
-                // May happen if a hexstring isn't prefixed with 0x
-                return new BigInteger(input, 16);
-            }
+            return new BigInteger(input, 10);
         }
     }
 

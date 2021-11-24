@@ -33,7 +33,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
 import exchange.convexus.factory.ConvexusFactoryUtils;
-import exchange.convexus.liquidity.ConvexusLiquidity;
+import exchange.convexus.liquidity.ConvexusLiquidityUtils;
 import exchange.convexus.utils.AssertUtils;
 import exchange.convexus.utils.IntUtils;
 import score.Address;
@@ -75,7 +75,7 @@ public class MintMiscTest extends ConvexusPoolTest {
     BigInteger b0 = (BigInteger) sicx.call("balanceOf", pool.getAddress());
     BigInteger b1 = (BigInteger) usdc.call("balanceOf", pool.getAddress());
 
-    ConvexusLiquidity.deposit(alice, callee.getAddress(), sicx.score, new BigInteger("1"));
+    ConvexusLiquidityUtils.deposit(alice, callee.getAddress(), sicx.score, new BigInteger("1"));
     callee.invoke(alice, "mint", pool.getAddress(), alice.getAddress(), lowerTick, upperTick, liquidityDelta);
     
     BigInteger liquidityAfter = (BigInteger) pool.call("liquidity");
@@ -99,7 +99,7 @@ public class MintMiscTest extends ConvexusPoolTest {
     BigInteger b0 = (BigInteger) sicx.call("balanceOf", pool.getAddress());
     BigInteger b1 = (BigInteger) usdc.call("balanceOf", pool.getAddress());
 
-    ConvexusLiquidity.deposit(alice, callee.getAddress(), usdc.score, new BigInteger("1"));
+    ConvexusLiquidityUtils.deposit(alice, callee.getAddress(), usdc.score, new BigInteger("1"));
     callee.invoke(alice, "mint", pool.getAddress(), alice.getAddress(), lowerTick, upperTick, liquidityDelta);
     
     BigInteger liquidityAfter = (BigInteger) pool.call("liquidity");
@@ -123,8 +123,8 @@ public class MintMiscTest extends ConvexusPoolTest {
     BigInteger b0 = (BigInteger) sicx.call("balanceOf", pool.getAddress());
     BigInteger b1 = (BigInteger) usdc.call("balanceOf", pool.getAddress());
 
-    ConvexusLiquidity.deposit(alice, callee.getAddress(), sicx.score, new BigInteger("1"));
-    ConvexusLiquidity.deposit(alice, callee.getAddress(), usdc.score, new BigInteger("1"));
+    ConvexusLiquidityUtils.deposit(alice, callee.getAddress(), sicx.score, new BigInteger("1"));
+    ConvexusLiquidityUtils.deposit(alice, callee.getAddress(), usdc.score, new BigInteger("1"));
     callee.invoke(alice, "mint", pool.getAddress(), alice.getAddress(), lowerTick, upperTick, liquidityDelta);
     
     BigInteger liquidityAfter = (BigInteger) pool.call("liquidity");
@@ -142,8 +142,8 @@ public class MintMiscTest extends ConvexusPoolTest {
     int lowerTick = -tickSpacing;
     int upperTick = tickSpacing;
 
-    ConvexusLiquidity.deposit(alice, callee.getAddress(), sicx.score, new BigInteger("499850034993001260"));
-    ConvexusLiquidity.deposit(alice, callee.getAddress(), usdc.score, new BigInteger("499850034993001260"));
+    ConvexusLiquidityUtils.deposit(alice, callee.getAddress(), sicx.score, new BigInteger("499850034993001260"));
+    ConvexusLiquidityUtils.deposit(alice, callee.getAddress(), usdc.score, new BigInteger("499850034993001260"));
     callee.invoke(alice, "mint", pool.getAddress(), alice.getAddress(), lowerTick, upperTick, TEN.pow(18).multiply(BigInteger.valueOf(1000)));
 
     AssertUtils.assertThrowsMessage(AssertionError.class, () ->
@@ -157,14 +157,14 @@ public class MintMiscTest extends ConvexusPoolTest {
     int lowerTick = -tickSpacing * 100;
     int upperTick = tickSpacing * 100;
     
-    ConvexusLiquidity.deposit(alice, callee.getAddress(), sicx.score, new BigInteger("4876819758127888900"));
-    ConvexusLiquidity.deposit(alice, callee.getAddress(), usdc.score, new BigInteger("4876819758127888900"));
+    ConvexusLiquidityUtils.deposit(alice, callee.getAddress(), sicx.score, new BigInteger("4876819758127888900"));
+    ConvexusLiquidityUtils.deposit(alice, callee.getAddress(), usdc.score, new BigInteger("4876819758127888900"));
     callee.invoke(alice, "mint", pool.getAddress(), alice.getAddress(), lowerTick, upperTick, liquidityDelta);
     
     BigInteger liquidityBefore = (BigInteger) pool.call("liquidity");
 
     BigInteger amount0In = TEN.pow(18);
-    ConvexusLiquidity.deposit(alice, callee.getAddress(), sicx.score, new BigInteger("1000000000000000000"));
+    ConvexusLiquidityUtils.deposit(alice, callee.getAddress(), sicx.score, new BigInteger("1000000000000000000"));
     swapExact0For1(amount0In, alice);
     
     BigInteger liquidityAfter = (BigInteger) pool.call("liquidity");

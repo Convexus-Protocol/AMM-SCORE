@@ -27,4 +27,20 @@ public class IncreaseLiquidityParams {
     public BigInteger deadline;
 
     public IncreaseLiquidityParams () {}
+    
+    public IncreaseLiquidityParams (
+        BigInteger tokenId,
+        BigInteger amount0Desired,
+        BigInteger amount1Desired,
+        BigInteger amount0Min,
+        BigInteger amount1Min,
+        BigInteger deadline
+    ) {
+        this.tokenId = tokenId;
+        this.amount0Desired = amount0Desired;
+        this.amount1Desired = amount1Desired;
+        this.amount0Min = amount0Min;
+        this.amount1Min = amount1Min;
+        this.deadline = deadline;
+    }
 }

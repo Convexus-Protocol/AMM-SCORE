@@ -34,7 +34,7 @@ import exchange.convexus.factory.ConvexusFactoryUtils;
 import exchange.convexus.librairies.Position;
 import exchange.convexus.librairies.Positions;
 import exchange.convexus.librairies.Tick;
-import exchange.convexus.liquidity.ConvexusLiquidity;
+import exchange.convexus.liquidity.ConvexusLiquidityUtils;
 
 public class BurnTest extends ConvexusPoolTest {
 
@@ -82,14 +82,14 @@ public class BurnTest extends ConvexusPoolTest {
       // some activity that would make the ticks non-zero
       sm.getBlock().increase(10);
       
-      ConvexusLiquidity.deposit(bob, callee.getAddress(), sicx.score, new BigInteger("1000000000000000000"));
-      ConvexusLiquidity.deposit(bob, callee.getAddress(), usdc.score, new BigInteger("1000000000000000000"));
+      ConvexusLiquidityUtils.deposit(bob, callee.getAddress(), sicx.score, new BigInteger("1000000000000000000"));
+      ConvexusLiquidityUtils.deposit(bob, callee.getAddress(), usdc.score, new BigInteger("1000000000000000000"));
       callee.invoke(bob, "mint", pool.getAddress(), bob.getAddress(), minTick, maxTick, TEN.pow(18));
       
-      ConvexusLiquidity.deposit(alice, callee.getAddress(), sicx.score, new BigInteger("1000000000000000000"));
+      ConvexusLiquidityUtils.deposit(alice, callee.getAddress(), sicx.score, new BigInteger("1000000000000000000"));
       swapExact0For1(TEN.pow(18), alice);
       
-      ConvexusLiquidity.deposit(alice, callee.getAddress(), usdc.score, new BigInteger("1000000000000000000"));
+      ConvexusLiquidityUtils.deposit(alice, callee.getAddress(), usdc.score, new BigInteger("1000000000000000000"));
       swapExact1For0(TEN.pow(18), alice);
 
       pool.invoke(bob, "burn", minTick, maxTick, TEN.pow(18));
@@ -107,11 +107,11 @@ public class BurnTest extends ConvexusPoolTest {
     int tickUpper = maxTick - tickSpacing;
     // some activity that would make the ticks non-zero
     sm.getBlock().increase(10);
-    ConvexusLiquidity.deposit(alice, callee.getAddress(), sicx.score, new BigInteger("1"));
-    ConvexusLiquidity.deposit(alice, callee.getAddress(), usdc.score, new BigInteger("1"));
+    ConvexusLiquidityUtils.deposit(alice, callee.getAddress(), sicx.score, new BigInteger("1"));
+    ConvexusLiquidityUtils.deposit(alice, callee.getAddress(), usdc.score, new BigInteger("1"));
     callee.invoke(alice, "mint", pool.getAddress(), alice.getAddress(), tickLower, tickUpper, ONE);
     
-    ConvexusLiquidity.deposit(alice, callee.getAddress(), sicx.score, new BigInteger("1000000000000000000"));
+    ConvexusLiquidityUtils.deposit(alice, callee.getAddress(), sicx.score, new BigInteger("1000000000000000000"));
     swapExact0For1(TEN.pow(18), alice);
     
     pool.invoke(alice, "burn", tickLower, tickUpper, ONE);
@@ -127,15 +127,15 @@ public class BurnTest extends ConvexusPoolTest {
     // some activity that would make the ticks non-zero
     sm.getBlock().increase(10);
     
-    ConvexusLiquidity.deposit(alice, callee.getAddress(), sicx.score, new BigInteger("1"));
-    ConvexusLiquidity.deposit(alice, callee.getAddress(), usdc.score, new BigInteger("1"));
+    ConvexusLiquidityUtils.deposit(alice, callee.getAddress(), sicx.score, new BigInteger("1"));
+    ConvexusLiquidityUtils.deposit(alice, callee.getAddress(), usdc.score, new BigInteger("1"));
     callee.invoke(alice, "mint", pool.getAddress(), alice.getAddress(), tickLower, tickUpper, ONE);
     
-    ConvexusLiquidity.deposit(alice, callee.getAddress(), sicx.score, new BigInteger("1"));
-    ConvexusLiquidity.deposit(alice, callee.getAddress(), usdc.score, new BigInteger("1"));
+    ConvexusLiquidityUtils.deposit(alice, callee.getAddress(), sicx.score, new BigInteger("1"));
+    ConvexusLiquidityUtils.deposit(alice, callee.getAddress(), usdc.score, new BigInteger("1"));
     callee.invoke(alice, "mint", pool.getAddress(), alice.getAddress(), tickLower + tickSpacing, tickUpper, ONE);
     
-    ConvexusLiquidity.deposit(alice, callee.getAddress(), sicx.score, new BigInteger("1000000000000000000"));
+    ConvexusLiquidityUtils.deposit(alice, callee.getAddress(), sicx.score, new BigInteger("1000000000000000000"));
     swapExact0For1(TEN.pow(18), alice);
     
     pool.invoke(alice, "burn", tickLower, tickUpper, ONE);
@@ -151,15 +151,15 @@ public class BurnTest extends ConvexusPoolTest {
     // some activity that would make the ticks non-zero
     sm.getBlock().increase(10);
     
-    ConvexusLiquidity.deposit(alice, callee.getAddress(), sicx.score, new BigInteger("1"));
-    ConvexusLiquidity.deposit(alice, callee.getAddress(), usdc.score, new BigInteger("1"));
+    ConvexusLiquidityUtils.deposit(alice, callee.getAddress(), sicx.score, new BigInteger("1"));
+    ConvexusLiquidityUtils.deposit(alice, callee.getAddress(), usdc.score, new BigInteger("1"));
     callee.invoke(alice, "mint", pool.getAddress(), alice.getAddress(), tickLower, tickUpper, ONE);
     
-    ConvexusLiquidity.deposit(alice, callee.getAddress(), sicx.score, new BigInteger("1"));
-    ConvexusLiquidity.deposit(alice, callee.getAddress(), usdc.score, new BigInteger("1"));
+    ConvexusLiquidityUtils.deposit(alice, callee.getAddress(), sicx.score, new BigInteger("1"));
+    ConvexusLiquidityUtils.deposit(alice, callee.getAddress(), usdc.score, new BigInteger("1"));
     callee.invoke(alice, "mint", pool.getAddress(), alice.getAddress(), tickLower, tickUpper - tickSpacing, ONE);
     
-    ConvexusLiquidity.deposit(alice, callee.getAddress(), sicx.score, new BigInteger("1000000000000000000"));
+    ConvexusLiquidityUtils.deposit(alice, callee.getAddress(), sicx.score, new BigInteger("1000000000000000000"));
     swapExact0For1(TEN.pow(18), alice);
     
     pool.invoke(alice, "burn", tickLower, tickUpper, ONE);

@@ -17,6 +17,7 @@
 package exchange.convexus.staker;
 
 import java.math.BigInteger;
+import static java.math.BigInteger.ZERO;
 
 /// @notice Represents a staked liquidity NFT
 public class Stake {
@@ -32,5 +33,9 @@ public class Stake {
         this.secondsPerLiquidityInsideInitialX128 = secondsPerLiquidityInsideInitialX128;
         this.liquidityNoOverflow = liquidityNoOverflow;
         this.liquidityIfOverflow = liquidityIfOverflow;
+    }
+
+    public static Stake empty() {
+      return new Stake(ZERO, ZERO, ZERO);
     }
 }

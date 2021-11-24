@@ -17,6 +17,7 @@
 package exchange.convexus.positionmgr;
 
 import static java.math.BigInteger.ONE;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.iconloop.score.test.ServiceManager;
 
@@ -24,14 +25,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 public class CreateAndInitializePoolIfNecessaryTest extends NonFungiblePositionManagerTest {
-
-  final int TICK_SPACINGS[] = {10, 60, 200};
-  final int FEE_AMOUNTS[] = {500, 3000, 10000};
-  final int LOW = 0;
-  final int MEDIUM = 1;
-  final int HIGH = 2;
-  int FEE = FEE_AMOUNTS[MEDIUM];
-  int tickSpacing = TICK_SPACINGS[MEDIUM];
 
   @BeforeEach
   void setup() throws Exception {
@@ -42,12 +35,13 @@ public class CreateAndInitializePoolIfNecessaryTest extends NonFungiblePositionM
   }
 
   @Test
-  void test () {
-    initializer.invoke(owner, "createAndInitializePoolIfNecessary", 
-      sicx.getAddress(),
-      usdc.getAddress(),
-      FEE,
-      encodePriceSqrt(ONE, ONE)
-    );
+  void testCreateAndInitializePoolIfNecessary () {
+    createAndInitializePoolIfNecessary(sicx.getAddress(), usdc.getAddress(), FEE_AMOUNTS[MEDIUM], encodePriceSqrt(ONE, ONE), tickSpacing);
+  }
+
+  @Test
+  void testIsPayable () {
+    // Periphery::NonfungiblePositionManager.spec.js line 101
+    assertTrue(false); // TODO
   }
 }

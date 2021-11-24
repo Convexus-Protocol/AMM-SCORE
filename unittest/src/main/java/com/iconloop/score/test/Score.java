@@ -17,10 +17,12 @@
 package com.iconloop.score.test;
 
 import score.Address;
+import score.Context;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigInteger;
+import java.util.EmptyStackException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -126,6 +128,16 @@ public class Score extends TestBase {
     }
 
     Object call(Account from, boolean readonly, BigInteger value, String method, Object... params) {
+
+        try {
+            if (!readonly && sm.getCurrentFrame().isReadonly()) {
+                // Cannot push a write frame on top of a read frame
+                readonly = true;
+            }
+        } catch (EmptyStackException e) {
+            // No frame pushed yet, pass
+        }
+        
         sm.pushFrame(from, this.score, readonly, method, value);
         Class<?>[] paramClasses = new Class<?>[params.length];
         for (int i = 0; i < params.length; i++) {
@@ -156,6 +168,7 @@ public class Score extends TestBase {
             e.printStackTrace();
             throw new RuntimeException(e.getMessage());
         } catch (InvocationTargetException e) {
+            Context.println("========================================");
             e.printStackTrace();
             throw new AssertionError(e.getTargetException().getMessage());
         } finally {

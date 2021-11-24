@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package exchange.convexus.staker.pools;
+package exchange.convexus.pools;
 
 import static exchange.convexus.librairies.BlockTimestamp._blockTimestamp;
 import static exchange.convexus.utils.IntUtils.uint256;
@@ -55,7 +55,7 @@ import score.annotation.EventLog;
 import score.annotation.External;
 import score.annotation.Optional;
 
-public class Pool12 {
+public class Pool2 {
 
     // ================================================
     // Consts
@@ -293,7 +293,7 @@ public class Pool12 {
     /**
      *  @notice Contract constructor
      */
-    public Pool12(
+    public Pool2(
         // TODO: PATCH PATCH PATCH: REMOVE ME
         Address _token0,
         Address _token1,
@@ -302,7 +302,7 @@ public class Pool12 {
         int tickSpacing
         // END OF PATCH
     ) {
-        // ConvexusPoolDeployerParameters parameters = (ConvexusPoolDeployerParameters) Context.call(Context.getCaller(), "parameters");
+        // ConvexusPoolDeployerParameters parameters = ConvexusPoolDeployerParameters.fromMap(Context.call(Context.getCaller(), "parameters"));
 
         /**  === TODO: PATCH PATCH PATCH: REMOVE ME === */
         ConvexusPoolDeployerParameters parameters = new ConvexusPoolDeployerParameters(
@@ -881,7 +881,7 @@ public class Pool12 {
             zeroForOne
                 ? sqrtPriceLimitX96.compareTo(slot0Start.sqrtPriceX96) < 0 && sqrtPriceLimitX96.compareTo(TickMath.MIN_SQRT_RATIO) > 0
                 : sqrtPriceLimitX96.compareTo(slot0Start.sqrtPriceX96) > 0 && sqrtPriceLimitX96.compareTo(TickMath.MAX_SQRT_RATIO) < 0,
-            "swap: SPL"
+            "swap: Wrong sqrtPriceLimitX96"
         );
 
         SwapCache cache = new SwapCache(
@@ -970,7 +970,7 @@ public class Pool12 {
             }
             
             // shift tick if we reached the next price
-            if (state.sqrtPriceX96 == step.sqrtPriceNextX96) {
+            if (state.sqrtPriceX96.equals(step.sqrtPriceNextX96)) {
                 // if the tick is initialized, run the tick transition
                 if (step.initialized) {
                     // check for the placeholder value, which we replace with the actual value the first time the swap
@@ -1231,7 +1231,7 @@ public class Pool12 {
         BigInteger amount1 = amount1Requested.compareTo(_protocolFees.token1) > 0 ? _protocolFees.token1 : amount1Requested;
         
         if (amount0.compareTo(ZERO) > 0) {
-            if (amount0 == _protocolFees.token0) {
+            if (amount0.equals(_protocolFees.token0)) {
                 // ensure that the slot is not cleared, for steps savings
                 amount0 = amount0.subtract(BigInteger.ONE); 
             }
@@ -1240,7 +1240,7 @@ public class Pool12 {
             pay(token0, recipient, amount0, "collectProtocol");
         }
         if (amount1.compareTo(ZERO) > 0) {
-            if (amount1 == _protocolFees.token1) {
+            if (amount1.equals(_protocolFees.token1)) {
                 // ensure that the slot is not cleared, for steps savings
                 amount1 = amount1.subtract(BigInteger.ONE); 
             }

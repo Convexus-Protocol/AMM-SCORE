@@ -19,6 +19,7 @@ package exchange.convexus.staker;
 import java.math.BigInteger;
 
 import score.Address;
+import score.Context;
 import score.ObjectReader;
 import score.ObjectWriter;
 
@@ -64,5 +65,9 @@ public class IncentiveKey {
         w.write(obj.startTime);
         w.write(obj.endTime);
         w.write(obj.refundee);
+    }
+
+    public String toString () {
+        return "[KEY] \n rewardToken = " + rewardToken + " \n pool = " + pool + " (" + Context.call(pool, "name") + ")" + " \n startTime = " + startTime + " \n endTime = " + endTime + " \n refundee = " + refundee;
     }
 }

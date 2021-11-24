@@ -35,6 +35,8 @@ public class ReentrancyLock {
      * @param state reentrancy protection state
      */
     public void lock (boolean state) {
+        StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
+        Context.println("Locking : " + state + " / " + stackTraceElements[2].getClassName() + "::" + stackTraceElements[2].getMethodName());
         boolean lock_state = this.locked.getOrDefault(false);
         if (state) {
             Context.require(!lock_state, 

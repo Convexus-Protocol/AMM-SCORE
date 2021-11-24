@@ -32,4 +32,9 @@ public class QuoteResult {
         this.sqrtPriceX96After = sqrtPriceX96After;
         this.initializedTicksCrossed = initializedTicksCrossed;
     }
+
+    public static QuoteResult fromMap(Object invoke) {
+        return null;
+    }
+
 }

@@ -22,7 +22,9 @@ import score.Context;
 
 public class TimeUtils {
 
-  public static final BigInteger ONE_SECOND = BigInteger.valueOf(1000 * 1000);
+  public static final BigInteger TO_SECONDS = BigInteger.valueOf(1000 * 1000);
+
+  public static final BigInteger ONE_SECOND = BigInteger.valueOf(1);
   public static final BigInteger ONE_MINUTE = BigInteger.valueOf(60).multiply(ONE_SECOND);
   public static final BigInteger ONE_HOUR   = BigInteger.valueOf(60).multiply(ONE_MINUTE);
   public static final BigInteger ONE_DAY    = BigInteger.valueOf(24).multiply(ONE_HOUR);
@@ -30,7 +32,11 @@ public class TimeUtils {
   public static final BigInteger ONE_MONTH  = BigInteger.valueOf(30).multiply(ONE_DAY);
   public static final BigInteger ONE_YEAR   = BigInteger.valueOf(365).multiply(ONE_DAY);
 
+  public static BigInteger timestampToSeconds (long timestamp) {
+    return BigInteger.valueOf(timestamp).divide(TO_SECONDS);
+  }
+
   public static BigInteger nowSeconds () {
-    return BigInteger.valueOf(Context.getBlockTimestamp()).divide(ONE_SECOND);
+    return timestampToSeconds(Context.getBlockTimestamp());
   }
 }

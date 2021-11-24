@@ -24,7 +24,7 @@ import java.math.BigInteger;
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
-import com.iconloop.score.token.irc721.IRC721;
+import com.iconloop.score.token.irc721.IRC721Enumerable;
 
 import exchange.convexus.librairies.FixedPoint128;
 import exchange.convexus.librairies.FullMath;
@@ -43,7 +43,6 @@ import scorex.io.Reader;
 import scorex.io.StringReader;
 
 import static exchange.convexus.librairies.BlockTimestamp._blockTimestamp;
-import static exchange.convexus.utils.AddressUtils.ZERO_ADDRESS;
 import static exchange.convexus.utils.IntUtils.uint128;
 
 import exchange.convexus.liquidity.AddLiquidityParams;
@@ -52,7 +51,7 @@ import exchange.convexus.liquidity.ConvexusLiquidityManagement;
 
 // @title NFT positions
 // @notice Wraps Convexus positions in the IRC3 non-fungible token interface
-public class NonFungiblePositionManager extends IRC721 {
+public class NonFungiblePositionManager extends IRC721Enumerable {
 
     // ================================================
     // Consts
@@ -100,7 +99,7 @@ public class NonFungiblePositionManager extends IRC721 {
     /// @param amount1 The amount of token1 that was paid for the increase in liquidity
     @EventLog
     public void IncreaseLiquidity(BigInteger tokenId, BigInteger liquidity, BigInteger amount0, BigInteger amount1) {}
-    
+
     /// @notice Emitted when liquidity is decreased for a position NFT
     /// @param tokenId The ID of the token for which liquidity was decreased
     /// @param liquidity The amount by which liquidity for the NFT position was decreased
@@ -108,7 +107,7 @@ public class NonFungiblePositionManager extends IRC721 {
     /// @param amount1 The amount of token1 that was accounted for the decrease in liquidity
     @EventLog
     protected void DecreaseLiquidity(BigInteger tokenId, BigInteger liquidity, BigInteger amount0, BigInteger amount1) {}
-    
+
     /// @notice Emitted when tokens are collected for a position NFT
     /// @dev The amounts reported may not be exactly equivalent to the amounts transferred, due to rounding behavior
     /// @param tokenId The ID of the token for which underlying tokens were collected
@@ -151,8 +150,9 @@ public class NonFungiblePositionManager extends IRC721 {
      */
     @External(readonly = true)
     public PositionInformation positions (BigInteger tokenId) {
-        NFTPosition position = this._positions.get(tokenId);
-        Context.require(position != null, "Invalid token ID");
+        NFTPosition position = this._positions.getOrDefault(tokenId, NFTPosition.empty());
+        Context.require(!position.poolId.equals(ZERO),
+            "positions: Invalid token ID");
 
         PoolAddress.PoolKey poolKey = this._poolIdToPoolKey.get(position.poolId);
         return new PositionInformation(
@@ -186,6 +186,16 @@ public class NonFungiblePositionManager extends IRC721 {
         return poolId;
     }
 
+    /**
+     * @notice Creates a new position wrapped in a NFT
+     * @dev Call this when the pool does exist and is initialized. Note that if the pool is created but not initialized
+     * a method does not exist, i.e. the pool is assumed to be initialized.
+     * @param params The params necessary to mint a position, encoded as `MintParams` in calldata
+     * @return tokenId The ID of the token that represents the minted position
+     * @return liquidity The amount of liquidity for this position
+     * @return amount0 The amount of token0
+     * @return amount1 The amount of token1
+     */
     @External
     public MintResult mint (MintParams params) {
         this.checkDeadline(params.deadline);
@@ -296,10 +306,9 @@ public class NonFungiblePositionManager extends IRC721 {
 
         positionStorage.feeGrowthInside0LastX128 = feeGrowthInside0LastX128;
         positionStorage.feeGrowthInside1LastX128 = feeGrowthInside1LastX128;
-        positionStorage.liquidity = positionStorage.liquidity.add(poolPos.liquidity);
+        positionStorage.liquidity = positionStorage.liquidity.add(liquidity);
 
         this._positions.set(params.tokenId, positionStorage);
-        
         this.IncreaseLiquidity(params.tokenId, liquidity, amount0, amount1);
 
         return new IncreaseLiquidityResult(liquidity, amount0, amount1);
@@ -331,7 +340,7 @@ public class NonFungiblePositionManager extends IRC721 {
 
         PoolAddress.PoolKey poolKey = this._poolIdToPoolKey.get(positionStorage.poolId);
         Address pool = PoolAddress.getPool(this.factory, poolKey);
-        var pairAmounts = (PairAmounts) Context.call(pool, "burn", positionStorage.tickLower, positionStorage.tickUpper, positionStorage.liquidity);
+        var pairAmounts = PairAmounts.fromMap(Context.call(pool, "burn", positionStorage.tickLower, positionStorage.tickUpper, params.liquidity));
         amount0 = pairAmounts.amount0;
         amount1 = pairAmounts.amount1;
 
@@ -363,13 +372,23 @@ public class NonFungiblePositionManager extends IRC721 {
         return new PairAmounts(amount0, amount1);
     }
 
+    /**
+     * @notice Collects up to a maximum amount of fees owed to a specific position to the recipient
+     * @param params tokenId The ID of the NFT for which tokens are being collected,
+     * recipient The account that should receive the tokens,
+     * amount0Max The maximum amount of token0 to collect,
+     * amount1Max The maximum amount of token1 to collect
+     * @return amount0 The amount of fees collected in token0
+     * @return amount1 The amount of fees collected in token1
+     */
     @External
     public PairAmounts collect (CollectParams params) {
         isAuthorizedForToken(params.tokenId);
 
-        Context.require(params.amount0Max.compareTo(ZERO) > 0 || params.amount1Max.compareTo(ZERO) > 0);
+        Context.require(params.amount0Max.compareTo(ZERO) > 0 || params.amount1Max.compareTo(ZERO) > 0,
+            "collect: amount0Max and amount1Max cannot be both zero");
         // allow collecting to the nft position manager address with address 0
-        Address recipient = params.recipient == ZERO_ADDRESS ? Context.getAddress() : params.recipient;
+        Address recipient = params.recipient.equals(ZERO_ADDRESS) ? Context.getAddress() : params.recipient;
 
         NFTPosition positionStorage = this._positions.get(params.tokenId);
         PoolAddress.PoolKey poolKey = this._poolIdToPoolKey.get(positionStorage.poolId);
@@ -400,13 +419,13 @@ public class NonFungiblePositionManager extends IRC721 {
         amount1Collect = (params.amount1Max.compareTo(tokensOwed1) > 0) ? tokensOwed1 : params.amount1Max;
         
         // the actual amounts collected are returned
-        var result = (PairAmounts) Context.call(pool, "collect", 
+        var result = PairAmounts.fromMap(Context.call(pool, "collect", 
             recipient,
             positionStorage.tickLower,
             positionStorage.tickUpper,
             amount0Collect,
             amount1Collect
-        );
+        ));
         BigInteger amount0 = result.amount0;
         BigInteger amount1 = result.amount1;
         
@@ -515,7 +534,7 @@ public class NonFungiblePositionManager extends IRC721 {
     /// @dev Overrides _approve to use the operator in the position, which is packed with the position permit nonce
     @Override
     protected void _approve (Address to, BigInteger tokenId) {
-        var position = this._positions.get(tokenId);
+        var position = this._positions.getOrDefault(tokenId, NFTPosition.empty());
         position.operator = to;
         this._positions.set(tokenId, position);
         this.Approval(ownerOf(tokenId), to, tokenId);
@@ -552,5 +571,10 @@ public class NonFungiblePositionManager extends IRC721 {
     @External(readonly = true)
     public String name() {
         return this.name;
+    }
+
+    @External(readonly = true)
+    public Address factory() {
+        return this.factory;
     }
 }

@@ -26,4 +26,18 @@ public class DecreaseLiquidityParams {
   public BigInteger deadline;
   
   public DecreaseLiquidityParams () {}
+  
+  public DecreaseLiquidityParams (
+    BigInteger tokenId,
+    BigInteger liquidity,
+    BigInteger amount0Min,
+    BigInteger amount1Min,
+    BigInteger deadline
+  ) {
+    this.tokenId = tokenId;
+    this.liquidity = liquidity;
+    this.amount0Min = amount0Min;
+    this.amount1Min = amount1Min;
+    this.deadline = deadline;
+  }
 }

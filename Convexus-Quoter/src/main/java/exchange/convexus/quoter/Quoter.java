@@ -36,7 +36,9 @@ import score.Context;
 import score.ObjectReader;
 import score.UserRevertedException;
 import score.VarDB;
+import score.annotation.EventLog;
 import score.annotation.External;
+import score.annotation.Optional;
 import scorex.util.StringTokenizer;
 
 /**
@@ -63,6 +65,12 @@ public class Quoter {
     // ================================================
     /// @dev Transient storage variable used to check a safety condition in exact output swaps.
     private final VarDB<BigInteger> amountOutCached = Context.newVarDB(NAME + "_amountOutCached", BigInteger.class);
+
+    // ================================================
+    // Event Logs
+    // ================================================
+    @EventLog
+    public void QuoteResult(BigInteger amount, BigInteger sqrtPriceX96After, int initializedTicksCrossed) {}
 
     // ================================================
     // Methods
@@ -93,14 +101,13 @@ public class Quoter {
         BigInteger amount0Delta,
         BigInteger amount1Delta,
         byte[] path
-    ) throws ConvexusSwapCallbackException {
+    ) {
         Context.require(
             amount0Delta.compareTo(ZERO) > 0 
         ||  amount1Delta.compareTo(ZERO) > 0, 
             "convexusSwapCallback: swaps entirely within 0-liquidity regions are not supported");
 
-        ObjectReader reader = Context.newByteArrayObjectReader("RLPn", path);
-        PoolData decoded = Path.decodeFirstPool(reader);
+        PoolData decoded = Path.decodeFirstPool(path);
         Address tokenIn = decoded.tokenA;
         Address tokenOut = decoded.tokenB;
         int fee = decoded.fee;
@@ -121,7 +128,7 @@ public class Quoter {
         }
 
         Address pool = getPool(tokenIn, tokenOut, fee);
-        var slot0 = (Slot0) Context.call(pool, "slot0");
+        var slot0 = Slot0.fromMap(Context.call(pool, "slot0"));
         BigInteger sqrtPriceX96After = slot0.sqrtPriceX96;
         int tickAfter = slot0.tick;
 
@@ -141,6 +148,14 @@ public class Quoter {
      * @dev Parses a revert reason that should contain the numeric quote
      */
     private RevertReason parseRevertReason (String reason) {
+        final String prefix = "Reverted(0): ";
+
+        // A manual reverted reason should start with the prefix as expected
+        Context.require(reason.startsWith(prefix), reason);
+
+        // Remove the prefixed error message from Context.revert()
+        reason = reason.replace(prefix, "");
+
         StringTokenizer scanner = new StringTokenizer(reason, ";");
         BigInteger amountReceived = StringUtils.toBigInt(scanner.nextToken());
         BigInteger sqrtPriceX96After = StringUtils.toBigInt(scanner.nextToken());
@@ -152,12 +167,13 @@ public class Quoter {
         String reason,
         Address pool
     ) {
-        var slot0 = (Slot0) Context.call(pool, "slot0");
+        var slot0 = Slot0.fromMap(Context.call(pool, "slot0"));
         int tickBefore = slot0.tick;
         var result = parseRevertReason(reason);
 
         int initializedTicksCrossed = countInitializedTicksCrossed(pool, tickBefore, result.tickAfter);
         
+        this.QuoteResult(result.amount, result.sqrtPriceX96After, initializedTicksCrossed);
         return new QuoteResult(result.amount, result.sqrtPriceX96After, initializedTicksCrossed);
     }
 
@@ -275,12 +291,9 @@ public class Quoter {
                 params.sqrtPriceLimitX96.equals(ZERO)
                     ? (zeroForOne ? TickMath.MIN_SQRT_RATIO.add(ONE) : TickMath.MAX_SQRT_RATIO.subtract(ONE))
                     : params.sqrtPriceLimitX96,
-                BytesUtils.concat(
-                    params.tokenIn.toByteArray(), 
-                    BytesUtils.intToBytes(params.fee), 
-                    params.tokenOut.toByteArray())
+                Path.encodePath(new PoolData(params.tokenIn, params.tokenOut, params.fee))
             );
-        } catch (UserRevertedException exception) {
+        } catch (UserRevertedException | AssertionError exception) { // TODO: test this behavior onchain (check flashtest.java)
             return handleRevert(exception.getMessage(), pool);
         }
 
@@ -303,8 +316,7 @@ public class Quoter {
 
         int i = 0;
         while (true) {
-            ObjectReader reader = Context.newByteArrayObjectReader("RLPn", path);
-            var firstPool = Path.decodeFirstPool(reader);
+            var firstPool = Path.decodeFirstPool(path);
             Address tokenIn = firstPool.tokenA;
             Address tokenOut = firstPool.tokenB;
             int fee = firstPool.fee;
@@ -395,8 +407,7 @@ public class Quoter {
 
         int i = 0;
         while (true) {
-            ObjectReader reader = Context.newByteArrayObjectReader("RLPn", path);
-            var firstPool = Path.decodeFirstPool(reader);
+            var firstPool = Path.decodeFirstPool(path);
             Address tokenIn = firstPool.tokenA;
             Address tokenOut = firstPool.tokenB;
             int fee = firstPool.fee;
@@ -429,6 +440,11 @@ public class Quoter {
                 return new QuoteMultiResult(amountOut, sqrtPriceX96AfterList, initializedTicksCrossedList);
             }
         }
+    }
+    
+    @External
+    public void tokenFallback (Address _from, BigInteger _value, @Optional byte[] _data) throws Exception {
+        // Accept coins
     }
 
     // ================================================

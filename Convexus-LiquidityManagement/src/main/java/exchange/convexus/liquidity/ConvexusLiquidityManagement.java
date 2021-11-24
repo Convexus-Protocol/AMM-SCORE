@@ -117,6 +117,7 @@ public class ConvexusLiquidityManagement {
         PoolAddress.PoolKey poolKey = new PoolAddress.PoolKey(params.token0, params.token1, params.fee);
 
         Address pool = PoolAddress.getPool(this.factory, poolKey);
+        Context.require(pool != null, "addLiquidity: pool doesn't exist");
         
         // compute the liquidity amount
         var result = Slot0.fromMap(Context.call(pool, "slot0"));
@@ -136,7 +137,6 @@ public class ConvexusLiquidityManagement {
         ByteArrayObjectWriter writer = Context.newByteArrayObjectWriter("RLPn");
         writer.write(new MintCallbackData(poolKey, Context.getCaller()));
 
-        Context.println("pool = " + Context.call(pool, "name"));
         PairAmounts amounts = PairAmounts.fromMap(Context.call(pool, "mint", 
             params.recipient,
             params.tickLower,

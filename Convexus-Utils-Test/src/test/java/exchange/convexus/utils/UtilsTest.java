@@ -14,10 +14,8 @@
  * limitations under the License.
  */
 
-package exchange.convexus.quoter;
+package exchange.convexus.utils;
 
-public class ConvexusSwapCallbackException extends Exception {
-    ConvexusSwapCallbackException (String error) {
-        super(error);
-    }
+public class UtilsTest extends ConvexusTest {
+
 }

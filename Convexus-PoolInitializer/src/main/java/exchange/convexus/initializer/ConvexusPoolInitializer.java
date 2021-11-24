@@ -70,7 +70,7 @@ public class ConvexusPoolInitializer {
             pool = (Address) Context.call(factory, "createPool", token0, token1, fee);
             Context.call(pool, "initialize", sqrtPriceX96);
         } else {
-            var slot0 = (Slot0) Context.call(pool, "slot0");
+            var slot0 = Slot0.fromMap(Context.call(pool, "slot0"));
             if (slot0.sqrtPriceX96.equals(ZERO)) {
                 Context.call(pool, "initialize", sqrtPriceX96);
             }

@@ -1,3 +1,19 @@
+/*
+ * Copyright 2021 ICONation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.iconloop.score.token.irc721;
 
 import static java.math.BigInteger.ONE;
@@ -16,13 +32,19 @@ import score.annotation.Optional;
 
 public class IRC721 {
 
-  private static final Address ZERO_ADDRESS = new Address(new byte[Address.LENGTH]);
-
+  // ================================================
+  // Consts
+  // ================================================
+  // Zero Address
+  protected static final Address ZERO_ADDRESS = new Address(new byte[Address.LENGTH]);
   // Token name
   private final String name;
   // Token symbol
   private final String symbol;
 
+  // ================================================
+  // DB Variables
+  // ================================================
   // Mapping from token ID to owner address
   private final DictDB<BigInteger, Address> _owners = Context.newDictDB("owners", Address.class);
   // Mapping owner address to token count
@@ -32,17 +54,32 @@ public class IRC721 {
   // Mapping from owner to operator approvals
   private final BranchDB<Address, DictDB<Address, Boolean>> _operatorApprovals = Context.newBranchDB("operatorApprovals", Boolean.class);
 
+  // ================================================
+  // Event Logs
+  // ================================================
+  @EventLog
+  protected void Transfer(Address from, Address to, BigInteger tokenId) {}
+
+  @EventLog
+  protected void Approval(Address ownerOf, Address to, BigInteger tokenId) {}
+
+  @EventLog
+  protected void ApprovalForAll(Address owner, Address operator, boolean approved) {}
+
+  // ================================================
+  // Methods
+  // ================================================
   public IRC721 (String name, String symbol) {
     this.name = name;
     this.symbol = symbol;
   }
-  
+
   @External(readonly = true)
   public BigInteger balanceOf(Address owner) {
     require(!owner.equals(ZERO_ADDRESS), "IRC721: balance query for the zero address");
     return _balances.getOrDefault(owner, ZERO);
   }
-  
+
   @External(readonly = true)
   public Address ownerOf(BigInteger tokenId) {
     Address owner = _owners.getOrDefault(tokenId, ZERO_ADDRESS);
@@ -183,7 +220,7 @@ public class IRC721 {
   protected boolean _isApprovedOrOwner(Address spender, BigInteger tokenId) {
     require(_exists(tokenId), "IRC721: operator query for nonexistent token");
     Address owner = ownerOf(tokenId);
-    return (spender == owner || getApproved(tokenId) == spender || isApprovedForAll(owner, spender));
+    return (spender.equals(owner) || getApproved(tokenId).equals(spender) || isApprovedForAll(owner, spender));
   }
   
   /**
@@ -208,9 +245,6 @@ public class IRC721 {
     );
   }
   
-  @EventLog
-  protected void Transfer(Address from, Address to, BigInteger tokenId) {}
-
   /**
    * @dev Mints `tokenId` and transfers it to `to`.
    *
@@ -290,12 +324,6 @@ public class IRC721 {
       this.Transfer(from, to, tokenId);
   }
   
-  @EventLog
-  protected void Approval(Address ownerOf, Address to, BigInteger tokenId) {}
-
-  @EventLog
-  protected void ApprovalForAll(Address owner, Address operator, boolean approved) {}
-
   /**
    * @dev Approve `to` to operate on `tokenId`
    *
