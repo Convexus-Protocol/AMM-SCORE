@@ -16,6 +16,7 @@
 
 package exchange.convexus.staker;
 
+import static exchange.convexus.utils.SleepUtils.sleep;
 import static exchange.convexus.utils.TimeUtils.ONE_SECOND;
 import static java.math.BigInteger.TWO;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -76,7 +77,7 @@ public class StakeEntireTime extends ConvexusStakerTest {
     ConvexusStakerUtils.createIncentive(alice, rwtk.score, totalReward, staker.getAddress(), pool01.getAddress(), startTime, endTime, alice.getAddress());
 
     Score[] tokensToStake = {sicx.score, usdc.score};
-    sm.getBlock().increase(startTime.subtract(now).divide(ONE_SECOND).intValue() + 1);
+    sleep(startTime.subtract(now).divide(ONE_SECOND).intValue() + 1);
     tokensId[0] = mintDepositStake(lp1, tokensToStake, amountsToStake, ticksToStake, startTime, endTime);
     tokensId[1] = mintDepositStake(lp2, tokensToStake, amountsToStake, ticksToStake, startTime, endTime);
     tokensId[2] = mintDepositStake(lp3, tokensToStake, amountsToStake, ticksToStake, startTime, endTime);
@@ -93,7 +94,7 @@ public class StakeEntireTime extends ConvexusStakerTest {
   @Test
   void testWhoAllStakeEntireTimeWithdrawAtTheEnd () {
     BigInteger now = TimeUtils.nowSeconds();
-    sm.getBlock().increase(endTime.subtract(now).divide(ONE_SECOND).intValue() + 1);
+    sleep(endTime.subtract(now).divide(ONE_SECOND).intValue() + 1);
 
     // Sanity check: make sure we go past the incentive end time.
     now = TimeUtils.nowSeconds();

@@ -165,11 +165,14 @@ public class Score extends TestBase {
             var result = m.invoke(instance, params);
             return getReturnValue(result);
         } catch (NoSuchMethodException | IllegalAccessException e) {
+            Context.println("========================================");
             e.printStackTrace();
+            sm.revertCurrentFrame();
             throw new RuntimeException(e.getMessage());
         } catch (InvocationTargetException e) {
             Context.println("========================================");
             e.printStackTrace();
+            sm.revertCurrentFrame();
             throw new AssertionError(e.getTargetException().getMessage());
         } finally {
             sm.popFrame();

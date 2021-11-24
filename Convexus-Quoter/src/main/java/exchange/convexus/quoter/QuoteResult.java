@@ -19,22 +19,17 @@ package exchange.convexus.quoter;
 import java.math.BigInteger;
 
 public class QuoteResult {
-    public BigInteger amount;
+    public BigInteger amountOut;
     public BigInteger sqrtPriceX96After;
     public int initializedTicksCrossed;
 
     public QuoteResult(
-        BigInteger amount,
+        BigInteger amountOut,
         BigInteger sqrtPriceX96After,
         int initializedTicksCrossed
     ) {
-        this.amount = amount;
+        this.amountOut = amountOut;
         this.sqrtPriceX96After = sqrtPriceX96After;
         this.initializedTicksCrossed = initializedTicksCrossed;
     }
-
-    public static QuoteResult fromMap(Object invoke) {
-        return null;
-    }
-
 }

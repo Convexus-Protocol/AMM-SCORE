@@ -16,6 +16,7 @@
 
 package exchange.convexus.pool;
 
+import static exchange.convexus.utils.SleepUtils.sleep;
 import static java.math.BigInteger.ONE;
 import static java.math.BigInteger.TEN;
 import static java.math.BigInteger.TWO;
@@ -397,7 +398,7 @@ public class MintInitializedTest extends ConvexusPoolTest {
     Oracle.Observation expected = new Oracle.Observation(start, ZERO, ZERO, true);
     assertObservationEquals(expected, observation);
 
-    sm.getBlock().increase(1);
+    sleep(1);
     
     ConvexusLiquidityUtils.deposit(alice, callee.getAddress(), sicx.score, new BigInteger("2"));
     callee.invoke(alice, "mint", pool.getAddress(), alice.getAddress(), -240, 0, BigInteger.valueOf(100));
@@ -502,7 +503,7 @@ public class MintInitializedTest extends ConvexusPoolTest {
     Oracle.Observation expected = new Oracle.Observation(start, ZERO, ZERO, true);
     assertObservationEquals(expected, observation);
 
-    sm.getBlock().increase(1);
+    sleep(1);
     
     ConvexusLiquidityUtils.deposit(alice, callee.getAddress(), sicx.score, new BigInteger("317"));
     ConvexusLiquidityUtils.deposit(alice, callee.getAddress(), usdc.score, new BigInteger("32"));
@@ -589,7 +590,7 @@ public class MintInitializedTest extends ConvexusPoolTest {
     Oracle.Observation expected = new Oracle.Observation(start, ZERO, ZERO, true);
     assertObservationEquals(expected, observation);
 
-    sm.getBlock().increase(1);
+    sleep(1);
     
     ConvexusLiquidityUtils.deposit(alice, callee.getAddress(), usdc.score, new BigInteger("22"));
     callee.invoke(alice, "mint", pool.getAddress(), alice.getAddress(), -46080, -23040, BigInteger.valueOf(100));

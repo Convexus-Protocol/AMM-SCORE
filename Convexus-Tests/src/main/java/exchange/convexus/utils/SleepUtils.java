@@ -23,12 +23,13 @@ import com.iconloop.score.test.TestBase;
 
 public class SleepUtils extends TestBase {
   protected static final ServiceManager sm = getServiceManager();
-  public static void sleep (long microseconds) {
-    // 2 secs block generation
-    sm.getBlock().increase((microseconds / 2_000_000));
+  
+  public static void sleep (long seconds) {
+    // 1 secs block generation
+    sm.getBlock().increase(seconds);
   }
 
-  public static void sleep (BigInteger microseconds) {
-      sleep(microseconds.longValue());
+  public static void sleep (BigInteger seconds) {
+    sleep(seconds.longValue());
   }
 }

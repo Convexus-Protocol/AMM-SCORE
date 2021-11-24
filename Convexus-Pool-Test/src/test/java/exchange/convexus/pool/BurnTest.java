@@ -16,6 +16,7 @@
 
 package exchange.convexus.pool;
 
+import static exchange.convexus.utils.SleepUtils.sleep;
 import static java.math.BigInteger.ONE;
 import static java.math.BigInteger.TEN;
 import static java.math.BigInteger.ZERO;
@@ -80,7 +81,7 @@ public class BurnTest extends ConvexusPoolTest {
   @Test
   void testDoesNotClearPositionFeeGrowthSnapshotIfNoMoreLIquidity () {
       // some activity that would make the ticks non-zero
-      sm.getBlock().increase(10);
+      sleep(10);
       
       ConvexusLiquidityUtils.deposit(bob, callee.getAddress(), sicx.score, new BigInteger("1000000000000000000"));
       ConvexusLiquidityUtils.deposit(bob, callee.getAddress(), usdc.score, new BigInteger("1000000000000000000"));
@@ -106,7 +107,7 @@ public class BurnTest extends ConvexusPoolTest {
     int tickLower = minTick + tickSpacing;
     int tickUpper = maxTick - tickSpacing;
     // some activity that would make the ticks non-zero
-    sm.getBlock().increase(10);
+    sleep(10);
     ConvexusLiquidityUtils.deposit(alice, callee.getAddress(), sicx.score, new BigInteger("1"));
     ConvexusLiquidityUtils.deposit(alice, callee.getAddress(), usdc.score, new BigInteger("1"));
     callee.invoke(alice, "mint", pool.getAddress(), alice.getAddress(), tickLower, tickUpper, ONE);
@@ -125,7 +126,7 @@ public class BurnTest extends ConvexusPoolTest {
     int tickUpper = maxTick - tickSpacing;
 
     // some activity that would make the ticks non-zero
-    sm.getBlock().increase(10);
+    sleep(10);
     
     ConvexusLiquidityUtils.deposit(alice, callee.getAddress(), sicx.score, new BigInteger("1"));
     ConvexusLiquidityUtils.deposit(alice, callee.getAddress(), usdc.score, new BigInteger("1"));
@@ -149,7 +150,7 @@ public class BurnTest extends ConvexusPoolTest {
     int tickUpper = maxTick - tickSpacing;
 
     // some activity that would make the ticks non-zero
-    sm.getBlock().increase(10);
+    sleep(10);
     
     ConvexusLiquidityUtils.deposit(alice, callee.getAddress(), sicx.score, new BigInteger("1"));
     ConvexusLiquidityUtils.deposit(alice, callee.getAddress(), usdc.score, new BigInteger("1"));

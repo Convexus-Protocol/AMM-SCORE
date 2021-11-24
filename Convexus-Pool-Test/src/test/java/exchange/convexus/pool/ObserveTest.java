@@ -16,6 +16,7 @@
 
 package exchange.convexus.pool;
 
+import static exchange.convexus.utils.SleepUtils.sleep;
 import static java.math.BigInteger.TEN;
 import static java.math.BigInteger.TWO;
 import static java.math.BigInteger.ZERO;
@@ -68,7 +69,7 @@ public class ObserveTest extends ConvexusPoolTest {
     var observation = ObserveResult.fromMap(pool.call("observe", new Object[] {secondsAgos}));
     assertEquals(ZERO, observation.tickCumulatives[0]);
     
-    sm.getBlock().increase(10);
+    sleep(10);
     
     observation = ObserveResult.fromMap(pool.call("observe", new Object[] {secondsAgos}));
     assertEquals(ZERO, observation.tickCumulatives[0]);
@@ -79,7 +80,7 @@ public class ObserveTest extends ConvexusPoolTest {
     // moves to tick -1
     ConvexusLiquidityUtils.deposit(alice, callee.getAddress(), sicx.score, new BigInteger("1000"));
     swapExact0For1(BigInteger.valueOf(1000), alice);
-    sm.getBlock().increase(4);
+    sleep(4);
     
     BigInteger[] secondsAgos = { ZERO };
     var observation = ObserveResult.fromMap(pool.call("observe", new Object[] {secondsAgos}));
@@ -93,14 +94,14 @@ public class ObserveTest extends ConvexusPoolTest {
     var slot0 = Slot0.fromMap(pool.call("slot0"));
     assertEquals(-4452, slot0.tick);
     
-    sm.getBlock().increase(4);
+    sleep(4);
 
     ConvexusLiquidityUtils.deposit(alice, callee.getAddress(), usdc.score, new BigInteger("250000000000000000"));
     swapExact1For0(TEN.pow(18).divide(BigInteger.valueOf(4)), alice);
     slot0 = Slot0.fromMap(pool.call("slot0"));
     assertEquals(-1558, slot0.tick);
 
-    sm.getBlock().increase(6);
+    sleep(6);
     
     BigInteger[] secondsAgos = { ZERO };
     var observation = ObserveResult.fromMap(pool.call("observe", new Object[] {secondsAgos}));

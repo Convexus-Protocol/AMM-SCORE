@@ -33,7 +33,6 @@ import exchange.convexus.utils.StringUtils;
 import exchange.convexus.pool.Slot0;
 import score.Address;
 import score.Context;
-import score.ObjectReader;
 import score.UserRevertedException;
 import score.VarDB;
 import score.annotation.EventLog;
@@ -333,7 +332,7 @@ public class Quoter {
                     )
                 );
             
-            BigInteger _amountOut = result.amount;
+            BigInteger _amountOut = result.amountOut;
             BigInteger _sqrtPriceX96After = result.sqrtPriceX96After;
             int _initializedTicksCrossed = result.initializedTicksCrossed;
             
@@ -424,7 +423,7 @@ public class Quoter {
                     )
                 );
             
-            BigInteger _amountIn = result.amount;
+            BigInteger _amountIn = result.amountOut;
             BigInteger _sqrtPriceX96After = result.sqrtPriceX96After;
             int _initializedTicksCrossed = result.initializedTicksCrossed;
             

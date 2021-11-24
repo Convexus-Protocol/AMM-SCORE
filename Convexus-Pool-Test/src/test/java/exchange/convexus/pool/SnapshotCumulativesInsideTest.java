@@ -16,6 +16,7 @@
 
 package exchange.convexus.pool;
 
+import static exchange.convexus.utils.SleepUtils.sleep;
 import static java.math.BigInteger.ONE;
 import static java.math.BigInteger.TWO;
 import static java.math.BigInteger.TEN;
@@ -116,7 +117,7 @@ public class SnapshotCumulativesInsideTest extends ConvexusPoolTest {
 
   @Test
   void testIncreasesByExpectedAmountWhenTimeElapsesInTheRage () {
-    sm.getBlock().increase(5);
+    sleep(5);
     var result = SnapshotCumulativesInsideResult.fromMap(pool.call("snapshotCumulativesInside", tickLower, tickUpper));
     assertEquals(BigInteger.valueOf(5).shiftLeft(128).divide(TEN), result.secondsPerLiquidityInsideX128);
     assertEquals(ZERO, result.tickCumulativeInside);
@@ -125,9 +126,9 @@ public class SnapshotCumulativesInsideTest extends ConvexusPoolTest {
 
   @Test
   void testDoesNotAccountForTimeIncreaseAboveRange () {
-    sm.getBlock().increase(5);
+    sleep(5);
     swapToHigherPrice(alice, encodePriceSqrt(TWO, ONE), "2");
-    sm.getBlock().increase(7);
+    sleep(7);
     
     var result = SnapshotCumulativesInsideResult.fromMap(pool.call("snapshotCumulativesInside", tickLower, tickUpper));
     assertEquals(BigInteger.valueOf(5).shiftLeft(128).divide(TEN), result.secondsPerLiquidityInsideX128);
@@ -137,9 +138,9 @@ public class SnapshotCumulativesInsideTest extends ConvexusPoolTest {
   
   @Test
   void testDoesNotAccountForTimeIncreaseBelowRange () {
-    sm.getBlock().increase(5);
+    sleep(5);
     swapToLowerPrice(alice, encodePriceSqrt(ONE, TWO), "2");
-    sm.getBlock().increase(7);
+    sleep(7);
     
     var result = SnapshotCumulativesInsideResult.fromMap(pool.call("snapshotCumulativesInside", tickLower, tickUpper));
     assertEquals(BigInteger.valueOf(5).shiftLeft(128).divide(TEN), result.secondsPerLiquidityInsideX128);
@@ -151,9 +152,9 @@ public class SnapshotCumulativesInsideTest extends ConvexusPoolTest {
   @Test
   void testTimeIncreaseBelowRangeIsNotCounted () {
     swapToLowerPrice(alice, encodePriceSqrt(ONE, TWO), "2");
-    sm.getBlock().increase(5);
+    sleep(5);
     swapToHigherPrice(alice, encodePriceSqrt(ONE, ONE), "2");
-    sm.getBlock().increase(7);
+    sleep(7);
     
     var result = SnapshotCumulativesInsideResult.fromMap(pool.call("snapshotCumulativesInside", tickLower, tickUpper));
     assertEquals(BigInteger.valueOf(7).shiftLeft(128).divide(TEN), result.secondsPerLiquidityInsideX128);
@@ -165,9 +166,9 @@ public class SnapshotCumulativesInsideTest extends ConvexusPoolTest {
   @Test
   void testTimeIncreaseAboveRangeIsNotCounted () {
     swapToHigherPrice(alice, encodePriceSqrt(TWO, ONE), "2");
-    sm.getBlock().increase(5);
+    sleep(5);
     swapToLowerPrice(alice, encodePriceSqrt(ONE, ONE), "2");
-    sm.getBlock().increase(7);
+    sleep(7);
     
     var result = SnapshotCumulativesInsideResult.fromMap(pool.call("snapshotCumulativesInside", tickLower, tickUpper));
     assertEquals(BigInteger.valueOf(7).shiftLeft(128).divide(TEN), result.secondsPerLiquidityInsideX128);
@@ -180,10 +181,10 @@ public class SnapshotCumulativesInsideTest extends ConvexusPoolTest {
 
   @Test
   void testPositionsMintedAfterTimeSpent () {
-    sm.getBlock().increase(5);
+    sleep(5);
     mint(alice, tickUpper, getMaxTick(tickSpacing), BigInteger.valueOf(15), "15", "0");
     swapToHigherPrice(alice, encodePriceSqrt(TWO, ONE), "10");
-    sm.getBlock().increase(8);
+    sleep(8);
 
     var result = SnapshotCumulativesInsideResult.fromMap(pool.call("snapshotCumulativesInside", tickUpper, getMaxTick(tickSpacing)));
     assertEquals(BigInteger.valueOf(8).shiftLeft(128).divide(BigInteger.valueOf(15)), result.secondsPerLiquidityInsideX128);
@@ -196,9 +197,9 @@ public class SnapshotCumulativesInsideTest extends ConvexusPoolTest {
   @Test
   void overlappingLiquidityIsAggregated () {
     mint(alice, tickLower, getMaxTick(tickSpacing), BigInteger.valueOf(15), "15", "1");
-    sm.getBlock().increase(5);
+    sleep(5);
     swapToHigherPrice(alice, encodePriceSqrt(TWO, ONE), "10");
-    sm.getBlock().increase(8);
+    sleep(8);
     
     var result = SnapshotCumulativesInsideResult.fromMap(pool.call("snapshotCumulativesInside", tickLower, tickUpper));
     assertEquals(BigInteger.valueOf(5).shiftLeft(128).divide(BigInteger.valueOf(25)), result.secondsPerLiquidityInsideX128);
@@ -208,15 +209,15 @@ public class SnapshotCumulativesInsideTest extends ConvexusPoolTest {
 
   @Test
   void testRelativeBehaviorOfSnapshots () {
-    sm.getBlock().increase(5);
+    sleep(5);
     mint(alice, getMinTick(tickSpacing), tickLower, BigInteger.valueOf(15), "0", "15");
 
     var start = SnapshotCumulativesInsideResult.fromMap(pool.call("snapshotCumulativesInside", getMinTick(tickSpacing), tickLower));
-    sm.getBlock().increase(8);
+    sleep(8);
     
     // 13 seconds in starting range, then 3 seconds in newly minted range
     swapToLowerPrice(alice, encodePriceSqrt(ONE, TWO), "10");
-    sm.getBlock().increase(3);
+    sleep(3);
     
     var result = SnapshotCumulativesInsideResult.fromMap(pool.call("snapshotCumulativesInside", getMinTick(tickSpacing), tickLower));
 
