@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package foundation.icon.test.cases;
+package exchange.convexus.factory;
 
 import foundation.icon.icx.IconService;
 import foundation.icon.icx.KeyWallet;
@@ -23,13 +23,14 @@ import foundation.icon.icx.transport.http.HttpProvider;
 import foundation.icon.test.Env;
 import foundation.icon.test.TestBase;
 import foundation.icon.test.TransactionHandler;
-import foundation.icon.test.score.IRC2BasicToken;
 import foundation.icon.test.score.Score;
-import foundation.icon.test.score.ConvexusFactoryScore;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import exchange.convexus.score.ConvexusFactoryScore;
+import exchange.convexus.score.ConvexusPoolScore;
+import exchange.convexus.score.IRC2BasicToken;
 import exchange.convexus.utils.MathUtils;
 
 import java.io.File;
@@ -38,9 +39,15 @@ import java.nio.file.Files;
 
 import static foundation.icon.test.Env.LOG;
 
-public class ConvexusFactoryIntTest extends TestBase {
+public class ConvexusFactoryTest extends TestBase {
     private static TransactionHandler txHandler;
     private static KeyWallet[] wallets;
+    
+    final int TICK_SPACINGS[] = {10, 60, 200};
+    final int FEE_AMOUNTS[] = {500, 3000, 10000};
+    final int LOW = 0;
+    final int MEDIUM = 1;
+    final int HIGH = 2;
 
     @BeforeAll
     static void setup() throws Exception {
@@ -69,12 +76,11 @@ public class ConvexusFactoryIntTest extends TestBase {
 
     @Test
     public void deployAndStartTest() throws Exception {
-        // deploy MultiSigWallet SCORE
-        ConvexusFactoryScore score = ConvexusFactoryScore.mustDeploy(txHandler, wallets[0]);
-        startTest(score);
+        ConvexusFactoryScore factory = ConvexusFactoryScore.mustDeploy(txHandler, wallets[0]);
+        startTest(factory);
     }
 
-    private void startTest(ConvexusFactoryScore score) throws Exception {
+    private void startTest(ConvexusFactoryScore factory) throws Exception {
         LOG.infoEntering("setup", "initial wallets");
         KeyWallet ownerWallet = wallets[0];
         KeyWallet aliceWallet = wallets[1];
@@ -90,15 +96,28 @@ public class ConvexusFactoryIntTest extends TestBase {
         LOG.info("Deploying SICX token");
         var sicx = IRC2BasicToken.install(txHandler, ownerWallet, "Staked ICX", "sICX", BigInteger.valueOf(8), MathUtils.pow10(18));
 
-        // LOG.info("Deploying bnUSD token");
-        // var bnusd = IRC2BasicToken.install(txHandler, ownerWallet, "Balanced USD", "bnUSD", BigInteger.valueOf(8), MathUtils.pow10(18));
-
         LOG.info("Setting the pool contract bytes to Factory");
         byte[] fileContent = Files.readAllBytes(new File(Score.getFilePath("Convexus-Pool")).toPath());
-        score.setPoolContract(ownerWallet, fileContent);
+        factory.setPoolContract(ownerWallet, fileContent);
 
-        LOG.info("Deploying a new SICX / USDC pool");
-        score.createPool(ownerWallet, sicx.getAddress(), usdc.getAddress(), 500);
+        LOG.info("Deploying a new SICX / USDC pool (until SCORE can deploy other SCOREs)");
+        // Faking it until SCORE can deploy other SCOREs
+        ConvexusPoolScore pool = ConvexusPoolScore.mustDeploy(
+            txHandler, wallets[0], 
+            sicx.getAddress(), 
+            usdc.getAddress(), 
+            factory.getAddress(), 
+            FEE_AMOUNTS[MEDIUM], 
+            TICK_SPACINGS[MEDIUM]
+        );
+
+        LOG.info("Creating a new pool using the factory");
+        factory.createPool(ownerWallet, 
+            sicx.getAddress(), 
+            usdc.getAddress(), 
+            FEE_AMOUNTS[MEDIUM],
+            pool.getAddress()
+        );
 
         LOG.infoExiting();
     }

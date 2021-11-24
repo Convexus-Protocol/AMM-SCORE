@@ -292,9 +292,8 @@ public class ConvexusPool {
         int tickSpacing
         // END OF PATCH
     ) {
-        // ConvexusPoolDeployerParameters parameters = (ConvexusPoolDeployerParameters) Context.call(Context.getCaller(), "parameters");
-
         /**  === TODO: PATCH PATCH PATCH: REMOVE ME === */
+        // ConvexusPoolDeployerParameters parameters = (ConvexusPoolDeployerParameters) Context.call(Context.getCaller(), "parameters");
         ConvexusPoolDeployerParameters parameters = new ConvexusPoolDeployerParameters(
             _factory, 
             _token0, 

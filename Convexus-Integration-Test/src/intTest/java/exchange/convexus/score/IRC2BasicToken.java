@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package foundation.icon.test.score;
+package exchange.convexus.score;
 
 import foundation.icon.icx.Wallet;
 import foundation.icon.icx.transport.jsonrpc.RpcObject;
@@ -22,6 +22,7 @@ import foundation.icon.icx.transport.jsonrpc.RpcValue;
 import foundation.icon.test.ResultTimeoutException;
 import foundation.icon.test.TransactionFailureException;
 import foundation.icon.test.TransactionHandler;
+import foundation.icon.test.score.Score;
 
 import java.io.IOException;
 import java.math.BigInteger;

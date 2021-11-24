@@ -82,14 +82,6 @@ public class ConvexusPoolTest extends ConvexusTest {
     factory = deploy_factory();
   }
 
-  public ScoreSpy<ConvexusPoolMock> deploy_mock_pool (Address token0, Address token1, Address factory, int fee, int tickSpacing) throws Exception {
-    Score score = sm.deploy(owner, ConvexusPoolMock.class, token0, token1, factory, fee, tickSpacing);
-
-    var spy = (ConvexusPoolMock) Mockito.spy(score.getInstance());
-    score.setInstance(spy);
-    return new ScoreSpy<ConvexusPoolMock>(score, spy);
-  }
-
   protected void assertObservationEquals(Observation expected, Observation actual) {
     assertEquals(expected.initialized, actual.initialized);
     assertEquals(expected.tickCumulative, actual.tickCumulative);

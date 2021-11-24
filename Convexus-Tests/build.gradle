@@ -1,4 +1,4 @@
-version = '0.9.1'
+// version = '0.9.1'
 
 dependencies {
     implementation 'foundation.icon:javaee-api:0.9.0'

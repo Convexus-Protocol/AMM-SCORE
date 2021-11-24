@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package foundation.icon.test.score;
+package exchange.convexus.score;
 
 import foundation.icon.icx.Wallet;
 import foundation.icon.icx.data.Address;
@@ -24,6 +24,7 @@ import foundation.icon.icx.transport.jsonrpc.RpcValue;
 import foundation.icon.test.ResultTimeoutException;
 import foundation.icon.test.TransactionFailureException;
 import foundation.icon.test.TransactionHandler;
+import foundation.icon.test.score.Score;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -42,17 +43,18 @@ public class ConvexusFactoryScore extends Score {
         RpcObject params = new RpcObject.Builder()
                 .build();
         Score score = txHandler.deploy(wallet, getFilePath("Convexus-Factory"), params);
-        LOG.info("scoreAddr = " + score.getAddress());
+        LOG.info("ConvexusFactory deployed at: " + score.getAddress());
         LOG.infoExiting();
         return new ConvexusFactoryScore(score);
     }
 
-    public TransactionResult createPool(Wallet fromWallet, Address tokenA, Address tokenB, int fee)
+    public TransactionResult createPool(Wallet fromWallet, Address tokenA, Address tokenB, int fee, Address pool)
             throws IOException, ResultTimeoutException {
         RpcObject params = new RpcObject.Builder()
                 .put("tokenA", new RpcValue(tokenA))
                 .put("tokenB", new RpcValue(tokenB))
                 .put("fee", new RpcValue(BigInteger.valueOf(fee)))
+                .put("pool", new RpcValue(pool))
                 .build();
         TransactionResult result = invokeAndWaitResult(fromWallet, "createPool", params);
         ensurePoolCreated(result, tokenA, tokenB, fee);
@@ -74,8 +76,8 @@ public class ConvexusFactoryScore extends Score {
             Address token0 = event.getIndexed().get(1).asAddress();
             Address token1 = event.getIndexed().get(2).asAddress();
             BigInteger _fee = event.getIndexed().get(3).asInteger();
-            // BigInteger tickSpacing = event.getIndexed().get(4).asInteger();
-            Address pool = event.getIndexed().get(5).asAddress();
+            // BigInteger tickSpacing = event.getData().get(0).asInteger();
+            Address pool = event.getData().get(1).asAddress();
             if ((tokenA.equals(token0) && tokenB.equals(token1))
             ||  (tokenA.equals(token1) && tokenB.equals(token0))
             && fee == _fee.intValue()
