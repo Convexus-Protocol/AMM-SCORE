@@ -195,7 +195,7 @@ public class CVXS {
     }
 
     /**
-     * @notice Transfer `amount` tokens from `msg.sender` to `dst`
+     * @notice Transfer `amount` tokens from `Context.getCaller()` to `dst`
      * @param dst The address of the destination account
      * @param rawAmount The number of tokens to transfer
      * @return Whether or not the transfer succeeded
@@ -206,7 +206,7 @@ public class CVXS {
     }
 
     /**
-     * @notice Delegate votes from `msg.sender` to `delegatee`
+     * @notice Delegate votes from `Context.getCaller()` to `delegatee`
      * @param delegatee The address to delegate votes to
      */
     @External

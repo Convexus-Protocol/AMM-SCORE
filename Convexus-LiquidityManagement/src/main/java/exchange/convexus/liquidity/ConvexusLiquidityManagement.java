@@ -70,7 +70,7 @@ public class ConvexusLiquidityManagement {
     }
 
     /**
-     * @notice Called to `msg.sender` after minting liquidity to a position from ConvexusPool#mint.
+     * @notice Called to `Context.getCaller()` after minting liquidity to a position from ConvexusPool#mint.
      * @dev In the implementation you must pay the pool tokens owed for the minted liquidity.
      * The caller of this method must be checked to be a ConvexusPool deployed by the canonical ConvexusFactory.
      * @param amount0Owed The amount of token0 due to the pool for the minted liquidity

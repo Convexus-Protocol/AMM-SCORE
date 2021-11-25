@@ -253,7 +253,7 @@ public class NonFungiblePositionManager extends IRC721Enumerable {
     }
 
     /**
-     * @notice Increases the amount of liquidity in a position, with tokens paid by the `msg.sender`
+     * @notice Increases the amount of liquidity in a position, with tokens paid by the `Context.getCaller()`
      * @param params tokenId The ID of the token for which liquidity is being increased,
      * amount0Desired The desired amount of token0 to be spent,
      * amount1Desired The desired amount of token1 to be spent,
@@ -467,7 +467,7 @@ public class NonFungiblePositionManager extends IRC721Enumerable {
     // Implements LiquidityManager
     // ================================================
     /**
-     * @notice Called to `msg.sender` after minting liquidity to a position from ConvexusPool#mint.
+     * @notice Called to `Context.getCaller()` after minting liquidity to a position from ConvexusPool#mint.
      * @dev In the implementation you must pay the pool tokens owed for the minted liquidity.
      * The caller of this method must be checked to be a ConvexusPool deployed by the canonical ConvexusFactory.
      * @param amount0Owed The amount of token0 due to the pool for the minted liquidity

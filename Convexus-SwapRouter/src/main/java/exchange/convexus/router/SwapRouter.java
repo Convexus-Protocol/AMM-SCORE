@@ -269,7 +269,7 @@ public class SwapRouter {
         reentreancy.lock(true);
         this.checkDeadline(params.deadline);
         
-        // it's okay that the payer is fixed to msg.sender here, as they're only paying for the "final" exact output
+        // it's okay that the payer is fixed to Context.getCaller() here, as they're only paying for the "final" exact output
         // swap, which happens first, and subsequent swaps are paid for within nested callback frames
         exactOutputInternal(
             tokenIn,

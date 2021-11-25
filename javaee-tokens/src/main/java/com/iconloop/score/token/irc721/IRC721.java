@@ -295,7 +295,7 @@ public class IRC721 {
 
   /**
    * @dev Transfers `tokenId` from `from` to `to`.
-   *  As opposed to {transferFrom}, this imposes no restrictions on msg.sender.
+   *  As opposed to {transferFrom}, this imposes no restrictions on Context.getCaller().
    *
    * Requirements:
    *
