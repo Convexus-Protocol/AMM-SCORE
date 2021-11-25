@@ -17,6 +17,7 @@
 package exchange.convexus.staker;
 
 import java.math.BigInteger;
+import java.util.Map;
 
 public class RewardAmount {
   public BigInteger reward;
@@ -28,5 +29,14 @@ public class RewardAmount {
   ) {
     this.reward = reward;
     this.secondsInsideX128 = secondsInsideX128;
+  }
+
+  public static RewardAmount fromMap(Object call) {
+    @SuppressWarnings("unchecked")
+    Map<String,Object> map = (Map<String,Object>) call;
+    return new RewardAmount (
+      (BigInteger) map.get("reward"),
+      (BigInteger) map.get("secondsInsideX128")
+    );
   }
 }

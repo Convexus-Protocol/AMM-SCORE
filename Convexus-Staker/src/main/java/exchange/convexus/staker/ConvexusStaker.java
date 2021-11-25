@@ -368,10 +368,10 @@ public class ConvexusStaker {
         rewardToken.set(deposit.owner, rewardToken.getOrDefault(deposit.owner, ZERO).add(rewardAmount));
 
         Stake stake = _stakes.at(tokenId).get(incentiveId);
-        stake.secondsPerLiquidityInsideInitialX128 = null;
-        stake.liquidityNoOverflow = null;
+        stake.secondsPerLiquidityInsideInitialX128 = ZERO;
+        stake.liquidityNoOverflow = ZERO;
         if (liquidity.compareTo(MAX_UINT96) >= 0) {
-            stake.liquidityIfOverflow = null;
+            stake.liquidityIfOverflow = ZERO;
         }
         _stakes.at(tokenId).set(incentiveId, stake);
 
@@ -561,7 +561,7 @@ public class ConvexusStaker {
 
     @External(readonly = true)
     public BigInteger rewards (Address rewardToken, Address owner) {
-        return rewards.at(rewardToken).get(owner);
+        return rewards.at(rewardToken).getOrDefault(owner, ZERO);
     }
 
     /**

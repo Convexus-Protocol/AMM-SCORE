@@ -18,17 +18,13 @@ package exchange.convexus.staker;
 
 import static exchange.convexus.utils.TimeUtils.ONE_SECOND;
 import static java.math.BigInteger.ONE;
+import static java.math.BigInteger.TEN;
 import static java.math.BigInteger.TWO;
 import static java.math.BigInteger.ZERO;
-import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.verify;
 
 import java.math.BigInteger;
 
 import com.iconloop.score.test.Account;
-import com.iconloop.score.test.Score;
-
-import org.mockito.ArgumentCaptor;
 
 import exchange.convexus.NFTUtils.NFTUtils;
 import exchange.convexus.factory.ConvexusFactory;
@@ -72,6 +68,7 @@ public class ConvexusStakerTest extends ConvexusTest {
   protected final Account lpUser1 = sm.createAccount();
   protected final Account lpUser2 = sm.createAccount();
   protected final Account incentiveCreator = sm.createAccount();
+  final BigInteger DEFAULT_LP_AMOUNT = EXA.multiply(TEN);
 
   void setup_tokens () throws Exception {
     sicx = deploy_sicx();
@@ -82,29 +79,31 @@ public class ConvexusStakerTest extends ConvexusTest {
     // Transfer some funds to Alice
     sicx.invoke(owner, "mintTo", alice.getAddress(), IntUtils.MAX_UINT256);
     usdc.invoke(owner, "mintTo", alice.getAddress(), IntUtils.MAX_UINT256);
+    baln.invoke(owner, "mintTo", alice.getAddress(), IntUtils.MAX_UINT256);
     rwtk.invoke(owner, "mintTo", alice.getAddress(), IntUtils.MAX_UINT256);
     // Transfer some funds to Bob
     sicx.invoke(owner, "mintTo", bob.getAddress(), IntUtils.MAX_UINT256);
     usdc.invoke(owner, "mintTo", bob.getAddress(), IntUtils.MAX_UINT256);
+    baln.invoke(owner, "mintTo", bob.getAddress(), IntUtils.MAX_UINT256);
     rwtk.invoke(owner, "mintTo", bob.getAddress(), IntUtils.MAX_UINT256);
-    
     // Transfer some funds to incentiveCreator
     sicx.invoke(owner, "mintTo", incentiveCreator.getAddress(), IntUtils.MAX_UINT256);
     usdc.invoke(owner, "mintTo", incentiveCreator.getAddress(), IntUtils.MAX_UINT256);
+    baln.invoke(owner, "mintTo", incentiveCreator.getAddress(), IntUtils.MAX_UINT256);
     rwtk.invoke(owner, "mintTo", incentiveCreator.getAddress(), IntUtils.MAX_UINT256);
     
     // Transfer some funds to LPs
     sicx.invoke(owner, "mintTo", lpUser0.getAddress(), IntUtils.MAX_UINT256);
     usdc.invoke(owner, "mintTo", lpUser0.getAddress(), IntUtils.MAX_UINT256);
-    rwtk.invoke(owner, "mintTo", lpUser0.getAddress(), IntUtils.MAX_UINT256);
+    baln.invoke(owner, "mintTo", lpUser0.getAddress(), IntUtils.MAX_UINT256);
     
     sicx.invoke(owner, "mintTo", lpUser1.getAddress(), IntUtils.MAX_UINT256);
     usdc.invoke(owner, "mintTo", lpUser1.getAddress(), IntUtils.MAX_UINT256);
-    rwtk.invoke(owner, "mintTo", lpUser1.getAddress(), IntUtils.MAX_UINT256);
+    baln.invoke(owner, "mintTo", lpUser1.getAddress(), IntUtils.MAX_UINT256);
     
     sicx.invoke(owner, "mintTo", lpUser2.getAddress(), IntUtils.MAX_UINT256);
     usdc.invoke(owner, "mintTo", lpUser2.getAddress(), IntUtils.MAX_UINT256);
-    rwtk.invoke(owner, "mintTo", lpUser2.getAddress(), IntUtils.MAX_UINT256);
+    baln.invoke(owner, "mintTo", lpUser2.getAddress(), IntUtils.MAX_UINT256);
   }
 
   void setup_pool1 () throws Exception {
@@ -114,9 +113,9 @@ public class ConvexusStakerTest extends ConvexusTest {
   }
 
   void setup_pool2 () throws Exception {
-    pool2 = deploy(Pool2.class, usdc.getAddress(), rwtk.getAddress(), factory.getAddress(), FEE_AMOUNTS[MEDIUM], TICK_SPACINGS[MEDIUM]);
+    pool2 = deploy(Pool2.class, usdc.getAddress(), baln.getAddress(), factory.getAddress(), FEE_AMOUNTS[MEDIUM], TICK_SPACINGS[MEDIUM]);
     pool2.invoke(alice, "initialize", encodePriceSqrt(ONE, ONE));
-    ConvexusFactoryUtils.createPool(factory, alice, usdc.getAddress(), rwtk.getAddress(), FEE_AMOUNTS[MEDIUM], pool2.getAddress());
+    ConvexusFactoryUtils.createPool(factory, alice, usdc.getAddress(), baln.getAddress(), FEE_AMOUNTS[MEDIUM], pool2.getAddress());
   }
 
   void setup_staker () throws Exception {
@@ -132,74 +131,32 @@ public class ConvexusStakerTest extends ConvexusTest {
   }
 
   // --- Helpers ---
-  protected BigInteger mintPosition (
-    Account from,
-    Address token0,
-    Address token1,
-    int fee,
-    int tickLower,
-    int tickUpper,
-    Address recipient,
-    BigInteger amount0Desired,
-    BigInteger amount1Desired,
-    BigInteger amount0Min,
-    BigInteger amount1Min,
-    BigInteger deadline
-  ) {
-    reset(nft.spy);
-    NFTUtils.mint(
-      nft, 
-      from,
-      token0,
-      token1,
-      fee,
-      tickLower,
-      tickUpper,
-      amount0Desired,
-      amount1Desired,
-      amount0Min,
-      amount1Min,
-      recipient,
-      deadline
-    );
-
-    // Get IncreaseLiquidity event
-    ArgumentCaptor<BigInteger> _tokenId = ArgumentCaptor.forClass(BigInteger.class);
-    ArgumentCaptor<BigInteger> _liquidity = ArgumentCaptor.forClass(BigInteger.class);
-    ArgumentCaptor<BigInteger> _amount0 = ArgumentCaptor.forClass(BigInteger.class);
-    ArgumentCaptor<BigInteger> _amount1 = ArgumentCaptor.forClass(BigInteger.class);
-    verify(nft.spy).IncreaseLiquidity(_tokenId.capture(), _liquidity.capture(), _amount0.capture(), _amount1.capture());
-    return _tokenId.getValue();
-  }
-
-  protected BigInteger mintDepositStake (Account lp, Score[] tokensToStake, BigInteger[] amountsToStake, int[] ticksToStake, BigInteger startTime, BigInteger endTime) {
-    BigInteger now = now();
-
+  protected BigInteger mintDepositStake (Account lp, Address[] tokensToStake, BigInteger[] amountsToStake, int[] ticksToStake, BigInteger startTime, BigInteger endTime, Address poolAddress, Address refundee) {
     ConvexusLiquidityUtils.deposit(lp, nft.getAddress(), sicx.score, amountsToStake[0]);
     ConvexusLiquidityUtils.deposit(lp, nft.getAddress(), usdc.score, amountsToStake[1]);
 
-    BigInteger tokenId = mintPosition(
+    // The LP mints their NFT
+    BigInteger tokenId = NFTUtils.mintPosition(
+      nft,
       lp, 
-      sicx.getAddress(), 
-      usdc.getAddress(), 
+      tokensToStake[0], 
+      tokensToStake[1], 
       FEE_AMOUNTS[MEDIUM], 
-      ticksToStake[0], 
-      ticksToStake[1], 
+      ticksToStake[0],
+      ticksToStake[1],
+      amountsToStake[0],
+      amountsToStake[1],
+      ZERO, ZERO,
       lp.getAddress(), 
-      amountsToStake[0], 
-      amountsToStake[1], 
-      ZERO, ZERO, 
-      now
+      now().add(BigInteger.valueOf(1000))
     );
 
     // The LP approves and stakes their NFT
     nft.invoke(lp, "approve", staker.getAddress(), tokenId);
-
-    // Deposit NFT Position to Staker contract
-    nft.invoke(lp, "safeTransferFrom", lp.getAddress(), staker.getAddress(), tokenId, "safeTransferFrom".getBytes());
+    NFTUtils.safeTransferFrom(nft, lp, staker.getAddress(), tokenId);
 
     // Stake
-    staker.invoke(lp, "stakeToken", new IncentiveKey(rwtk.getAddress(), pool1.getAddress(), startTime, endTime, alice.getAddress()), tokenId);
+    ConvexusStakerUtils.stakeToken(staker, lp, rwtk.getAddress(), poolAddress, new BigInteger[] {startTime, endTime}, refundee, tokenId);
 
     return tokenId;
   }

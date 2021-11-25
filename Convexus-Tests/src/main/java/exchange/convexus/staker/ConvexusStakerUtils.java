@@ -53,14 +53,37 @@ public class ConvexusStakerUtils {
     return new IncentiveKey(rewardToken.getAddress(), pool, startTime, endTime, from.getAddress());
   }
 
+  public static void createIncentive (Account from, Score rewardToken, Address staker, IncentiveKey key, BigInteger reward) {
+
+    var params = Json.object()
+      .add("pool", key.pool.toString())
+      .add("startTime", key.startTime.toString())
+      .add("endTime", key.endTime.toString())
+      .add("refundee", key.refundee.toString());
+    
+    JsonObject data = Json.object()
+      .add("method", "createIncentive")
+      .add("params", params);
+
+    byte[] dataBytes = data.toString().getBytes();
+
+    rewardToken.invoke(
+      from, 
+      "transfer", 
+      staker,
+      reward, 
+      dataBytes
+    );
+  }
+
   public static void stakeToken (
     ScoreSpy<ConvexusStaker> staker, 
     Account from,
     Address rwtk,
     Address pool,
     BigInteger[] timestamps,
-    BigInteger tokenId, 
-    Address refundee
+    Address refundee,
+    BigInteger tokenId
   ) {
     staker.invoke(from, "stakeToken", 
       new IncentiveKey(
@@ -74,4 +97,12 @@ public class ConvexusStakerUtils {
     );
   }
 
+  public static void stakeToken (
+    ScoreSpy<ConvexusStaker> staker, 
+    Account from,
+    IncentiveKey incentiveKey,
+    BigInteger tokenId
+  ) {
+    staker.invoke(from, "stakeToken", incentiveKey, tokenId);
+  }
 }

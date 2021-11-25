@@ -37,6 +37,7 @@ import com.iconloop.score.test.ServiceManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import exchange.convexus.NFTUtils.NFTUtils;
 import exchange.convexus.liquidity.ConvexusLiquidityUtils;
 import exchange.convexus.positionmgr.PositionInformation;
 import exchange.convexus.utils.AssertUtils;
@@ -56,7 +57,6 @@ public class StakeTokenTest extends ConvexusStakerTest {
   byte[] incentiveId;
   BigInteger[] timestamps;
   BigInteger tokenId;
-  BigInteger DEFAULT_LP_AMOUNT = EXA.multiply(TEN);
 
   @BeforeEach
   void setup() throws Exception {
@@ -73,18 +73,19 @@ public class StakeTokenTest extends ConvexusStakerTest {
     ConvexusLiquidityUtils.deposit(lpUser0, nft.getAddress(), sicx.score, amountDesired);
     ConvexusLiquidityUtils.deposit(lpUser0, nft.getAddress(), usdc.score, amountDesired);
 
-    tokenId = mintPosition(
+    tokenId = NFTUtils.mintPosition(
+      nft,
       lpUser0, 
       sicx.getAddress(), 
       usdc.getAddress(), 
       FEE_AMOUNTS[MEDIUM], 
       getMinTick(TICK_SPACINGS[MEDIUM]), 
       getMaxTick(TICK_SPACINGS[MEDIUM]), 
+      amountDesired, 
+      amountDesired, 
+      ZERO, 
+      ZERO, 
       lpUser0.getAddress(), 
-      amountDesired, 
-      amountDesired, 
-      ZERO, 
-      ZERO, 
       now().add(BigInteger.valueOf(1000)));
 
     safeTransferFrom(nft, lpUser0, staker.getAddress(), tokenId);
@@ -94,7 +95,7 @@ public class StakeTokenTest extends ConvexusStakerTest {
   }
 
   void subject (BigInteger tokenId, Account from) {
-    stakeToken(staker, from, rwtk.getAddress(), pool1.getAddress(), timestamps, tokenId, incentiveCreator.getAddress());
+    stakeToken(staker, from, rwtk.getAddress(), pool1.getAddress(), timestamps, incentiveCreator.getAddress(), tokenId);
   }
 
   @Test
@@ -174,18 +175,19 @@ public class StakeTokenTest extends ConvexusStakerTest {
     ConvexusLiquidityUtils.deposit(lpUser0, nft.getAddress(), sicx.score, amountDesired);
     ConvexusLiquidityUtils.deposit(lpUser0, nft.getAddress(), usdc.score, amountDesired);
 
-    BigInteger tokenId2 = mintPosition(
+    BigInteger tokenId2 = NFTUtils.mintPosition(
+      nft,
       lpUser0,
       sicx.getAddress(), 
       usdc.getAddress(), 
       FEE_AMOUNTS[MEDIUM], 
       getMinTick(TICK_SPACINGS[MEDIUM]), 
       getMaxTick(TICK_SPACINGS[MEDIUM]), 
+      amountDesired, 
+      amountDesired, 
+      ZERO, 
+      ZERO, 
       lpUser0.getAddress(), 
-      amountDesired, 
-      amountDesired, 
-      ZERO, 
-      ZERO, 
       now().add(BigInteger.valueOf(1000))
     );
 
@@ -212,20 +214,21 @@ public class StakeTokenTest extends ConvexusStakerTest {
     var incentiveKey = ConvexusStakerUtils.createIncentive(incentiveCreator, rwtk.score, totalReward, staker.getAddress(), pool2.getAddress(), timestamps[0], timestamps[1]);
 
     ConvexusLiquidityUtils.deposit(lpUser0, nft.getAddress(), usdc.score, DEFAULT_LP_AMOUNT);
-    ConvexusLiquidityUtils.deposit(lpUser0, nft.getAddress(), rwtk.score, DEFAULT_LP_AMOUNT);
+    ConvexusLiquidityUtils.deposit(lpUser0, nft.getAddress(), baln.score, DEFAULT_LP_AMOUNT);
 
-    BigInteger otherTokenId = mintPosition(
+    BigInteger otherTokenId = NFTUtils.mintPosition(
+      nft,
       lpUser0, 
       usdc.getAddress(), 
-      rwtk.getAddress(), 
+      baln.getAddress(), 
       FEE_AMOUNTS[MEDIUM], 
       getMinTick(TICK_SPACINGS[MEDIUM]),
       getMaxTick(TICK_SPACINGS[MEDIUM]),
+      DEFAULT_LP_AMOUNT,
+      DEFAULT_LP_AMOUNT,
+      ZERO,
+      ZERO,
       lpUser0.getAddress(),
-      DEFAULT_LP_AMOUNT,
-      DEFAULT_LP_AMOUNT,
-      ZERO,
-      ZERO,
       now().add(BigInteger.valueOf(1000)));
 
     sleep(incentiveKey.startTime.subtract(now()).add(ONE));
@@ -252,8 +255,8 @@ public class StakeTokenTest extends ConvexusStakerTest {
           timestamps[0].add(TEN), 
           timestamps[1]
         }, 
-        tokenId, 
-        incentiveCreator.getAddress()
+        incentiveCreator.getAddress(),
+        tokenId
       ), 
       "stakeToken: non-existent incentive");
   }
