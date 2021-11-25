@@ -19,6 +19,7 @@ package exchange.convexus.staker;
 import static java.math.BigInteger.ZERO;
 
 import java.math.BigInteger;
+import java.util.Map;
 
 /// @notice Represents a staking incentive
 public class Incentive {
@@ -38,5 +39,15 @@ public class Incentive {
 
     public static Incentive empty() {
       return new Incentive(ZERO, ZERO, ZERO);
+    }
+
+    public static Incentive fromMap(Object call) {
+        @SuppressWarnings("unchecked")
+        Map<String,Object> map = (Map<String,Object>) call;
+        return new Incentive(
+            (BigInteger) map.get("totalRewardUnclaimed"),
+            (BigInteger) map.get("totalSecondsClaimedX128"),
+            (BigInteger) map.get("numberOfStakes")
+        );
     }
 }

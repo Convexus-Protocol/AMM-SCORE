@@ -30,7 +30,7 @@ import org.mockito.ArgumentCaptor;
 import exchange.convexus.factory.ConvexusFactoryUtils;
 import exchange.convexus.librairies.Oracle.Observation;
 import exchange.convexus.utils.AssertUtils;
-import exchange.convexus.utils.TimeUtils;
+import static exchange.convexus.utils.TimeUtils.now;
 
 import static java.math.BigInteger.ONE;
 import static java.math.BigInteger.ZERO;
@@ -120,7 +120,7 @@ public class IncreaseObservationCardinalityNextTest extends ConvexusPoolTest {
     assertEquals(ZERO, observation.secondsPerLiquidityCumulativeX128);
     assertEquals(ZERO, observation.tickCumulative);
     assertEquals(true, observation.initialized);
-    assertEquals(TimeUtils.nowSeconds(), observation.blockTimestamp);
+    assertEquals(now(), observation.blockTimestamp);
   }
 
   @Test

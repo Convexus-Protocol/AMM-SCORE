@@ -23,7 +23,6 @@ import foundation.icon.icx.transport.http.HttpProvider;
 import foundation.icon.test.Env;
 import foundation.icon.test.TestBase;
 import foundation.icon.test.TransactionHandler;
-import foundation.icon.test.score.Score;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -35,18 +34,16 @@ import exchange.convexus.utils.MathUtils;
 
 import static java.math.BigInteger.ONE;
 
-import java.io.File;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.MathContext;
-import java.nio.file.Files;
 
 import static foundation.icon.test.Env.LOG;
 
 public class ConvexusPoolTest extends TestBase {
     private static TransactionHandler txHandler;
     private static KeyWallet[] wallets;
-    
+
     final int TICK_SPACINGS[] = {10, 60, 200};
     final int FEE_AMOUNTS[] = {500, 3000, 10000};
     final int LOW = 0;
@@ -96,7 +93,7 @@ public class ConvexusPoolTest extends TestBase {
 
         LOG.info("Deploying the PoolFactory");
         ConvexusFactoryScore factory = ConvexusFactoryScore.mustDeploy(txHandler, wallets[0]);
-        
+
         LOG.info("Deploying a new SICX / USDC pool");
         ConvexusPoolScore pool = ConvexusPoolScore.mustDeploy(
             txHandler, wallets[0], 
@@ -108,8 +105,16 @@ public class ConvexusPoolTest extends TestBase {
             TICK_SPACINGS[MEDIUM]
         );
 
-        LOG.info("Initializing the  pool");
+        LOG.info("Initializing the pool");
         pool.initialize(ownerWallet, encodePriceSqrt(ONE, ONE));
+        
+        LOG.info("Adding it to the factory");
+        factory.createPool(ownerWallet, 
+            sicx.getAddress(), 
+            usdc.getAddress(), 
+            FEE_AMOUNTS[MEDIUM],
+            pool.getAddress()
+        );
 
         LOG.infoExiting();
     }

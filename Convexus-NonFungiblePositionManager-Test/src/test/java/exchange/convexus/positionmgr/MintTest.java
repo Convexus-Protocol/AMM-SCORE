@@ -29,7 +29,7 @@ import org.junit.jupiter.api.Test;
 
 import exchange.convexus.liquidity.ConvexusLiquidityUtils;
 import exchange.convexus.utils.AssertUtils;
-import exchange.convexus.utils.TimeUtils;
+import static exchange.convexus.utils.TimeUtils.now;
 import static exchange.convexus.NFTUtils.NFTUtils.mint;
 
 public class MintTest extends NonFungiblePositionManagerTest {
@@ -63,7 +63,7 @@ public class MintTest extends NonFungiblePositionManagerTest {
     params.amount0Min = ZERO;
     params.amount1Min = ZERO;
     params.recipient = alice.getAddress();
-    params.deadline = TimeUtils.nowSeconds();
+    params.deadline = now();
 
     AssertUtils.assertThrowsMessage(AssertionError.class, () -> 
       mint (
@@ -79,7 +79,7 @@ public class MintTest extends NonFungiblePositionManagerTest {
         ZERO,
         ZERO,
         alice.getAddress(),
-        TimeUtils.nowSeconds()
+        now()
       ),
       "addLiquidity: pool doesn't exist");
   }
@@ -102,7 +102,7 @@ public class MintTest extends NonFungiblePositionManagerTest {
         ZERO,
         ZERO,
         alice.getAddress(),
-        TimeUtils.nowSeconds()
+        now()
       ),
       "checkEnoughDeposited: user didn't deposit enough funds");
   }
@@ -129,7 +129,7 @@ public class MintTest extends NonFungiblePositionManagerTest {
       ZERO,
       ZERO,
       bob.getAddress(),
-      TimeUtils.nowSeconds().add(BigInteger.TEN)
+      now().add(BigInteger.TEN)
     );
 
     assertEquals(nft.call("balanceOf", bob.getAddress()), ONE);

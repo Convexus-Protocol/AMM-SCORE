@@ -39,6 +39,7 @@ import exchange.convexus.swappay.ConvexusSwapPay;
 import exchange.convexus.cvxs.CVXS;
 import exchange.convexus.positionmgr.NonFungiblePositionManager;
 import exchange.convexus.positiondescriptor.NonfungibleTokenPositionDescriptor;
+import exchange.convexus.testtokens.Baln;
 import exchange.convexus.testtokens.RewardToken;
 import exchange.convexus.testtokens.Sicx;
 import exchange.convexus.testtokens.Usdc;
@@ -227,6 +228,15 @@ public class ConvexusTest extends TestBase {
         var spy = (Usdc) spy(score.getInstance());
         score.setInstance(spy);
         return new ScoreSpy<Usdc>(score, spy);
+    }
+    
+    
+    public ScoreSpy<Baln> deploy_baln () throws Exception {
+        Score score = sm.deploy(owner, Baln.class, "BALN", "BALN", 18);
+
+        var spy = (Baln) spy(score.getInstance());
+        score.setInstance(spy);
+        return new ScoreSpy<Baln>(score, spy);
     }
     
     public ScoreSpy<RewardToken> deploy_reward_token () throws Exception {

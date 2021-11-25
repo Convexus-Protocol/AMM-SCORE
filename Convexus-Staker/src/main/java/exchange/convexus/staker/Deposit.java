@@ -17,6 +17,7 @@
 package exchange.convexus.staker;
 
 import java.math.BigInteger;
+import java.util.Map;
 
 import score.Address;
 
@@ -39,5 +40,16 @@ public class Deposit {
         this.numberOfStakes = numberOfStakes;
         this.tickLower = tickLower;
         this.tickUpper = tickUpper;
+    }
+
+    public static Deposit fromMap(Object call) {
+        @SuppressWarnings("unchecked")
+        Map<String,Object> map = (Map<String,Object>) call;
+        return new Deposit(
+            (Address) map.get("owner"),
+            (BigInteger) map.get("numberOfStakes"),
+            ((BigInteger) map.get("tickLower")).intValue(),
+            ((BigInteger) map.get("tickUpper")).intValue()
+        );
     }
 }

@@ -17,6 +17,7 @@
 package exchange.convexus.staker;
 
 import static exchange.convexus.utils.SleepUtils.sleep;
+import static exchange.convexus.utils.TimeUtils.ONE_DAY;
 import static exchange.convexus.utils.TimeUtils.ONE_SECOND;
 import static java.math.BigInteger.TWO;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -30,7 +31,7 @@ import com.iconloop.score.test.ServiceManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import exchange.convexus.utils.TimeUtils;
+import static exchange.convexus.utils.TimeUtils.now;
 
 public class StakeEntireTime extends ConvexusStakerTest {
 
@@ -43,7 +44,7 @@ public class StakeEntireTime extends ConvexusStakerTest {
   BigInteger THOUSAND = BigInteger.valueOf(1000);
   int tickSpacing = TICK_SPACINGS[MEDIUM];
   BigInteger totalReward = EXA.multiply(BigInteger.valueOf(3_000));
-  BigInteger duration = TimeUtils.ONE_DAY.multiply(BigInteger.valueOf(30));
+  BigInteger duration = ONE_DAY.multiply(BigInteger.valueOf(30));
   BigInteger[] tokensId = new BigInteger[3];
   
   BigInteger startTime;
@@ -65,43 +66,43 @@ public class StakeEntireTime extends ConvexusStakerTest {
     setup_staker();
     setup_tokens();
 
-    final BigInteger now = TimeUtils.nowSeconds();
+    final BigInteger now = now();
     startTime = now.add(ONE_SECOND.multiply(THOUSAND));
     endTime = startTime.add(duration);
 
     // Create Pool
-    setup_pool01();
-    setup_pool12();
+    setup_pool1();
+    setup_pool2();
 
     // createIncentive
-    ConvexusStakerUtils.createIncentive(alice, rwtk.score, totalReward, staker.getAddress(), pool01.getAddress(), startTime, endTime, alice.getAddress());
+    ConvexusStakerUtils.createIncentive(incentiveCreator, rwtk.score, totalReward, staker.getAddress(), pool1.getAddress(), startTime, endTime);
 
     Score[] tokensToStake = {sicx.score, usdc.score};
     sleep(startTime.subtract(now).divide(ONE_SECOND).intValue() + 1);
-    tokensId[0] = mintDepositStake(lp1, tokensToStake, amountsToStake, ticksToStake, startTime, endTime);
-    tokensId[1] = mintDepositStake(lp2, tokensToStake, amountsToStake, ticksToStake, startTime, endTime);
-    tokensId[2] = mintDepositStake(lp3, tokensToStake, amountsToStake, ticksToStake, startTime, endTime);
+    tokensId[0] = mintDepositStake(lpUser0, tokensToStake, amountsToStake, ticksToStake, startTime, endTime);
+    tokensId[1] = mintDepositStake(lpUser1, tokensToStake, amountsToStake, ticksToStake, startTime, endTime);
+    tokensId[2] = mintDepositStake(lpUser2, tokensToStake, amountsToStake, ticksToStake, startTime, endTime);
   }
 
   @Test
   void testAssumptions () {
     assertEquals(staker.call("factory"), factory.getAddress());
-    assertEquals(staker.call("nonfungiblePositionManager"), nonfungiblePositionManager.getAddress());
+    assertEquals(staker.call("nonfungiblePositionManager"), nft.getAddress());
     assertEquals(staker.call("maxIncentiveDuration"), ONE_SECOND.multiply(TWO.pow(32)));
     assertEquals(staker.call("maxIncentiveStartLeadTime"), ONE_SECOND.multiply(TWO.pow(32)));
   }
 
   @Test
   void testWhoAllStakeEntireTimeWithdrawAtTheEnd () {
-    BigInteger now = TimeUtils.nowSeconds();
+    BigInteger now = now();
     sleep(endTime.subtract(now).divide(ONE_SECOND).intValue() + 1);
 
     // Sanity check: make sure we go past the incentive end time.
-    now = TimeUtils.nowSeconds();
+    now = now();
     assertTrue(now.compareTo(endTime) >= 0);
 
     // Everyone pulls their liquidity at the same time
-    unstakeCollectBurnFlow(lp1, rwtk.getAddress(), pool01.getAddress(), startTime, endTime, tokensId[0]);
+    unstakeCollectBurnFlow(lpUser0, rwtk.getAddress(), pool1.getAddress(), startTime, endTime, tokensId[0]);
     // TODO: Not Approved ? Why ?
   }
 }

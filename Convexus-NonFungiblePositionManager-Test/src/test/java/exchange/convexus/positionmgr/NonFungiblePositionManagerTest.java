@@ -119,23 +119,6 @@ public class NonFungiblePositionManagerTest extends ConvexusTest {
     ));
   }
   
-  protected void decreaseLiquidity (
-    Account from,
-    BigInteger tokenId,
-    BigInteger liquidity,
-    BigInteger amount0Min,
-    BigInteger amount1Min,
-    BigInteger deadline
-  ) {
-    nft.invoke(from, "decreaseLiquidity", new DecreaseLiquidityParams(
-      tokenId,
-      liquidity,
-      amount0Min,
-      amount1Min,
-      deadline
-    ));
-  }
-  
   protected PairAmounts collect (
     Account from,
     BigInteger tokenId,

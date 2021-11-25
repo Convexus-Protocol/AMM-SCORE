@@ -23,18 +23,18 @@ import com.eclipsesource.json.JsonObject;
 import com.iconloop.score.test.Account;
 import com.iconloop.score.test.Score;
 
+import exchange.convexus.utils.ScoreSpy;
 import score.Address;
-import score.Context;
 
 public class ConvexusStakerUtils {
   
-  public static void createIncentive (Account from, Score token, BigInteger amount, Address staker, Address pool, BigInteger startTime, BigInteger endTime, Address refundee) {
+  public static IncentiveKey createIncentive (Account from, Score rewardToken, BigInteger amount, Address staker, Address pool, BigInteger startTime, BigInteger endTime) {
 
     var params = Json.object()
       .add("pool", pool.toString())
       .add("startTime", startTime.toString())
       .add("endTime", endTime.toString())
-      .add("refundee", refundee.toString());
+      .add("refundee", from.getAddress().toString());
     
     JsonObject data = Json.object()
       .add("method", "createIncentive")
@@ -42,12 +42,36 @@ public class ConvexusStakerUtils {
 
     byte[] dataBytes = data.toString().getBytes();
 
-    token.invoke(
+    rewardToken.invoke(
       from, 
       "transfer", 
       staker,
       amount, 
       dataBytes
     );
+
+    return new IncentiveKey(rewardToken.getAddress(), pool, startTime, endTime, from.getAddress());
   }
+
+  public static void stakeToken (
+    ScoreSpy<ConvexusStaker> staker, 
+    Account from,
+    Address rwtk,
+    Address pool,
+    BigInteger[] timestamps,
+    BigInteger tokenId, 
+    Address refundee
+  ) {
+    staker.invoke(from, "stakeToken", 
+      new IncentiveKey(
+        rwtk, 
+        pool, 
+        timestamps[0], 
+        timestamps[1], 
+        refundee
+      ),
+      tokenId
+    );
+  }
+
 }

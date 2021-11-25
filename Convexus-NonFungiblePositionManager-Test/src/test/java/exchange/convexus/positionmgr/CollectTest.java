@@ -21,6 +21,7 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static exchange.convexus.NFTUtils.NFTUtils.mint;
+import static exchange.convexus.utils.TimeUtils.now;
 import static java.math.BigInteger.ONE;
 
 import java.math.BigInteger;
@@ -30,10 +31,10 @@ import com.iconloop.score.test.ServiceManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import exchange.convexus.NFTUtils.NFTUtils;
 import exchange.convexus.liquidity.ConvexusLiquidityUtils;
 import exchange.convexus.utils.AssertUtils;
 import exchange.convexus.utils.IntUtils;
-import exchange.convexus.utils.TimeUtils;
 import score.Address;
 
 public class CollectTest extends NonFungiblePositionManagerTest {
@@ -67,7 +68,7 @@ public class CollectTest extends NonFungiblePositionManagerTest {
       ZERO, 
       ZERO, 
       alice.getAddress(),
-      TimeUtils.nowSeconds().add(ONE)
+      now().add(ONE)
     );
   }
 
@@ -116,7 +117,7 @@ public class CollectTest extends NonFungiblePositionManagerTest {
 
   @Test
   void transfersTokensOwedFromBurn () {
-    decreaseLiquidity(alice, tokenId, BigInteger.valueOf(50), ZERO, ZERO, TimeUtils.nowSeconds().add(ONE));
+    NFTUtils.decreaseLiquidity(nft, alice, tokenId, BigInteger.valueOf(50), ZERO, ZERO, now().add(ONE));
     Address poolAddress = (Address) factory.call("getPool", sicx.getAddress(), usdc.getAddress(), FEE_AMOUNTS[MEDIUM]);
 
     reset(sicx.spy);

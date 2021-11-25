@@ -30,7 +30,7 @@ import org.junit.jupiter.api.Test;
 
 import exchange.convexus.liquidity.ConvexusLiquidityUtils;
 import exchange.convexus.utils.AssertUtils;
-import exchange.convexus.utils.TimeUtils;
+import static exchange.convexus.utils.TimeUtils.now;
 import static exchange.convexus.NFTUtils.NFTUtils.mint;
 
 public class TransferFromTest extends NonFungiblePositionManagerTest {
@@ -64,7 +64,7 @@ public class TransferFromTest extends NonFungiblePositionManagerTest {
       ZERO, 
       ZERO, 
       bob.getAddress(),
-      TimeUtils.nowSeconds().add(ONE)
+      now().add(ONE)
     );
   }
   

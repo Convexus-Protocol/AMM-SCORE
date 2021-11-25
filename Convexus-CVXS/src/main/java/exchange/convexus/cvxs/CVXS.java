@@ -17,6 +17,7 @@
 package exchange.convexus.cvxs;
 
 import static exchange.convexus.utils.AddressUtils.ZERO_ADDRESS;
+import static exchange.convexus.utils.TimeUtils.now;
 import static java.math.BigInteger.TWO;
 import static java.math.BigInteger.ZERO;
 
@@ -119,7 +120,7 @@ public class CVXS {
     ) {
         // Initial deploy
         if (balances.get(account) == null) {
-            Context.require(mintingAllowedAfter_.compareTo(TimeUtils.nowSeconds()) >= 0,
+            Context.require(mintingAllowedAfter_.compareTo(now()) >= 0,
             "CVXS: minting can only begin after deployment");
 
             balances.set(account, INITIAL_TOTAL_SUPPLY);
@@ -153,7 +154,7 @@ public class CVXS {
      */
     @External
     public void mint (Address dst, BigInteger amount) {
-        final BigInteger now = TimeUtils.nowSeconds();
+        final BigInteger now = now();
         final BigInteger ONE_HUNDRED = BigInteger.valueOf(100);
 
         Context.require(Context.getCaller().equals(this.minter.get()), 

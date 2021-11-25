@@ -36,7 +36,7 @@ import exchange.convexus.librairies.Path;
 import exchange.convexus.librairies.PoolData;
 import exchange.convexus.liquidity.ConvexusLiquidityUtils;
 import exchange.convexus.router.SwapRouterUtils;
-import exchange.convexus.utils.TimeUtils;
+import static exchange.convexus.utils.TimeUtils.now;
 import score.Address;
 import static exchange.convexus.NFTUtils.NFTUtils.mint;
 
@@ -72,7 +72,7 @@ public class FeesAccountingTest extends NonFungiblePositionManagerTest {
       ZERO, 
       ZERO, 
       alice.getAddress(),
-      TimeUtils.nowSeconds().add(ONE)
+      now().add(ONE)
     );
     
     // nft 2 earns 75% of fees
@@ -92,7 +92,7 @@ public class FeesAccountingTest extends NonFungiblePositionManagerTest {
       ZERO, 
       ZERO, 
       alice.getAddress(),
-      TimeUtils.nowSeconds().add(ONE)
+      now().add(ONE)
     );
     
     // swap for ~10k of fees
@@ -104,7 +104,7 @@ public class FeesAccountingTest extends NonFungiblePositionManagerTest {
       swapAmout,
       Path.encodePath(new PoolData(sicx.getAddress(), usdc.getAddress(), FEE_AMOUNTS[MEDIUM])), 
       alice.getAddress(), 
-      TimeUtils.nowSeconds().add(ONE), 
+      now().add(ONE), 
       ZERO
     );
   }
@@ -131,7 +131,7 @@ public class FeesAccountingTest extends NonFungiblePositionManagerTest {
     verifyNoInteractions(usdc.spy);
     BigInteger after = (BigInteger) sicx.call("balanceOf", alice.getAddress());
     assertEquals(after.subtract(before), BigInteger.valueOf(2501));
-    
+
     before = (BigInteger) sicx.call("balanceOf", alice.getAddress());
     reset(sicx.spy);
     reset(usdc.spy);

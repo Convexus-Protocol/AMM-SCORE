@@ -34,7 +34,7 @@ import exchange.convexus.router.ExactOutputSingleParams;
 import exchange.convexus.utils.BytesUtils;
 import exchange.convexus.utils.ReentrancyLock;
 import exchange.convexus.utils.StringUtils;
-import exchange.convexus.utils.TimeUtils;
+import static exchange.convexus.utils.TimeUtils.now;
 
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonObject;
@@ -99,7 +99,7 @@ public class Swap {
             SICX,
             poolFee,
             caller,
-            TimeUtils.nowSeconds(),
+            now(),
             ZERO,
             ZERO
         );
@@ -137,7 +137,7 @@ public class Swap {
             this.SICX,
             poolFee,
             caller,
-            TimeUtils.nowSeconds(),
+            now(),
             amountOut,
             ZERO
         );
@@ -176,7 +176,7 @@ public class Swap {
                 SICX.toByteArray()
             ),
             caller,
-            TimeUtils.nowSeconds(),
+            now(),
             ZERO
         );
 
@@ -223,7 +223,7 @@ public class Swap {
                 IUSDC.toByteArray()
             ), 
             caller,
-            TimeUtils.nowSeconds(),
+            now(),
             amountOut
         );
 

@@ -4,6 +4,7 @@ import java.math.BigInteger;
 
 import com.iconloop.score.test.Account;
 
+import exchange.convexus.positionmgr.DecreaseLiquidityParams;
 import exchange.convexus.positionmgr.MintParams;
 import exchange.convexus.positionmgr.NonFungiblePositionManager;
 import exchange.convexus.utils.ScoreSpy;
@@ -41,4 +42,25 @@ public class NFTUtils {
     nft.invoke(from, "mint", params);
   }
 
+  public static void decreaseLiquidity (
+    ScoreSpy<NonFungiblePositionManager> nft,
+    Account from,
+    BigInteger tokenId,
+    BigInteger liquidity,
+    BigInteger amount0Min,
+    BigInteger amount1Min,
+    BigInteger deadline
+  ) {
+    nft.invoke(from, "decreaseLiquidity", new DecreaseLiquidityParams(
+      tokenId,
+      liquidity,
+      amount0Min,
+      amount1Min,
+      deadline
+    ));
+  }
+
+  public static void safeTransferFrom(ScoreSpy<NonFungiblePositionManager> nft, Account lp, Address staker, BigInteger tokenId) {
+    nft.invoke(lp, "safeTransferFrom", lp.getAddress(), staker, tokenId, "".getBytes());
+  }
 }

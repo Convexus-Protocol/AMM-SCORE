@@ -43,7 +43,7 @@ import exchange.convexus.librairies.Tick;
 import exchange.convexus.liquidity.ConvexusLiquidityUtils;
 import exchange.convexus.utils.AssertUtils;
 import exchange.convexus.utils.IntUtils;
-import exchange.convexus.utils.TimeUtils;
+import static exchange.convexus.utils.TimeUtils.now;
 import score.Address;
 
 public class MintInitializedTest extends ConvexusPoolTest {
@@ -79,7 +79,7 @@ public class MintInitializedTest extends ConvexusPoolTest {
   // =========================================
   BigInteger initializeWithPrice10_1() {
     pool.invoke(alice, "initialize", encodePriceSqrt(ONE, TEN));
-    var start = TimeUtils.nowSeconds();
+    var start = now();
     ConvexusLiquidityUtils.deposit(alice, callee.getAddress(), usdc.score, BigInteger.valueOf(1000));
     ConvexusLiquidityUtils.deposit(alice, callee.getAddress(), sicx.score, BigInteger.valueOf(9996));
     callee.invoke(alice, "mint", pool.getAddress(), alice.getAddress(), minTick, maxTick, BigInteger.valueOf(3161));
@@ -393,7 +393,7 @@ public class MintInitializedTest extends ConvexusPoolTest {
 
   @Test
   void testDoesNotWriteAnObservation () {
-    var start = TimeUtils.nowSeconds();
+    var start = now();
     Oracle.Observation observation = Oracle.Observation.fromMap(pool.call("observations", 0));
     Oracle.Observation expected = new Oracle.Observation(start, ZERO, ZERO, true);
     assertObservationEquals(expected, observation);
@@ -498,7 +498,7 @@ public class MintInitializedTest extends ConvexusPoolTest {
 
   @Test
   void testWritesAnObservation () {
-    var start = TimeUtils.nowSeconds();
+    var start = now();
     Oracle.Observation observation = Oracle.Observation.fromMap(pool.call("observations", 0));
     Oracle.Observation expected = new Oracle.Observation(start, ZERO, ZERO, true);
     assertObservationEquals(expected, observation);
@@ -585,7 +585,7 @@ public class MintInitializedTest extends ConvexusPoolTest {
 
   @Test
   void testDoesNotWriteAnObservationBelowCurrentPrice () {
-    var start = TimeUtils.nowSeconds();
+    var start = now();
     Oracle.Observation observation = Oracle.Observation.fromMap(pool.call("observations", 0));
     Oracle.Observation expected = new Oracle.Observation(start, ZERO, ZERO, true);
     assertObservationEquals(expected, observation);

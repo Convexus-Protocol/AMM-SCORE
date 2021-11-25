@@ -30,8 +30,10 @@ import org.junit.jupiter.api.Test;
 
 import exchange.convexus.liquidity.ConvexusLiquidityUtils;
 import exchange.convexus.utils.AssertUtils;
-import exchange.convexus.utils.TimeUtils;
+
+import static exchange.convexus.NFTUtils.NFTUtils.decreaseLiquidity;
 import static exchange.convexus.NFTUtils.NFTUtils.mint;
+import static exchange.convexus.utils.TimeUtils.now;
 
 public class DecreaseLiquidityTest extends NonFungiblePositionManagerTest {
 
@@ -64,7 +66,7 @@ public class DecreaseLiquidityTest extends NonFungiblePositionManagerTest {
       ZERO, 
       ZERO, 
       alice.getAddress(),
-      TimeUtils.nowSeconds().add(ONE)
+      now().add(ONE)
     );
   }
 
@@ -72,12 +74,13 @@ public class DecreaseLiquidityTest extends NonFungiblePositionManagerTest {
   void testFailsIfPastDeadline () {
     AssertUtils.assertThrowsMessage(AssertionError.class, () ->
       decreaseLiquidity (
+        nft,
         alice,
         tokenId,
         BigInteger.valueOf(50),
         ZERO,
         ZERO,
-        TimeUtils.nowSeconds().subtract(ONE)
+        now().subtract(ONE)
       ),
       "checkDeadline: Transaction too old"
     );
@@ -87,12 +90,13 @@ public class DecreaseLiquidityTest extends NonFungiblePositionManagerTest {
   void testCannotBeCalledByOtherAddresses () {
     AssertUtils.assertThrowsMessage(AssertionError.class, () ->
       decreaseLiquidity (
+        nft,
         bob,
         tokenId,
         BigInteger.valueOf(50),
         ZERO,
         ZERO,
-        TimeUtils.nowSeconds().subtract(ONE)
+        now().subtract(ONE)
       ),
       "checkAuthorizedForToken: Not approved"
     );
@@ -101,12 +105,13 @@ public class DecreaseLiquidityTest extends NonFungiblePositionManagerTest {
   @Test
   void testDecreasesPositionLiquidity () {
     decreaseLiquidity (
+      nft,
       alice,
       tokenId,
       BigInteger.valueOf(25),
       ZERO,
       ZERO,
-      TimeUtils.nowSeconds().add(ONE)
+      now().add(ONE)
     );
 
     var position = PositionInformation.fromMap(nft.call("positions", tokenId));
@@ -122,12 +127,13 @@ public class DecreaseLiquidityTest extends NonFungiblePositionManagerTest {
   void testAccountsForTokensOwed () {
     
     decreaseLiquidity (
+      nft,
       alice,
       tokenId,
       BigInteger.valueOf(25),
       ZERO,
       ZERO,
-      TimeUtils.nowSeconds().add(ONE)
+      now().add(ONE)
     );
 
     var position = PositionInformation.fromMap(nft.call("positions", tokenId));
@@ -138,12 +144,13 @@ public class DecreaseLiquidityTest extends NonFungiblePositionManagerTest {
   @Test
   void testCanDecreaseForAllTheLiquidity () {
     decreaseLiquidity (
+      nft,
       alice,
       tokenId,
       BigInteger.valueOf(100),
       ZERO,
       ZERO,
-      TimeUtils.nowSeconds().add(ONE)
+      now().add(ONE)
     );
     
     var position = PositionInformation.fromMap(nft.call("positions", tokenId));
@@ -154,12 +161,13 @@ public class DecreaseLiquidityTest extends NonFungiblePositionManagerTest {
   void testCannotDecreaseForMoreThanAllTheLiquidity () {
     AssertUtils.assertThrowsMessage(AssertionError.class, () ->
       decreaseLiquidity (
+        nft,
         alice,
         tokenId,
         BigInteger.valueOf(101),
         ZERO,
         ZERO,
-        TimeUtils.nowSeconds().add(ONE)
+        now().add(ONE)
       ),
       "decreaseLiquidity: invalid liquidity"
     );
@@ -184,17 +192,18 @@ public class DecreaseLiquidityTest extends NonFungiblePositionManagerTest {
       ZERO, 
       ZERO, 
       alice.getAddress(),
-      TimeUtils.nowSeconds().add(ONE)
+      now().add(ONE)
     );
     
     AssertUtils.assertThrowsMessage(AssertionError.class, () ->
       decreaseLiquidity (
+        nft,
         alice,
         tokenId,
         BigInteger.valueOf(101),
         ZERO,
         ZERO,
-        TimeUtils.nowSeconds().add(ONE)
+        now().add(ONE)
       ),
       "decreaseLiquidity: invalid liquidity"
     );

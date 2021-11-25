@@ -29,8 +29,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import exchange.convexus.liquidity.ConvexusLiquidityUtils;
-import exchange.convexus.utils.TimeUtils;
+
 import static exchange.convexus.NFTUtils.NFTUtils.mint;
+import static exchange.convexus.utils.TimeUtils.now;
 
 public class IncreaseLiquidityTest extends NonFungiblePositionManagerTest {
 
@@ -63,7 +64,7 @@ public class IncreaseLiquidityTest extends NonFungiblePositionManagerTest {
       ZERO, 
       ZERO, 
       alice.getAddress(),
-      TimeUtils.nowSeconds().add(ONE)
+      now().add(ONE)
     );
   }
 
@@ -82,7 +83,7 @@ public class IncreaseLiquidityTest extends NonFungiblePositionManagerTest {
       hundred,
       ZERO,
       ZERO,
-      TimeUtils.nowSeconds().add(ONE)
+      now().add(ONE)
     );
 
     var position = PositionInformation.fromMap(nft.call("positions", tokenId));

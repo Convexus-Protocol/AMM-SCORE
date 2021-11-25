@@ -36,7 +36,7 @@ public class TimeUtils {
     return BigInteger.valueOf(timestamp).divide(TO_SECONDS);
   }
 
-  public static BigInteger nowSeconds () {
+  public static BigInteger now () {
     return timestampToSeconds(Context.getBlockTimestamp());
   }
 }

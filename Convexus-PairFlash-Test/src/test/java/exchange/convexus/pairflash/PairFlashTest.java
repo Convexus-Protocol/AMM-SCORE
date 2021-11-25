@@ -44,7 +44,7 @@ import exchange.convexus.testtokens.Usdc;
 import exchange.convexus.utils.ConvexusTest;
 import exchange.convexus.utils.IntUtils;
 import exchange.convexus.utils.ScoreSpy;
-import exchange.convexus.utils.TimeUtils;
+import static exchange.convexus.utils.TimeUtils.now;
 import score.Address;
 import static exchange.convexus.NFTUtils.NFTUtils.mint;
 
@@ -113,7 +113,7 @@ public class PairFlashTest extends ConvexusTest {
       ZERO, 
       ZERO, 
       alice.getAddress(),
-      TimeUtils.nowSeconds().add(ONE)
+      now().add(ONE)
     );
 
     return pool;

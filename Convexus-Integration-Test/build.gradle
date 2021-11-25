@@ -50,11 +50,7 @@ task integrationTest(type: Test) {
     def prefix = 'score.path.'
     systemProperty(prefix + 'Convexus-Factory', factoryjar.outputJarName)
     systemProperty(prefix + 'Convexus-Pool', pooljar.outputJarName)
-        // project(':Convexus-Pool').getProjectDir().toString()
-        // + '/build/libs/Convexus-Pool-' 
-        // + '0.9.1'
-        // + '-optimized.jar')
-    systemProperty(prefix + 'IRC2BasicToken', new File(project(':testinteg').projectDir, 'jar/irc2-token-0.9.1-debug.jar'))
+    systemProperty(prefix + 'IRC2BasicToken', new File(project(':testinteg').projectDir, 'jar/irc2-token-debug.jar'))
 }
 
 integrationTest.dependsOn(factoryjar, pooljar)

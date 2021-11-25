@@ -31,7 +31,7 @@ import com.eclipsesource.json.JsonValue;
 import exchange.convexus.pool.SnapshotCumulativesInsideResult;
 import exchange.convexus.positionmgr.PositionInformation;
 import exchange.convexus.utils.StringUtils;
-import exchange.convexus.utils.TimeUtils;
+import static exchange.convexus.utils.TimeUtils.now;
 import score.Address;
 import score.BranchDB;
 import score.Context;
@@ -166,7 +166,7 @@ public class ConvexusStaker {
      * @dev @External public through tokenFallback
      */
     private void createIncentive (IncentiveKey key, BigInteger reward) {
-        final BigInteger now = TimeUtils.nowSeconds();
+        final BigInteger now = now();
 
         Context.require(reward.compareTo(ZERO) > 0,
             "createIncentive: reward must be positive");
@@ -200,7 +200,7 @@ public class ConvexusStaker {
      */
     @External
     public BigInteger endIncentive (IncentiveKey key) {
-        final BigInteger now = TimeUtils.nowSeconds();
+        final BigInteger now = now();
         Context.require(now.compareTo(key.endTime) >= 0,
             "endIncentive: cannot end incentive before end time");
 
@@ -313,7 +313,7 @@ public class ConvexusStaker {
     @External
     public void unstakeToken (IncentiveKey key, BigInteger tokenId) {
         Deposit deposit = deposits.get(tokenId);
-        final BigInteger now = TimeUtils.nowSeconds();
+        final BigInteger now = now();
         final Address caller = Context.getCaller();
 
         // anyone can call unstakeToken if the block time is after the end time of the incentive
@@ -325,8 +325,8 @@ public class ConvexusStaker {
         byte[] incentiveId = IncentiveId.compute(key);
 
         var stakes = stakes(tokenId, incentiveId);
-        BigInteger secondsPerLiquidityInsideInitialX128 = stakes[0];
-        BigInteger liquidity = stakes[1];
+        BigInteger secondsPerLiquidityInsideInitialX128 = stakes.secondsPerLiquidityInsideInitialX128;
+        BigInteger liquidity = stakes.liquidity;
         
         Context.require(liquidity.compareTo(ZERO) > 0,
             "unstakeToken: stake does not exist");
@@ -413,11 +413,11 @@ public class ConvexusStaker {
     public RewardAmount getRewardInfo (IncentiveKey key, BigInteger tokenId)
     {
         byte[] incentiveId = IncentiveId.compute(key);
-        final BigInteger now = TimeUtils.nowSeconds();
+        final BigInteger now = now();
 
         var stakes = stakes(tokenId, incentiveId);
-        BigInteger secondsPerLiquidityInsideInitialX128 = stakes[0];
-        BigInteger liquidity = stakes[1];
+        BigInteger secondsPerLiquidityInsideInitialX128 = stakes.secondsPerLiquidityInsideInitialX128;
+        BigInteger liquidity = stakes.liquidity;
 
         Context.require(liquidity.compareTo(ZERO) > 0, 
             "getRewardInfo: stake does not exist");
@@ -442,7 +442,7 @@ public class ConvexusStaker {
 
     /// @dev Stakes a deposited token without doing an ownership check
     private void _stakeToken (IncentiveKey key, BigInteger tokenId) {
-        final BigInteger now = TimeUtils.nowSeconds();
+        final BigInteger now = now();
 
         Context.require(now.compareTo(key.startTime) >= 0, 
             "stakeToken: incentive not started");
@@ -521,7 +521,6 @@ public class ConvexusStaker {
         }
     }
 
-
     // ================================================
     // Public variable getters
     // ================================================
@@ -573,16 +572,15 @@ public class ConvexusStaker {
      * @return liquidity The amount of liquidity in the NFT as of the last time the rewards were computed
      */
     @External(readonly = true)
-    public BigInteger[] stakes(BigInteger tokenId, byte[] incentiveId) {
-        BigInteger[] result = new BigInteger[2];
+    public StakesResult stakes(BigInteger tokenId, byte[] incentiveId) {
         Stake stake = this._stakes.at(tokenId).getOrDefault(incentiveId, Stake.empty());
-        result[0] = stake.secondsPerLiquidityInsideInitialX128;
-        result[1] = stake.liquidityNoOverflow;
+        BigInteger secondsPerLiquidityInsideInitialX128 = stake.secondsPerLiquidityInsideInitialX128;
+        BigInteger liquidity = stake.liquidityNoOverflow;
         
-        if (result[1].equals(MAX_UINT96)) {
-            result[1] = stake.liquidityIfOverflow;
+        if (liquidity.equals(MAX_UINT96)) {
+            liquidity = stake.liquidityIfOverflow;
         }
 
-        return result;
+        return new StakesResult(secondsPerLiquidityInsideInitialX128, liquidity);
     }
 }

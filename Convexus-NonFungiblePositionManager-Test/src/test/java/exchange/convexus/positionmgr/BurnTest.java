@@ -17,7 +17,9 @@
 package exchange.convexus.positionmgr;
 
 import static java.math.BigInteger.ZERO;
+import static exchange.convexus.NFTUtils.NFTUtils.decreaseLiquidity;
 import static exchange.convexus.NFTUtils.NFTUtils.mint;
+import static exchange.convexus.utils.TimeUtils.now;
 import static java.math.BigInteger.ONE;
 
 import java.math.BigInteger;
@@ -30,7 +32,6 @@ import org.junit.jupiter.api.Test;
 import exchange.convexus.liquidity.ConvexusLiquidityUtils;
 import exchange.convexus.utils.AssertUtils;
 import exchange.convexus.utils.IntUtils;
-import exchange.convexus.utils.TimeUtils;
 
 public class BurnTest extends NonFungiblePositionManagerTest {
 
@@ -63,7 +64,7 @@ public class BurnTest extends NonFungiblePositionManagerTest {
       ZERO, 
       ZERO, 
       alice.getAddress(),
-      TimeUtils.nowSeconds().add(ONE)
+      now().add(ONE)
     );
   }
 
@@ -83,7 +84,7 @@ public class BurnTest extends NonFungiblePositionManagerTest {
   
   @Test
   void testCannotBeCalledWhileThereIsStillPartialLiquidity () {
-    decreaseLiquidity(alice, tokenId, BigInteger.valueOf(50), ZERO, ZERO, TimeUtils.nowSeconds().add(ONE));
+    decreaseLiquidity(nft, alice, tokenId, BigInteger.valueOf(50), ZERO, ZERO, now().add(ONE));
     AssertUtils.assertThrowsMessage(AssertionError.class, () ->
       burn (alice, tokenId),
       "burn: Not cleared");
@@ -91,7 +92,7 @@ public class BurnTest extends NonFungiblePositionManagerTest {
 
   @Test
   void testCannotBeCalledWhileThereIsStillTokensOwed () {
-    decreaseLiquidity(alice, tokenId, BigInteger.valueOf(100), ZERO, ZERO, TimeUtils.nowSeconds().add(ONE));
+    decreaseLiquidity(nft, alice, tokenId, BigInteger.valueOf(100), ZERO, ZERO, now().add(ONE));
     AssertUtils.assertThrowsMessage(AssertionError.class, () ->
       burn (alice, tokenId),
       "burn: Not cleared");
@@ -99,7 +100,7 @@ public class BurnTest extends NonFungiblePositionManagerTest {
 
   @Test
   void testDeletesTheToken () {
-    decreaseLiquidity(alice, tokenId, BigInteger.valueOf(100), ZERO, ZERO, TimeUtils.nowSeconds().add(ONE));
+    decreaseLiquidity(nft, alice, tokenId, BigInteger.valueOf(100), ZERO, ZERO, now().add(ONE));
     collect (
       alice,
       tokenId,

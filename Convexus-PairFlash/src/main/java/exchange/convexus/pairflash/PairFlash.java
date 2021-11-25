@@ -24,7 +24,7 @@ import exchange.convexus.librairies.CallbackValidation;
 import exchange.convexus.librairies.PeripheryPayments;
 import exchange.convexus.librairies.PoolAddress;
 import exchange.convexus.router.ExactInputSingleParams;
-import exchange.convexus.utils.TimeUtils;
+import static exchange.convexus.utils.TimeUtils.now;
 import score.Address;
 import score.ByteArrayObjectWriter;
 import score.Context;
@@ -89,7 +89,7 @@ public class PairFlash {
             tokenOut, 
             poolFee, 
             thisAddress,
-            TimeUtils.nowSeconds(), 
+            now(), 
             amountOutMinimum,
             ZERO
         );

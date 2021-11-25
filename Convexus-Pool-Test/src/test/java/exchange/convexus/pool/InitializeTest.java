@@ -36,7 +36,7 @@ import org.mockito.ArgumentCaptor;
 import exchange.convexus.factory.ConvexusFactoryUtils;
 import exchange.convexus.librairies.Oracle;
 import exchange.convexus.utils.AssertUtils;
-import exchange.convexus.utils.TimeUtils;
+import static exchange.convexus.utils.TimeUtils.now;
 
 public class InitializeTest extends ConvexusPoolTest {
   
@@ -130,7 +130,7 @@ public class InitializeTest extends ConvexusPoolTest {
     pool.invoke(alice, "initialize", encodePriceSqrt(ONE, ONE));
 
     Oracle.Observation observation = Oracle.Observation.fromMap(pool.call("observations", 0));
-    Oracle.Observation expected = new Oracle.Observation(TimeUtils.nowSeconds(), ZERO, ZERO, true);
+    Oracle.Observation expected = new Oracle.Observation(now(), ZERO, ZERO, true);
     assertObservationEquals(expected, observation);
   }
 
