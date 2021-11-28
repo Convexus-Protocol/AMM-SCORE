@@ -29,7 +29,7 @@ import exchange.convexus.pools.Pool1;
 import exchange.convexus.pools.Pool2;
 import score.Address;
 
-public class ExactOutputTest extends SwapRouterTest {
+public class ExactOutputSingleTest extends SwapRouterTest {
 
   @BeforeEach
   void setup() throws Exception {
@@ -43,14 +43,14 @@ public class ExactOutputTest extends SwapRouterTest {
   }
 
   @Test
-  void testSinglePool01 () {
+  void testSwap01 () {
     Address pool = (Address) factory.call("getPool", sicx.getAddress(), usdc.getAddress(), FEE_AMOUNTS[MEDIUM]);
 
     // get balances before
     var poolBefore = getBalances(pool);
     var traderBefore = getBalances(trader.getAddress());
 
-    exactOutput(sicx.score, usdc.score);
+    exactOutputSingle(sicx.score, usdc.score);
 
     // get balances after
     var poolAfter = getBalances(pool);
@@ -61,16 +61,16 @@ public class ExactOutputTest extends SwapRouterTest {
     assertEquals(poolAfter[0], poolBefore[0].add(BigInteger.valueOf(3)));
     assertEquals(poolAfter[1], poolBefore[1].subtract(BigInteger.valueOf(1)));
   }
-
+  
   @Test
-  void testSinglePool10 () {
+  void testSwap10 () {
     Address pool = (Address) factory.call("getPool", usdc.getAddress(), sicx.getAddress(), FEE_AMOUNTS[MEDIUM]);
 
     // get balances before
     var poolBefore = getBalances(pool);
     var traderBefore = getBalances(trader.getAddress());
-
-    exactOutput(usdc.score, sicx.score);
+    
+    exactOutputSingle(usdc.score, sicx.score);
 
     // get balances after
     var poolAfter = getBalances(pool);
@@ -80,31 +80,5 @@ public class ExactOutputTest extends SwapRouterTest {
     assertEquals(traderAfter[1], traderBefore[1].subtract(BigInteger.valueOf(3)));
     assertEquals(poolAfter[0], poolBefore[0].subtract(BigInteger.valueOf(1)));
     assertEquals(poolAfter[1], poolBefore[1].add(BigInteger.valueOf(3)));
-  }
-
-  @Test
-  void testMultiplePool012 () {
-    // get balances before
-    var traderBefore = getBalances(trader.getAddress());
-
-    exactOutput(sicx.score, usdc.score, baln.score, BigInteger.ONE, BigInteger.valueOf(5));
-
-    var traderAfter = getBalances(trader.getAddress());
-    assertEquals(traderAfter[0], traderBefore[0].subtract(BigInteger.valueOf(5)));
-    assertEquals(traderAfter[1], traderBefore[1]);
-    assertEquals(traderAfter[2], traderBefore[2].add(BigInteger.valueOf(1)));
-  }
-
-  @Test
-  void testMultiplePool210 () {
-    // get balances before
-    var traderBefore = getBalances(trader.getAddress());
-
-    exactOutput(baln.score, usdc.score, sicx.score, BigInteger.ONE, BigInteger.valueOf(5));
-
-    var traderAfter = getBalances(trader.getAddress());
-    assertEquals(traderAfter[2], traderBefore[2].subtract(BigInteger.valueOf(5)));
-    assertEquals(traderAfter[1], traderBefore[1]);
-    assertEquals(traderAfter[0], traderBefore[0].add(BigInteger.valueOf(1)));
   }
 }

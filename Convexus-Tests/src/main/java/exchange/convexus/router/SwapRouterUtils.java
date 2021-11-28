@@ -106,4 +106,37 @@ public class SwapRouterUtils {
     );
   }
 
+  public static void exactOutputSingle (
+    Account from, Score tokenIn, Address router, BigInteger _value, 
+    Address tokenOut, 
+    int fee, 
+    Address recipient, 
+    BigInteger deadline,
+    BigInteger amountOut,
+    BigInteger sqrtPriceLimitX96
+  ) {
+    ExactOutputSingleParams params = new ExactOutputSingleParams(
+      tokenOut, 
+      fee, 
+      recipient, 
+      deadline,
+      amountOut,
+      sqrtPriceLimitX96
+    );
+
+    JsonObject data = Json.object()
+      .add("method", "exactOutputSingle")
+      .add("params", params.toJson());
+
+    byte[] dataBytes = data.toString().getBytes();
+
+    tokenIn.invoke(
+      from, 
+      "transfer", 
+      router, 
+      _value, 
+      dataBytes
+    );
+  }
+
 }

@@ -167,7 +167,6 @@ public class SwapRouterTest extends ConvexusTest {
   }
 
   void exactInputSingle (Score tokenIn, Score tokenOut, BigInteger amountIn, BigInteger amountOutMinimum) {
-
     // ensure that the swap fails if the limit is any tighter
     AssertUtils.assertThrowsMessage(AssertionError.class, () ->
       SwapRouterUtils.exactInputSingle(
@@ -202,6 +201,48 @@ public class SwapRouterTest extends ConvexusTest {
       : new BigInteger("1461446703485210103287273052203988822378723970341")
     );
   }
+
+  
+  void exactOutputSingle (Score tokenIn, Score tokenOut) {
+    exactOutputSingle (tokenIn, tokenOut, ONE, BigInteger.valueOf(3));
+  }
+
+  void exactOutputSingle (Score tokenIn, Score tokenOut, BigInteger amountOut, BigInteger amountInMaximum) {
+    // ensure that the swap fails if the limit is any tighter
+    AssertUtils.assertThrowsMessage(AssertionError.class, () ->
+      SwapRouterUtils.exactOutputSingle(
+        trader, 
+        tokenIn, 
+        router.getAddress(), 
+        amountInMaximum.subtract(ONE),
+        tokenOut.getAddress(),
+        FEE_AMOUNTS[MEDIUM],
+        trader.getAddress(),
+        TimeUtils.now().add(ONE),
+        amountOut,
+        AddressUtils.compareTo(tokenIn.getAddress(), tokenOut.getAddress()) < 0 
+          ? new BigInteger("4295128740")
+          : new BigInteger("1461446703485210103287273052203988822378723970341")
+      ),
+      "Insufficient balance"
+    );
+
+    SwapRouterUtils.exactOutputSingle(
+      trader, 
+      tokenIn, 
+      router.getAddress(), 
+      amountInMaximum,
+      tokenOut.getAddress(),
+      FEE_AMOUNTS[MEDIUM],
+      trader.getAddress(),
+      TimeUtils.now().add(ONE),
+      amountOut,
+      AddressUtils.compareTo(tokenIn.getAddress(), tokenOut.getAddress()) < 0 
+        ? new BigInteger("4295128740")
+        : new BigInteger("1461446703485210103287273052203988822378723970341")
+    );
+  }
+
 
   void exactOutput (Score token0, Score token1) {
     exactOutput(new Score[] {token0, token1}, ONE, BigInteger.valueOf(3));
