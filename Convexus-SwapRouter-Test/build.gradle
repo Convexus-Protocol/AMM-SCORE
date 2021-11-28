@@ -7,6 +7,8 @@ dependencies {
     testImplementation project(':Convexus-Pool')
     testImplementation project(':Convexus-Factory')
     testImplementation project(':Convexus-SwapRouter')
+    testImplementation project(':Convexus-NonFungiblePositionManager')
+    testImplementation project(':Convexus-NonfungibleTokenPositionDescriptor')
     testImplementation project(':unittest')
 
     testImplementation 'org.mockito:mockito-inline:3.11.0'
