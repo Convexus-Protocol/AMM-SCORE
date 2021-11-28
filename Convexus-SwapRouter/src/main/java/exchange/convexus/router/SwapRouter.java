@@ -30,6 +30,7 @@ import exchange.convexus.librairies.PeripheryPayments;
 import exchange.convexus.librairies.PoolAddress;
 import exchange.convexus.librairies.PoolData;
 import exchange.convexus.librairies.TickMath;
+import exchange.convexus.liquidity.ConvexusLiquidityManagement;
 import exchange.convexus.librairies.CallbackValidation;
 import exchange.convexus.librairies.PairAmounts;
 import exchange.convexus.utils.AddressUtils;
@@ -71,6 +72,9 @@ public class SwapRouter {
     // address of the Convexus factory
     public final Address factory;
 
+    // Liquidity Manager
+    private final ConvexusLiquidityManagement liquidityMgr;
+
     // ================================================
     // DB Variables
     // ================================================
@@ -90,6 +94,7 @@ public class SwapRouter {
     public SwapRouter(Address _factory) {
         this.name = "Convexus Swap Router";
         this.factory = _factory;
+        this.liquidityMgr = new ConvexusLiquidityManagement(_factory);
     }
 
     /**
@@ -141,8 +146,7 @@ public class SwapRouter {
             // either initiate the next swap or pay
             if (Path.hasMultiplePools(callbackData.path)) {
                 callbackData.path = Path.skipToken(callbackData.path);
-                // TODO: tokenIn is valid?
-                exactOutputInternal(tokenIn, amountToPay, caller, ZERO, callbackData);
+                exactOutputInternal(amountToPay, caller, ZERO, callbackData);
             } else {
                 this.amountInCached.set(amountToPay);
                 tokenIn = tokenOut; // swap in/out because exact output swaps are reversed
@@ -162,7 +166,6 @@ public class SwapRouter {
         this.checkDeadline(params.deadline);
 
         BigInteger amountOut = exactInputInternal(
-            tokenIn,
             amountIn, 
             params.recipient, 
             params.sqrtPriceLimitX96, 
@@ -194,7 +197,6 @@ public class SwapRouter {
 
         // avoid an db loading by using the swap return data
         BigInteger amountIn = exactOutputInternal(
-            tokenIn,
             params.amountOut, 
             params.recipient, 
             params.sqrtPriceLimitX96, 
@@ -228,17 +230,19 @@ public class SwapRouter {
         reentreancy.lock(true);
         this.checkDeadline(params.deadline);
 
+        // Check if first token matches with the path
+        PoolData pool = Path.decodeFirstPool(params.path);
+        Context.require(pool.tokenA.equals(tokenIn), 
+            "exactInput: Path doesn't match with the token sent");
+
         BigInteger amountOut = ZERO;
-        
-        this.checkDeadline(params.deadline);
-        Address payer = Context.getCaller(); // caller pays for the first hop
+        Address payer = caller; // caller pays for the first hop
 
         while (true) {
             boolean hasMultiplePools = Path.hasMultiplePools(params.path);
 
             // the outputs of prior swaps become the inputs to subsequent ones
             amountIn = exactInputInternal(
-                tokenIn,
                 amountIn, 
                 hasMultiplePools ? Context.getAddress() : params.recipient, // for intermediate swaps, this contract custodies
                 ZERO, 
@@ -269,14 +273,18 @@ public class SwapRouter {
         reentreancy.lock(true);
         this.checkDeadline(params.deadline);
         
-        // it's okay that the payer is fixed to Context.getCaller() here, as they're only paying for the "final" exact output
+        // Check if last token matches with the path
+        PoolData pool = Path.decodeLastPool(params.path);
+        Context.require(pool.tokenB.equals(tokenIn), 
+            "exactOutput: Path doesn't match with the token sent");
+
+        // it's okay that the payer is fixed to `caller` here, as they're only paying for the "final" exact output
         // swap, which happens first, and subsequent swaps are paid for within nested callback frames
         exactOutputInternal(
-            tokenIn,
             params.amountOut, 
             params.recipient, 
             ZERO, 
-            new SwapCallbackData(params.path, Context.getCaller())
+            new SwapCallbackData(params.path, caller)
         );
 
         BigInteger amountIn = this.amountInCached.get();
@@ -294,7 +302,6 @@ public class SwapRouter {
      * @return amountOut The amount of the received token
      */
     private BigInteger exactInputInternal(
-        Address tokenIn,
         BigInteger amountIn,
         Address recipient,
         BigInteger sqrtPriceLimitX96,
@@ -306,9 +313,7 @@ public class SwapRouter {
         }
 
         PoolData pool = Path.decodeFirstPool(data.path);
-        Context.require(tokenIn.equals(pool.tokenA), 
-            "exactInputInternal: tokenIn should be tokenA");
-
+        Address tokenIn = pool.tokenA;
         Address tokenOut = pool.tokenB;
         int fee = pool.fee;
 
@@ -336,7 +341,6 @@ public class SwapRouter {
      * @return amountIn The amount of the input token
      */
     private BigInteger exactOutputInternal(
-        Address tokenIn,
         BigInteger amountOut, 
         Address recipient, 
         BigInteger sqrtPriceLimitX96,
@@ -349,8 +353,7 @@ public class SwapRouter {
 
         PoolData pool = Path.decodeFirstPool(data.path);
         Address tokenOut = pool.tokenA;
-        Context.require(tokenIn.equals(pool.tokenB), 
-            "exactOutputInternal: tokenIn should be tokenB");
+        Address tokenIn = pool.tokenB;
         int fee = pool.fee;
 
         boolean zeroForOne = AddressUtils.compareTo(tokenIn, tokenOut) < 0;
@@ -425,11 +428,33 @@ public class SwapRouter {
                 break;
             }
 
+            case "pay": {
+                // Accept the incoming token transfer
+                this.liquidityMgr.deposit(_from, token, _value);
+                break;
+            }
+
             default:
                 Context.revert("tokenFallback: Unimplemented tokenFallback action");
         }
     }
-    
+
+    // ================================================
+    // Implements LiquidityManager
+    // ================================================
+    /**
+     * @notice Remove funds from the liquidity manager
+     */
+    @External
+    public void withdraw (Address token) {
+        this.liquidityMgr.withdraw(token);
+    }
+
+    @External(readonly = true)
+    public BigInteger deposited(Address user, Address token) {
+        return this.liquidityMgr.deposited(user, token);
+    }
+
     // ================================================
     // Checks
     // ================================================

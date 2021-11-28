@@ -121,7 +121,7 @@ public class ConvexusStakerTest extends ConvexusTest {
   void setup_staker () throws Exception {
     factory = deploy_factory();
     positiondescriptor = deploy_positiondescriptor();
-    nft = deploy_positionmgr(factory.getAddress(), positiondescriptor.getAddress());
+    nft = deploy_nft(factory.getAddress(), positiondescriptor.getAddress());
     staker = deploy_staker(
       factory.getAddress(), 
       nft.getAddress(), 

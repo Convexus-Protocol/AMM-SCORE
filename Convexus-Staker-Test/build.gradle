@@ -5,6 +5,10 @@ dependencies {
     testImplementation project(':Convexus-Utils')
     testImplementation project(':Convexus-Tests')
     testImplementation project(':Convexus-Staker')
+    testImplementation project(':Convexus-NonFungiblePositionManager')
+    testImplementation project(':Convexus-NonfungibleTokenPositionDescriptor')
+    testImplementation project(':Convexus-Pool')
+    testImplementation project(':Convexus-Factory')
 
     testImplementation project(':unittest')
     // testImplementation 'foundation.icon:javaee-unittest:0.9.1'

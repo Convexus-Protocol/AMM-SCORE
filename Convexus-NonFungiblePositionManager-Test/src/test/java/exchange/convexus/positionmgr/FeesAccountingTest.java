@@ -32,9 +32,11 @@ import com.iconloop.score.test.ServiceManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import exchange.convexus.initializer.ConvexusPoolInitializerUtils;
 import exchange.convexus.librairies.Path;
 import exchange.convexus.librairies.PoolData;
 import exchange.convexus.liquidity.ConvexusLiquidityUtils;
+import exchange.convexus.pool.ConvexusPool;
 import exchange.convexus.router.SwapRouterUtils;
 import static exchange.convexus.utils.TimeUtils.now;
 import score.Address;
@@ -49,11 +51,11 @@ public class FeesAccountingTest extends NonFungiblePositionManagerTest {
   void setup() throws Exception {
     ServiceManager.Block.resetInstance();
     setup_tokens();
-    setup_positionmgr();
+    setup_nft();
     setup_initializer();
 
     // create a position
-    createAndInitializePoolIfNecessary(sicx.getAddress(), usdc.getAddress(), FEE_AMOUNTS[MEDIUM], encodePriceSqrt(ONE, ONE), tickSpacing);
+    ConvexusPoolInitializerUtils.createAndInitializePoolIfNecessary(ConvexusPool.class, alice, factory, sicx.getAddress(), usdc.getAddress(), FEE_AMOUNTS[MEDIUM], encodePriceSqrt(ONE, ONE), tickSpacing);
 
     // nft 1 earns 25% of fees
     final BigInteger nft1Value = BigInteger.valueOf(100);
@@ -127,7 +129,7 @@ public class FeesAccountingTest extends NonFungiblePositionManagerTest {
     reset(sicx.spy);
     reset(usdc.spy);
     collect(alice, tokenId1, alice.getAddress(), MAX_UINT128, MAX_UINT128);
-    verify(sicx.spy).Transfer(pool, alice.getAddress(), BigInteger.valueOf(2501), "collect".getBytes());
+    verify(sicx.spy).Transfer(pool, alice.getAddress(), BigInteger.valueOf(2501), "{\"method\": \"pay\"}".getBytes());
     verifyNoInteractions(usdc.spy);
     BigInteger after = (BigInteger) sicx.call("balanceOf", alice.getAddress());
     assertEquals(after.subtract(before), BigInteger.valueOf(2501));
@@ -136,7 +138,7 @@ public class FeesAccountingTest extends NonFungiblePositionManagerTest {
     reset(sicx.spy);
     reset(usdc.spy);
     collect(alice, tokenId2, alice.getAddress(), MAX_UINT128, MAX_UINT128);
-    verify(sicx.spy).Transfer(pool, alice.getAddress(), BigInteger.valueOf(7503), "collect".getBytes());
+    verify(sicx.spy).Transfer(pool, alice.getAddress(), BigInteger.valueOf(7503), "{\"method\": \"pay\"}".getBytes());
     verifyNoInteractions(usdc.spy);
     after = (BigInteger) sicx.call("balanceOf", alice.getAddress());
     assertEquals(after.subtract(before), BigInteger.valueOf(7503));

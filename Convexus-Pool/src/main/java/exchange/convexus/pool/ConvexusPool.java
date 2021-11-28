@@ -776,12 +776,12 @@ public class ConvexusPool {
         if (amount0.compareTo(ZERO) > 0) {
             position.tokensOwed0 = position.tokensOwed0.subtract(amount0);
             this.positions.set(key, position);
-            pay(this.token0, recipient, amount0, "collect");
+            pay(this.token0, recipient, amount0);
         }
         if (amount1.compareTo(ZERO) > 0) {
             position.tokensOwed1 = position.tokensOwed1.subtract(amount1);
             this.positions.set(key, position);
-            pay(this.token1, recipient, amount1, "collect");
+            pay(this.token1, recipient, amount1);
         }
 
         this.Collect(caller, tickLower, tickUpper, recipient, amount0, amount1);
@@ -790,9 +790,9 @@ public class ConvexusPool {
         return new PairAmounts(amount0, amount1);
     }
 
-    private void pay (Address token, Address recipient, BigInteger amount, String reason) {
-        Context.println("[Pool][pay][" + Context.call(token, "symbol") + "] " + amount + " (" + reason + ")");
-        Context.call(token, "transfer", recipient, amount, reason.getBytes());
+    private void pay (Address token, Address recipient, BigInteger amount) {
+        Context.println("[Pool][pay][" + Context.call(token, "symbol") + "] " + amount);
+        Context.call(token, "transfer", recipient, amount, "{\"method\": \"pay\"}".getBytes());
     }
 
     /**
@@ -1060,7 +1060,7 @@ public class ConvexusPool {
         // do the transfers and collect payment
         if (zeroForOne) {
             if (amount1.compareTo(ZERO) < 0) {
-                pay(token1, recipient, amount1.negate(), "swap");
+                pay(token1, recipient, amount1.negate());
             }
 
             BigInteger balance0Before = balance0();
@@ -1070,7 +1070,7 @@ public class ConvexusPool {
                 "swap: the callback didn't charge the payment (1)");
         } else {
             if (amount0.compareTo(ZERO) < 0) {
-                pay(token0, recipient, amount0.negate(), "swap");
+                pay(token0, recipient, amount0.negate());
             }
 
             BigInteger balance1Before = balance1();
@@ -1118,10 +1118,10 @@ public class ConvexusPool {
         BigInteger balance1Before = balance1();
 
         if (amount0.compareTo(ZERO) > 0) {
-            pay(token0, recipient, amount0, "flash");
+            pay(token0, recipient, amount0);
         }
         if (amount1.compareTo(ZERO) > 0) {
-            pay(token1, recipient, amount1, "flash");
+            pay(token1, recipient, amount1);
         }
 
         Context.call(caller, "convexusFlashCallback", fee0, fee1, data);
@@ -1226,7 +1226,7 @@ public class ConvexusPool {
             }
             _protocolFees.token0 = _protocolFees.token0.subtract(amount0);
             this.protocolFees.set(_protocolFees);
-            pay(token0, recipient, amount0, "collectProtocol");
+            pay(token0, recipient, amount0);
         }
         if (amount1.compareTo(ZERO) > 0) {
             if (amount1.equals(_protocolFees.token1)) {
@@ -1235,7 +1235,7 @@ public class ConvexusPool {
             }
             _protocolFees.token1 = _protocolFees.token1.subtract(amount1);
             this.protocolFees.set(_protocolFees);
-            pay(token1, recipient, amount1, "collectProtocol");
+            pay(token1, recipient, amount1);
         }
 
         this.CollectProtocol(caller, recipient, amount0, amount1);

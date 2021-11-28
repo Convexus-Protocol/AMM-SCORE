@@ -16,6 +16,8 @@
 
 package exchange.convexus.utils;
 
+import static exchange.convexus.utils.TimeUtils.now;
+
 import java.math.BigInteger;
 
 import com.iconloop.score.test.ServiceManager;
@@ -31,5 +33,9 @@ public class SleepUtils extends TestBase {
 
   public static void sleep (BigInteger seconds) {
     sleep(seconds.longValue());
+  }
+
+  public static void sleepTo (BigInteger timestampSeconds) {
+    sleep(timestampSeconds.subtract(now()).longValue());
   }
 }

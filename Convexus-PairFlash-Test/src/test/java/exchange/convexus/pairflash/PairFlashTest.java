@@ -82,7 +82,7 @@ public class PairFlashTest extends ConvexusTest {
 
   void setup_positionmgr () throws Exception {
     positiondescriptor = deploy_positiondescriptor();
-    nft = deploy_positionmgr(factory.getAddress(), positiondescriptor.getAddress());
+    nft = deploy_nft(factory.getAddress(), positiondescriptor.getAddress());
   }
   
   void setup_pairflash () throws Exception {

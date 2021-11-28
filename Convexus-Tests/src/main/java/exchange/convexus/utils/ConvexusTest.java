@@ -53,10 +53,10 @@ import java.math.MathContext;
 
 public class ConvexusTest extends TestBase {
 
-    protected final ServiceManager sm = getServiceManager();
+    protected final static ServiceManager sm = getServiceManager();
 
     // Roles
-    protected final Account owner = sm.createAccount();
+    protected final static Account owner = sm.createAccount();
     protected final Account minter = sm.createAccount();
     protected final Account burner = sm.createAccount();
     protected final Account admin = sm.createAccount();
@@ -88,7 +88,7 @@ public class ConvexusTest extends TestBase {
     }
 
     // Deployers
-    public <T> ScoreSpy<T> deploy (Class<?> clazz, Object... params) throws Exception {
+    public static <T> ScoreSpy<T> deploy (Class<?> clazz, Object... params) throws Exception {
         Score score = sm.deploy(owner, clazz, params);
 
         @SuppressWarnings("unchecked")
@@ -153,7 +153,7 @@ public class ConvexusTest extends TestBase {
         return new ScoreSpy<CVXS>(score, spy);
     }
     
-    public ScoreSpy<NonFungiblePositionManager> deploy_positionmgr (Address factory, Address tokenDescriptor) throws Exception {
+    public ScoreSpy<NonFungiblePositionManager> deploy_nft (Address factory, Address tokenDescriptor) throws Exception {
         Score score = sm.deploy(owner, NonFungiblePositionManager.class, factory, tokenDescriptor);
 
         var spy = (NonFungiblePositionManager) spy(score.getInstance());

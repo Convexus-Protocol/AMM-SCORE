@@ -119,7 +119,7 @@ public class ConvexusCallee {
     depositedUser.set(token, oldBalance.subtract(owed));
 
     // Actually transfer the tokens
-    Context.call(token, "transfer", destination, owed, "pay".getBytes());
+    Context.call(token, "transfer", destination, owed, "{\"method\": \"pay\"}".getBytes());
   }
 
   // @External - this method is external through tokenFallback

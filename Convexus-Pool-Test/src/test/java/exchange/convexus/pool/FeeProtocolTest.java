@@ -195,7 +195,7 @@ public class FeeProtocolTest extends ConvexusPoolTest {
 
     reset(sicx.spy);
     pool.invoke(alice, "collect", alice.getAddress(), minTick, maxTick, IntUtils.MAX_UINT128, IntUtils.MAX_UINT128);
-    verify(sicx.spy).Transfer(pool.getAddress(), alice.getAddress(), new BigInteger ("416666666666666"), "collect".getBytes());
+    verify(sicx.spy).Transfer(pool.getAddress(), alice.getAddress(), new BigInteger ("416666666666666"), "{\"method\": \"pay\"}".getBytes());
 
     protocolFees = ProtocolFees.fromMap(pool.call("protocolFees"));
     assertEquals(new BigInteger("166666666666666"), protocolFees.token0);

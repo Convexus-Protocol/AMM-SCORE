@@ -31,9 +31,12 @@ import score.Context;
 import score.ObjectReader;
 import score.annotation.External;
 import score.annotation.Optional;
+import scorex.io.Reader;
+import scorex.io.StringReader;
 
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonObject;
+import com.eclipsesource.json.JsonValue;
 
 import exchange.convexus.liquidity.AddLiquidityParams;
 import exchange.convexus.liquidity.AddLiquidityResult;
@@ -237,8 +240,25 @@ public class PairFlash {
 
     @External
     public void tokenFallback (Address _from, BigInteger _value, @Optional byte[] _data) throws Exception {
+        Reader reader = new StringReader(new String(_data));
+        JsonValue input = Json.parse(reader);
+        JsonObject root = input.asObject();
+        String method = root.get("method").asString();
         Address token = Context.getCaller();
-        this.liquidityMgr.deposit(_from, token, _value);
+
+        switch (method)
+        {
+            case "deposit": 
+            case "pay": 
+            {
+                // Accept the incoming token transfer
+                this.liquidityMgr.deposit(_from, token, _value);
+                break;
+            }
+
+            default:
+                Context.revert("tokenFallback: Unimplemented '" + method + "' tokenFallback action");
+        }
     }
 
     @External(readonly = true)

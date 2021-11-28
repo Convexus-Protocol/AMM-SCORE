@@ -5,9 +5,9 @@ dependencies {
     testImplementation project(':Convexus-Utils')
     testImplementation project(':Convexus-Tests')
     testImplementation project(':Convexus-Pool')
+    testImplementation project(':Convexus-Factory')
     testImplementation project(':Convexus-SwapRouter')
     testImplementation project(':unittest')
-    // testImplementation 'foundation.icon:javaee-unittest:0.9.1'
 
     testImplementation 'org.mockito:mockito-inline:3.11.0'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.0'

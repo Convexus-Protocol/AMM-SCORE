@@ -19,7 +19,9 @@ package exchange.convexus.librairies;
 import java.util.Arrays;
 
 import exchange.convexus.utils.BytesUtils;
+import exchange.convexus.utils.StringUtils;
 import score.Address;
+import score.Context;
 
 public class Path {
   
@@ -69,6 +71,23 @@ public class Path {
     );
   }
 
+  /**
+   * @notice Decodes the first pool in path
+   * @param path The bytes encoded swap path
+   * @return PoolData: 
+   *  tokenA The first token of the given pool
+   *  tokenB The second token of the given pool
+   *  fee The fee level of the pool
+   */
+  public static PoolData decodeLastPool (byte[] path) {
+    int start = path.length - POP_OFFSET;
+    return new PoolData(
+      new Address(Arrays.copyOfRange(path, start, start+ADDR_SIZE)),
+      new Address(Arrays.copyOfRange(path, start+NEXT_OFFSET, start+POP_OFFSET)),
+      BytesUtils.getBigEndianInt(Arrays.copyOfRange(path, start+ADDR_SIZE, start+NEXT_OFFSET))
+    );
+  }
+
   public static byte[] encodePath (PoolData obj) {
     return BytesUtils.concat(
       obj.tokenA.toByteArray(),
@@ -77,12 +96,36 @@ public class Path {
     );
   }
 
+  public static byte[] encodePath (Address[] path, Integer[] fees) {
+    Context.require(path.length == (fees.length + 1), 
+      "encodePath: path/fee lengths do not match");
+
+    byte[] encoded = new byte[0];
+
+    for (int i = 0; i < fees.length; i++) {
+      encoded = BytesUtils.concat(
+        encoded,
+        path[i].toByteArray(),
+        BytesUtils.intToBytes(fees[i])
+      );
+    }
+
+    // encode the final token
+    encoded = BytesUtils.concat(
+      encoded,
+      path[path.length - 1].toByteArray()
+    );
+
+    return encoded;
+  }
+
   /**
    * @notice Gets the segment corresponding to the first pool in the path
    * @param path The bytes encoded swap path
    * @return The segment containing all data necessary to target the first pool in the path
    */
   public static byte[] getFirstPool(byte[] path) {
+    Context.require(path.length >= POP_OFFSET, "getFirstPool: Invalid path length");
     return Arrays.copyOfRange(path, 0, POP_OFFSET);
   }
 
@@ -92,7 +135,7 @@ public class Path {
    * @return The remaining token + fee elements in the path
    */
   public static byte[] skipToken(byte[] path) {
-    return Arrays.copyOfRange(path, NEXT_OFFSET, path.length - NEXT_OFFSET);
+    return Arrays.copyOfRange(path, NEXT_OFFSET, path.length);
   }
 
 }

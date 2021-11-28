@@ -22,6 +22,10 @@ import static java.math.BigInteger.ZERO;
 
 import java.math.BigInteger;
 
+import com.eclipsesource.json.Json;
+import com.eclipsesource.json.JsonObject;
+import com.eclipsesource.json.JsonValue;
+
 import exchange.convexus.librairies.CallbackValidation;
 import exchange.convexus.librairies.Path;
 import exchange.convexus.librairies.PoolAddress;
@@ -38,6 +42,8 @@ import score.VarDB;
 import score.annotation.EventLog;
 import score.annotation.External;
 import score.annotation.Optional;
+import scorex.io.Reader;
+import scorex.io.StringReader;
 import scorex.util.StringTokenizer;
 
 /**
@@ -440,10 +446,25 @@ public class Quoter {
             }
         }
     }
-    
+
     @External
     public void tokenFallback (Address _from, BigInteger _value, @Optional byte[] _data) throws Exception {
-        // Accept coins
+        Reader reader = new StringReader(new String(_data));
+        JsonValue input = Json.parse(reader);
+        JsonObject root = input.asObject();
+        String method = root.get("method").asString();
+        // Address token = Context.getCaller();
+
+        switch (method)
+        {
+            case "pay": {
+                // Accept the incoming token transfer
+                break;
+            }
+
+            default:
+                Context.revert("tokenFallback: Unimplemented tokenFallback action");
+        }
     }
 
     // ================================================

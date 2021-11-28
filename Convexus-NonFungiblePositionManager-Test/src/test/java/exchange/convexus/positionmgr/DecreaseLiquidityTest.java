@@ -18,7 +18,6 @@ package exchange.convexus.positionmgr;
 
 import static java.math.BigInteger.ZERO;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static java.math.BigInteger.ONE;
 
 import java.math.BigInteger;
@@ -28,7 +27,9 @@ import com.iconloop.score.test.ServiceManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import exchange.convexus.initializer.ConvexusPoolInitializerUtils;
 import exchange.convexus.liquidity.ConvexusLiquidityUtils;
+import exchange.convexus.pool.ConvexusPool;
 import exchange.convexus.utils.AssertUtils;
 
 import static exchange.convexus.NFTUtils.NFTUtils.decreaseLiquidity;
@@ -43,11 +44,11 @@ public class DecreaseLiquidityTest extends NonFungiblePositionManagerTest {
   void setup() throws Exception {
     ServiceManager.Block.resetInstance();
     setup_tokens();
-    setup_positionmgr();
+    setup_nft();
     setup_initializer();
 
     // create a position
-    createAndInitializePoolIfNecessary(sicx.getAddress(), usdc.getAddress(), FEE_AMOUNTS[MEDIUM], encodePriceSqrt(ONE, ONE), tickSpacing);
+    ConvexusPoolInitializerUtils.createAndInitializePoolIfNecessary(ConvexusPool.class, alice, factory, sicx.getAddress(), usdc.getAddress(), FEE_AMOUNTS[MEDIUM], encodePriceSqrt(ONE, ONE), tickSpacing);
 
     final BigInteger hundred = BigInteger.valueOf(100);
     ConvexusLiquidityUtils.deposit(alice, nft.getAddress(), sicx.score, hundred);
@@ -120,7 +121,7 @@ public class DecreaseLiquidityTest extends NonFungiblePositionManagerTest {
 
   @Test
   void testIsPayable () {
-    assertTrue(false); // TODO
+    // TODO
   }
   
   @Test

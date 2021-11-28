@@ -27,6 +27,8 @@ import com.iconloop.score.test.Account;
 
 import score.Address;
 
+import exchange.convexus.factory.ConvexusFactoryUtils;
+
 public class ConvexusFactoryUtils {
 
   public static Address createPool (

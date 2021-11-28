@@ -167,12 +167,12 @@ public class Score extends TestBase {
         } catch (NoSuchMethodException | IllegalAccessException e) {
             Context.println("========================================");
             e.printStackTrace();
-            sm.revertCurrentFrame();
+            sm.revertFrame(sm.getCurrentFrame().getId());
             throw new RuntimeException(e.getMessage());
         } catch (InvocationTargetException e) {
             Context.println("========================================");
             e.printStackTrace();
-            sm.revertCurrentFrame();
+            sm.revertFrame(sm.getCurrentFrame().getId());
             throw new AssertionError(e.getTargetException().getMessage());
         } finally {
             sm.popFrame();

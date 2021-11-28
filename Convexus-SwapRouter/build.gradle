@@ -5,6 +5,8 @@ dependencies {
     implementation 'foundation.icon:javaee-scorex:0.5.2'
     implementation 'com.github.sink772:minimal-json:0.9.6'
 
+    implementation project(':Convexus-LiquidityManagement')
+
     implementation project(':Convexus-Utils')
 }
 

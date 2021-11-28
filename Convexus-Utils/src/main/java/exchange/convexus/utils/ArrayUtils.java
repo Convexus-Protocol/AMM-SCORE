@@ -27,19 +27,7 @@ public class ArrayUtils {
         return result;
     }
 
-    public static void fill (Object[] a, Object val) {
-        for (int i = 0, len = a.length; i < len; i++) {
-            a[i] = val;
-        }
-    }
-    public static void arrayFill (BigInteger[] array, BigInteger fill) {
-        int size = array.length;
-        for (int i = 0; i < size; i++) {
-            array[i] = fill;
-        }
-    }
-
-    public static void arrayFill (Address[] array, Address fill) {
+    public static <T> void arrayFill (T[] array, T fill) {
         int size = array.length;
         for (int i = 0; i < size; i++) {
             array[i] = fill;
@@ -48,6 +36,12 @@ public class ArrayUtils {
 
     public static BigInteger[] newFill (int size, BigInteger fill) {
         BigInteger[] result = new BigInteger[size];
+        arrayFill(result, fill);
+        return result;
+    }
+
+    public static Integer[] newFill (int size, Integer fill) {
+        Integer[] result = new Integer[size];
         arrayFill(result, fill);
         return result;
     }

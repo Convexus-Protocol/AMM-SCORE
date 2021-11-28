@@ -34,6 +34,6 @@ public class PeripheryPayments {
     BigInteger value
   ) {
     // TODO: ICX payment
-    Context.call(token, "transfer", recipient, value, "pay".getBytes());
+    Context.call(token, "transfer", recipient, value, "{\"method\": \"pay\"}".getBytes());
   }
 }

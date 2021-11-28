@@ -30,6 +30,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import exchange.convexus.factory.ConvexusFactoryUtils;
+import exchange.convexus.liquidity.ConvexusLiquidityUtils;
 import exchange.convexus.utils.AssertUtils;
 
 public class SwapUnderpaymentTest extends ConvexusPoolTest {
@@ -63,6 +64,17 @@ public class SwapUnderpaymentTest extends ConvexusPoolTest {
   }
 
   @Test
+  void testAmountSpecificedMustBeDifferentFromZero () {
+    var slot0 = Slot0.fromMap(pool.call("slot0"));
+    ConvexusLiquidityUtils.deposit(alice, underpay.getAddress(), sicx.score, ONE);
+    ConvexusLiquidityUtils.deposit(alice, underpay.getAddress(), usdc.score, ONE);
+    
+    AssertUtils.assertThrowsMessage(AssertionError.class, 
+      () -> underpay.invoke(alice, "swap", pool.getAddress(), alice.getAddress(), false, slot0.sqrtPriceX96.add(ONE), ZERO, ONE, ONE),
+      "swap: amountSpecified must be different from zero");
+  }
+
+  @Test
   void testUnderpayZeroForOneAndExactIn () {
     AssertUtils.assertThrowsMessage(AssertionError.class, 
       () -> underswap_pay(alice, true, MIN_SQRT_RATIO.add(ONE), BigInteger.valueOf(1000), ONE, ZERO), 
@@ -78,13 +90,13 @@ public class SwapUnderpaymentTest extends ConvexusPoolTest {
 
   @Test
   void testOverpayZeroForOneAndExactIn () {
-   underswap_pay(alice, true, MIN_SQRT_RATIO.add(ONE), BigInteger.valueOf(1000), BigInteger.valueOf(2000), BigInteger.valueOf(0));
+   underswap_pay(alice, true, MIN_SQRT_RATIO.add(ONE), BigInteger.valueOf(1000), BigInteger.valueOf(2000), ZERO);
   }
 
   @Test
   void testUnderpayZeroForOneAndExactOut () {
     AssertUtils.assertThrowsMessage(AssertionError.class, 
-      () -> underswap_pay(alice, true, MIN_SQRT_RATIO.add(ONE), BigInteger.valueOf(-1000), ONE, BigInteger.valueOf(0)), 
+      () -> underswap_pay(alice, true, MIN_SQRT_RATIO.add(ONE), BigInteger.valueOf(-1000), ONE, ZERO), 
       "swap: the callback didn't charge the payment (1)");
   }
 
@@ -97,20 +109,20 @@ public class SwapUnderpaymentTest extends ConvexusPoolTest {
 
   @Test
   void testOverpayZeroForOneAndExactOut () {
-   underswap_pay(alice, true, MIN_SQRT_RATIO.add(ONE), BigInteger.valueOf(-1000), BigInteger.valueOf(2000), BigInteger.valueOf(0));
+   underswap_pay(alice, true, MIN_SQRT_RATIO.add(ONE), BigInteger.valueOf(-1000), BigInteger.valueOf(2000), ZERO);
   }
 
   @Test
   void testUnderpayONeForZeroAndExactIn () {
     AssertUtils.assertThrowsMessage(AssertionError.class, 
-      () -> underswap_pay(alice, false, MAX_SQRT_RATIO.subtract(ONE), BigInteger.valueOf(1000), BigInteger.valueOf(0), BigInteger.valueOf(1)), 
+      () -> underswap_pay(alice, false, MAX_SQRT_RATIO.subtract(ONE), BigInteger.valueOf(1000), ZERO, BigInteger.valueOf(1)), 
       "swap: the callback didn't charge the payment (2)");
   }
 
   @Test
   void testPayInTheWrongTokenONeForZeroAndExactIn () {
     AssertUtils.assertThrowsMessage(AssertionError.class, 
-      () -> underswap_pay(alice, false, MAX_SQRT_RATIO.subtract(ONE), BigInteger.valueOf(1000), BigInteger.valueOf(2000), BigInteger.valueOf(0)), 
+      () -> underswap_pay(alice, false, MAX_SQRT_RATIO.subtract(ONE), BigInteger.valueOf(1000), BigInteger.valueOf(2000), ZERO), 
       "swap: the callback didn't charge the payment (2)");
   }
 
@@ -124,19 +136,19 @@ public class SwapUnderpaymentTest extends ConvexusPoolTest {
   @Test
   void testUnderpayOneForZeroAndExactOut () {
     AssertUtils.assertThrowsMessage(AssertionError.class, 
-      () -> underswap_pay(alice, false, MAX_SQRT_RATIO.subtract(ONE), BigInteger.valueOf(-1000), BigInteger.valueOf(0), BigInteger.valueOf(1)), 
+      () -> underswap_pay(alice, false, MAX_SQRT_RATIO.subtract(ONE), BigInteger.valueOf(-1000), ZERO, BigInteger.valueOf(1)), 
       "swap: the callback didn't charge the payment (2)");
   }
 
   @Test
   void testPayInTheWrongTokenOneForZeroAndExactOut () {
     AssertUtils.assertThrowsMessage(AssertionError.class, 
-      () -> underswap_pay(alice, false, MAX_SQRT_RATIO.subtract(ONE), BigInteger.valueOf(-1000), BigInteger.valueOf(2000), BigInteger.valueOf(0)), 
+      () -> underswap_pay(alice, false, MAX_SQRT_RATIO.subtract(ONE), BigInteger.valueOf(-1000), BigInteger.valueOf(2000), ZERO), 
       "swap: the callback didn't charge the payment (2)");
   }
 
   @Test
   void testOverpayOneForZeroAndExactOut () {
-   underswap_pay(alice, false, MAX_SQRT_RATIO.subtract(ONE), BigInteger.valueOf(-1000), BigInteger.valueOf(0), BigInteger.valueOf(2000));
+   underswap_pay(alice, false, MAX_SQRT_RATIO.subtract(ONE), BigInteger.valueOf(-1000), ZERO, BigInteger.valueOf(2000));
   }
 }

@@ -37,6 +37,8 @@ import exchange.convexus.librairies.Tick;
 import exchange.convexus.librairies.TickBitmap;
 import exchange.convexus.librairies.TickMath;
 import exchange.convexus.librairies.Ticks;
+import exchange.convexus.librairies.WriteResult;
+import exchange.convexus.librairies.Observations.ObserveSingleResult;
 import exchange.convexus.pool.ModifyPositionParams;
 import exchange.convexus.pool.ModifyPositionResult;
 import exchange.convexus.pool.PositionStorage;
@@ -302,9 +304,8 @@ public class Pool2 {
         int tickSpacing
         // END OF PATCH
     ) {
-        // ConvexusPoolDeployerParameters parameters = ConvexusPoolDeployerParameters.fromMap(Context.call(Context.getCaller(), "parameters"));
-
         /**  === TODO: PATCH PATCH PATCH: REMOVE ME === */
+        // ConvexusPoolDeployerParameters parameters = (ConvexusPoolDeployerParameters) Context.call(Context.getCaller(), "parameters");
         ConvexusPoolDeployerParameters parameters = new ConvexusPoolDeployerParameters(
             _factory, 
             _token0, 
@@ -787,12 +788,12 @@ public class Pool2 {
         if (amount0.compareTo(ZERO) > 0) {
             position.tokensOwed0 = position.tokensOwed0.subtract(amount0);
             this.positions.set(key, position);
-            pay(this.token0, recipient, amount0, "collect");
+            pay(this.token0, recipient, amount0);
         }
         if (amount1.compareTo(ZERO) > 0) {
             position.tokensOwed1 = position.tokensOwed1.subtract(amount1);
             this.positions.set(key, position);
-            pay(this.token1, recipient, amount1, "collect");
+            pay(this.token1, recipient, amount1);
         }
 
         this.Collect(caller, tickLower, tickUpper, recipient, amount0, amount1);
@@ -801,9 +802,9 @@ public class Pool2 {
         return new PairAmounts(amount0, amount1);
     }
 
-    private void pay (Address token, Address recipient, BigInteger amount, String reason) {
-        Context.println("[Pool][pay][" + Context.call(token, "symbol") + "] " + amount + " (" + reason + ")");
-        Context.call(token, "transfer", recipient, amount, reason.getBytes());
+    private void pay (Address token, Address recipient, BigInteger amount) {
+        Context.println("[Pool][pay][" + Context.call(token, "symbol") + "] " + amount);
+        Context.call(token, "transfer", recipient, amount, "{\"method\": \"pay\"}".getBytes());
     }
 
     /**
@@ -976,7 +977,7 @@ public class Pool2 {
                     // check for the placeholder value, which we replace with the actual value the first time the swap
                     // crosses an initialized tick
                     if (!cache.computedLatestObservation) {
-                        var result = observations.observeSingle(
+                        ObserveSingleResult result = observations.observeSingle(
                             cache.blockTimestamp,
                             ZERO,
                             slot0Start.tick,
@@ -1012,7 +1013,7 @@ public class Pool2 {
 
         // update tick and write an oracle entry if the tick change
         if (state.tick != slot0Start.tick) {
-            var result =
+            WriteResult result =
                 observations.write(
                     slot0Start.observationIndex,
                     cache.blockTimestamp,
@@ -1071,7 +1072,7 @@ public class Pool2 {
         // do the transfers and collect payment
         if (zeroForOne) {
             if (amount1.compareTo(ZERO) < 0) {
-                pay(token1, recipient, amount1.negate(), "swap");
+                pay(token1, recipient, amount1.negate());
             }
 
             BigInteger balance0Before = balance0();
@@ -1081,7 +1082,7 @@ public class Pool2 {
                 "swap: the callback didn't charge the payment (1)");
         } else {
             if (amount0.compareTo(ZERO) < 0) {
-                pay(token0, recipient, amount0.negate(), "swap");
+                pay(token0, recipient, amount0.negate());
             }
 
             BigInteger balance1Before = balance1();
@@ -1129,10 +1130,10 @@ public class Pool2 {
         BigInteger balance1Before = balance1();
 
         if (amount0.compareTo(ZERO) > 0) {
-            pay(token0, recipient, amount0, "flash");
+            pay(token0, recipient, amount0);
         }
         if (amount1.compareTo(ZERO) > 0) {
-            pay(token1, recipient, amount1, "flash");
+            pay(token1, recipient, amount1);
         }
 
         Context.call(caller, "convexusFlashCallback", fee0, fee1, data);
@@ -1237,7 +1238,7 @@ public class Pool2 {
             }
             _protocolFees.token0 = _protocolFees.token0.subtract(amount0);
             this.protocolFees.set(_protocolFees);
-            pay(token0, recipient, amount0, "collectProtocol");
+            pay(token0, recipient, amount0);
         }
         if (amount1.compareTo(ZERO) > 0) {
             if (amount1.equals(_protocolFees.token1)) {
@@ -1246,7 +1247,7 @@ public class Pool2 {
             }
             _protocolFees.token1 = _protocolFees.token1.subtract(amount1);
             this.protocolFees.set(_protocolFees);
-            pay(token1, recipient, amount1, "collectProtocol");
+            pay(token1, recipient, amount1);
         }
 
         this.CollectProtocol(caller, recipient, amount0, amount1);

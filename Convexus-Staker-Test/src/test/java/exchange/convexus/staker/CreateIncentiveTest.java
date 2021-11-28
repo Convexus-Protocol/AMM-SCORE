@@ -19,6 +19,7 @@ import static java.math.BigInteger.ONE;
 import static java.math.BigInteger.TEN;
 import static java.math.BigInteger.ZERO;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 
@@ -34,8 +35,10 @@ import org.junit.jupiter.api.Test;
 
 import exchange.convexus.NFTUtils.NFTUtils;
 import exchange.convexus.liquidity.ConvexusLiquidityUtils;
+import exchange.convexus.utils.AssertUtils;
+import exchange.convexus.utils.MathUtils;
 
-public class IncentivesTest extends ConvexusStakerTest {
+public class CreateIncentiveTest extends ConvexusStakerTest {
   
   BigInteger[] timestamps;
   BigInteger tokenId;
@@ -59,6 +62,10 @@ public class IncentivesTest extends ConvexusStakerTest {
   void subject (Score rewardToken) {
     timestamps = makeTimestamps(now());
     ConvexusStakerUtils.createIncentive(incentiveCreator, rewardToken, totalReward, staker.getAddress(), incentiveKey.pool, timestamps[0], timestamps[1]);
+  }
+
+  void subject (BigInteger[] timestamps) {
+    ConvexusStakerUtils.createIncentive(incentiveCreator, rwtk.score, totalReward, staker.getAddress(), incentiveKey.pool, timestamps[0], timestamps[1]);
   }
 
   void subject () {
@@ -174,7 +181,54 @@ public class IncentivesTest extends ConvexusStakerTest {
   }
 
   @Test
-  void testInvalidTimestamps () {
-    // TODO
+  void testCurrentTimeIsAfterStartTime () {
+    BigInteger[] timestamps = makeTimestamps(now(), BigInteger.valueOf(100_000));
+
+    // Go to after the start time
+    sleep(timestamps[0].add(BigInteger.valueOf(100)).subtract(now()));
+
+    assertTrue(now().compareTo(timestamps[0]) > 0);
+    assertTrue(now().compareTo(timestamps[1]) < 0);
+
+    AssertUtils.assertThrowsMessage(AssertionError.class, () ->
+      subject(timestamps), 
+      "createIncentive: start time must be now or in the future");
+  }
+
+  @Test
+  void testEndTimeIsBeforeStartTime () {
+    BigInteger[] timestamps = makeTimestamps(now());
+    timestamps[1] = timestamps[0].subtract(BigInteger.TEN);
+    
+    AssertUtils.assertThrowsMessage(AssertionError.class, () ->
+      subject(timestamps), 
+      "createIncentive: start time must be before end time");
+  }
+
+  @Test
+  void testStartTimeIsTooFarIntoTheFuture () {
+    BigInteger[] timestamps = makeTimestamps(now().add(MathUtils.pow(BigInteger.TWO, 32).add(ONE)));
+    AssertUtils.assertThrowsMessage(AssertionError.class, () ->
+      subject(timestamps), 
+      "createIncentive: start time too far into future");
+  }
+
+  @Test
+  void testEndTimeIsWithingValidDurationOfStartTime () {
+    BigInteger[] timestamps = makeTimestamps(now());
+    timestamps[1] = timestamps[0].add(MathUtils.pow(BigInteger.TWO, 32).add(ONE));
+
+    AssertUtils.assertThrowsMessage(AssertionError.class, () ->
+      subject(timestamps), 
+      "createIncentive: incentive duration is too long");
+  }
+
+  @Test
+  void testTotalRewardIs0OrAnInvalidAmount () {
+    BigInteger[] timestamps = makeTimestamps(now(), BigInteger.valueOf(1_000));
+    
+    AssertUtils.assertThrowsMessage(AssertionError.class, () ->
+      ConvexusStakerUtils.createIncentive(incentiveCreator, rwtk.score, ZERO, staker.getAddress(), pool1.getAddress(), timestamps[0], timestamps[1]),
+      "createIncentive: reward must be positive");
   }
 }

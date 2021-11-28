@@ -34,7 +34,6 @@ import com.iconloop.score.test.Account;
 import com.iconloop.score.test.Score;
 
 import org.mockito.ArgumentCaptor;
-import org.mockito.Mockito;
 
 import exchange.convexus.callee.ConvexusCallee;
 import exchange.convexus.factory.ConvexusFactory;

@@ -16,7 +16,6 @@
 
 package exchange.convexus.positionmgr;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 
@@ -27,7 +26,6 @@ import com.iconloop.score.test.Account;
 import org.mockito.ArgumentCaptor;
 
 import exchange.convexus.factory.ConvexusFactory;
-import exchange.convexus.factory.ConvexusFactoryUtils;
 import exchange.convexus.initializer.ConvexusPoolInitializer;
 import exchange.convexus.librairies.PairAmounts;
 import exchange.convexus.pool.ConvexusPool;
@@ -75,29 +73,12 @@ public class NonFungiblePositionManagerTest extends ConvexusTest {
     initializer = deploy_initializer(factory.getAddress());
   }
 
-  void setup_positionmgr () throws Exception {
+  void setup_nft () throws Exception {
     factory = deploy_factory();
     // factory.invoke(owner, "setPoolContract", Files.readAllBytes(Paths.get("../Convexus-Pool/build/libs/Convexus-Pool-0.9.1-optimized.jar")));
     router = deploy_router(factory.getAddress());
     positiondescriptor = deploy_positiondescriptor();
-    nft = deploy_positionmgr(factory.getAddress(), positiondescriptor.getAddress());
-  }
-  
-  // Mock createAndInitializePoolIfNecessary until SCORE deployers supported by unittest
-  protected void createAndInitializePoolIfNecessary (Address token0, Address token1, int fee, BigInteger price, int tickSpacing) {
-    // initializer.invoke(owner, "createAndInitializePoolIfNecessary", 
-    //   sicx.getAddress(),
-    //   usdc.getAddress(),
-    //   fee,
-    //   price
-    // );
-    try {
-      pool = deploy(ConvexusPool.class, token0, token1, factory.getAddress(), fee, tickSpacing);
-      pool.invoke(alice, "initialize", price);
-      ConvexusFactoryUtils.createPool(factory, alice, token0, token1, fee, pool.getAddress());
-    } catch (Exception e) {
-      assertTrue(false);
-    }
+    nft = deploy_nft(factory.getAddress(), positiondescriptor.getAddress());
   }
 
   protected void increaseLiquidity (

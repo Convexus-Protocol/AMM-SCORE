@@ -48,7 +48,6 @@ public class SwapsTest extends ConvexusPoolTest {
 
   void before_each() throws Exception {
     ServiceManager.Block.resetInstance();
-    sm.resetStorage();
     setup_tokens();
     setup_factory();
     reset(factory.spy);
