@@ -38,6 +38,9 @@ class Command:
     @staticmethod
     def optimizedJar(args):
         javaPkg, version, build = get_meta(args.package, args.endpoint)
+        print(f"Executing {javaPkg}:build...")
+        result = str(bash(f"./gradlew {javaPkg}:build"))
+        print(f"Executing {javaPkg}:optimizedJar...")
         result = str(bash(f"./gradlew {javaPkg}:optimizedJar"))
         if not "BUILD SUCCESSFUL" in result:
             print(result)

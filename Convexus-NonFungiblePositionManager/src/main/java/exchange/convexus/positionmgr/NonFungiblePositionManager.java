@@ -50,7 +50,7 @@ import exchange.convexus.liquidity.AddLiquidityResult;
 import exchange.convexus.liquidity.ConvexusLiquidityManagement;
 
 // @title NFT positions
-// @notice Wraps Convexus positions in the IRC3 non-fungible token interface
+// @notice Wraps Convexus positions in the IRC non-fungible token interface
 public class NonFungiblePositionManager extends IRC721Enumerable {
 
     // ================================================
