@@ -57,6 +57,7 @@ public class MethodCall {
     r.beginList();
     for (int i = 0; i < nParams; i++) {
       // params[i] = 
+      // TODO
     }
     r.end();
 
@@ -66,5 +67,6 @@ public class MethodCall {
   public static void writeObject(ObjectWriter w, MethodCall obj) {
       // w.write(obj.fromBlock);
       // w.write(obj.votes);
+      // TODO
   }
 }
