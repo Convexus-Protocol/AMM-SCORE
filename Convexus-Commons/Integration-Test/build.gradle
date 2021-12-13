@@ -1,0 +1,55 @@
+// version = '0.9.1'
+
+// for integration tests
+sourceSets {
+    intTest {}
+}
+configurations {
+    intTestImplementation.extendsFrom testImplementation
+    intTestRuntimeOnly.extendsFrom testRuntimeOnly
+}
+
+dependencies {
+    compileOnly 'foundation.icon:javaee-api:0.9.0'
+    implementation  'com.github.sink772:javaee-tokens:0.6.1'
+
+    testImplementation project(':Convexus-Commons:Utils')
+    testImplementation project(':Convexus-Commons:Convexus-Tests')
+    testImplementation project(':Convexus-Core:Contracts:Factory')
+    testImplementation project(':Convexus-Commons:ICON:unittest')
+    
+    testImplementation 'org.mockito:mockito-inline:3.11.0'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.6.0'
+    
+    testImplementation 'foundation.icon:icon-sdk:2.0.0'
+    testImplementation project(':Convexus-Commons:ICON:testinteg')
+    testRuntimeOnly project(':Convexus-Core:Contracts:Factory')
+}
+
+test {
+    useJUnitPlatform()
+}
+
+def pooljar = project(':Convexus-Core:Contracts:Pool').getTasks().getByName('optimizedJar')
+def factoryjar = project(':Convexus-Core:Contracts:Factory').getTasks().getByName('optimizedJar')
+
+task integrationTest(type: Test) {
+    useJUnitPlatform()
+    description = 'Runs integration tests.'
+    group = 'verification'
+
+    testClassesDirs = sourceSets.intTest.output.classesDirs
+    classpath = sourceSets.intTest.runtimeClasspath
+    testLogging.showStandardStreams = true
+
+    // use the common config files
+    systemProperty('env.props', new File(project(':Convexus-Commons:ICON:testinteg').projectDir, 'conf/env.props'))
+
+    def prefix = 'score.path.'
+    systemProperty(prefix + 'Convexus-Core:Contracts:Factory', factoryjar.outputJarName)
+    systemProperty(prefix + 'Convexus-Core:Contracts:Pool', pooljar.outputJarName)
+    systemProperty(prefix + 'IRC2BasicToken', new File(project(':Convexus-Commons:ICON:testinteg').projectDir, 'jar/irc2-token-debug.jar'))
+}
+
+integrationTest.dependsOn(factoryjar, pooljar)

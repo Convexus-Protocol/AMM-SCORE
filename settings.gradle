@@ -1,37 +1,61 @@
 rootProject.name = 'Convexus'
+
 include (
-    'Convexus-Factory',
-    'Convexus-Factory-Test',
-    'Convexus-Pool',
-    'Convexus-Pool-Test',
-    'Convexus-SwapRouter',
-    'Convexus-SwapRouter-Test',
-    'Convexus-LiquidityManagement',
-    'Convexus-LiquidityManagement-Test',
-    'Convexus-NonFungiblePositionManager',
-    'Convexus-NonFungiblePositionManager-Test',
-    'Convexus-NonfungibleTokenPositionDescriptor',
-    'Convexus-NonfungibleTokenPositionDescriptor-Test',
-    'Convexus-PoolInitializer',
-    'Convexus-PoolInitializer-Test',
-    'Convexus-Governor',
-    'Convexus-Governor-Test',
-    'Convexus-TickLens',
-    'Convexus-TickLens-Test',
-    'Convexus-Quoter',
-    'Convexus-Quoter-Test',
-    'Convexus-PairFlash',
-    'Convexus-PairFlash-Test',
-    'Convexus-Swap',
-    'Convexus-Swap-Test',
-    'Convexus-CVXS',
-    'Convexus-CVXS-Test',
-    'Convexus-Staker',
-    'Convexus-Staker-Test',
-    'Convexus-Tests',
-    'Convexus-Utils',
-    'Convexus-Utils-Test',
-    'Convexus-Integration-Test',
-    'javaee-tokens',
-    'unittest',
-    'testinteg')
+  // ---------------------
+  // --- Convexus Core ---
+  // ---------------------
+  // Contracts
+  'Convexus-Core:Contracts:Factory',
+  'Convexus-Core:Contracts:Pool',
+
+  // Tests
+  'Convexus-Core:Tests:Factory-Test',
+  'Convexus-Core:Tests:Pool-Test',
+
+  // --------------------------
+  // --- Convexus Periphery ---
+  // --------------------------
+  ':Convexus-Periphery:Contracts:SwapRouter',
+  ':Convexus-Periphery:Contracts:LiquidityManagement',
+  ':Convexus-Periphery:Contracts:NonFungiblePositionManager',
+  ':Convexus-Periphery:Contracts:NonfungibleTokenPositionDescriptor',
+  ':Convexus-Periphery:Contracts:PoolInitializer',
+  ':Convexus-Periphery:Contracts:Governor',
+  ':Convexus-Periphery:Contracts:TickLens',
+  ':Convexus-Periphery:Contracts:Quoter',
+  ':Convexus-Periphery:Contracts:PairFlash',
+  ':Convexus-Periphery:Contracts:Swap',
+  ':Convexus-Periphery:Contracts:CVXS',
+  ':Convexus-Periphery:Contracts:Staker',
+
+  // Tests
+  'Convexus-Periphery:Tests:SwapRouter-Test',
+  'Convexus-Periphery:Tests:LiquidityManagement-Test',
+  'Convexus-Periphery:Tests:NonFungiblePositionManager-Test',
+  'Convexus-Periphery:Tests:NonfungibleTokenPositionDescriptor-Test',
+  'Convexus-Periphery:Tests:PoolInitializer-Test',
+  'Convexus-Periphery:Tests:Governor-Test',
+  'Convexus-Periphery:Tests:TickLens-Test',
+  'Convexus-Periphery:Tests:Quoter-Test',
+  'Convexus-Periphery:Tests:PairFlash-Test',
+  'Convexus-Periphery:Tests:Swap-Test',
+  'Convexus-Periphery:Tests:CVXS-Test',
+  'Convexus-Periphery:Tests:Staker-Test',
+
+  // -----------------------
+  // --- Convexus Common ---
+  // -----------------------
+  // Librairies & common code
+  ':Convexus-Commons:Librairies',
+  ':Convexus-Commons:Interfaces',
+  ':Convexus-Commons:Utils',
+  ':Convexus-Commons:Convexus-Tests',
+  ':Convexus-Commons:Integration-Test',
+  ':Convexus-Commons:Librairies-Test',
+  
+  // ICON related code
+  ':Convexus-Commons:ICON:irc2',
+  ':Convexus-Commons:ICON:irc721',
+  ':Convexus-Commons:ICON:unittest',
+  ':Convexus-Commons:ICON:testinteg',
+)
