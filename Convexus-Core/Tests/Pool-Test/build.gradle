@@ -7,6 +7,7 @@ dependencies {
     testImplementation project(':Convexus-Core:Contracts:Factory')
 
     testImplementation project(':Convexus-Commons:Utils')
+    testImplementation project(':Convexus-Commons:Librairies')
     testImplementation project(':Convexus-Commons:Convexus-Tests')
     testImplementation project(':Convexus-Commons:ICON:unittest')
 

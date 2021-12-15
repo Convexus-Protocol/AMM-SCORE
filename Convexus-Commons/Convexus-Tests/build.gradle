@@ -28,5 +28,6 @@ dependencies {
     implementation project(':Convexus-Commons:Utils')
     implementation project(':Convexus-Commons:Librairies')
     implementation project(':Convexus-Commons:ICON:irc2')
+    implementation project(':Convexus-Commons:ICON:irc721')
     implementation project(':Convexus-Commons:ICON:unittest')
 }

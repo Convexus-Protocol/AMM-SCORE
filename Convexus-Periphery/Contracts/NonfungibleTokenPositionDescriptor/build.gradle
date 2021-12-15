@@ -6,6 +6,7 @@ dependencies {
     implementation 'com.github.sink772:minimal-json:0.9.6'
     
     implementation project(':Convexus-Commons:Utils')
+    implementation project(':Convexus-Commons:Librairies')
     implementation project(':Convexus-Core:Contracts:Pool')
     implementation project(':Convexus-Periphery:Contracts:NonFungiblePositionManager')
 }
