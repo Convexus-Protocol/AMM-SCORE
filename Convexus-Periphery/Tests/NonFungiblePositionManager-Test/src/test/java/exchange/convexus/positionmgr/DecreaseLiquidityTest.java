@@ -32,8 +32,8 @@ import exchange.convexus.liquidity.ConvexusLiquidityUtils;
 import exchange.convexus.pool.ConvexusPool;
 import exchange.convexus.utils.AssertUtils;
 
-import static exchange.convexus.NFTUtils.NFTUtils.decreaseLiquidity;
-import static exchange.convexus.NFTUtils.NFTUtils.mint;
+import static exchange.convexus.nft.NFTUtils.decreaseLiquidity;
+import static exchange.convexus.nft.NFTUtils.mint;
 import static exchange.convexus.utils.TimeUtils.now;
 
 public class DecreaseLiquidityTest extends NonFungiblePositionManagerTest {

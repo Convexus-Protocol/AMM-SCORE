@@ -44,9 +44,10 @@ import exchange.convexus.testtokens.Usdc;
 import exchange.convexus.utils.ConvexusTest;
 import exchange.convexus.utils.IntUtils;
 import exchange.convexus.utils.ScoreSpy;
+
+import static exchange.convexus.nft.NFTUtils.mint;
 import static exchange.convexus.utils.TimeUtils.now;
 import score.Address;
-import static exchange.convexus.NFTUtils.NFTUtils.mint;
 
 public class PairFlashTest extends ConvexusTest {
 

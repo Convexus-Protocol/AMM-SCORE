@@ -26,10 +26,10 @@ import java.math.BigInteger;
 
 import com.iconloop.score.test.Account;
 
-import exchange.convexus.NFTUtils.NFTUtils;
 import exchange.convexus.factory.ConvexusFactory;
 import exchange.convexus.factory.ConvexusFactoryUtils;
 import exchange.convexus.liquidity.ConvexusLiquidityUtils;
+import exchange.convexus.nft.NFTUtils;
 import exchange.convexus.pools.Pool1;
 import exchange.convexus.pools.Pool2;
 import exchange.convexus.positiondescriptor.NonfungibleTokenPositionDescriptor;

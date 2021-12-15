@@ -18,6 +18,7 @@ package exchange.convexus.positionmgr;
 
 import static java.math.BigInteger.ZERO;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static exchange.convexus.nft.NFTUtils.mint;
 import static exchange.convexus.utils.AddressUtils.ZERO_ADDRESS;
 import static java.math.BigInteger.ONE;
 
@@ -33,7 +34,6 @@ import exchange.convexus.liquidity.ConvexusLiquidityUtils;
 import exchange.convexus.pool.ConvexusPool;
 import exchange.convexus.utils.AssertUtils;
 import static exchange.convexus.utils.TimeUtils.now;
-import static exchange.convexus.NFTUtils.NFTUtils.mint;
 
 public class TransferFromTest extends NonFungiblePositionManagerTest {
 

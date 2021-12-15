@@ -17,8 +17,8 @@
 package exchange.convexus.positionmgr;
 
 import static java.math.BigInteger.ZERO;
-import static exchange.convexus.NFTUtils.NFTUtils.decreaseLiquidity;
-import static exchange.convexus.NFTUtils.NFTUtils.mint;
+import static exchange.convexus.nft.NFTUtils.decreaseLiquidity;
+import static exchange.convexus.nft.NFTUtils.mint;
 import static exchange.convexus.utils.TimeUtils.now;
 import static java.math.BigInteger.ONE;
 

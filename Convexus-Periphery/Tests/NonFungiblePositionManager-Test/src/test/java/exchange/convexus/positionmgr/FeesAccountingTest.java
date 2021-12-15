@@ -23,6 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
+import static exchange.convexus.nft.NFTUtils.mint;
 import static exchange.convexus.utils.IntUtils.MAX_UINT128;
 
 import java.math.BigInteger;
@@ -40,7 +41,6 @@ import exchange.convexus.pool.ConvexusPool;
 import exchange.convexus.router.SwapRouterUtils;
 import static exchange.convexus.utils.TimeUtils.now;
 import score.Address;
-import static exchange.convexus.NFTUtils.NFTUtils.mint;
 
 public class FeesAccountingTest extends NonFungiblePositionManagerTest {
 

@@ -31,8 +31,9 @@ import exchange.convexus.initializer.ConvexusPoolInitializerUtils;
 import exchange.convexus.liquidity.ConvexusLiquidityUtils;
 import exchange.convexus.pool.ConvexusPool;
 import exchange.convexus.utils.AssertUtils;
+
+import static exchange.convexus.nft.NFTUtils.mint;
 import static exchange.convexus.utils.TimeUtils.now;
-import static exchange.convexus.NFTUtils.NFTUtils.mint;
 
 public class MintTest extends NonFungiblePositionManagerTest {
 

@@ -31,8 +31,8 @@ import static exchange.convexus.utils.TimeUtils.now;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import exchange.convexus.NFTUtils.NFTUtils;
 import exchange.convexus.liquidity.ConvexusLiquidityUtils;
+import exchange.convexus.nft.NFTUtils;
 import exchange.convexus.pool.SnapshotCumulativesInsideResult;
 import exchange.convexus.positionmgr.PositionInformation;
 import exchange.convexus.utils.MathUtils;

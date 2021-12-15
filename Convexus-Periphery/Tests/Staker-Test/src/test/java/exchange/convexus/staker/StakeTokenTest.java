@@ -16,8 +16,8 @@
 
 package exchange.convexus.staker;
 
-import static exchange.convexus.NFTUtils.NFTUtils.decreaseLiquidity;
-import static exchange.convexus.NFTUtils.NFTUtils.safeTransferFrom;
+import static exchange.convexus.nft.NFTUtils.decreaseLiquidity;
+import static exchange.convexus.nft.NFTUtils.safeTransferFrom;
 import static exchange.convexus.staker.ConvexusStakerUtils.stakeToken;
 import static exchange.convexus.utils.SleepUtils.sleep;
 import static exchange.convexus.utils.TimeUtils.now;
@@ -37,8 +37,8 @@ import com.iconloop.score.test.ServiceManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import exchange.convexus.NFTUtils.NFTUtils;
 import exchange.convexus.liquidity.ConvexusLiquidityUtils;
+import exchange.convexus.nft.NFTUtils;
 import exchange.convexus.positionmgr.PositionInformation;
 import exchange.convexus.utils.AssertUtils;
 import exchange.convexus.utils.SleepUtils;
