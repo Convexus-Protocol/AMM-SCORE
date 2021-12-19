@@ -52,7 +52,7 @@ public class CollectTest extends ConvexusPoolTest {
     setup_pool(factory.getAddress(), FEE, tickSpacing);
     reset(pool.spy);
 
-    ConvexusFactoryUtils.createPool(factory, alice, sicx.getAddress(), usdc.getAddress(), FEE, pool.getAddress());
+    ConvexusFactoryUtils.createPool(factory, alice, sicx.getAddress(), usdc.getAddress(), FEE);
     pool.invoke(alice, "initialize", encodePriceSqrt(ONE, ONE));
   }
 

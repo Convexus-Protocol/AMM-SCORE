@@ -32,20 +32,20 @@ public class ConvexusPoolDeployer {
   // ================================================
   // DB Variables
   // ================================================
-  public static final VarDB<ConvexusPoolDeployerParameters> parameters = Context.newVarDB(NAME + "_parameters", ConvexusPoolDeployerParameters.class);
+  public static final VarDB<Parameters> parameters = Context.newVarDB(NAME + "_parameters", Parameters.class);
 
   // ================================================
   // Methods
   // ================================================
   public static Address deploy(byte[] contractBytes, Address factory, Address token0, Address token1, int fee, int tickSpacing) {
-    ConvexusPoolDeployer.parameters.set(new ConvexusPoolDeployerParameters(factory, token0, token1, fee, tickSpacing));
+    ConvexusPoolDeployer.parameters.set(new Parameters(factory, token0, token1, fee, tickSpacing));
     Address pool = Context.deploy(contractBytes);
     ConvexusPoolDeployer.parameters.set(null);
     return pool;
   }
 
   @External(readonly = true)
-  public ConvexusPoolDeployerParameters parameters () {
+  public Parameters parameters () {
     return ConvexusPoolDeployer.parameters.get();
   }
 }

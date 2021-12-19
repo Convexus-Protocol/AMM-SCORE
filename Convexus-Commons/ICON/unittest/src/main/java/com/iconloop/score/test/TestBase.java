@@ -18,10 +18,19 @@ package com.iconloop.score.test;
 
 import java.math.BigInteger;
 
-public class TestBase {
+public class TestBase extends ClassLoader {
     protected static final BigInteger ICX = BigInteger.TEN.pow(18);
 
     private static ServiceManager sInstance;
+
+    public static String getFilePath(String pkgName) {
+        String key = "score.path." + pkgName;
+        String path = System.getProperty(key);
+        if (path == null) {
+            throw new IllegalArgumentException("No such property: " + key);
+        }
+        return path;
+    }
 
     protected static ServiceManager getServiceManager() {
         if (sInstance == null) {

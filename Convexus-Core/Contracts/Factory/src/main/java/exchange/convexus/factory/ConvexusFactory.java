@@ -29,7 +29,7 @@ import score.annotation.External;
  * @title Canonical Convexus factory
  * @notice Deploys Convexus pools and manages ownership and control over pool protocol fees
  */
-public class ConvexusFactory {
+public class ConvexusFactory implements IConvexusPoolDeployer {
 
     // ================================================
     // Consts
@@ -40,6 +40,9 @@ public class ConvexusFactory {
 
     // Contract name
     private final String name;
+
+    // Implements IConvexusPoolDeployer
+    private final ConvexusPoolDeployer poolDeployer;
 
     // ================================================
     // DB Variables
@@ -91,6 +94,8 @@ public class ConvexusFactory {
      *  
      */
     public ConvexusFactory() {
+        this.poolDeployer = new ConvexusPoolDeployer();
+
         final Address caller = Context.getCaller();
         this.name = "Convexus Factory";
 
@@ -129,9 +134,7 @@ public class ConvexusFactory {
     public Address createPool(
         Address tokenA,
         Address tokenB,
-        int fee,
-        // TODO: UNPATCHME:
-        Address pool
+        int fee
     ) {
         Context.require(!tokenA.equals(tokenB),
             "createPool: tokenA must be different from tokenB");
@@ -154,18 +157,15 @@ public class ConvexusFactory {
         Context.require(getPool.at(token0).at(token1).get(fee) == null, 
             "createPool: pool already exists");
 
-        /**  === TODO: FIX Begin patch === */
-        // Address pool = ConvexusPoolDeployer.deploy(
-        //     this.poolContract.get(), 
-        //     Context.getAddress(), 
-        //     token0, token1, fee, tickSpacing
-        // );
-        ConvexusPoolDeployer.parameters.set(new ConvexusPoolDeployerParameters(Context.getAddress(), token0, token1, fee, tickSpacing));
-        /** ==== End Patch === */
+        Address pool = ConvexusPoolDeployer.deploy(
+            this.poolContract.get(), 
+            Context.getAddress(), 
+            token0, token1, fee, tickSpacing
+        );
 
-        getPool.at(token0).at(token1).set(fee, pool);
+        this.getPool.at(token0).at(token1).set(fee, pool);
         // populate mapping in the reverse direction, deliberate choice to avoid the cost of comparing addresses
-        getPool.at(token1).at(token0).set(fee, pool);
+        this.getPool.at(token1).at(token0).set(fee, pool);
 
         this.PoolCreated(token0, token1, fee, tickSpacing, pool);
 
@@ -212,10 +212,17 @@ public class ConvexusFactory {
         this.FeeAmountEnabled(fee, tickSpacing);
     }
 
+    /**
+     * Access: Owner
+     * 
+     * @param contractBytes
+     */
     @External
     public void setPoolContract (byte[] contractBytes) {
+        // Access control
         checkOwner();
 
+        // OK
         this.poolContract.set(contractBytes);
     }
 
@@ -249,5 +256,12 @@ public class ConvexusFactory {
     @External(readonly = true)
     public Address getPool(Address token0, Address token1, int fee) {
         return this.getPool.at(token0).at(token1).get(fee);
+    }
+
+    // --- Implement IConvexusPoolDeployer ---
+    @Override
+    @External(readonly = true)
+    public Parameters parameters() {
+        return this.poolDeployer.parameters();
     }
 }

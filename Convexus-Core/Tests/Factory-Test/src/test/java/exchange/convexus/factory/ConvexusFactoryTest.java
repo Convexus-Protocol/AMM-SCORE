@@ -16,12 +16,29 @@
 
 package exchange.convexus.factory;
 
+import exchange.convexus.testtokens.Sicx;
+import exchange.convexus.testtokens.Usdc;
 import exchange.convexus.utils.ConvexusTest;
+import exchange.convexus.utils.IntUtils;
 import exchange.convexus.utils.ScoreSpy;
 
 public class ConvexusFactoryTest extends ConvexusTest {
 
   ScoreSpy<ConvexusFactory> factory;
+  ScoreSpy<Sicx> sicx;
+  ScoreSpy<Usdc> usdc;
+
+  void setup_tokens () throws Exception {
+    sicx = deploy_sicx();
+    usdc = deploy_usdc();
+    
+    // Transfer some funds to Alice
+    sicx.invoke(owner, "mintTo", alice.getAddress(), IntUtils.MAX_UINT256);
+    usdc.invoke(owner, "mintTo", alice.getAddress(), IntUtils.MAX_UINT256);
+    // Transfer some funds to Bob
+    sicx.invoke(owner, "mintTo", bob.getAddress(), IntUtils.MAX_UINT256);
+    usdc.invoke(owner, "mintTo", bob.getAddress(), IntUtils.MAX_UINT256);
+  }
 
   void setup_factory () throws Exception {
     factory = deploy_factory();

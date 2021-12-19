@@ -496,7 +496,7 @@ public class SwapsTest extends ConvexusPoolTest {
     before_each();
     setup_pool(factory.getAddress(), poolCase.feeAmount, poolCase.tickSpacing);
     reset(pool.spy);
-    ConvexusFactoryUtils.createPool(factory, alice, sicx.getAddress(), usdc.getAddress(), poolCase.feeAmount, pool.getAddress());
+    ConvexusFactoryUtils.createPool(factory, alice, sicx.getAddress(), usdc.getAddress(), poolCase.feeAmount);
     pool.invoke(alice, "initialize", poolCase.startingPrice);
 
     // mint all positions

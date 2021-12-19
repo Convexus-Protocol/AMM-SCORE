@@ -36,12 +36,10 @@ public class ConvexusFactoryUtils {
     Account from,
     Address tokenA,
     Address tokenB,
-    int fee,
-    // TODO: UNPATCHME:
-    Address pool
+    int fee
   ) {
     reset(factory.spy);
-    factory.invoke(from, "createPool", tokenA, tokenB, fee, pool);
+    factory.invoke(from, "createPool", tokenA, tokenB, fee);
     // Get pool address from PoolCreated event
     ArgumentCaptor<Address> _token0 = ArgumentCaptor.forClass(Address.class);
     ArgumentCaptor<Address> _token1 = ArgumentCaptor.forClass(Address.class);

@@ -46,6 +46,7 @@ def get_icon_service(endpoint):
         "bicon":   ['https://bicon.net.solidwallet.io', 0x3],
         "sejong":  ['https://sejong.net.solidwallet.io', 0x53],
         "gochain": ['http://localhost:9082', 0x3],
+        "convexus": ['https://endpoint.convexus.netlib.re', 0x3],
         "local":   ['http://localhost:9000', 0x3],
     }
     url, nid = endpoint_map.get(endpoint, [endpoint, 0x3])

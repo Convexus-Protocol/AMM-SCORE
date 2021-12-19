@@ -59,7 +59,7 @@ public class TickTransitionTest extends ConvexusPoolTest {
 
   @Test
   void testTickTransitionCannotRunTwiceIfZeroForOneSwapEndsAtFractionalPriceJustBelowTick () {
-    ConvexusFactoryUtils.createPool(factory, alice, sicx.getAddress(), usdc.getAddress(), FEE, pool.getAddress());
+    ConvexusFactoryUtils.createPool(factory, alice, sicx.getAddress(), usdc.getAddress(), FEE);
 
     // initialize at a price of ~0.3 token1/token0
     // meaning if you swap in 2 token0, you should end up getting 0 token1

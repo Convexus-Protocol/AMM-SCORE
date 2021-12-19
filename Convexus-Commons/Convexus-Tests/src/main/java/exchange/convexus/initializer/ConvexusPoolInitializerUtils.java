@@ -42,7 +42,7 @@ public class ConvexusPoolInitializerUtils {
     try {
       ScoreSpy<?> pool = ConvexusTest.deploy(poolClass, token0, token1, factory.getAddress(), fee, tickSpacing);
       pool.invoke(from, "initialize", price);
-      ConvexusFactoryUtils.createPool(factory, from, token0, token1, fee, pool.getAddress());
+      ConvexusFactoryUtils.createPool(factory, from, token0, token1, fee);
     } catch (Exception e) {
       assertTrue(false);
     }

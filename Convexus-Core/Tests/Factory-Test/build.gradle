@@ -51,9 +51,7 @@ task integrationTest(type: Test) {
     systemProperty(prefix + 'Convexus-Core:Contracts:Factory', factoryjar.outputJarName)
     systemProperty(prefix + 'Convexus-Core:Contracts:Pool', 
         project(':Convexus-Core:Contracts:Pool').getProjectDir().toString()
-        + '/build/libs/Convexus-Core:Contracts:Pool-' 
-        + '0.9.1'
-        + '-optimized.jar')
+        + '/build/libs/Convexus-Core:Contracts:Pool-optimized.jar')
     // systemProperty(prefix + 'IRC2BasicToken', irc2jar.outputJarName)
 }
 

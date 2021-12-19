@@ -19,15 +19,29 @@ package exchange.convexus.factory;
 import score.Address;
 import score.ObjectReader;
 import score.ObjectWriter;
+import score.annotation.Keep;
 
-public class ConvexusPoolDeployerParameters {
-    public Address factory;
-    public Address token0;
-    public Address token1;
-    public int fee;
-    public int tickSpacing;
-    
-    public static void writeObject(ObjectWriter w, ConvexusPoolDeployerParameters obj) {
+public class Parameters {
+
+    private Address factory;
+    private Address token0;
+    private Address token1;
+    private Integer fee;
+    private Integer tickSpacing;
+
+    @Keep public Parameters() {}
+    @Keep public void setFactory (Address factory) { this.factory = factory; }
+    @Keep public Address getFactory () { return this.factory; }
+    @Keep public void setToken0 (Address token0) { this.token0 = token0; }
+    @Keep public Address getToken0 () { return this.token0; }
+    @Keep public void setToken1 (Address token1) { this.token1 = token1; }
+    @Keep public Address getToken1 () { return this.token1; }
+    @Keep public void setFee (Integer fee) { this.fee = fee; }
+    @Keep public Integer getFee () { return this.fee; }
+    @Keep public void setTickSpacing (Integer tickSpacing) { this.tickSpacing = tickSpacing; }
+    @Keep public Integer getTickSpacing () { return this.tickSpacing; }
+
+    public static void writeObject(ObjectWriter w, Parameters obj) {
         w.write(obj.factory);
         w.write(obj.token0);
         w.write(obj.token1);
@@ -35,8 +49,8 @@ public class ConvexusPoolDeployerParameters {
         w.write(obj.tickSpacing);
     }
 
-    public static ConvexusPoolDeployerParameters readObject(ObjectReader r) {
-        return new ConvexusPoolDeployerParameters(
+    public static Parameters readObject(ObjectReader r) {
+        return new Parameters(
             r.readAddress(), // factory, 
             r.readAddress(), // token0, 
             r.readAddress(), // token1, 
@@ -45,12 +59,12 @@ public class ConvexusPoolDeployerParameters {
         );
     }
 
-    public ConvexusPoolDeployerParameters (
+    public Parameters (
         Address factory,
         Address token0,
         Address token1,
-        int fee,
-        int tickSpacing
+        Integer fee,
+        Integer tickSpacing
     ) {
         this.factory = factory;
         this.token0 = token0;

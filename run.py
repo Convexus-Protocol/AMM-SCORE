@@ -47,18 +47,21 @@ class Command:
 
     @staticmethod
     def deploy(args):
+        print(f" -------------------- Deploying {args.package} ... -------------------- ")
         Command.optimizedJar(args)
         config = Config(args.endpoint, args.keystore.name, args.password)
         deploy(config, args.package, verbose=print)
 
     @staticmethod
     def update(args):
+        print(f" -------------------- Updating {args.package} ... -------------------- ")
         Command.optimizedJar(args)
         config = Config(args.endpoint, args.keystore.name, args.password)
         update(config, args.package, verbose=print)
 
     @staticmethod
     def invoke(args):
+        print(f" -------------------- Invoking {args.package} ... -------------------- ")
         config = Config(args.endpoint, args.keystore.name, args.password)
         invoke(config, args.package, args.params, verbose=print)
 

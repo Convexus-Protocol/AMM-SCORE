@@ -16,7 +16,13 @@
 
 package exchange.convexus.factory;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.mockito.Mockito.reset;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 import com.iconloop.score.test.ServiceManager;
 
@@ -29,10 +35,28 @@ public class FactoryTest extends ConvexusFactoryTest {
   void setup() throws Exception {
     ServiceManager.Block.resetInstance();
     setup_factory();
+    setup_tokens();
     reset(factory.spy);
   }
 
+  void setPoolContract () {
+    try {
+      byte[] rawBytes = Files.readAllBytes(Paths.get("../../Contracts/Pool/build/libs/Pool-optimized.jar"));
+      factory.invoke(owner, "setPoolContract", rawBytes);
+    } catch (IOException e) {
+      assertEquals(e.getMessage(), "");
+    }
+  }
+
   @Test
-  void testAssumptions() {
+  void testSetContract() {
+    setPoolContract();
+  }
+
+  @Test
+  void testCreatePool () {
+    setPoolContract();
+    var poolAddress = ConvexusFactoryUtils.createPool(factory, owner, sicx.getAddress(), usdc.getAddress(), 500);
+    assertNotEquals(poolAddress, null);
   }
 }

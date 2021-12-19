@@ -22,7 +22,7 @@ import static java.math.BigInteger.ZERO;
 
 import java.math.BigInteger;
 
-import exchange.convexus.factory.ConvexusPoolDeployerParameters;
+import exchange.convexus.factory.Parameters;
 import exchange.convexus.librairies.FixedPoint128;
 import exchange.convexus.librairies.FullMath;
 import exchange.convexus.librairies.LiquidityMath;
@@ -55,17 +55,7 @@ import score.annotation.EventLog;
 import score.annotation.External;
 import score.annotation.Optional;
 
-public class Pool3 extends ConvexusPool3 {
-    public Pool3(
-        Address _token0,
-        Address _token1,
-        Address _factory,
-        int fee,
-        int tickSpacing
-    ) {
-        super(_token0, _token1, _factory, fee, tickSpacing);
-    }
-}
+public class Pool3 extends ConvexusPool3 {}
 
 class ConvexusPool3 {
 
@@ -305,36 +295,19 @@ class ConvexusPool3 {
     /**
      *  @notice Contract constructor
      */
-    public ConvexusPool3(
-        // TODO: PATCH PATCH PATCH: REMOVE ME
-        Address _token0,
-        Address _token1,
-        Address _factory,
-        int fee,
-        int tickSpacing
-        // END OF PATCH
-    ) {
-        /**  === TODO: PATCH PATCH PATCH: REMOVE ME === */
-        // ConvexusPoolDeployerParameters parameters = (ConvexusPoolDeployerParameters) Context.call(Context.getCaller(), "parameters");
-        ConvexusPoolDeployerParameters parameters = new ConvexusPoolDeployerParameters(
-            _factory, 
-            _token0, 
-            _token1, 
-            fee,
-            tickSpacing
-        );
-        /**  === END OF PATCH === */
+    public ConvexusPool3() {
+        Parameters parameters = Context.call(Parameters.class, Context.getCaller(), "parameters");
 
         Context.require(parameters != null,
             "ConvexusPool: Invalid ConvexusPoolDeployerParameters");
 
-        this.factory = parameters.factory;
-        this.token0 = parameters.token0;
-        this.token1 = parameters.token1;
-        this.fee = parameters.fee;
-        this.tickSpacing = parameters.tickSpacing;
+        this.factory = parameters.getFactory();
+        this.token0 = parameters.getToken0();
+        this.token1 = parameters.getToken1();
+        this.fee = parameters.getFee();
+        this.tickSpacing = parameters.getTickSpacing();
 
-        this.maxLiquidityPerTick = Tick.tickSpacingToMaxLiquidityPerTick(parameters.tickSpacing);
+        this.maxLiquidityPerTick = Tick.tickSpacingToMaxLiquidityPerTick(this.tickSpacing);
         this.name = "Convexus Pool " + Context.call(this.token0, "symbol") + "/" + Context.call(this.token1, "symbol");
 
         // Default values

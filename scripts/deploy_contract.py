@@ -38,8 +38,14 @@ def deploy(config: Config, package: str, verbose=print_empty):
     
     params = get_params(package, config.endpoint)
     javaPkg, version, build = get_meta(package, config.endpoint)
+    javaPkgPath = javaPkg.replace(':', '/')
+    jarName = javaPkg.split(':')[-1]
 
-    content = gen_deploy_data_content(f"./{javaPkg}/build/libs/{javaPkg}-{version}-{build}.jar")
+    if version:
+        content = gen_deploy_data_content(f"./{javaPkgPath}/build/libs/{jarName}-{version}-{build}.jar")
+    else:
+        content = gen_deploy_data_content(f"./{javaPkgPath}/build/libs/{jarName}-{build}.jar")
+
     content_type = 'application/java'
     tx_hash = tx_handler.install(owner, content, content_type, params)
 
@@ -55,10 +61,16 @@ def update(config: Config, package: str, verbose=print_empty):
     tx_handler = config.tx_handler
 
     javaPkg, version, build = get_meta(package, config.endpoint)
+    javaPkgPath = javaPkg.replace(':', '/')
+    jarName = javaPkg.split(':')[-1]
     address = get_deploy(package, config.endpoint)
     params = get_params(package, config.endpoint)
 
-    content = gen_deploy_data_content(f"./{javaPkg}/build/libs/{javaPkg}-{version}-{build}.jar")
+    if version:
+        content = gen_deploy_data_content(f"./{javaPkgPath}/build/libs/{jarName}-{version}-{build}.jar")
+    else:
+        content = gen_deploy_data_content(f"./{javaPkgPath}/build/libs/{jarName}-{build}.jar")
+
     content_type = 'application/java'
     tx_hash = tx_handler.update(owner, address, content, content_type, params)
 
