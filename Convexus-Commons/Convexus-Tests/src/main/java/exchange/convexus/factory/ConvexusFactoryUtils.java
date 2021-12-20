@@ -32,6 +32,26 @@ import exchange.convexus.factory.ConvexusFactoryUtils;
 public class ConvexusFactoryUtils {
 
   public static Address createPool (
+    ScoreSpy<ConvexusFactoryMock> factory,
+    Account from,
+    Address tokenA,
+    Address tokenB,
+    int fee,
+    Address pool
+  ) {
+    reset(factory.spy);
+    factory.invoke(from, "createPool", tokenA, tokenB, fee, pool);
+    // Get pool address from PoolCreated event
+    ArgumentCaptor<Address> _token0 = ArgumentCaptor.forClass(Address.class);
+    ArgumentCaptor<Address> _token1 = ArgumentCaptor.forClass(Address.class);
+    ArgumentCaptor<Integer> _fee = ArgumentCaptor.forClass(Integer.class);
+    ArgumentCaptor<Integer> _tickSpacing = ArgumentCaptor.forClass(Integer.class);
+    ArgumentCaptor<Address> _pool = ArgumentCaptor.forClass(Address.class);
+    verify(factory.spy).PoolCreated(_token0.capture(), _token1.capture(), _fee.capture(), _tickSpacing.capture(), _pool.capture());
+    return _pool.getValue();
+  }
+  
+  public static Address createPool (
     ScoreSpy<ConvexusFactory> factory,
     Account from,
     Address tokenA,

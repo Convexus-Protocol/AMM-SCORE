@@ -41,6 +41,6 @@ public class ConvexusFactoryTest extends ConvexusTest {
   }
 
   void setup_factory () throws Exception {
-    factory = deploy_factory();
+    factory = deploy(ConvexusFactory.class);
   }
 }

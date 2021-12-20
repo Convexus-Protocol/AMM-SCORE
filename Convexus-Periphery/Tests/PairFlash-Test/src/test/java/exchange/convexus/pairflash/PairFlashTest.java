@@ -27,7 +27,7 @@ import com.iconloop.score.test.Account;
 
 import org.mockito.ArgumentCaptor;
 
-import exchange.convexus.factory.ConvexusFactory;
+import exchange.convexus.factory.ConvexusFactoryMock;
 import exchange.convexus.factory.ConvexusFactoryUtils;
 import exchange.convexus.liquidity.ConvexusLiquidityUtils;
 import exchange.convexus.pools.Pool1;
@@ -52,7 +52,7 @@ import score.Address;
 public class PairFlashTest extends ConvexusTest {
 
   ScoreSpy<PairFlash> flash;
-  ScoreSpy<ConvexusFactory> factory;
+  ScoreSpy<ConvexusFactoryMock> factory;
   ScoreSpy<SwapRouter> router;
   ScoreSpy<Sicx> sicx;
   ScoreSpy<Usdc> usdc;
@@ -94,32 +94,30 @@ public class PairFlashTest extends ConvexusTest {
   }
 
   <T> ScoreSpy<T> setup_pool (int fee, int tickSpacing, BigInteger sqrtPriceLimitX96, Class<?> poolClass) throws Exception {
-    // TODO: FIXME
-    // ScoreSpy<T> pool = deploy(poolClass, sicx.getAddress(), usdc.getAddress(), factory.getAddress(), fee, tickSpacing);
-    // pool.invoke(alice, "initialize", sqrtPriceLimitX96);
-    // ConvexusFactoryUtils.createPool(factory, alice, sicx.getAddress(), usdc.getAddress(), FEE);
+    ScoreSpy<T> pool = deploy(poolClass, sicx.getAddress(), usdc.getAddress(), factory.getAddress(), fee, tickSpacing);
+    pool.invoke(alice, "initialize", sqrtPriceLimitX96);
+    ConvexusFactoryUtils.createPool(factory, alice, sicx.getAddress(), usdc.getAddress(), fee, pool.getAddress());
     
-    // ConvexusLiquidityUtils.deposit(alice, nft.getAddress(), sicx.score, BigInteger.valueOf(1000000));
-    // ConvexusLiquidityUtils.deposit(alice, nft.getAddress(), usdc.score, BigInteger.valueOf(1000000));
+    ConvexusLiquidityUtils.deposit(alice, nft.getAddress(), sicx.score, BigInteger.valueOf(1000000));
+    ConvexusLiquidityUtils.deposit(alice, nft.getAddress(), usdc.score, BigInteger.valueOf(1000000));
 
-    // mint (
-    //   nft,
-    //   alice, 
-    //   sicx.getAddress(), 
-    //   usdc.getAddress(), 
-    //   fee, 
-    //   getMinTick(tickSpacing),
-    //   getMaxTick(tickSpacing),
-    //   BigInteger.valueOf(1000000),
-    //   BigInteger.valueOf(1000000),
-    //   ZERO, 
-    //   ZERO, 
-    //   alice.getAddress(),
-    //   now().add(ONE)
-    // );
+    mint (
+      nft,
+      alice, 
+      sicx.getAddress(), 
+      usdc.getAddress(), 
+      fee, 
+      getMinTick(tickSpacing),
+      getMaxTick(tickSpacing),
+      BigInteger.valueOf(1000000),
+      BigInteger.valueOf(1000000),
+      ZERO, 
+      ZERO, 
+      alice.getAddress(),
+      now().add(ONE)
+    );
 
-    // return pool;
-    return null;
+    return pool;
   }
 
   void setup_pool1 () throws Exception {

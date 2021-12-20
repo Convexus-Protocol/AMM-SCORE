@@ -25,7 +25,7 @@ import com.iconloop.score.test.Account;
 
 import org.mockito.ArgumentCaptor;
 
-import exchange.convexus.factory.ConvexusFactory;
+import exchange.convexus.factory.ConvexusFactoryMock;
 import exchange.convexus.initializer.ConvexusPoolInitializer;
 import exchange.convexus.librairies.PairAmounts;
 import exchange.convexus.pool.ConvexusPool;
@@ -41,7 +41,7 @@ import score.Address;
 public class NonFungiblePositionManagerTest extends ConvexusTest {
 
   ScoreSpy<NonfungibleTokenPositionDescriptor> positiondescriptor;
-  ScoreSpy<ConvexusFactory> factory;
+  ScoreSpy<ConvexusFactoryMock> factory;
   ScoreSpy<ConvexusPoolInitializer> initializer;
   ScoreSpy<Sicx> sicx;
   ScoreSpy<Usdc> usdc;
@@ -75,7 +75,6 @@ public class NonFungiblePositionManagerTest extends ConvexusTest {
 
   void setup_nft () throws Exception {
     factory = deploy_factory();
-    // factory.invoke(owner, "setPoolContract", Files.readAllBytes(Paths.get("../Convexus-Core:Contracts:Pool/build/libs/Convexus-Core:Contracts:Pool-0.9.1-optimized.jar")));
     router = deploy_router(factory.getAddress());
     positiondescriptor = deploy_positiondescriptor();
     nft = deploy_nft(factory.getAddress(), positiondescriptor.getAddress());

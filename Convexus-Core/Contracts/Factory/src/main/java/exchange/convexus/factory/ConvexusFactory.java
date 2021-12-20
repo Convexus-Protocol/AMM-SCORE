@@ -47,10 +47,10 @@ public class ConvexusFactory implements IConvexusPoolDeployer {
     // ================================================
     // DB Variables
     // ================================================
-    private final VarDB<Address> owner = Context.newVarDB(NAME + "_owner", Address.class);
-    private final DictDB<Integer, Integer> feeAmountTickSpacing = Context.newDictDB(NAME + "_feeAmountTickSpacing", Integer.class);
-    private final BranchDB<Address, BranchDB<Address, DictDB<Integer, Address>>> getPool = Context.newBranchDB(NAME + "_getPool", Address.class);
-    private final VarDB<byte[]> poolContract = Context.newVarDB(NAME + "_poolContract", byte[].class);
+    protected final VarDB<Address> owner = Context.newVarDB(NAME + "_owner", Address.class);
+    protected final DictDB<Integer, Integer> feeAmountTickSpacing = Context.newDictDB(NAME + "_feeAmountTickSpacing", Integer.class);
+    protected final BranchDB<Address, BranchDB<Address, DictDB<Integer, Address>>> getPool = Context.newBranchDB(NAME + "_getPool", Address.class);
+    protected final VarDB<byte[]> poolContract = Context.newVarDB(NAME + "_poolContract", byte[].class);
 
     // ================================================
     // Event Logs

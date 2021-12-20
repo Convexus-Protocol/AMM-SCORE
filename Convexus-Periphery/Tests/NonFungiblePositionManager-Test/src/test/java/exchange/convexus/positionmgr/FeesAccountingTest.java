@@ -37,7 +37,7 @@ import exchange.convexus.initializer.ConvexusPoolInitializerUtils;
 import exchange.convexus.librairies.Path;
 import exchange.convexus.librairies.PoolData;
 import exchange.convexus.liquidity.ConvexusLiquidityUtils;
-import exchange.convexus.pool.ConvexusPool;
+import exchange.convexus.pool.ConvexusPoolMock;
 import exchange.convexus.router.SwapRouterUtils;
 import static exchange.convexus.utils.TimeUtils.now;
 import score.Address;
@@ -55,7 +55,7 @@ public class FeesAccountingTest extends NonFungiblePositionManagerTest {
     setup_initializer();
 
     // create a position
-    ConvexusPoolInitializerUtils.createAndInitializePoolIfNecessary(ConvexusPool.class, alice, factory, sicx.getAddress(), usdc.getAddress(), FEE_AMOUNTS[MEDIUM], encodePriceSqrt(ONE, ONE), tickSpacing);
+    ConvexusPoolInitializerUtils.createAndInitializePoolIfNecessary(ConvexusPoolMock.class, alice, factory, sicx.getAddress(), usdc.getAddress(), FEE_AMOUNTS[MEDIUM], encodePriceSqrt(ONE, ONE), tickSpacing);
 
     // nft 1 earns 25% of fees
     final BigInteger nft1Value = BigInteger.valueOf(100);

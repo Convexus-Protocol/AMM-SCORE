@@ -23,7 +23,7 @@ import com.iconloop.score.test.TestBase;
 
 import exchange.convexus.pool.ConvexusPool;
 import exchange.convexus.pool.ConvexusPoolMock;
-import exchange.convexus.factory.ConvexusFactory;
+import exchange.convexus.factory.ConvexusFactoryMock;
 import exchange.convexus.governor.ConvexusGovernor;
 import exchange.convexus.initializer.ConvexusPoolInitializer;
 import exchange.convexus.router.SwapRouter;
@@ -105,12 +105,12 @@ public class ConvexusTest extends TestBase {
         return new ScoreSpy<ConvexusPool>(score, spy);
     }
     
-    public ScoreSpy<ConvexusFactory> deploy_factory () throws Exception {
-        Score score = sm.deploy(owner, ConvexusFactory.class);
+    public ScoreSpy<ConvexusFactoryMock> deploy_factory () throws Exception {
+        Score score = sm.deploy(owner, ConvexusFactoryMock.class);
 
-        var spy = (ConvexusFactory) spy(score.getInstance());
+        var spy = (ConvexusFactoryMock) spy(score.getInstance());
         score.setInstance(spy);
-        return new ScoreSpy<ConvexusFactory>(score, spy);
+        return new ScoreSpy<ConvexusFactoryMock>(score, spy);
     }
     
     public ScoreSpy<SwapRouter> deploy_router (Address factory) throws Exception {

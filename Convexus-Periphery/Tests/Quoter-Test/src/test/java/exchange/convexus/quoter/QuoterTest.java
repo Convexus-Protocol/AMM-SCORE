@@ -16,13 +16,13 @@
 
 package exchange.convexus.quoter;
 
-import exchange.convexus.factory.ConvexusFactory;
+import exchange.convexus.factory.ConvexusFactoryMock;
 import exchange.convexus.utils.ConvexusTest;
 import exchange.convexus.utils.ScoreSpy;
 
 public class QuoterTest extends ConvexusTest {
 
-  ScoreSpy<ConvexusFactory> factory;
+  ScoreSpy<ConvexusFactoryMock> factory;
   ScoreSpy<Quoter> quoter;
 
   void setup_quoter () throws Exception {

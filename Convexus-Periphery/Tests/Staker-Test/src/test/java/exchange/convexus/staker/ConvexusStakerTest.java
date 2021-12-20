@@ -26,7 +26,7 @@ import java.math.BigInteger;
 
 import com.iconloop.score.test.Account;
 
-import exchange.convexus.factory.ConvexusFactory;
+import exchange.convexus.factory.ConvexusFactoryMock;
 import exchange.convexus.factory.ConvexusFactoryUtils;
 import exchange.convexus.liquidity.ConvexusLiquidityUtils;
 import exchange.convexus.nft.NFTUtils;
@@ -49,7 +49,7 @@ import score.Address;
 public class ConvexusStakerTest extends ConvexusTest {
 
   ScoreSpy<ConvexusStaker> staker;
-  ScoreSpy<ConvexusFactory> factory;
+  ScoreSpy<ConvexusFactoryMock> factory;
   ScoreSpy<NonfungibleTokenPositionDescriptor> positiondescriptor;
   ScoreSpy<NonFungiblePositionManager> nft;
   ScoreSpy<Sicx> sicx;
@@ -107,17 +107,15 @@ public class ConvexusStakerTest extends ConvexusTest {
   }
 
   void setup_pool1 () throws Exception {
-    // TODO FIXME
-    // pool1 = deploy(Pool1.class, sicx.getAddress(), usdc.getAddress(), factory.getAddress(), FEE_AMOUNTS[MEDIUM], TICK_SPACINGS[MEDIUM]);
-    // pool1.invoke(alice, "initialize", encodePriceSqrt(ONE, ONE));
-    // ConvexusFactoryUtils.createPool(factory, alice, sicx.getAddress(), usdc.getAddress(), FEE_AMOUNTS[MEDIUM], pool1.getAddress());
+    pool1 = deploy(Pool1.class, sicx.getAddress(), usdc.getAddress(), factory.getAddress(), FEE_AMOUNTS[MEDIUM], TICK_SPACINGS[MEDIUM]);
+    pool1.invoke(alice, "initialize", encodePriceSqrt(ONE, ONE));
+    ConvexusFactoryUtils.createPool(factory, alice, sicx.getAddress(), usdc.getAddress(), FEE_AMOUNTS[MEDIUM], pool1.getAddress());
   }
   
   void setup_pool2 () throws Exception {
-    // TODO FIXME
-    // pool2 = deploy(Pool2.class, usdc.getAddress(), baln.getAddress(), factory.getAddress(), FEE_AMOUNTS[MEDIUM], TICK_SPACINGS[MEDIUM]);
-    // pool2.invoke(alice, "initialize", encodePriceSqrt(ONE, ONE));
-    // ConvexusFactoryUtils.createPool(factory, alice, usdc.getAddress(), baln.getAddress(), FEE_AMOUNTS[MEDIUM], pool2.getAddress());
+    pool2 = deploy(Pool2.class, usdc.getAddress(), baln.getAddress(), factory.getAddress(), FEE_AMOUNTS[MEDIUM], TICK_SPACINGS[MEDIUM]);
+    pool2.invoke(alice, "initialize", encodePriceSqrt(ONE, ONE));
+    ConvexusFactoryUtils.createPool(factory, alice, usdc.getAddress(), baln.getAddress(), FEE_AMOUNTS[MEDIUM], pool2.getAddress());
   }
 
   void setup_staker () throws Exception {

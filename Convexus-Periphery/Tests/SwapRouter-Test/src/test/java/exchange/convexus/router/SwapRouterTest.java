@@ -27,7 +27,7 @@ import java.util.List;
 import com.iconloop.score.test.Account;
 import com.iconloop.score.test.Score;
 
-import exchange.convexus.factory.ConvexusFactory;
+import exchange.convexus.factory.ConvexusFactoryMock;
 import exchange.convexus.initializer.ConvexusPoolInitializerUtils;
 import exchange.convexus.librairies.Path;
 import exchange.convexus.liquidity.ConvexusLiquidityUtils;
@@ -49,7 +49,7 @@ import score.Address;
 public class SwapRouterTest extends ConvexusTest {
 
   ScoreSpy<SwapRouter> router;
-  ScoreSpy<ConvexusFactory> factory;
+  ScoreSpy<ConvexusFactoryMock> factory;
   ScoreSpy<NonfungibleTokenPositionDescriptor> positiondescriptor;
   ScoreSpy<NonFungiblePositionManager> nft;
   ScoreSpy<Sicx> sicx;

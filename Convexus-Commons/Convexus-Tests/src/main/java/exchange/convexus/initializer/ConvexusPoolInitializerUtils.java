@@ -24,7 +24,7 @@ import com.iconloop.score.test.Account;
 
 import score.Address;
 
-import exchange.convexus.factory.ConvexusFactory;
+import exchange.convexus.factory.ConvexusFactoryMock;
 import exchange.convexus.factory.ConvexusFactoryUtils;
 import exchange.convexus.utils.ConvexusTest;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -32,7 +32,16 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class ConvexusPoolInitializerUtils {
 
   // Mock createAndInitializePoolIfNecessary until SCORE deployers supported by unittest
-  public static void createAndInitializePoolIfNecessary (Class<?> poolClass, Account from, ScoreSpy<ConvexusFactory> factory, Address token0, Address token1, int fee, BigInteger price, int tickSpacing) {
+  public static void createAndInitializePoolIfNecessary (
+    Class<?> poolClass, 
+    Account from, 
+    ScoreSpy<ConvexusFactoryMock> factory,
+    Address token0, 
+    Address token1, 
+    int fee, 
+    BigInteger price, 
+    int tickSpacing
+  ) {
     // initializer.invoke(owner, "createAndInitializePoolIfNecessary", 
     //   sicx.getAddress(),
     //   usdc.getAddress(),
@@ -42,7 +51,7 @@ public class ConvexusPoolInitializerUtils {
     try {
       ScoreSpy<?> pool = ConvexusTest.deploy(poolClass, token0, token1, factory.getAddress(), fee, tickSpacing);
       pool.invoke(from, "initialize", price);
-      ConvexusFactoryUtils.createPool(factory, from, token0, token1, fee);
+      ConvexusFactoryUtils.createPool(factory, from, token0, token1, fee, pool.getAddress());
     } catch (Exception e) {
       assertTrue(false);
     }

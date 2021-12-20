@@ -29,7 +29,7 @@ import org.junit.jupiter.api.Test;
 
 import exchange.convexus.initializer.ConvexusPoolInitializerUtils;
 import exchange.convexus.liquidity.ConvexusLiquidityUtils;
-import exchange.convexus.pool.ConvexusPool;
+import exchange.convexus.pool.ConvexusPoolMock;
 import exchange.convexus.utils.AssertUtils;
 
 import static exchange.convexus.nft.NFTUtils.decreaseLiquidity;
@@ -48,7 +48,7 @@ public class DecreaseLiquidityTest extends NonFungiblePositionManagerTest {
     setup_initializer();
 
     // create a position
-    ConvexusPoolInitializerUtils.createAndInitializePoolIfNecessary(ConvexusPool.class, alice, factory, sicx.getAddress(), usdc.getAddress(), FEE_AMOUNTS[MEDIUM], encodePriceSqrt(ONE, ONE), tickSpacing);
+    ConvexusPoolInitializerUtils.createAndInitializePoolIfNecessary(ConvexusPoolMock.class, alice, factory, sicx.getAddress(), usdc.getAddress(), FEE_AMOUNTS[MEDIUM], encodePriceSqrt(ONE, ONE), tickSpacing);
 
     final BigInteger hundred = BigInteger.valueOf(100);
     ConvexusLiquidityUtils.deposit(alice, nft.getAddress(), sicx.score, hundred);

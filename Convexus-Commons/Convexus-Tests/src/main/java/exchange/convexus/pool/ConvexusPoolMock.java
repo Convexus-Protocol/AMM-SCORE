@@ -18,12 +18,14 @@ package exchange.convexus.pool;
 
 import java.math.BigInteger;
 
+import exchange.convexus.factory.Parameters;
 import score.Address;
 import score.annotation.External;
 
 public class ConvexusPoolMock extends ConvexusPool {
 
-  public ConvexusPoolMock(Address _token0, Address _token1, Address _factory, int fee, int tickSpacing) {
+  public ConvexusPoolMock(Address token0, Address token1, Address factory, int fee, int tickSpacing) {
+    super(new Parameters(factory, token0, token1, fee, tickSpacing));
   }
 
   @External

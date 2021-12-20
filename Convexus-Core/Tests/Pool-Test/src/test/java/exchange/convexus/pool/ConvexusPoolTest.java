@@ -36,7 +36,7 @@ import com.iconloop.score.test.Score;
 import org.mockito.ArgumentCaptor;
 
 import exchange.convexus.callee.ConvexusCallee;
-import exchange.convexus.factory.ConvexusFactory;
+import exchange.convexus.factory.ConvexusFactoryMock;
 import exchange.convexus.librairies.Position;
 import exchange.convexus.librairies.Positions;
 import exchange.convexus.librairies.TickMath;
@@ -51,7 +51,7 @@ import exchange.convexus.utils.ScoreSpy;
 public class ConvexusPoolTest extends ConvexusTest {
 
   ScoreSpy<ConvexusPoolMock> pool;
-  ScoreSpy<ConvexusFactory> factory;
+  ScoreSpy<ConvexusFactoryMock> factory;
   ScoreSpy<Sicx> sicx;
   ScoreSpy<Usdc> usdc;
   ScoreSpy<ConvexusCallee> callee;
