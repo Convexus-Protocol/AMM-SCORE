@@ -108,7 +108,7 @@ public class ServiceManager {
         return score;
     }
 
-    private Score getScoreFromAddress(Address target) {
+    public Score getScoreFromAddress(Address target) {
         var score = addressScoreMap.get(target);
         if (score == null) {
             throw new IllegalStateException("ScoreNotFound");

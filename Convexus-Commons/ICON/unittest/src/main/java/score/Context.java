@@ -236,8 +236,7 @@ public final class Context extends TestBase {
         }
     }
 
-    public static<T> T call(Class<T> cls,
-                            Address targetAddress, String method, Object... params) {
+    public static<T> T call(Class<T> cls, Address targetAddress, String method, Object... params) {
         var result = call(targetAddress, method, params);
         return cls.cast(_shadow(result, cls));
     }
@@ -257,7 +256,7 @@ public final class Context extends TestBase {
             Class<?> dappClass = classLoader.findClass(classLoader.dapp.mainClass);
             return sm.deploy(sm.getScoreFromClass(caller).getAccount(), dappClass, params).getAddress();
         } catch (Exception e) {
-            Context.revert("Failure during SCORE deployment : " + e.getMessage());
+            Context.revert("Failure during SCORE deployment");
             return null;
         }
     }

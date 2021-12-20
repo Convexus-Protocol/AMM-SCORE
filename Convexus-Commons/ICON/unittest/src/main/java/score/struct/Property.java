@@ -67,6 +67,34 @@ public interface Property {
         return null;
     }
 
+    static ReadableProperty getReadableProperty(
+            Class<?> cls,
+            String property) {
+        var getter = "get" + capitalize(property);
+        
+        while (cls != null) {
+            var ma = Arrays.stream(cls.getDeclaredMethods()).filter(
+                    m -> m.getName().equals(getter)
+                            && m.getParameterCount() == 0
+                            && !Modifier.isStatic(m.getModifiers())
+                            && Modifier.isPublic(m.getModifiers())
+            ).toArray(Method[]::new);
+            if (ma.length == 1) {
+                return new ReadableMethodProperty(ma[0]);
+            }
+            try {
+                var f = cls.getDeclaredField(property);
+                if (!Modifier.isStatic(f.getModifiers())
+                        && Modifier.isPublic(f.getModifiers())) {
+                    return new FieldProperty(f);
+                }
+            } catch (NoSuchFieldException ignored) {
+            }
+            cls = cls.getSuperclass();
+        }
+        return null;
+    }
+
     static boolean isGetter(Method m) {
         if (!Modifier.isPublic(m.getModifiers())
                 || Modifier.isStatic(m.getModifiers())

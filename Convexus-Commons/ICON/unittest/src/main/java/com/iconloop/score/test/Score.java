@@ -18,6 +18,7 @@ package com.iconloop.score.test;
 
 import score.Address;
 import score.Context;
+import score.struct.Property;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
@@ -119,11 +120,19 @@ public class Score extends TestBase {
 
         // Only remaining possibility : it's a user class that needs to be converted to Map
         Map<String, Object> returnMap = new HashMap<String, Object>();
-        for (var field : returnType.getFields()) {
+        for (var field : returnType.getDeclaredFields()) {
+            var rp = Property.getReadableProperty(returnType, field.getName());
+            
             // Decide what to do with field values, recursive call it
-            var fieldValue = getReturnValue(field.get(returnValue));
-            returnMap.put(field.getName(), fieldValue);
+            try {
+                var fieldValue = getReturnValue(rp.get(returnValue));
+                returnMap.put(field.getName(), fieldValue);
+            } catch (InvocationTargetException e) {
+                e.printStackTrace();
+                return null;
+            }
         }
+
         return returnMap;
     }
 

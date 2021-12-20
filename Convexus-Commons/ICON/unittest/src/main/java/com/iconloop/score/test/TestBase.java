@@ -18,7 +18,7 @@ package com.iconloop.score.test;
 
 import java.math.BigInteger;
 
-public class TestBase extends ClassLoader {
+public class TestBase {
     protected static final BigInteger ICX = BigInteger.TEN.pow(18);
 
     private static ServiceManager sInstance;
