@@ -22,22 +22,25 @@ import score.ObjectWriter;
 import score.annotation.Keep;
 
 public class Parameters {
+    @Keep public Parameters() {}
 
     private Address factory;
-    private Address token0;
-    private Address token1;
-    private Integer fee;
-    private Integer tickSpacing;
-
-    @Keep public Parameters() {}
     @Keep public void setFactory (Address factory) { this.factory = factory; }
     @Keep public Address getFactory () { return this.factory; }
+
+    private Address token0;
     @Keep public void setToken0 (Address token0) { this.token0 = token0; }
     @Keep public Address getToken0 () { return this.token0; }
+
+    private Address token1;
     @Keep public void setToken1 (Address token1) { this.token1 = token1; }
     @Keep public Address getToken1 () { return this.token1; }
+
+    private Integer fee;
     @Keep public void setFee (Integer fee) { this.fee = fee; }
     @Keep public Integer getFee () { return this.fee; }
+
+    private Integer tickSpacing;
     @Keep public void setTickSpacing (Integer tickSpacing) { this.tickSpacing = tickSpacing; }
     @Keep public Integer getTickSpacing () { return this.tickSpacing; }
 

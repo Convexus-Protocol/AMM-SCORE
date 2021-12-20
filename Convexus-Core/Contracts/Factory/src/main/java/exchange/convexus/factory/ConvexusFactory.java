@@ -157,7 +157,7 @@ public class ConvexusFactory implements IConvexusPoolDeployer {
         Context.require(getPool.at(token0).at(token1).get(fee) == null, 
             "createPool: pool already exists");
 
-        Address pool = ConvexusPoolDeployer.deploy(
+        Address pool = ConvexusPoolDeployer.deploy (
             this.poolContract.get(), 
             Context.getAddress(), 
             token0, token1, fee, tickSpacing

@@ -45,7 +45,7 @@ import score.annotation.EventLog;
 import score.annotation.External;
 import score.annotation.Optional;
 
-public class ConvexusPool {
+public abstract class ConvexusPool {
 
     // ================================================
     // Consts
@@ -283,12 +283,7 @@ public class ConvexusPool {
     /**
      *  @notice Contract constructor
      */
-    public ConvexusPool() {
-        Parameters parameters = Context.call(Parameters.class, Context.getCaller(), "parameters");
-
-        Context.require(parameters != null,
-            "ConvexusPool: Invalid ConvexusPoolDeployerParameters");
-
+    public ConvexusPool (Parameters parameters) {
         this.factory = parameters.getFactory();
         this.token0 = parameters.getToken0();
         this.token1 = parameters.getToken1();
