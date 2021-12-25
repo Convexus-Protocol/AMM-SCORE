@@ -1163,12 +1163,14 @@ public abstract class ConvexusPool {
         // Access control
         this.onlyFactoryOwner();
         
+        // Check user input for protocol fees
         Context.require(
             (feeProtocol0 == 0 || (feeProtocol0 >= 4 && feeProtocol0 <= 10)) &&
             (feeProtocol1 == 0 || (feeProtocol1 >= 4 && feeProtocol1 <= 10)),
             "setFeeProtocol: Bad fees amount"
         );
 
+        // OK
         Slot0 _slot0 = this.slot0.get();
         int feeProtocolOld = _slot0.feeProtocol;
         _slot0.feeProtocol = feeProtocol0 + (feeProtocol1 << 4);
@@ -1181,6 +1183,9 @@ public abstract class ConvexusPool {
 
     /**
      * @notice Collect the protocol fee accrued to the pool
+     * 
+     * Access control: Factory Owner
+     * 
      * @param recipient The address to which collected protocol fees should be sent
      * @param amount0Requested The maximum amount of token0 to send, can be 0 to collect fees in only token1
      * @param amount1Requested The maximum amount of token1 to send, can be 0 to collect fees in only token0
@@ -1194,8 +1199,11 @@ public abstract class ConvexusPool {
         BigInteger amount1Requested
     ) {
         this.poolLock.lock(true);
+
+        // Access control
         this.onlyFactoryOwner();
 
+        // OK
         var _protocolFees = protocolFees.get();
         final Address caller = Context.getCaller();
 
