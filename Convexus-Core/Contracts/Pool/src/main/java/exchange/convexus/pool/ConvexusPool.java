@@ -1147,6 +1147,9 @@ public abstract class ConvexusPool {
 
     /**
      * @notice Set the denominator of the protocol's % share of the fees
+     * 
+     * Access control: Factory Owner
+     * 
      * @param feeProtocol0 new protocol fee for token0 of the pool
      * @param feeProtocol1 new protocol fee for token1 of the pool
      */
@@ -1156,6 +1159,8 @@ public abstract class ConvexusPool {
         int feeProtocol1
     ) {
         this.poolLock.lock(true);
+
+        // Access control
         this.onlyFactoryOwner();
         
         Context.require(
