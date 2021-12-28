@@ -16,33 +16,19 @@
 
 package exchange.convexus.factory;
 
+import java.math.BigInteger;
+import java.util.Map;
+
 import score.Address;
 import score.ObjectReader;
 import score.ObjectWriter;
-import score.annotation.Keep;
 
 public class Parameters {
-    @Keep public Parameters() {}
-
-    private Address factory;
-    @Keep public void setFactory (Address factory) { this.factory = factory; }
-    @Keep public Address getFactory () { return this.factory; }
-
-    private Address token0;
-    @Keep public void setToken0 (Address token0) { this.token0 = token0; }
-    @Keep public Address getToken0 () { return this.token0; }
-
-    private Address token1;
-    @Keep public void setToken1 (Address token1) { this.token1 = token1; }
-    @Keep public Address getToken1 () { return this.token1; }
-
-    private Integer fee;
-    @Keep public void setFee (Integer fee) { this.fee = fee; }
-    @Keep public Integer getFee () { return this.fee; }
-
-    private Integer tickSpacing;
-    @Keep public void setTickSpacing (Integer tickSpacing) { this.tickSpacing = tickSpacing; }
-    @Keep public Integer getTickSpacing () { return this.tickSpacing; }
+    public Address factory;
+    public Address token0;
+    public Address token1;
+    public Integer fee;
+    public Integer tickSpacing;
 
     public static void writeObject(ObjectWriter w, Parameters obj) {
         w.write(obj.factory);
@@ -74,5 +60,17 @@ public class Parameters {
         this.token1 = token1;
         this.fee = fee;
         this.tickSpacing = tickSpacing;
+    }
+
+    public static Parameters fromMap (Object call) {
+        @SuppressWarnings("unchecked")
+        Map<String, Object> map = (Map<String, Object>) call;
+        return new Parameters (
+            (Address) map.get("factory"), 
+            (Address) map.get("token0"), 
+            (Address) map.get("token1"), 
+            ((BigInteger) map.get("fee")).intValue(),
+            ((BigInteger) map.get("tickSpacing")).intValue()
+        );
     }
 }

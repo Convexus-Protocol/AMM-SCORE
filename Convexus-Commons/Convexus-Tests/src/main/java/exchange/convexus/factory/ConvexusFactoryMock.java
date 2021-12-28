@@ -23,9 +23,7 @@ import score.annotation.External;
 
 public class ConvexusFactoryMock extends ConvexusFactory {
 
-  public ConvexusFactoryMock() {
-  }
-
+  public ConvexusFactoryMock() {}
   
   @Override
   @External
@@ -43,7 +41,7 @@ public class ConvexusFactoryMock extends ConvexusFactory {
       Address tokenA,
       Address tokenB,
       int fee,
-      // We don't really deploy it, pass it as an argument
+      // We don't really deploy it for unittests, pass it as an argument
       Address pool
   ) {
     Context.require(!tokenA.equals(tokenB),

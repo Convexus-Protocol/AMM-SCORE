@@ -25,8 +25,10 @@ public class ConvexusPoolFactored extends ConvexusPool {
     // ================================================
     /**
      *  @notice Contract constructor
+     * 
+     * @dev This constructor should be called from the Convexus Factory
      */
-    public ConvexusPoolFactored() {
-        super (Context.call(Parameters.class, Context.getCaller(), "parameters"));
+    public ConvexusPoolFactored () {
+        super (Parameters.fromMap(Context.call(Context.getCaller(), "parameters")));
     }
 }

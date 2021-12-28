@@ -27,7 +27,8 @@ import score.Address;
 import exchange.convexus.factory.ConvexusFactoryMock;
 import exchange.convexus.factory.ConvexusFactoryUtils;
 import exchange.convexus.utils.ConvexusTest;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ConvexusPoolInitializerUtils {
 
@@ -53,7 +54,7 @@ public class ConvexusPoolInitializerUtils {
       pool.invoke(from, "initialize", price);
       ConvexusFactoryUtils.createPool(factory, from, token0, token1, fee, pool.getAddress());
     } catch (Exception e) {
-      assertTrue(false);
+      assertEquals(e.getMessage(), "");
     }
   }
 

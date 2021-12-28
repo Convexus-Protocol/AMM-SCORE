@@ -297,14 +297,16 @@ abstract class ConvexusPool3 {
     // Methods
     // ================================================
     /**
-     *  @notice Contract constructor
+     * @notice Contract constructor
+     * @dev This contract should be not deployed, as this class is abstract anyway. 
+     * See {@code ConvexusPoolFactored} constructor for the actual pool deployed on the network
      */
-    public ConvexusPool3 (Parameters parameters) {
-        this.factory = parameters.getFactory();
-        this.token0 = parameters.getToken0();
-        this.token1 = parameters.getToken1();
-        this.fee = parameters.getFee();
-        this.tickSpacing = parameters.getTickSpacing();
+    protected ConvexusPool3 (Parameters parameters) {
+        this.factory = parameters.factory;
+        this.token0 = parameters.token0;
+        this.token1 = parameters.token1;
+        this.fee = parameters.fee;
+        this.tickSpacing = parameters.tickSpacing;
 
         this.maxLiquidityPerTick = Tick.tickSpacingToMaxLiquidityPerTick(this.tickSpacing);
         this.name = "Convexus Pool " + Context.call(this.token0, "symbol") + "/" + Context.call(this.token1, "symbol");
@@ -354,6 +356,9 @@ abstract class ConvexusPool3 {
     
     /**
      * @notice Returns a snapshot of the tick cumulative, seconds per liquidity and seconds inside a tick range
+     * 
+     * Access: Everyone
+     * 
      * @dev Snapshots must only be compared to other snapshots, taken over a period for which a position existed.
      * I.e., snapshots cannot be compared if a position is not held for the entire period between when the first
      * snapshot is taken and the second snapshot is taken.
@@ -419,6 +424,9 @@ abstract class ConvexusPool3 {
 
     /**
      * @notice Returns the cumulative tick and liquidity as of each timestamp `secondsAgo` from the current block timestamp
+     * 
+     * Access: Everyone
+     * 
      * @dev To get a time weighted average tick or liquidity-in-range, you must call this with two values, one representing
      * the beginning of the period and another for the end of the period. E.g., to get the last hour time-weighted average tick,
      * you must call it with secondsAgos = [3600, 0].
@@ -444,6 +452,9 @@ abstract class ConvexusPool3 {
 
     /**
      * @notice Increase the maximum number of price and liquidity observations that this pool will store
+     * 
+     * Access: Everyone
+     * 
      * @dev This method is no-op if the pool already has an observationCardinalityNext greater than or equal to
      * the input observationCardinalityNext.
      * @param observationCardinalityNext The desired minimum number of observations for the pool to store
@@ -468,6 +479,9 @@ abstract class ConvexusPool3 {
 
     /**
      * @notice Sets the initial price for the pool
+     * 
+     * Access: Everyone
+     * 
      * @dev Price is represented as a sqrt(amountToken1/amountToken0) Q64.96 value
      * @param sqrtPriceX96 the initial sqrt price of the pool as a Q64.96
      * @dev not locked because it initializes unlocked
@@ -666,6 +680,9 @@ abstract class ConvexusPool3 {
 
     /**
      * @notice Adds liquidity for the given recipient/tickLower/tickUpper position
+     * 
+     * Access: Everyone
+     * 
      * @dev The caller of this method receives a callback in the form of convexusMintCallback
      * in which they must pay any token0 or token1 owed for the liquidity. The amount of token0/token1 due depends
      * on tickLower, tickUpper, the amount of liquidity, and the current price.
@@ -734,6 +751,9 @@ abstract class ConvexusPool3 {
 
     /**
      * @notice Collects tokens owed to a position
+     * 
+     * Access: Everyone
+     * 
      * @dev Does not recompute fees earned, which must be done either via mint or burn of any amount of liquidity.
      * Collect must be called by the position owner. To withdraw only token0 or only token1, amount0Requested or
      * amount1Requested may be set to zero. To withdraw all tokens owed, caller may pass any value greater than the
@@ -791,6 +811,9 @@ abstract class ConvexusPool3 {
 
     /**
      * @notice Burn liquidity from the sender and account tokens owed for the liquidity to the position
+     * 
+     * Access: Everyone
+     * 
      * @dev Can be used to trigger a recalculation of fees owed to a position by calling with an amount of 0
      * @dev Fees must be collected separately via a call to #collect
      * @param tickLower The lower tick of the position for which to burn liquidity
@@ -834,6 +857,9 @@ abstract class ConvexusPool3 {
 
     /**
      * @notice Swap token0 for token1, or token1 for token0
+     * 
+     * Access: Everyone
+     * 
      * @dev The caller of this method receives a callback in the form of convexusSwapCallback
      * @param recipient The address to receive the output of the swap
      * @param zeroForOne The direction of the swap, true for token0 to token1, false for token1 to token0
@@ -1082,6 +1108,9 @@ abstract class ConvexusPool3 {
 
     /**
      * @notice Receive token0 and/or token1 and pay it back, plus a fee, in the callback
+     * 
+     * Access: Everyone
+     * 
      * @dev The caller of this method receives a callback in the form of convexusFlashCallback
      * @dev Can be used to donate underlying tokens pro-rata to currently in-range liquidity providers by calling
      * with 0 amount{0,1} and sending the donation amount(s) from the callback
@@ -1163,6 +1192,9 @@ abstract class ConvexusPool3 {
 
     /**
      * @notice Set the denominator of the protocol's % share of the fees
+     * 
+     * Access control: Factory Owner
+     * 
      * @param feeProtocol0 new protocol fee for token0 of the pool
      * @param feeProtocol1 new protocol fee for token1 of the pool
      */
@@ -1172,14 +1204,18 @@ abstract class ConvexusPool3 {
         int feeProtocol1
     ) {
         this.poolLock.lock(true);
+
+        // Access control
         this.onlyFactoryOwner();
         
+        // Check user input for protocol fees
         Context.require(
             (feeProtocol0 == 0 || (feeProtocol0 >= 4 && feeProtocol0 <= 10)) &&
             (feeProtocol1 == 0 || (feeProtocol1 >= 4 && feeProtocol1 <= 10)),
             "setFeeProtocol: Bad fees amount"
         );
 
+        // OK
         Slot0 _slot0 = this.slot0.get();
         int feeProtocolOld = _slot0.feeProtocol;
         _slot0.feeProtocol = feeProtocol0 + (feeProtocol1 << 4);
@@ -1192,6 +1228,9 @@ abstract class ConvexusPool3 {
 
     /**
      * @notice Collect the protocol fee accrued to the pool
+     * 
+     * Access control: Factory Owner
+     * 
      * @param recipient The address to which collected protocol fees should be sent
      * @param amount0Requested The maximum amount of token0 to send, can be 0 to collect fees in only token1
      * @param amount1Requested The maximum amount of token1 to send, can be 0 to collect fees in only token0
@@ -1205,8 +1244,11 @@ abstract class ConvexusPool3 {
         BigInteger amount1Requested
     ) {
         this.poolLock.lock(true);
+
+        // Access control
         this.onlyFactoryOwner();
 
+        // OK
         var _protocolFees = protocolFees.get();
         final Address caller = Context.getCaller();
 
