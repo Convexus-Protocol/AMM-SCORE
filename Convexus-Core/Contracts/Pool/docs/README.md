@@ -47,7 +47,7 @@ Below is the entire process flow for swapping a fixed amount of `token0` to a Co
 
 The `SwapRouter` contract should handle the tokens deposits and withdrawals from all EOA addresses. 
 
-For a simple token swap, we recommand using the `exactInputSingle` method from the `SwapRouter` contract.  See [SwapRouter::exactInputSingle](/Convexus-Periphery/Contracts/SwapRouter/docs/README.md#swaprouterexactinputsingle) for more information.
+For a simple token swap, we recommand using the `exactInputSingle` method from the `SwapRouter` contract.  See [SwapRouter::exactInputSingle](/Convexus-Periphery/Contracts/SwapRouter/docs/README.md#-swaprouterexactinputsingle) for more information.
 
 ## **Step 2: Request a swap**
 
@@ -96,4 +96,4 @@ public PairAmounts swap (
 
 ## **Step 3: The `convexusSwapCallback` callback**
 
-Once the swap has been performed, the `convexusSwapCallback` must fulfill all requirements from the ConvexusPool. See [SwapRouter::convexusSwapCallback](/Convexus-Periphery/Contracts/SwapRouter/docs/README.md#swaprouterconvexusswapcallback) for more information.
+Once the swap has been performed, the `convexusSwapCallback` must fulfill all requirements from the ConvexusPool. See [SwapRouter::convexusSwapCallback](/Convexus-Periphery/Contracts/SwapRouter/docs/README.md#-swaprouterconvexusswapcallback) for more information.
