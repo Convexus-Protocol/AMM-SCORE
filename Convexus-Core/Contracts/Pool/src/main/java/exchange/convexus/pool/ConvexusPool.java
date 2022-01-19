@@ -22,6 +22,10 @@ import static java.math.BigInteger.ZERO;
 
 import java.math.BigInteger;
 
+import com.eclipsesource.json.Json;
+import com.eclipsesource.json.JsonObject;
+import com.eclipsesource.json.JsonValue;
+
 import exchange.convexus.factory.Parameters;
 import exchange.convexus.librairies.FixedPoint128;
 import exchange.convexus.librairies.FullMath;
@@ -44,6 +48,8 @@ import score.VarDB;
 import score.annotation.EventLog;
 import score.annotation.External;
 import score.annotation.Optional;
+import scorex.io.Reader;
+import scorex.io.StringReader;
 
 public abstract class ConvexusPool {
 
@@ -1267,7 +1273,26 @@ public abstract class ConvexusPool {
 
     @External
     public void tokenFallback (Address _from, BigInteger _value, @Optional byte[] _data) throws Exception {
+        Reader reader = new StringReader(new String(_data));
+        JsonValue input = Json.parse(reader);
+        JsonObject root = input.asObject();
+        String method = root.get("method").asString();
+        Address token = Context.getCaller();
+
         Context.require(_from.isContract(), "tokenFallback: Pool shouldn't need to receive funds from EOA");
+
+        switch (method)
+        {
+            case "pay": {
+                // Accept the incoming token transfer only for the pool tokens
+                Context.require(token.equals(this.token0) || token.equals(this.token1), 
+                    "tokenFallback::pay: Invalid token received");
+                break;
+            }
+
+            default:
+                Context.revert("tokenFallback: Unimplemented tokenFallback action");
+        }
     }
 
     // ================================================
