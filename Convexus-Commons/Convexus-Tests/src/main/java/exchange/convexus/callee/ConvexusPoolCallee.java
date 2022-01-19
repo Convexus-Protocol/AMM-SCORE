@@ -25,6 +25,7 @@ import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
 
 import exchange.convexus.utils.IntUtils;
+import exchange.convexus.utils.StringUtils;
 import score.Address;
 import score.BranchDB;
 import score.ByteArrayObjectWriter;
@@ -37,13 +38,13 @@ import score.annotation.Optional;
 import scorex.io.Reader;
 import scorex.io.StringReader;
 
-public class ConvexusCallee {
-  
-    // ================================================
-    // Consts
-    // ================================================
-    // Contract class name
-    private static final String NAME = "ConvexusCallee";
+public class ConvexusPoolCallee {
+
+  // ================================================
+  // Consts
+  // ================================================
+  // Contract class name
+  private static final String NAME = "ConvexusPoolCallee";
 
   // ================================================
   // DB Variables
@@ -162,6 +163,45 @@ public class ConvexusCallee {
         break;
       }
 
+      case "swapExact0For1":
+      case "swap1ForExact0":
+      case "swap0ForExact1":
+      case "swapExact1For0":
+      {
+        deposit(_from, token, _value);
+        
+        JsonObject params = root.get("params").asObject();
+        Address pool = Address.fromString(params.get("pool").asString());
+        Address recipient = Address.fromString(params.get("recipient").asString());
+        BigInteger amount = _value;
+        BigInteger sqrtPriceLimitX96 = StringUtils.toBigInt(params.get("sqrtPriceLimitX96").asString());
+
+        switch (method) {
+          case "swapExact0For1": swapExact0For1(pool, amount, recipient, sqrtPriceLimitX96, _from.toByteArray()); break;
+          case "swap1ForExact0": swap1ForExact0(pool, amount, recipient, sqrtPriceLimitX96, _from.toByteArray()); break;
+          case "swap0ForExact1": swap0ForExact1(pool, amount, recipient, sqrtPriceLimitX96, _from.toByteArray()); break; 
+          case "swapExact1For0": swapExact1For0(pool, amount, recipient, sqrtPriceLimitX96, _from.toByteArray()); break;
+        }
+        break;
+      }
+
+      case "swapToLowerSqrtPrice":
+      case "swapToHigherSqrtPrice":
+      {
+        deposit(_from, token, _value);
+        
+        JsonObject params = root.get("params").asObject();
+        Address pool = Address.fromString(params.get("pool").asString());
+        Address recipient = Address.fromString(params.get("recipient").asString());
+        BigInteger sqrtPriceX96 = StringUtils.toBigInt(params.get("sqrtPriceX96").asString());
+
+        switch (method) {
+          case "swapToLowerSqrtPrice":  swapToLowerSqrtPrice (pool, sqrtPriceX96, recipient, _from.toByteArray()); break;
+          case "swapToHigherSqrtPrice": swapToHigherSqrtPrice(pool, sqrtPriceX96, recipient, _from.toByteArray()); break;
+        }
+        break;
+      }
+
       default:
         Context.revert("tokenFallback: Unimplemented tokenFallback action");
     }
@@ -212,34 +252,28 @@ public class ConvexusCallee {
     }
   }
 
-  @External
-  public void swapExact0For1 (Address pool, BigInteger amount0In, Address recipient, BigInteger sqrtPriceLimitX96) {
-    Context.call(pool, "swap", recipient, true, amount0In, sqrtPriceLimitX96, Context.getCaller().toByteArray());
+  private void swapExact0For1 (Address pool, BigInteger amount0In, Address recipient, BigInteger sqrtPriceLimitX96, byte[] data) {
+    Context.call(pool, "swap", recipient, true, amount0In, sqrtPriceLimitX96, data);
   }
 
-  @External
-  public void swap1ForExact0 (Address pool, BigInteger amount0Out, Address recipient, BigInteger sqrtPriceLimitX96) {
-    Context.call(pool, "swap", recipient, false, amount0Out.negate(), sqrtPriceLimitX96, Context.getCaller().toByteArray());
+  private void swap1ForExact0 (Address pool, BigInteger amount0Out, Address recipient, BigInteger sqrtPriceLimitX96, byte[] data) {
+    Context.call(pool, "swap", recipient, false, amount0Out.negate(), sqrtPriceLimitX96, data);
   }
 
-  @External
-  public void swap0ForExact1 (Address pool, BigInteger amount1Out, Address recipient, BigInteger sqrtPriceLimitX96) {
-    Context.call(pool, "swap", recipient, true, amount1Out.negate(), sqrtPriceLimitX96, Context.getCaller().toByteArray());
+  private void swap0ForExact1 (Address pool, BigInteger amount1Out, Address recipient, BigInteger sqrtPriceLimitX96, byte[] data) {
+    Context.call(pool, "swap", recipient, true, amount1Out.negate(), sqrtPriceLimitX96, data);
   }
 
-  @External
-  public void swapExact1For0 (Address pool, BigInteger amount1In, Address recipient, BigInteger sqrtPriceLimitX96) {
-    Context.call(pool, "swap", recipient, false, amount1In, sqrtPriceLimitX96, Context.getCaller().toByteArray());
+  private void swapExact1For0 (Address pool, BigInteger amount1In, Address recipient, BigInteger sqrtPriceLimitX96, byte[] data) {
+    Context.call(pool, "swap", recipient, false, amount1In, sqrtPriceLimitX96, data);
   }
 
-  @External
-  public void swapToLowerSqrtPrice (Address pool, BigInteger sqrtPriceX96, Address recipient) {
-    Context.call(pool, "swap", recipient, true, IntUtils.MAX_INT256, sqrtPriceX96, Context.getCaller().toByteArray());
+  private void swapToLowerSqrtPrice (Address pool, BigInteger sqrtPriceX96, Address recipient, byte[] data) {
+    Context.call(pool, "swap", recipient, true, IntUtils.MAX_INT256, sqrtPriceX96, data);
   }
 
-  @External
-  public void swapToHigherSqrtPrice (Address pool, BigInteger sqrtPriceX96, Address recipient) {
-    Context.call(pool, "swap", recipient, false, IntUtils.MAX_INT256, sqrtPriceX96, Context.getCaller().toByteArray());
+  private void swapToHigherSqrtPrice (Address pool, BigInteger sqrtPriceX96, Address recipient, byte[] data) {
+    Context.call(pool, "swap", recipient, false, IntUtils.MAX_INT256, sqrtPriceX96, data);
   }
 
   @External(readonly = true)
@@ -253,7 +287,7 @@ public class ConvexusCallee {
   private void checkEnoughDeposited (Address address, Address token, BigInteger amount) {
     var depositedUser = this.deposited.at(address);
     BigInteger userBalance = depositedUser.getOrDefault(token, ZERO);
-    Context.println("[Callee][checkEnoughDeposited][" + Context.call(token, "symbol") + "] " + userBalance + " / " + amount);
+    Context.println("[Callee][checkEnoughDeposited][" + Context.call(token, "symbol") + "]["+address+"] " + userBalance + " / " + amount);
     Context.require(userBalance.compareTo(amount) >= 0,
         // "checkEnoughDeposited: user didn't deposit enough funds - " + userBalance + "/" + amount);
         "checkEnoughDeposited: user didn't deposit enough funds");

@@ -157,7 +157,6 @@ public class ConvexusLiquidityManagement {
     /**
      * @notice Add funds to the liquidity manager
      */
-    // @External - this method is external through tokenFallback
     public void deposit (Address caller, Address tokenIn, BigInteger amountIn) {
         // --- Checks ---
         Context.require(amountIn.compareTo(ZERO) > 0, 
@@ -173,7 +172,6 @@ public class ConvexusLiquidityManagement {
     /**
      * @notice Remove funds from the liquidity manager
      */
-    // @External
     public void withdraw (Address token) {
         final Address caller = Context.getCaller();
 
@@ -200,8 +198,7 @@ public class ConvexusLiquidityManagement {
     // ================================================
     // Public variable getters
     // ================================================
-    // @External(readonly = true)
-    public BigInteger deposited(Address user, Address token) {
+    public BigInteger deposited (Address user, Address token) {
         return this.deposited.at(user).get(token);
     }
 }

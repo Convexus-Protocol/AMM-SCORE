@@ -43,7 +43,7 @@ import exchange.convexus.testtokens.Baln;
 import exchange.convexus.testtokens.RewardToken;
 import exchange.convexus.testtokens.Sicx;
 import exchange.convexus.testtokens.Usdc;
-import exchange.convexus.callee.ConvexusCallee;
+import exchange.convexus.callee.ConvexusPoolCallee;
 
 import static org.mockito.Mockito.spy;
 
@@ -247,11 +247,11 @@ public class ConvexusTest extends TestBase {
         return new ScoreSpy<RewardToken>(score, spy);
     }
     
-    public ScoreSpy<ConvexusCallee> deploy_callee () throws Exception {
-        Score score = sm.deploy(owner, ConvexusCallee.class);
-        var spy = (ConvexusCallee) spy(score.getInstance());
+    public ScoreSpy<ConvexusPoolCallee> deploy_callee () throws Exception {
+        Score score = sm.deploy(owner, ConvexusPoolCallee.class);
+        var spy = (ConvexusPoolCallee) spy(score.getInstance());
         score.setInstance(spy);
-        return new ScoreSpy<ConvexusCallee>(score, spy);
+        return new ScoreSpy<ConvexusPoolCallee>(score, spy);
     }
     
     public ScoreSpy<ConvexusReentrantCallee> deploy_reentrant_callee () throws Exception {

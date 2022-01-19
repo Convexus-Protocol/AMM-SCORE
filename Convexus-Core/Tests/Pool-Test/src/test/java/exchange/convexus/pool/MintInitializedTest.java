@@ -608,10 +608,7 @@ public class MintInitializedTest extends ConvexusPoolTest {
     ConvexusLiquidityUtils.deposit(alice, callee.getAddress(), usdc.score, new BigInteger("316227766016837934"));
     callee.invoke(alice, "mint", pool.getAddress(), alice.getAddress(), minTick + tickSpacing, maxTick - tickSpacing, TEN.pow(18));
 
-    ConvexusLiquidityUtils.deposit(alice, callee.getAddress(), sicx.score, new BigInteger("100000000000000000"));
     swapExact0For1(TEN.pow(18).divide(TEN), alice);
-    
-    ConvexusLiquidityUtils.deposit(alice, callee.getAddress(), usdc.score, new BigInteger("10000000000000000"));
     swapExact1For0(TEN.pow(18).divide(HUNDRED), alice);
 
     var fees = ProtocolFees.fromMap(pool.call("protocolFees"));
@@ -626,10 +623,7 @@ public class MintInitializedTest extends ConvexusPoolTest {
     ConvexusLiquidityUtils.deposit(alice, callee.getAddress(), usdc.score, new BigInteger("316227766016837934"));
     callee.invoke(alice, "mint", pool.getAddress(), alice.getAddress(), minTick + tickSpacing, maxTick - tickSpacing, TEN.pow(18));
     
-    ConvexusLiquidityUtils.deposit(alice, callee.getAddress(), sicx.score, new BigInteger("100000000000000000"));
     swapExact0For1(TEN.pow(18).divide(TEN), alice);
-    
-    ConvexusLiquidityUtils.deposit(alice, callee.getAddress(), usdc.score, new BigInteger("10000000000000000"));
     swapExact1For0(TEN.pow(18).divide(HUNDRED), alice);
     
     var fees = ProtocolFees.fromMap(pool.call("protocolFees"));
@@ -649,10 +643,7 @@ public class MintInitializedTest extends ConvexusPoolTest {
     ConvexusLiquidityUtils.deposit(bob, callee.getAddress(), usdc.score, new BigInteger("316227766016837934"));
     callee.invoke(bob, "mint", pool.getAddress(), bob.getAddress(), minTick + tickSpacing, maxTick - tickSpacing, TEN.pow(18));
     
-    ConvexusLiquidityUtils.deposit(alice, callee.getAddress(), sicx.score, new BigInteger("100000000000000000"));
     swapExact0For1(TEN.pow(18).divide(TEN), alice);
-    
-    ConvexusLiquidityUtils.deposit(alice, callee.getAddress(), usdc.score, new BigInteger("10000000000000000"));
     swapExact1For0(TEN.pow(18).divide(HUNDRED), alice);
 
     AssertUtils.assertThrowsMessage(AssertionError.class, () ->
@@ -667,10 +658,7 @@ public class MintInitializedTest extends ConvexusPoolTest {
     ConvexusLiquidityUtils.deposit(bob, callee.getAddress(), usdc.score, new BigInteger("316227766016837934"));
     callee.invoke(bob, "mint", pool.getAddress(), bob.getAddress(), minTick + tickSpacing, maxTick - tickSpacing, TEN.pow(18));
     
-    ConvexusLiquidityUtils.deposit(alice, callee.getAddress(), sicx.score, new BigInteger("100000000000000000"));
     swapExact0For1(TEN.pow(18).divide(TEN), alice);
-    
-    ConvexusLiquidityUtils.deposit(alice, callee.getAddress(), usdc.score, new BigInteger("10000000000000000"));
     swapExact1For0(TEN.pow(18).divide(HUNDRED), alice);
 
     ConvexusLiquidityUtils.deposit(alice, callee.getAddress(), sicx.score, new BigInteger("4"));

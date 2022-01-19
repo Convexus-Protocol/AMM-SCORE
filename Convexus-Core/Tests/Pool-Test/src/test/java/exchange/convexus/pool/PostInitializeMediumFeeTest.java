@@ -111,7 +111,6 @@ public class PostInitializeMediumFeeTest extends ConvexusPoolTest {
     assertEquals(TEN.pow(18).multiply(THREE), kAfter);
     
     // swap toward the left (just enough for the tick transition function to trigger)
-    ConvexusLiquidityUtils.deposit(alice, callee.getAddress(), sicx.score, new BigInteger("1"));
     swapExact0For1(ONE, alice);
     var slot0 = Slot0.fromMap(pool.call("slot0"));
     assertEquals(-1, slot0.tick);
@@ -140,7 +139,6 @@ public class PostInitializeMediumFeeTest extends ConvexusPoolTest {
     assertEquals(kBefore, kAfter);
     
     // swap toward the left (just enough for the tick transition function to trigger)
-    ConvexusLiquidityUtils.deposit(alice, callee.getAddress(), sicx.score, new BigInteger("1"));
     swapExact0For1(ONE, alice);
     var slot0 = Slot0.fromMap(pool.call("slot0"));
     assertEquals(-1, slot0.tick);

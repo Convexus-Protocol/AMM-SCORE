@@ -30,12 +30,14 @@ import static org.mockito.Mockito.verify;
 
 import java.math.BigInteger;
 
+import com.eclipsesource.json.Json;
+import com.eclipsesource.json.JsonObject;
 import com.iconloop.score.test.Account;
 import com.iconloop.score.test.Score;
 
 import org.mockito.ArgumentCaptor;
 
-import exchange.convexus.callee.ConvexusCallee;
+import exchange.convexus.callee.ConvexusPoolCallee;
 import exchange.convexus.factory.ConvexusFactoryMock;
 import exchange.convexus.librairies.Position;
 import exchange.convexus.librairies.Positions;
@@ -54,7 +56,7 @@ public class ConvexusPoolTest extends ConvexusTest {
   ScoreSpy<ConvexusFactoryMock> factory;
   ScoreSpy<Sicx> sicx;
   ScoreSpy<Usdc> usdc;
-  ScoreSpy<ConvexusCallee> callee;
+  ScoreSpy<ConvexusPoolCallee> callee;
   ScoreSpy<ConvexusReentrantCallee> reentrantCallee;
   ScoreSpy<ConvexusSwapPay> underpay;
 
@@ -87,6 +89,36 @@ public class ConvexusPoolTest extends ConvexusTest {
     assertEquals(expected.secondsPerLiquidityCumulativeX128, actual.secondsPerLiquidityCumulativeX128);
   }
 
+  protected void callSwap (
+    Account from, 
+    String method, 
+    Address pool, 
+    Address callee, 
+    Score token, 
+    BigInteger _value, 
+    Address recipient, 
+    BigInteger sqrtPriceLimitX96
+  ) {
+    var params = Json.object()
+      .add("pool", pool.toString())
+      .add("recipient", recipient.toString())
+      .add("sqrtPriceLimitX96", sqrtPriceLimitX96.toString());
+
+    JsonObject data = Json.object()
+      .add("method", method)
+      .add("params", params);
+
+    byte[] dataBytes = data.toString().getBytes();
+
+    token.invoke(
+      from, 
+      "transfer", 
+      callee, 
+      _value, 
+      dataBytes
+    );
+  }
+
   protected void swap (
     Account from,
     Score inputToken,
@@ -113,8 +145,16 @@ public class ConvexusPoolTest extends ConvexusTest {
       }
     }
 
-    ConvexusLiquidityUtils.deposit(from, callee.getAddress(), inputToken, IntUtils.MAX_UINT160);
-    callee.invoke(from, method, pool.getAddress(), exactInput ? amountIn : amountOut, from.getAddress(), sqrtPriceLimitX96);
+    callSwap (
+      from,
+      method,
+      pool.getAddress(), 
+      callee.getAddress(), 
+      inputToken, 
+      exactInput ? amountIn : amountOut, 
+      from.getAddress(), 
+      sqrtPriceLimitX96
+    );
   }
   
   protected void swapExact0For1 (BigInteger amount, Account caller, BigInteger sqrtPriceLimitX96) {
@@ -153,14 +193,41 @@ public class ConvexusPoolTest extends ConvexusTest {
     swapToSqrtPrice(caller, usdc.score, sqrtPriceX96, caller.getAddress(), new BigInteger(tokenAmount));
   }
 
+  protected void callSwapToSqrtPrice (
+    Account from, 
+    String method, 
+    Address pool, 
+    Address callee, 
+    Score token, 
+    BigInteger _value, 
+    Address recipient, 
+    BigInteger sqrtPriceX96
+  ) {
+    var params = Json.object()
+      .add("pool", pool.toString())
+      .add("recipient", recipient.toString())
+      .add("sqrtPriceX96", sqrtPriceX96.toString());
+
+    JsonObject data = Json.object()
+      .add("method", method)
+      .add("params", params);
+
+    byte[] dataBytes = data.toString().getBytes();
+
+    token.invoke(
+      from, 
+      "transfer", 
+      callee, 
+      _value, 
+      dataBytes
+    );
+  }
+
   private void swapToSqrtPrice(Account caller, Score tokenScore, BigInteger targetPrice, Address to, BigInteger tokenAmount) {
-    if (tokenAmount.compareTo(ZERO) > 0) {
-      ConvexusLiquidityUtils.deposit(caller, callee.getAddress(), tokenScore, tokenAmount);
-    }
     if (tokenScore.getAddress().equals(sicx.getAddress())) {
-      callee.invoke(caller, "swapToLowerSqrtPrice", pool.getAddress(), targetPrice, to);
+      callSwapToSqrtPrice(caller, "swapToLowerSqrtPrice", pool.getAddress(), callee.getAddress(), tokenScore, tokenAmount, to, targetPrice);
     } else {
-      callee.invoke(caller, "swapToHigherSqrtPrice", pool.getAddress(), targetPrice, to);
+      callSwapToSqrtPrice(caller, "swapToHigherSqrtPrice", pool.getAddress(), callee.getAddress(), tokenScore, tokenAmount, to, targetPrice);
     }
   }
 

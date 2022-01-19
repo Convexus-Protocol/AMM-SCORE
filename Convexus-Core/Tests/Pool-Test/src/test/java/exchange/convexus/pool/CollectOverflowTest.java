@@ -66,7 +66,7 @@ public class CollectOverflowTest extends ConvexusPoolTest {
 
   @Test
   void testToken0 () {
-    swapExact0For1(expandTo18Decimals(1), alice);
+    swapExact0For1(expandTo18Decimals(1), alice, encodePriceSqrt(ONE, BigInteger.TWO));
     burn(minTick, maxTick, ZERO);
 
     reset(pool.spy);

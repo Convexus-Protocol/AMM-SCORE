@@ -87,10 +87,7 @@ public class BurnTest extends ConvexusPoolTest {
       ConvexusLiquidityUtils.deposit(bob, callee.getAddress(), usdc.score, new BigInteger("1000000000000000000"));
       callee.invoke(bob, "mint", pool.getAddress(), bob.getAddress(), minTick, maxTick, TEN.pow(18));
       
-      ConvexusLiquidityUtils.deposit(alice, callee.getAddress(), sicx.score, new BigInteger("1000000000000000000"));
       swapExact0For1(TEN.pow(18), alice);
-      
-      ConvexusLiquidityUtils.deposit(alice, callee.getAddress(), usdc.score, new BigInteger("1000000000000000000"));
       swapExact1For0(TEN.pow(18), alice);
 
       pool.invoke(bob, "burn", minTick, maxTick, TEN.pow(18));
@@ -112,7 +109,6 @@ public class BurnTest extends ConvexusPoolTest {
     ConvexusLiquidityUtils.deposit(alice, callee.getAddress(), usdc.score, new BigInteger("1"));
     callee.invoke(alice, "mint", pool.getAddress(), alice.getAddress(), tickLower, tickUpper, ONE);
     
-    ConvexusLiquidityUtils.deposit(alice, callee.getAddress(), sicx.score, new BigInteger("1000000000000000000"));
     swapExact0For1(TEN.pow(18), alice);
     
     pool.invoke(alice, "burn", tickLower, tickUpper, ONE);
@@ -136,7 +132,6 @@ public class BurnTest extends ConvexusPoolTest {
     ConvexusLiquidityUtils.deposit(alice, callee.getAddress(), usdc.score, new BigInteger("1"));
     callee.invoke(alice, "mint", pool.getAddress(), alice.getAddress(), tickLower + tickSpacing, tickUpper, ONE);
     
-    ConvexusLiquidityUtils.deposit(alice, callee.getAddress(), sicx.score, new BigInteger("1000000000000000000"));
     swapExact0For1(TEN.pow(18), alice);
     
     pool.invoke(alice, "burn", tickLower, tickUpper, ONE);
@@ -160,7 +155,6 @@ public class BurnTest extends ConvexusPoolTest {
     ConvexusLiquidityUtils.deposit(alice, callee.getAddress(), usdc.score, new BigInteger("1"));
     callee.invoke(alice, "mint", pool.getAddress(), alice.getAddress(), tickLower, tickUpper - tickSpacing, ONE);
     
-    ConvexusLiquidityUtils.deposit(alice, callee.getAddress(), sicx.score, new BigInteger("1000000000000000000"));
     swapExact0For1(TEN.pow(18), alice);
     
     pool.invoke(alice, "burn", tickLower, tickUpper, ONE);

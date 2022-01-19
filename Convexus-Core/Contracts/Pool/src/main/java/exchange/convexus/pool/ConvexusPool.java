@@ -877,7 +877,7 @@ public abstract class ConvexusPool {
         
         Slot0 slot0Start = this.slot0.get();
 
-        Context.require(
+        Context.require (
             zeroForOne
                 ? sqrtPriceLimitX96.compareTo(slot0Start.sqrtPriceX96) < 0 && sqrtPriceLimitX96.compareTo(TickMath.MIN_SQRT_RATIO) > 0
                 : sqrtPriceLimitX96.compareTo(slot0Start.sqrtPriceX96) > 0 && sqrtPriceLimitX96.compareTo(TickMath.MAX_SQRT_RATIO) < 0,

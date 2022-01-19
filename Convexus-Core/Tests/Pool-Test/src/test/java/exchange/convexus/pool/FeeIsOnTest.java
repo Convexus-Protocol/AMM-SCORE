@@ -70,7 +70,6 @@ public class FeeIsOnTest extends ConvexusPoolTest {
     verify(sicx.spy).Transfer(callee.getAddress(), pool.getAddress(), new BigInteger ("5981737760509663"), "{\"method\": \"pay\"}".getBytes());
 
     // somebody takes the limit order
-    ConvexusLiquidityUtils.deposit(bob, callee.getAddress(), usdc.score, new BigInteger("2000000000000000000"));
     swapExact1For0(expandTo18Decimals(2), bob);
     reset(pool.spy);
 
@@ -105,7 +104,6 @@ public class FeeIsOnTest extends ConvexusPoolTest {
     verify(usdc.spy).Transfer(callee.getAddress(), pool.getAddress(), new BigInteger("5981737760509663"), "{\"method\": \"pay\"}".getBytes());
 
     // somebody takes the limit order
-    ConvexusLiquidityUtils.deposit(bob, callee.getAddress(), sicx.score, new BigInteger("2000000000000000000"));
     swapExact0For1(TEN.pow(18).multiply(TWO), bob);
 
     reset(sicx.spy);
