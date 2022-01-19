@@ -6,7 +6,7 @@
 
 - Given two amounts of tokens, the simple answer is : 
 
-> `sqrt(amount1 / amount2) * 2**96`
+> `sqrt(amount1 / amount0) * 2**96`
 
 - Please note that both division and square root  operations **needs** at least 128 bits decimal precision. So please use appropriate librairies supporting such precision, such as [jsbi](https://github.com/GoogleChromeLabs/jsbi).
 
@@ -24,7 +24,7 @@ const TWO = JSBI.BigInt(2)
  * Computes floor(sqrt(value))
  * @param value the value for which to compute the square root, rounded down
  */
-export function sqrt(value: JSBI): JSBI {
+function sqrt(value) {
   invariant(JSBI.greaterThanOrEqual(value, ZERO), 'NEGATIVE')
 
   // rely on built in sqrt if possible
@@ -32,10 +32,8 @@ export function sqrt(value: JSBI): JSBI {
     return JSBI.BigInt(Math.floor(Math.sqrt(JSBI.toNumber(value))))
   }
 
-  let z: JSBI
-  let x: JSBI
-  z = value
-  x = JSBI.add(JSBI.divide(value, TWO), ONE)
+  let z = value
+  let x = JSBI.add(JSBI.divide(value, TWO), ONE)
   while (JSBI.lessThan(x, z)) {
     z = x
     x = JSBI.divide(JSBI.add(JSBI.divide(value, x), x), TWO)
@@ -50,10 +48,13 @@ export function sqrt(value: JSBI): JSBI {
  * @returns The sqrt ratio
  */
 
-export function encodeSqrtRatioX96(amount1: JSBI , amount0: JSBI ): JSBI {
+export function encodePriceSqrt(amount1, amount0) {
   const numerator = JSBI.leftShift(JSBI.BigInt(amount1), JSBI.BigInt(192))
   const denominator = JSBI.BigInt(amount0)
   const ratioX192 = JSBI.divide(numerator, denominator)
   return sqrt(ratioX192)
 }
+
+console.assert(String(encodePriceSqrt(1, 1))  == "79228162514264337593543950336")
+console.assert(String(encodePriceSqrt(1, 10)) == "25054144837504793118641380156")
 ```
