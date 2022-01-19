@@ -463,7 +463,7 @@ public abstract class ConvexusPool {
     }
 
     /**
-     * @notice Sets the initial price for the pool
+     * Sets the initial price for the pool
      * 
      * Access: Everyone
      * 
@@ -477,7 +477,7 @@ public abstract class ConvexusPool {
             "initialize: this pool is already initialized");
 
         int tick = TickMath.getTickAtSqrtRatio(sqrtPriceX96);
-        
+
         var result = observations.initialize(_blockTimestamp());
 
         this.slot0.set(new Slot0(
