@@ -10,7 +10,7 @@
 
 - Sets the initial price for the pool
 - Access: Everyone
-- Price is represented as a sqrt(amountToken1/amountToken0) [Q64.96 value](../../../Convexus-Commons/Librairies/README.md#how-to-encode-a-Q64-96-price)
+- Price is represented as a sqrt(amountToken1/amountToken0) [Q64.96 value](../../../Convexus-Commons/Librairies/README.md#how-to-encode-a-q6496-price)
 
 ```java
 @External
