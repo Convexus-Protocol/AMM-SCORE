@@ -31,6 +31,12 @@ Token0 -> SwapRouter : **tokenFallback** ( \n\
   } \n\
 )
 
+SwapRouter -> ConvexusFactory : **getPool** ( \n\
+  "token0": token0, \n\
+  "token1": token1, \n\
+  "fee": fee, \n\
+)
+
 ' The SwapRouter contract performs the swap method
 SwapRouter -> ConvexusPool : **swap** ( \n\
   recipient, \n\
