@@ -1,63 +1,87 @@
 # Convexus SwapRouter Contract Documentation
 
+The `SwapRouter` is the contract doing all verifications in terms of amounts or slippage and handle the swap callback which is responsible to verify the authenticity of the pool. The SwapRouter can manage multiroute swaps.
 
 # **Tokens Swap**
 
-A Convexus Router is able to swap two tokens by calling the Convexus Pool `swap` method. It supports multiple ways of swapping tokens, depending of the user needs:
+The `SwapRouter` is able to swap two tokens thanks to the [ConvexusPool `swap`](/Convexus-Core/Contracts/Pool/docs/README.md#convexuspoolswap) method. It supports multiple ways of swapping tokens, depending of the user needs:
 
 - `exactInputSingle`: Swaps `amountIn` of one token for as much as possible of another token
 - `exactInput`: Swaps `amountIn` of one token for as much as possible of another along the specified path
 - `exactOutputSingle`: Swaps as little as possible of one token for `amountOut` of another token
 - `exactOutput`: Swaps as little as possible of one token for `amountOut` of another along the specified path (reversed)
 
-Below is the entire process flow for swapping a fixed amount of `token0` to a Convexus Pool, using the `exactInputSingle` method from a Convexus Swap Router
+Below is the entire process flow for swapping a fixed amount of `token0` to a Convexus Pool, using the `exactInputSingle` method from a Convexus Swap Router. The process flow is the same for `exactInput`, `exactOutputSingle` and `exactOutput`.
+
+
+> ⚠️ If you need more detailed information about the token swap process in the core layer, see [here](/Convexus-Core/Contracts/Pool/docs/README.md#tokens-swap).
+
 
 ![exactInputSingle](./uml/exactInputSingle.svg)
 
+## `SwapRouter::ExactInputSingleParams`
 
-## 📜 `SwapRouter::exactInputSingle`
-
-<!-- TODO -->
-
-
-## 📜 `SwapRouter::convexusSwapCallback`
-
-After calling a `ConvexusPool::swap` method, the Pool will send the computed amount of tokens to the recipient address. After doing so, it will be waiting for the correct amount of input tokens. In the `convexusSwapCallback` implementation, you must pay the pool tokens owed for the swap, or the transaction will revert.
-
-The caller of this method must be checked to be a `ConvexusPool` deployed by the canonical `ConvexusFactory`. `amount0Delta` and `amount1Delta` can both be 0 if no tokens were swapped.
-
-## Method Call
-
-- Called to `msg.sender` after executing a swap via `ConvexusPool::swap`.
-- Access: Everyone
-- In the implementation you must pay the pool tokens owed for the swap.
-- The caller of this method must be checked to be a ConvexusPool deployed by the canonical ConvexusFactory. 
-- `amount0Delta` and `amount1Delta` can both be 0 if no tokens were swapped.
-
+### ⚙️ Structure definition
 
 ```java
-@External
-public void convexusSwapCallback (
-    BigInteger amount0Delta,
-    BigInteger amount1Delta,
-    byte[] data
+class ExactInputSingleParams {
+  // The token expected as output
+  Address tokenOut;
+  // The pool fee
+  int fee;
+  // The recipient address
+  Address recipient;
+  // The timestamp deadline, in seconds
+  BigInteger deadline;
+  // The minimum amount of token in output
+  BigInteger amountOutMinimum;
+  // The Q64.96 sqrt price limit
+  BigInteger sqrtPriceLimitX96;
+}
+```
+
+## `SwapRouter::exactInputSingle`
+
+### 📜 Method Call
+
+```java
+// @External - this method is external through tokenFallback
+private void exactInputSingle (
+    Address caller, 
+    Address tokenIn, 
+    BigInteger amountIn, 
+    ExactInputSingleParams params
 )
 ```
 
-- `amount0Delta`: The amount of token0 that was sent (negative) or must be received (positive) by the pool by the end of the swap. If positive, the callback must send that amount of token0 to the pool.
-- `amount1Delta`: The amount of token1 that was sent (negative) or must be received (positive) by the pool by the end of the swap. If positive, the callback must send that amount of token1 to the pool.
-- `data`: Any data passed through by the caller via the swap call
+- Swaps `amountIn` of one token for as much as possible of another token
+- Access: Everyone
+- `caller`: The method caller, it is handled by tokenFallback
+- `tokenIn`: The tokenIn address, it is handled by tokenFallback
+- `amountIn`: The token amount sent, it is handled by tokenFallback
+- `params`: The parameters necessary for the swap, encoded as [`ExactInputSingleParams`](#swaprouterexactinputsingleparams)
 
-### Example call:
+### 🧪 Example call
+
 
 ```java
 {
-  "to": SwapRouter,
-  "method": "convexusSwapCallback",
+  "to": token0,
+  "method": "transfer",
   "params": {
-    "amount0Delta": "0x1000", // needs to be paid to the pool
-    "amount1Delta": "0x0",
-    "data": [...] // same value than the `swap` data field
+    "_to": SwapRouter,
+    "_value": "0xde0b6b3a7640000", // 10**18
+    "_data": bytes(hex({
+      "method": "exactInputSingle",
+      "params": {
+        "tokenOut": token1,
+        "fee": "0xbb8", // 3000, 0.3%
+        "recipient": recipient,
+        "deadline": "0x61e92f6b", // in seconds
+        "amountOutMinimum": "0x1", // a low amount such as 1 so it may accept anything
+        "sqrtPriceLimitX96": "0xb504f333f9de6484597d89b3" // encodePriceSqrt(1, 2)
+      }
+    }))
   },
 }
 ```
