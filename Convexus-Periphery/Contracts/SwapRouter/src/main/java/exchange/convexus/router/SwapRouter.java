@@ -164,11 +164,21 @@ public class SwapRouter {
 
     /**
      * @notice Swaps `amountIn` of one token for as much as possible of another token
-     * @param params The parameters necessary for the swap, encoded as `ExactInputSingleParams` in calldata
-     * @return amountOut The amount of the received token
+     * 
+     * Access: Everyone
+     * 
+     * @param caller The method caller, it is handled by tokenFallback
+     * @param tokenIn The tokenIn address, it is handled by tokenFallback
+     * @param amountIn The token amount sent, it is handled by tokenFallback
+     * @param params The parameters necessary for the swap, encoded as `ExactInputSingleParams`
      */
     // @External - this method is external through tokenFallback
-    private void exactInputSingle (Address caller, Address tokenIn, BigInteger amountIn, ExactInputSingleParams params) {
+    private void exactInputSingle (
+        Address caller, 
+        Address tokenIn, 
+        BigInteger amountIn, 
+        ExactInputSingleParams params
+    ) {
         reentreancy.lock(true);
         this.checkDeadline(params.deadline);
 
@@ -194,11 +204,16 @@ public class SwapRouter {
 
     /**
      * @notice Swaps as little as possible of one token for `amountOut` of another token
-     * @param params The parameters necessary for the swap, encoded as `ExactOutputSingleParams` in calldata
+     * @param params The parameters necessary for the swap, encoded as `ExactOutputSingleParams`
      * @return amountIn The amount of the input token
      */
     // @External - this method is external through tokenFallback
-    private void exactOutputSingle (Address caller, Address tokenIn, BigInteger amountInMaximum, ExactOutputSingleParams params) {
+    private void exactOutputSingle (
+        Address caller,
+        Address tokenIn,
+        BigInteger amountInMaximum,
+        ExactOutputSingleParams params
+    ) {
         reentreancy.lock(true);
         this.checkDeadline(params.deadline);
 
@@ -233,7 +248,12 @@ public class SwapRouter {
     }
 
     // @External - this method is external through tokenFallback
-    private void exactInput (Address caller, Address tokenIn, BigInteger amountIn, ExactInputParams params) {
+    private void exactInput (
+        Address caller,
+        Address tokenIn,
+        BigInteger amountIn,
+        ExactInputParams params
+    ) {
         reentreancy.lock(true);
         this.checkDeadline(params.deadline);
 
@@ -305,7 +325,7 @@ public class SwapRouter {
 
     /**
      * @notice Swaps `amountIn` of one token for as much as possible of another token
-     * @param params The parameters necessary for the swap, encoded as `ExactInputSingleParams` in calldata
+     * @param params The parameters necessary for the swap, encoded as `ExactInputSingleParams`
      * @return amountOut The amount of the received token
      */
     private BigInteger exactInputInternal(
@@ -344,7 +364,7 @@ public class SwapRouter {
 
     /**
      * @notice Swaps as little as possible of one token for `amountOut` of another token
-     * @param params The parameters necessary for the swap, encoded as `ExactOutputSingleParams` in calldata
+     * @param params The parameters necessary for the swap, encoded as `ExactOutputSingleParams`
      * @return amountIn The amount of the input token
      */
     private BigInteger exactOutputInternal(

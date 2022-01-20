@@ -855,8 +855,7 @@ public abstract class ConvexusPool {
      * @param recipient The address to receive the output of the swap
      * @param zeroForOne The direction of the swap, true for token0 to token1, false for token1 to token0
      * @param amountSpecified The amount of the swap, which implicitly configures the swap as exact input (positive), or exact output (negative)
-     * @param sqrtPriceLimitX96 The Q64.96 sqrt price limit. If zero for one, the price cannot be less than this
-     * value after the swap. If one for zero, the price cannot be greater than this value after the swap
+     * @param sqrtPriceLimitX96 The Q64.96 sqrt price limit. If zero for one, the price cannot be less than this value after the swap. If one for zero, the price cannot be greater than this value after the swap.
      * @param data Any data to be passed through to the callback
      * @return amount0 The delta of the balance of token0 of the pool, exact when negative, minimum when positive
      * @return amount1 The delta of the balance of token1 of the pool, exact when negative, minimum when positive
@@ -1184,7 +1183,7 @@ public abstract class ConvexusPool {
     /**
      * @notice Set the denominator of the protocol's % share of the fees
      * 
-     * Access control: Factory Owner
+     * Access: Factory Owner
      * 
      * @param feeProtocol0 new protocol fee for token0 of the pool
      * @param feeProtocol1 new protocol fee for token1 of the pool
@@ -1220,7 +1219,7 @@ public abstract class ConvexusPool {
     /**
      * @notice Collect the protocol fee accrued to the pool
      * 
-     * Access control: Factory Owner
+     * Access: Factory Owner
      * 
      * @param recipient The address to which collected protocol fees should be sent
      * @param amount0Requested The maximum amount of token0 to send, can be 0 to collect fees in only token1
@@ -1229,7 +1228,7 @@ public abstract class ConvexusPool {
      * @return amount1 The protocol fee collected in token1
      */
     @External
-    public PairAmounts collectProtocol(
+    public PairAmounts collectProtocol (
         Address recipient,
         BigInteger amount0Requested,
         BigInteger amount1Requested

@@ -25,11 +25,17 @@ import exchange.convexus.utils.StringUtils;
 import score.Address;
 
 public class ExactInputSingleParams {
+    // The token expected as output
     public Address tokenOut;
+    // The pool fee
     public int fee;
+    // The recipient address
     public Address recipient;
+    // The timestamp deadline, in seconds
     public BigInteger deadline;
+    // The minimum amount of token in output
     public BigInteger amountOutMinimum;
+    // The Q64.96 sqrt price limit
     public BigInteger sqrtPriceLimitX96;
 
     public ExactInputSingleParams (

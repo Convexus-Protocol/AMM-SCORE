@@ -190,7 +190,7 @@ public class NonFungiblePositionManager extends IRC721Enumerable {
      * @notice Creates a new position wrapped in a NFT
      * @dev Call this when the pool does exist and is initialized. Note that if the pool is created but not initialized
      * a method does not exist, i.e. the pool is assumed to be initialized.
-     * @param params The params necessary to mint a position, encoded as `MintParams` in calldata
+     * @param params The params necessary to mint a position, encoded as `MintParams`
      * @return tokenId The ID of the token that represents the minted position
      * @return liquidity The amount of liquidity for this position
      * @return amount0 The amount of token0
