@@ -1193,7 +1193,7 @@ abstract class ConvexusPool2 {
     /**
      * @notice Set the denominator of the protocol's % share of the fees
      * 
-     * Access control: Factory Owner
+     * Access: Factory Owner
      * 
      * @param feeProtocol0 new protocol fee for token0 of the pool
      * @param feeProtocol1 new protocol fee for token1 of the pool
@@ -1229,7 +1229,7 @@ abstract class ConvexusPool2 {
     /**
      * @notice Collect the protocol fee accrued to the pool
      * 
-     * Access control: Factory Owner
+     * Access: Factory Owner
      * 
      * @param recipient The address to which collected protocol fees should be sent
      * @param amount0Requested The maximum amount of token0 to send, can be 0 to collect fees in only token1
