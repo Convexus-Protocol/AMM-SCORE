@@ -12,83 +12,8 @@ A Convexus Router is able to swap two tokens by calling the Convexus Pool `swap`
 
 Below is the entire process flow for swapping a fixed amount of `token0` to a Convexus Pool, using the `exactInputSingle` method from a Convexus Swap Router
 
-```plantuml
-' Send the tokens to the SwapRouter contract
-recipient -> Token0 : transfer ( \
-\n   SwapRouter, \
-\n   amount0, { \
-\n     "method":"exactInputSingle", \
-\n     "params": {\
-\n       "tokenOut": token1, \
-\n       "fee": fee, \
-\n       "recipient": recipient, \
-\n       "deadline": deadline, \
-\n       "amountOutMinimum": amountOutMinimum, \
-\n       "sqrtPriceLimitX96": sqrtPriceLimitX96 \
-\n    } \
-\n  } \
-\n)
+![exactInputSingle](./uml/exactInputSingle.svg)
 
-Token0 -> SwapRouter : tokenFallback ( \
-\n   recipient, \
-\n   amount0, { \
-\n     "method":"exactInputSingle", \
-\n     "params": {\
-\n       "tokenOut": token1, \
-\n       "fee": fee, \
-\n       "recipient": recipient, \
-\n       "deadline": deadline, \
-\n       "amountOutMinimum": amountOutMinimum, \
-\n       "sqrtPriceLimitX96": sqrtPriceLimitX96 \
-\n    } \
-\n  } \
-\n)
-
-' The SwapRouter contract performs the swap method
-SwapRouter -> ConvexusPool : swap ( \
-\n  recipient, \
-\n  true, \
-\n  amount0, \
-\n  sqrtPriceLimitX96, \
-\n  bytes(recipient) \
-\n)
-
-' The swapped tokens are paid back to the recipient
-ConvexusPool -> Token1 : transfer ( \
-\n  recipient, \
-\n  amount1, { \
-\n    "method": "pay" \
-\n  } \
-\n)
-
-Token1 -> recipient : tokenFallback ( \
-\n  ConvexusPool, \
-\n  amount1, { \
-\n    "method": "pay" \
-\n  } \
-\n)
-
-ConvexusPool -> SwapRouter : convexusSwapCallback (\
-\n  amount0, \
-\n  amount1, \
-\n  recipient \
-\n)
-
-' The SwapRouter contract send the required amount0 of token0
-SwapRouter -> Token0 : transfer ( \
-\n  ConvexusPool, \
-\n  amount0, { \
-\n    "method": "pay" \
-\n  } \
-\n)
-
-Token0 -> ConvexusPool : tokenFallback ( \
-\n  SwapRouter, \
-\n  amount0, { \
-\n    "method": "pay" \
-\n  } \
-\n)
-```
 
 ## 📜 `SwapRouter::exactInputSingle`
 
