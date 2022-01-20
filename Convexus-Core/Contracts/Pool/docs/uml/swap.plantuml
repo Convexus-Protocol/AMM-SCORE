@@ -1,0 +1,48 @@
+@startuml Token Swap
+
+' The Callee contract performs the swap method
+Callee -> ConvexusPool : swap ( \
+\n  recipient, \
+\n  true, \
+\n  amount0, \
+\n  sqrtPriceLimitX96, \
+\n  bytes(recipient) \
+\n)
+
+' The swapped tokens are paid back to the recipient
+ConvexusPool -> Token1 : transfer ( \
+\n  recipient, \
+\n  amount1, { \
+\n    "method": "pay" \
+\n  } \
+\n)
+
+Token1 -> recipient : tokenFallback ( \
+\n  ConvexusPool, \
+\n  amount1, { \
+\n    "method": "pay" \
+\n  } \
+\n)
+
+ConvexusPool -> Callee : convexusSwapCallback (\
+\n  amount0, \
+\n  amount1, \
+\n  recipient \
+\n)
+
+' The Callee contract send the required amount0 of token0
+Callee -> Token0 : transfer ( \
+\n  ConvexusPool, \
+\n  amount0, { \
+\n    "method": "pay" \
+\n  } \
+\n)
+
+Token0 -> ConvexusPool : tokenFallback ( \
+\n  Callee, \
+\n  amount0, { \
+\n    "method": "pay" \
+\n  } \
+\n)
+
+@enduml

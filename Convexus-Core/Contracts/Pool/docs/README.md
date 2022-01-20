@@ -37,9 +37,9 @@ A Convexus Pool is able to swap two tokens by calling its `swap` method given an
 
 The `swap` method must **not** be called directly from a EOA address. Another contract should handle the user tokens during the swap. Only another SCORE contract can deposit some tokens to a Convexus Pool contract, otherwise the transaction will be reverted.
 
-Below is the entire process flow for swapping a fixed amount of `token0` to a Convexus Pool, using a Convexus Swap Router.
+Below is the entire process flow for swapping a fixed amount of `token0` to a Convexus Pool from a generic `Callee` contract.
 
-> ⚠️ Please note that the methods implemented in the `SwapRouter` contract isn't part of the Core layer, so it isn't mandatory for calling the `swap` method. In the example below, the `SwapRouter` contract implements a `exactInputSingle` method that swaps a given `amount0` of `token0` for a minimum amount of `amountOutMinimum` for `token1`.
+> ⚠️ Please note that the methods implemented in the generic `Callee` contract isn't part of the Core layer, so its implementation may be anything. In most cases, a `SwapRouter` is used for performing the swaps.
 
 ![uml/swap-tokens.png](uml/swap-tokens.png)
 

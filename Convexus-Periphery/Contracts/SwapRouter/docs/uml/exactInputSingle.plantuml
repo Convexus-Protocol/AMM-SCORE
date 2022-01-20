@@ -1,14 +1,14 @@
 @startuml Token Swap
 
 ' Send the tokens to the SwapRouter contract
-EOA -> Token0 : transfer ( \
+recipient -> Token0 : transfer ( \
 \n   SwapRouter, \
 \n   amount0, { \
 \n     "method":"exactInputSingle", \
 \n     "params": {\
 \n       "tokenOut": token1, \
 \n       "fee": fee, \
-\n       "recipient": EOA, \
+\n       "recipient": recipient, \
 \n       "deadline": deadline, \
 \n       "amountOutMinimum": amountOutMinimum, \
 \n       "sqrtPriceLimitX96": sqrtPriceLimitX96 \
@@ -17,13 +17,13 @@ EOA -> Token0 : transfer ( \
 \n)
 
 Token0 -> SwapRouter : tokenFallback ( \
-\n   EOA, \
+\n   recipient, \
 \n   amount0, { \
 \n     "method":"exactInputSingle", \
 \n     "params": {\
 \n       "tokenOut": token1, \
 \n       "fee": fee, \
-\n       "recipient": EOA, \
+\n       "recipient": recipient, \
 \n       "deadline": deadline, \
 \n       "amountOutMinimum": amountOutMinimum, \
 \n       "sqrtPriceLimitX96": sqrtPriceLimitX96 \
@@ -33,22 +33,22 @@ Token0 -> SwapRouter : tokenFallback ( \
 
 ' The SwapRouter contract performs the swap method
 SwapRouter -> ConvexusPool : swap ( \
-\n  EOA, \
+\n  recipient, \
 \n  true, \
 \n  amount0, \
 \n  sqrtPriceLimitX96, \
-\n  bytes(EOA) \
+\n  bytes(recipient) \
 \n)
 
-' The swapped tokens are paid back to the EOA
+' The swapped tokens are paid back to the recipient
 ConvexusPool -> Token1 : transfer ( \
-\n  EOA, \
+\n  recipient, \
 \n  amount1, { \
 \n    "method": "pay" \
 \n  } \
 \n)
 
-Token1 -> EOA : tokenFallback ( \
+Token1 -> recipient : tokenFallback ( \
 \n  ConvexusPool, \
 \n  amount1, { \
 \n    "method": "pay" \
@@ -58,7 +58,7 @@ Token1 -> EOA : tokenFallback ( \
 ConvexusPool -> SwapRouter : convexusSwapCallback (\
 \n  amount0, \
 \n  amount1, \
-\n  EOA \
+\n  recipient \
 \n)
 
 ' The SwapRouter contract send the required amount0 of token0
