@@ -71,7 +71,7 @@ private void exactInputSingle (
   "params": {
     "_to": SwapRouter,
     "_value": "0xde0b6b3a7640000", // 10**18
-    "_data": bytes(hex({
+    "_data": hex({
       "method": "exactInputSingle",
       "params": {
         "tokenOut": token1,
@@ -81,7 +81,7 @@ private void exactInputSingle (
         "amountOutMinimum": "0x1", // a low amount such as 1 so it may accept anything
         "sqrtPriceLimitX96": "0xb504f333f9de6484597d89b3" // encodePriceSqrt(1, 2)
       }
-    }))
+    })
   },
 }
 ```
