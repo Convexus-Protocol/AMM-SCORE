@@ -196,7 +196,7 @@ private void exactInput (
 - `caller`: The method caller. This field is handled by tokenFallback
 - `tokenIn`: The tokenIn address. This field is handled by tokenFallback
 - `amountIn` The token amount sent. This field is handled by tokenFallback
-- `params` The parameters necessary for the multi-hop swap, encoded as `ExactInputParams`
+- `params` The parameters necessary for the multi-hop swap, encoded as [`ExactInputParams`](#swaprouterexactinputparams)
 
 ### 🧪 Example call
 
