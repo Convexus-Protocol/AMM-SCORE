@@ -2,6 +2,7 @@
 
 dependencies {
     compileOnly 'foundation.icon:javaee-api:0.9.0'
+    implementation 'com.github.sink772:minimal-json:0.9.6'
 
     testImplementation project(':Convexus-Core:Contracts:Pool')
     testImplementation project(':Convexus-Core:Contracts:Factory')
