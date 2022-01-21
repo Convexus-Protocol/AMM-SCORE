@@ -210,10 +210,10 @@ private void exactInput (
     "_data": hex({
       "method": "exactInput",
       "params": {
+        "path": hex([token0, 3000, token2, 3000, token1]) // Multiple pool swaps are encoded through bytes called a `path`. A path is a sequence of token addresses and poolFees that define the pools used in the swaps. The format for pool encoding is (tokenIn, fee, tokenOut/tokenIn, fee, tokenOut) where tokenIn/tokenOut parameter is the shared token across the pools. Since we are swapping token0 to token2 and then token2 to token1 the path encoding is (token0, 0.3%, token2, 0.3%, token1).
         "recipient": recipient,
         "deadline": "0x61e92f6b", // in seconds
         "amountOutMinimum": "0x0", // we are setting to zero, but this is a significant risk in production. For a real deployment, this value should be calculated using our SDK or an onchain price oracle - this helps protect against getting an unusually bad price for a trade due to a front running sandwich or another type of price manipulation
-        "path": hex([token0, 3000, token2, 3000, token1]) // Multiple pool swaps are encoded through bytes called a `path`. A path is a sequence of token addresses and poolFees that define the pools used in the swaps. The format for pool encoding is (tokenIn, fee, tokenOut/tokenIn, fee, tokenOut) where tokenIn/tokenOut parameter is the shared token across the pools. Since we are swapping token0 to token2 and then token2 to token1 the path encoding is (token0, 0.3%, token2, 0.3%, token1).
       }
     })
   },
