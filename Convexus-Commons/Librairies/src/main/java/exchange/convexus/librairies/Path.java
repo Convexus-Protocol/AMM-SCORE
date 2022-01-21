@@ -66,7 +66,7 @@ public class Path {
     return new PoolData(
       new Address(Arrays.copyOfRange(path, 0, ADDR_SIZE)),
       new Address(Arrays.copyOfRange(path, NEXT_OFFSET, POP_OFFSET)),
-      BytesUtils.getBigEndianInt(Arrays.copyOfRange(path, ADDR_SIZE, NEXT_OFFSET))
+      BytesUtils.bytesToInt(Arrays.copyOfRange(path, ADDR_SIZE, NEXT_OFFSET))
     );
   }
 
@@ -83,7 +83,7 @@ public class Path {
     return new PoolData(
       new Address(Arrays.copyOfRange(path, start, start+ADDR_SIZE)),
       new Address(Arrays.copyOfRange(path, start+NEXT_OFFSET, start+POP_OFFSET)),
-      BytesUtils.getBigEndianInt(Arrays.copyOfRange(path, start+ADDR_SIZE, start+NEXT_OFFSET))
+      BytesUtils.bytesToInt(Arrays.copyOfRange(path, start+ADDR_SIZE, start+NEXT_OFFSET))
     );
   }
 

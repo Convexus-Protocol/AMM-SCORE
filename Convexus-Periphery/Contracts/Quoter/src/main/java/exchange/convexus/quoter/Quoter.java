@@ -314,7 +314,7 @@ public class Quoter {
     /// @return gasEstimate The estimate of the gas that the swap consumes
     @External
     public QuoteMultiResult quoteExactInput (byte[] path, BigInteger amountIn) {
-        
+
         int numPools = Path.numPools(path);
         BigInteger[] sqrtPriceX96AfterList = new BigInteger[numPools];
         int[] initializedTicksCrossedList = new int[numPools];

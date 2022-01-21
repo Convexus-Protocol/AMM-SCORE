@@ -24,10 +24,14 @@ import exchange.convexus.utils.StringUtils;
 import score.Address;
 
 public class ExactInputParams {
-    byte[] path;
-    Address recipient;
-    BigInteger deadline;
-    BigInteger amountOutMinimum;
+    // The `path` is a sequence of [`tokenAddress`, `fee`, `tokenAddress`], encoded in *reverse order*, which are the variables needed to compute each pool contract address in our sequence of swaps. The multihop swap router code will automatically find the correct pool with these variables, and execute the swap needed within each pool in our sequence.
+    public byte[] path;
+    // The destination address of the outbound asset
+    public Address recipient;
+    // The unix time after which a transaction will be reverted, to protect against long delays and the increased chance of large price swings therein
+    public BigInteger deadline;
+    // The maximum amount of token0 willing to be swapped for the specified amountOut of token1
+    public BigInteger amountOutMinimum;
     
     public ExactInputParams (
       byte[] path,

@@ -22,15 +22,17 @@ public class BytesUtils {
 
     public final static int INT_SIZE = 4;
 
-    public static int getBigEndianInt (byte[] bytearray) {
+    // Assume big endianess
+    public static int bytesToInt (byte[] bytearray) {
         Context.require(bytearray.length == INT_SIZE, 
-            "getBigEndianInt: Invalid bytearray size");
+            "bytesToInt: Invalid bytearray size");
         return  ((bytearray[0] & 0xFF) << 24) 
               | ((bytearray[1] & 0xFF) << 16) 
               | ((bytearray[2] & 0xFF) << 8) 
               | ((bytearray[3] & 0xFF));
     }
 
+    // Assume big endianess
     public static byte[] intToBytes (int data) {
         return new byte[] {
             (byte)((data >> 24) & 0xff),

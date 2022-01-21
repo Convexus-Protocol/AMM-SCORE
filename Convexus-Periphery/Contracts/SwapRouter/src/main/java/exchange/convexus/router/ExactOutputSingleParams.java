@@ -25,7 +25,20 @@ import exchange.convexus.utils.StringUtils;
 import score.Address;
 
 public class ExactOutputSingleParams {
-  public ExactOutputSingleParams(
+  // The contract address of the outbound token
+  public Address tokenOut;
+  // The fee tier of the pool, used to determine the correct pool contract in which to execute 
+  public int fee;
+  // The destination address of the outbound token
+  public Address recipient;
+  // The unix time after which a swap will fail, to protect against long-pending transactions and 
+  public BigInteger deadline;
+  // The desired amount of `token1` received after the swap
+  public BigInteger amountOut;
+  // The Q64.96 sqrt price limit
+  public BigInteger sqrtPriceLimitX96;
+  
+  public ExactOutputSingleParams (
     Address tokenOut, 
     int fee, 
     Address recipient, 
@@ -41,13 +54,6 @@ public class ExactOutputSingleParams {
     this.sqrtPriceLimitX96 = sqrtPriceLimitX96;
   }
 
-  public Address tokenOut;
-  public int fee;
-  public Address recipient;
-  public BigInteger deadline;
-  public BigInteger amountOut;
-  public BigInteger sqrtPriceLimitX96;
-  
   public JsonObject toJson() {
     return Json.object()
         .add("tokenOut", tokenOut.toString())

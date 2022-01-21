@@ -25,13 +25,13 @@ import exchange.convexus.utils.StringUtils;
 import score.Address;
 
 public class ExactInputSingleParams {
-    // The token expected as output
+    // The contract address of the outbound token
     public Address tokenOut;
-    // The pool fee
+    // The fee tier of the pool, used to determine the correct pool contract in which to execute the swap
     public int fee;
-    // The recipient address
+    // The destination address of the outbound token
     public Address recipient;
-    // The timestamp deadline, in seconds
+    // The unix time after which a swap will fail, to protect against long-pending transactions and wild swings in prices
     public BigInteger deadline;
     // The minimum amount of token in output
     public BigInteger amountOutMinimum;

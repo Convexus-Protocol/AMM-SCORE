@@ -167,9 +167,9 @@ public class SwapRouter {
      * 
      * Access: Everyone
      * 
-     * @param caller The method caller, it is handled by tokenFallback
-     * @param tokenIn The tokenIn address, it is handled by tokenFallback
-     * @param amountIn The token amount sent, it is handled by tokenFallback
+     * @param caller The method caller. This field is handled by tokenFallback
+     * @param tokenIn The tokenIn address. This field is handled by tokenFallback
+     * @param amountIn The token amount sent. This field is handled by tokenFallback
      * @param params The parameters necessary for the swap, encoded as `ExactInputSingleParams`
      */
     // @External - this method is external through tokenFallback
@@ -204,6 +204,12 @@ public class SwapRouter {
 
     /**
      * @notice Swaps as little as possible of one token for `amountOut` of another token
+     * 
+     * Access: Everyone
+     * 
+     * @param caller: The method caller. This field is handled by tokenFallback
+     * @param tokenIn: The tokenIn address. This field is handled by tokenFallback
+     * @param amountInMaximum: The maximum amount of `token0` willing to be swapped for the specified amountOut of `token1`. This field is handled by tokenFallback.
      * @param params The parameters necessary for the swap, encoded as `ExactOutputSingleParams`
      * @return amountIn The amount of the input token
      */
@@ -241,12 +247,22 @@ public class SwapRouter {
         // send back the tokens excess to the caller if there's any
         BigInteger excess = amountInMaximum.subtract(amountIn);
         if (excess.compareTo(ZERO) > 0) {
-            Context.call(tokenIn, "transfer", caller, excess, "excess".getBytes());
+            Context.call(tokenIn, "transfer", caller, excess, "{\"method\": \"excess\"}".getBytes());
         }
 
         reentreancy.lock(false);
     }
 
+    /**
+     * @notice Swaps `amountIn` of one token for as much as possible of another along the specified path
+     * 
+     * Access: Everyone
+     * 
+     * @param caller: The method caller. This field is handled by tokenFallback
+     * @param tokenIn: The tokenIn address. This field is handled by tokenFallback
+     * @param amountIn The token amount sent. This field is handled by tokenFallback
+     * @param params The parameters necessary for the multi-hop swap, encoded as `ExactInputParams`
+     */
     // @External - this method is external through tokenFallback
     private void exactInput (
         Address caller,
@@ -259,6 +275,7 @@ public class SwapRouter {
 
         // Check if first token matches with the path
         PoolData pool = Path.decodeFirstPool(params.path);
+
         Context.require(pool.tokenA.equals(tokenIn), 
             "exactInput: Path doesn't match with the token sent");
 
