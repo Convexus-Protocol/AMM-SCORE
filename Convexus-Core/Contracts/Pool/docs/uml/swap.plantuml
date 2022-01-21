@@ -9,20 +9,28 @@ Callee -> ConvexusPool : **swap** ( \n\
   bytes(recipient) \n\
 )
 
-' The swapped tokens are paid back to the recipient
-ConvexusPool -> Token1 : **transfer** ( \n\
-  recipient, \n\
-  amount1, { \n\
-    "method": "pay" \n\
-  } \n\
-)
+note over ConvexusPool : \
+**ConvexusPool** compute \n\
+the correct amount1 of token1 \n\
+and transfer it to recipient
 
-Token1 -> recipient : **tokenFallback** ( \n\
-  ConvexusPool, \n\
-  amount1, { \n\
-    "method": "pay" \n\
-  } \n\
-)
+
+group Transfer amount1 of token1
+  ' The swapped tokens are paid back to the recipient
+  ConvexusPool -> Token1 : **transfer** ( \n\
+    recipient, \n\
+    amount1, { \n\
+      "method": "pay" \n\
+    } \n\
+  )
+
+  Token1 -> recipient : **tokenFallback** ( \n\
+    ConvexusPool, \n\
+    amount1, { \n\
+      "method": "pay" \n\
+    } \n\
+  )
+end group
 
 ConvexusPool -> Callee : **convexusSwapCallback** ( \n\
   amount0, \n\
@@ -30,19 +38,29 @@ ConvexusPool -> Callee : **convexusSwapCallback** ( \n\
   recipient \n\
 )
 
-' The Callee contract send the required amount0 of token0
-Callee -> Token0 : **transfer** ( \n\
-  ConvexusPool, \n\
-  amount0, { \n\
-    "method": "pay" \n\
-  } \n\
-)
+note over Callee : \
+**Callee** must pay back \n\
+the given amount0 and \n\
+amount1 or the transaction \n\
+will revert
 
-Token0 -> ConvexusPool : **tokenFallback** ( \n\
-  Callee, \n\
-  amount0, { \n\
-    "method": "pay" \n\
-  } \n\
-)
+group Transfer amount0 of token0
+
+  ' The Callee contract send the required amount0 of token0
+  Callee -> Token0 : **transfer** ( \n\
+    ConvexusPool, \n\
+    amount0, { \n\
+      "method": "pay" \n\
+    } \n\
+  )
+
+  Token0 -> ConvexusPool : **tokenFallback** ( \n\
+    Callee, \n\
+    amount0, { \n\
+      "method": "pay" \n\
+    } \n\
+  )
+
+end group
 
 @enduml

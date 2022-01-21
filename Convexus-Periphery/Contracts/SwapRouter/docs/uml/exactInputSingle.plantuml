@@ -1,5 +1,14 @@
 @startuml Tokens Swap
 
+note over recipient
+**recipient** wants to swap
+amount0 of token0 for a
+minimum amountOutMinimum
+of token1
+end note
+
+group Transfer amount0 of token0
+
 ' Send the tokens to the SwapRouter contract
 recipient -> Token0 : **transfer** ( \n\
    SwapRouter, \n\
@@ -31,11 +40,26 @@ Token0 -> SwapRouter : **tokenFallback** ( \n\
   } \n\
 )
 
+end group
+
+note over SwapRouter
+**SwapRouter** queries **ConvexusFactory**
+using the received params for retrieving
+the **ConvexusPool** address
+end note
+
 SwapRouter -> ConvexusFactory : **getPool** ( \n\
   "token0": token0, \n\
   "token1": token1, \n\
   "fee": fee, \n\
 )
+activate ConvexusFactory
+return ConvexusPool address
+
+note over SwapRouter
+Performs the Core Layer swap
+to the queried ConvexusPool 
+end note
 
 ' The SwapRouter contract performs the swap method
 SwapRouter -> ConvexusPool : **swap** ( \n\
