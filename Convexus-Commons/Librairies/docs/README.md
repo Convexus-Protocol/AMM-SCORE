@@ -68,7 +68,7 @@ console.assert(String(encodePriceSqrt(1, 10)) == "25054144837504793118641380156"
 
 A **path** if a sequence of [`tokenIn`, `fee`, `tokenOut`], encoded in bytes.
 
-The `tokenIn` and `tokenOut` addresses must be represented in bytes using its standard format provided in most ICON SDK.
+The `tokenIn` and `tokenOut` addresses must be represented in bytes using its standard format provided in the ICON SDK.
 The `fee` must be represented in bytes as a big endian 32-bits integer.
 
 Here's an example:
