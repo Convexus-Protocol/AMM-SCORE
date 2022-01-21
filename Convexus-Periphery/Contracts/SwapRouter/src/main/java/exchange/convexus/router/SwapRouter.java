@@ -211,7 +211,6 @@ public class SwapRouter {
      * @param tokenIn: The tokenIn address. This field is handled by tokenFallback
      * @param amountInMaximum: The maximum amount of `token0` willing to be swapped for the specified amountOut of `token1`. This field is handled by tokenFallback.
      * @param params The parameters necessary for the swap, encoded as `ExactOutputSingleParams`
-     * @return amountIn The amount of the input token
      */
     // @External - this method is external through tokenFallback
     private void exactOutputSingle (
@@ -312,8 +311,23 @@ public class SwapRouter {
         reentreancy.lock(false);
     }
 
+    /**
+     * @notice Swaps as little as possible of one token for `amountOut` of another along the specified path (reversed)
+     * 
+     * Access: Everyone
+     * 
+     * @param caller: The method caller. This field is handled by tokenFallback
+     * @param tokenIn: The tokenIn address. This field is handled by tokenFallback
+     * @param amountInMaximum: The maximum amount of `token0` willing to be swapped for the specified amountOut of `token1`. This field is handled by tokenFallback.
+     * @param params The parameters necessary for the swap, encoded as `ExactOutputParams`
+     */
     // @External - this method is external through tokenFallback
-    private void exactOutput (Address caller, Address tokenIn, BigInteger amountInMaximum, ExactOutputParams params) {
+    private void exactOutput (
+        Address caller, 
+        Address tokenIn, 
+        BigInteger amountInMaximum, 
+        ExactOutputParams params
+    ) {
         reentreancy.lock(true);
         this.checkDeadline(params.deadline);
         
