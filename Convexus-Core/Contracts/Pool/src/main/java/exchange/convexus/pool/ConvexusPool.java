@@ -91,16 +91,11 @@ public abstract class ConvexusPool {
     // DB Variables
     // ================================================
     // The 0th storage slot in the pool stores many values, and is exposed as a single method to save steps when accessed externally.
-    // This value may not always be equal to SqrtTickMath.getTickAtSqrtRatio(sqrtPriceX96) if the price is on a tick
-    // boundary.
-    // Encoded as two 4 bit values, where the protocol fee of token1 is shifted 4 bits and the protocol fee of token0
-    // is the lower 4 bits. Used as the denominator of a fraction of the swap fee, e.g. 4 means 1/4th of the swap fee.
-    // unlocked Whether the pool is currently locked to reentrancy
     private final VarDB<Slot0> slot0 = Context.newVarDB(NAME + "_slot0", Slot0.class);
 
-    // whether the pool is locked
+    // Whether the pool is locked
     private final ReentrancyLock poolLock = new ReentrancyLock(NAME + "_poolLock");
-    
+
     // The fee growth as a Q128.128 fees of token0 collected per unit of liquidity for the entire life of the pool
     protected final VarDB<BigInteger> feeGrowthGlobal0X128 = Context.newVarDB(NAME + "_feeGrowthGlobal0X128", BigInteger.class);
     // The fee growth as a Q128.128 fees of token1 collected per unit of liquidity for the entire life of the pool
@@ -1340,6 +1335,9 @@ public abstract class ConvexusPool {
         return this.observations.get(index);
     }
 
+    /**
+     * The 0th storage slot in the pool stores many values, and is exposed as a single method to save steps when accessed externally.
+     */
     @External(readonly = true)
     public Slot0 slot0 () {
         return this.slot0.get();

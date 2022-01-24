@@ -36,6 +36,10 @@ public class IIRC2 {
     return ((BigInteger) Context.call(irc2, "decimals")).intValue();
   }
 
+  public static String symbol (Address irc2) {
+    return ((String) Context.call(irc2, "symbol"));
+  }
+
   public static BigInteger totalSupply (Address irc2) {
     return (BigInteger) Context.call(irc2, "totalSupply");
   }
