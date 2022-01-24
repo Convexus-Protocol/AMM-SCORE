@@ -6,11 +6,13 @@ dependencies {
     implementation 'com.github.sink772:minimal-json:0.9.6'
 
     implementation project(':Convexus-Periphery:Contracts:SwapRouter')
+    implementation project(':Convexus-Periphery:Contracts:LiquidityManagement')
     implementation project(':Convexus-Commons:Utils')
+    implementation project(':Convexus-Commons:Interfaces')
 }
 
 optimizedJar {
-    mainClassName = 'exchange.convexus.swap.ConvexusSwap'
+    mainClassName = 'exchange.convexus.swap.Swap'
     // setEnableDebug(true)
     from {
         configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
