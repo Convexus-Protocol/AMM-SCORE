@@ -35,3 +35,11 @@ def invoke(config: Config, package: str, paramsfilename: str, verbose=print_empt
 
     tx_hash = tx_handler.invoke(owner, address, method, params)
     return tx_handler.ensure_tx_result(tx_hash)
+
+def call(config: Config, package: str, paramsfilename: str, verbose=print_empty):
+    tx_handler = config.tx_handler
+
+    address = get_deploy(package, config.endpoint)
+    method, params = get_call(package, config.endpoint, paramsfilename)
+
+    return tx_handler.call(address, method, params)

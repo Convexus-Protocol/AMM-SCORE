@@ -68,7 +68,7 @@ class TxHandler:
         return self._icon_service.call(_call)
 
     def invoke(self, wallet, to, method, params, limit=None):
-        print(f"Calling {method}({params}) ...")
+        print(f"Invoking {method}({params}) ...")
         transaction = CallTransactionBuilder() \
             .from_(wallet.get_address()) \
             .to(to) \
