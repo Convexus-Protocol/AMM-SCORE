@@ -27,6 +27,9 @@ import score.annotation.External;
 import score.annotation.Optional;
 import scorex.io.Reader;
 import scorex.io.StringReader;
+import exchange.convexus.liquidity.AddLiquidityParams;
+import exchange.convexus.liquidity.AddLiquidityResult;
+import exchange.convexus.liquidity.ConvexusLiquidityManagement;
 import exchange.convexus.router.ExactInputParams;
 import exchange.convexus.router.ExactInputSingleParams;
 import exchange.convexus.router.ExactOutputParams;
@@ -35,6 +38,8 @@ import exchange.convexus.utils.BytesUtils;
 import exchange.convexus.utils.ReentrancyLock;
 import exchange.convexus.utils.StringUtils;
 import static exchange.convexus.utils.TimeUtils.now;
+
+import exchange.convexus.interfaces.irc2.IIRC2;
 
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonObject;
@@ -56,13 +61,16 @@ public class Swap {
     private final String name;
     private final Address swapRouter;
 
+    // Liquidity Manager
+    private final ConvexusLiquidityManagement liquidityMgr;
+
     // For this example, we will set the pool fee to 0.3%.
     public final int poolFee = 3000;
 
-    // This example swaps IUSDC/sICX for single path swaps and IUSDC/bnUSD/sICX for multi path swaps.
-    public final Address IUSDC = Address.fromString("cx6b175474e89094c44da98b954eedeac495271d0f");
-    public final Address SICX  = Address.fromString("cxc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2");
-    public final Address BNUSD = Address.fromString("cxa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48");
+    // This example swaps tokenIn/tokenOut for single path swaps and tokenIn/tokenInOut/tokenOut for multi path swaps.
+    public final Address tokenIn;
+    public final Address tokenOut;
+    public final Address tokenInOut;
 
     // ================================================
     // DB Variables
@@ -75,19 +83,28 @@ public class Swap {
     /**
      *  Contract constructor
      */
-    public Swap(
-        Address _swapRouter
+    public Swap (
+        Address _swapRouter,
+        Address _factory,
+        Address _tokenIn,
+        Address _tokenOut,
+        Address _tokenInOut
     ) {
-        this.name = "Convexus IUSDC-BNUSD-SICX Swap";
+        this.name = "Convexus " + IIRC2.symbol(_tokenIn) + "-" + IIRC2.symbol(_tokenInOut) + "-" + IIRC2.symbol(_tokenOut) + " Swap";
         this.swapRouter = _swapRouter;
+        this.tokenIn = _tokenIn;
+        this.tokenOut = _tokenOut;
+        this.tokenInOut = _tokenInOut;
+        
+        this.liquidityMgr = new ConvexusLiquidityManagement(_factory);
     }
 
     /**
-     * @notice swapExactInputSingle swaps a fixed amount of IUSDC for a maximum possible amount of sICX
-     * using the IUSDC/sICX 0.3% pool by calling `exactInputSingle` in the swap router.
-     * @dev The calling address must approve this contract to spend at least `amountIn` worth of its IUSDC for this function to succeed.
-     * @param amountIn The exact amount of IUSDC that will be swapped for sICX.
-     * @return amountOut The amount of sICX received.
+     * @notice swapExactInputSingle swaps a fixed amount of `tokenIn` for a maximum possible amount of `tokenOut`
+     * using the `tokenIn`/`tokenOut` 0.3% pool by calling `exactInputSingle` in the swap router.
+     * @dev The calling address must approve this contract to spend at least `amountIn` worth of its `tokenIn` for this function to succeed.
+     * @param amountIn The exact amount of `tokenIn` that will be swapped for `tokenOut`.
+     * @return amountOut The amount of `tokenOut` received.
      */
     // @External - this method is external through tokenFallback
     private void swapExactInputSingle (Address caller, Address tokenIn, BigInteger amountIn) {
@@ -96,7 +113,7 @@ public class Swap {
         // Naively set amountOutMinimum to 0. In production, use an oracle or other data source to choose a safer value for amountOutMinimum.
         // We also set the sqrtPriceLimitx96 to be 0 to ensure we swap our exact input amount.
         ExactInputSingleParams params = new ExactInputSingleParams(
-            SICX,
+            tokenOut,
             poolFee,
             caller,
             now(),
@@ -115,12 +132,11 @@ public class Swap {
         reentreancy.lock(false);
     }
 
-
     /**
-     * @notice swapExactOutputSingle swaps a minimum possible amount of IUSDC for a fixed amount of SICX.
-     * @param amountOut The exact amount of SICX to receive from the swap.
-     * @param amountInMaximum The amount of IUSDC we are willing to spend to receive the specified amount of SICX.
-     * @return amountIn The amount of IUSDC actually spent in the swap.
+     * @notice swapExactOutputSingle swaps a minimum possible amount of `tokenIn` for a fixed amount of `tokenOut`.
+     * @param amountOut The exact amount of `tokenOut` to receive from the swap.
+     * @param amountInMaximum The amount of `tokenIn` we are willing to spend to receive the specified amount of `tokenOut`.
+     * @return amountIn The amount of `tokenIn` actually spent in the swap.
      */
     // @External - this method is external through tokenFallback
     private void swapExactOutputSingle(
@@ -134,7 +150,7 @@ public class Swap {
         // Approve the router to spend the specifed `amountInMaximum` of DAI.
         // In production, you should choose the maximum amount to spend based on oracles or other data sources to acheive a better swap.
         ExactOutputSingleParams params = new ExactOutputSingleParams(
-            this.SICX,
+            this.tokenOut,
             poolFee,
             caller,
             now(),
@@ -142,7 +158,7 @@ public class Swap {
             ZERO
         );
 
-        // Forward IUSDC to the router and call the "exactOutputSingle" method
+        // Forward `tokenIn` to the router and call the "exactOutputSingle" method
         JsonObject data = Json.object()
             .add("method", "exactOutputSingle")
             .add("params", params.toJson());
@@ -166,14 +182,14 @@ public class Swap {
 
         // Multiple pool swaps are encoded through bytes called a `path`. A path is a sequence of token addresses and poolFees that define the pools used in the swaps.
         // The format for pool encoding is (tokenIn, fee, tokenOut/tokenIn, fee, tokenOut) where tokenIn/tokenOut parameter is the shared token across the pools.
-        // Since we are swapping USDC to BNUSD and then BNUSD to SICX the path encoding is (USDC, 0.3%, BNUSD, 0.3%, SICX).
+        // Since we are swapping `tokenIn` to `tokenInOut` and then `tokenInOut` to `tokenOut` the path encoding is (`tokenIn`, 0.3%, `tokenInOut`, 0.3%, `tokenOut`).
         ExactInputParams params = new ExactInputParams(
             BytesUtils.concat(
                 tokenIn.toByteArray(),
                 BytesUtils.intToBytes(poolFee),
-                BNUSD.toByteArray(),
+                tokenInOut.toByteArray(),
                 BytesUtils.intToBytes(poolFee),
-                SICX.toByteArray()
+                tokenOut.toByteArray()
             ),
             caller,
             now(),
@@ -193,13 +209,13 @@ public class Swap {
 
     
     /**
-     * @notice swapExactOutputMultihop swaps a minimum possible amount of IUSDC for a fixed amount of WETH through an intermediary pool.
-     * For this example, we want to swap IUSDC for SICX through a BNUSD pool but we specify the desired amountOut of SICX. Notice how the path encoding is slightly different in for exact output swaps.
-     * @dev The calling address must approve this contract to spend its IUSDC for this function to succeed. As the amount of input IUSDC is variable,
+     * @notice swapExactOutputMultihop swaps a minimum possible amount of `tokenIn` for a fixed amount of WETH through an intermediary pool.
+     * For this example, we want to swap `tokenIn` for `tokenOut` through a `tokenInOut` pool but we specify the desired amountOut of `tokenOut`. Notice how the path encoding is slightly different in for exact output swaps.
+     * @dev The calling address must approve this contract to spend its `tokenIn` for this function to succeed. As the amount of input `tokenIn` is variable,
      * the calling address will need to approve for a slightly higher amount, anticipating some variance.
-     * @param amountOut The desired amount of SICX.
-     * @param amountInMaximum The maximum amount of IUSDC willing to be swapped for the specified amountOut of SICX.
-     * @return amountIn The amountIn of IUSDC actually spent to receive the desired amountOut.
+     * @param amountOut The desired amount of `tokenOut`.
+     * @param amountInMaximum The maximum amount of `tokenIn` willing to be swapped for the specified amountOut of `tokenOut`.
+     * @return amountIn The amountIn of `tokenIn` actually spent to receive the desired amountOut.
      */
     // @External - this method is external through tokenFallback
     private void swapExactOutputMultihop(
@@ -211,23 +227,23 @@ public class Swap {
         reentreancy.lock(true);
 
         // The parameter path is encoded as (tokenOut, fee, tokenIn/tokenOut, fee, tokenIn)
-        // The tokenIn/tokenOut field is the shared token between the two pools used in the multiple pool swap. In this case BNUSD is the "shared" token.
+        // The tokenIn/tokenOut field is the shared token between the two pools used in the multiple pool swap. In this case `tokenInOut` is the "shared" token.
         // For an exactOutput swap, the first swap that occurs is the swap which returns the eventual desired token.
-        // In this case, our desired output token is WETH9 so that swap happpens first, and is encoded in the path accordingly.
+        // In this case, our desired output token is `tokenOut` so that swap happpens first, and is encoded in the path accordingly.
         ExactOutputParams params = new ExactOutputParams(
             BytesUtils.concat(
-                SICX.toByteArray(),
+                tokenOut.toByteArray(),
                 BytesUtils.intToBytes(poolFee),
-                BNUSD.toByteArray(),
+                tokenInOut.toByteArray(),
                 BytesUtils.intToBytes(poolFee),
-                IUSDC.toByteArray()
+                tokenIn.toByteArray()
             ), 
             caller,
             now(),
             amountOut
         );
 
-        // Forward IUSDC to the router and call the "exactOutput" method
+        // Forward `tokenIn` to the router and call the "exactOutput" method
         JsonObject data = Json.object()
             .add("method", "exactOutput")
             .add("params", params.toJson());
@@ -252,8 +268,8 @@ public class Swap {
         String method = root.get("method").asString();
         Address token = Context.getCaller();
 
-        // Ensure we received IUSDC as input
-        Context.require(token.equals(IUSDC));
+        // Ensure we received `tokenIn` as input
+        Context.require(token.equals(tokenIn));
 
         switch (method)
         {
@@ -283,9 +299,59 @@ public class Swap {
                 break;
             }
 
+            // Implements LiquidityManager
+            case "deposit": 
+            {
+                // Accept the incoming token transfer
+                this.liquidityMgr.deposit(_from, token, _value);
+                break;
+            }
+
             default:
                 Context.revert("tokenFallback: Unimplemented tokenFallback action");
         }
+    }
+
+    // ================================================
+    // Implements LiquidityManager
+    // ================================================
+    /**
+     * @notice Called to `Context.getCaller()` after minting liquidity to a position from ConvexusPool#mint.
+     * @dev In the implementation you must pay the pool tokens owed for the minted liquidity.
+     * The caller of this method must be checked to be a ConvexusPool deployed by the canonical ConvexusFactory.
+     * @param amount0Owed The amount of token0 due to the pool for the minted liquidity
+     * @param amount1Owed The amount of token1 due to the pool for the minted liquidity
+     * @param data Any data passed through by the caller via the mint call
+     */
+    @External
+    public void convexusMintCallback (
+        BigInteger amount0Owed,
+        BigInteger amount1Owed,
+        byte[] data
+    ) {
+        this.liquidityMgr.convexusMintCallback(amount0Owed, amount1Owed, data);
+    }
+
+    /**
+     * @notice Add liquidity to an initialized pool
+     * @dev Liquidity must have been provided beforehand
+     */
+    @External
+    public AddLiquidityResult addLiquidity (AddLiquidityParams params) {
+        return this.liquidityMgr.addLiquidity(params);
+    }
+
+    /**
+     * @notice Remove funds from the liquidity manager
+     */
+    @External
+    public void withdraw (Address token) {
+        this.liquidityMgr.withdraw(token);
+    }
+
+    @External(readonly = true)
+    public BigInteger deposited(Address user, Address token) {
+        return this.liquidityMgr.deposited(user, token);
     }
 
     // ================================================
