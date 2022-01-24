@@ -5,7 +5,7 @@ from bash import bash
 
 from scripts.config import Config
 from scripts.deploy_contract import deploy, update
-from scripts.call_contract import invoke
+from scripts.call_contract import invoke, call
 from scripts.meta import get_meta
 
 class Command:
@@ -29,6 +29,10 @@ class Command:
         invoke_parser.add_argument('package', type=str, help='package name')
         invoke_parser.add_argument('params', type=str, help='contract params filename')
 
+        call_parser = subparsers.add_parser('call')
+        call_parser.add_argument('package', type=str, help='package name')
+        call_parser.add_argument('params', type=str, help='contract params filename')
+
         optimizedJar_parser = subparsers.add_parser('optimizedJar')
         optimizedJar_parser.add_argument('package', type=str, help='package name')
 
@@ -38,9 +42,9 @@ class Command:
     @staticmethod
     def optimizedJar(args):
         javaPkg, version, build = get_meta(args.package, args.endpoint)
-        print(f"Executing {javaPkg}:build...")
+        print(f"Executing {javaPkg}:build ...")
         result = str(bash(f"./gradlew {javaPkg}:build"))
-        print(f"Executing {javaPkg}:optimizedJar...")
+        print(f"Executing {javaPkg}:optimizedJar ...")
         result = str(bash(f"./gradlew {javaPkg}:optimizedJar"))
         if not "BUILD SUCCESSFUL" in result:
             print(result)
@@ -64,6 +68,11 @@ class Command:
         print(f" -------------------- Invoking {args.package} ... -------------------- ")
         config = Config(args.endpoint, args.keystore.name, args.password)
         invoke(config, args.package, args.params, verbose=print)
+
+    @staticmethod
+    def call(args):
+        config = Config(args.endpoint, args.keystore.name, args.password)
+        print(call(config, args.package, args.params, verbose=print))
 
 if __name__ == "__main__":
     Command()
