@@ -197,7 +197,7 @@ public class ConvexusFactory implements IConvexusPoolDeployer {
         checkOwner();
 
         Context.require(fee < 1000000, 
-            "enableFeeAmount; fee needs to be lower than 1000000");
+            "enableFeeAmount: fee needs to be lower than 1000000");
         
         // tick spacing is capped at 16384 to prevent the situation where tickSpacing is so large that
         // TickBitmap#nextInitializedTickWithinOneWord overflows int24 container from a valid tick
