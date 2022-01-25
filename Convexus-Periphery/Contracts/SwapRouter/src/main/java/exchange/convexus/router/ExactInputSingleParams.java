@@ -57,7 +57,7 @@ public class ExactInputSingleParams {
     public static ExactInputSingleParams fromJson(JsonObject params) {
       return new ExactInputSingleParams(
           Address.fromString(params.get("tokenOut").asString()),
-          params.get("fee").asInt(),
+          StringUtils.toBigInt(params.get("fee").asString()).intValue(),
           Address.fromString(params.get("recipient").asString()),
           StringUtils.toBigInt(params.get("deadline").asString()),
           StringUtils.toBigInt(params.get("amountOutMinimum").asString()),

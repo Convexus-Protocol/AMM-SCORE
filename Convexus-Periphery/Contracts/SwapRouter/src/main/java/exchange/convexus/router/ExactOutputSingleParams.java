@@ -67,7 +67,7 @@ public class ExactOutputSingleParams {
   public static ExactOutputSingleParams fromJson(JsonObject params) {
     return new ExactOutputSingleParams(
         Address.fromString(params.get("tokenOut").asString()),
-        params.get("fee").asInt(),
+        StringUtils.toBigInt(params.get("fee").asString()).intValue(),
         Address.fromString(params.get("recipient").asString()),
         StringUtils.toBigInt(params.get("deadline").asString()),
         StringUtils.toBigInt(params.get("amountOut").asString()),
