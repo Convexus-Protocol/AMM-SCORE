@@ -12,7 +12,7 @@ dependencies {
 }
 
 optimizedJar {
-    mainClassName = 'exchange.convexus.router.ConvexusRouter'
+    mainClassName = 'exchange.convexus.router.SwapRouter'
     // setEnableDebug(true)
     from {
         configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
