@@ -48,6 +48,7 @@ echo '{}' | jq \
   --arg fee $fee \
   '{method: "getPool", params: {token0: $token0, token1: $token1, fee: $fee}}' > ./config/calls/factory/${endpoint}/getPool.json
 pool=$(./run.py -e ${endpoint} call factory getPool)
+echo "Pool deployed : ${pool}"
 echo '{}' | jq \
   --arg scoreAddress $pool \
   '{scoreAddress: $scoreAddress}' > ./config/deploy/iusdc-sicx-pool/${endpoint}/deploy.json
