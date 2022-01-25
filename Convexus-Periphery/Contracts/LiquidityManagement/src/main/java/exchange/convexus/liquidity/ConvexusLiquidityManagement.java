@@ -157,7 +157,12 @@ public class ConvexusLiquidityManagement {
     /**
      * @notice Add funds to the liquidity manager
      */
-    public void deposit (Address caller, Address tokenIn, BigInteger amountIn) {
+    // @External - this method is external through tokenFallback
+    public void deposit (
+        Address caller, 
+        Address tokenIn, 
+        BigInteger amountIn
+    ) {
         // --- Checks ---
         Context.require(amountIn.compareTo(ZERO) > 0, 
             "deposit: Deposit amount cannot be less or equal to 0");
@@ -176,7 +181,7 @@ public class ConvexusLiquidityManagement {
         final Address caller = Context.getCaller();
 
         var depositedUser = this.deposited.at(caller);
-        BigInteger amount = depositedUser.getOrDefault(caller, ZERO);
+        BigInteger amount = depositedUser.getOrDefault(token, ZERO);
 
         if (amount.compareTo(ZERO) > 0) {
             Context.call(token, "transfer", caller, amount, "withdraw".getBytes());
