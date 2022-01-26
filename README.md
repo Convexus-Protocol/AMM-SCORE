@@ -41,13 +41,13 @@ See our introduction [Medium](https://convexus.medium.com/convexus-cbf2db4ce9e7)
 <details>
 <summary>❓ I want to swap a token against another</summary>
 
-Please refer to the [`SwapRouter`](/Convexus-Periphery/Contracts/SwapRouter/docs/README.md) documentation. In most cases, you will need to call [`exactInputSingle`](/Convexus-Periphery/Contracts/SwapRouter/docs/README.md#swaprouterexactinputsingle).
+Please refer to the [`SwapRouter`](/Convexus-Periphery/Contracts/SwapRouter/docs/README.md) documentation. In most cases, you will need to call the [`exactInputSingle`](/Convexus-Periphery/Contracts/SwapRouter/docs/README.md#swaprouterexactinputsingle) method.
 </details>
 
 
 <details>
 <summary>❓ I want to provide liquidity to a pool</summary>
 
-Please refer to the [`NonFungiblePositionManager`](/Convexus-Periphery/Contracts/NonFungiblePositionManager/docs/README.md) documentation. You will need first to deposit some funds using [`deposit`](/Convexus-Periphery/Contracts/NonFungiblePositionManager/docs/README.md#nonfungiblepositionmanagerdeposit), then create a new position wrapped in a NFT using [`mint`](/Convexus-Periphery/Contracts/NonFungiblePositionManager/docs/README.md#nonfungiblepositionmanagermint).
+Please refer to the [`NonFungiblePositionManager`](/Convexus-Periphery/Contracts/NonFungiblePositionManager/docs/README.md) documentation. You will need first to deposit some funds using [`deposit`](/Convexus-Periphery/Contracts/NonFungiblePositionManager/docs/README.md#nonfungiblepositionmanagerdeposit), then create a new position wrapped in a NFT using [`mint`](/Convexus-Periphery/Contracts/NonFungiblePositionManager/docs/README.md#nonfungiblepositionmanagermint). The NFT represents the liquidity you provided to the pool.
 </details>
 
