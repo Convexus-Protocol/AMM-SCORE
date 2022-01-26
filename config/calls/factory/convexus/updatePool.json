@@ -1,0 +1,9 @@
+{
+  "method": "updatePool",
+  "params": {
+    "pool": "cx1fffee71325ce9cf1a37228afe4dccfa9584e97c",
+    "tokenA": "cx08af94eb40b6f2615fd5f110e801ebb5eae6bba5",
+    "tokenB": "cx998e3e0d6be28165928af5bb50490900a28ea184",
+    "fee": "0xbb8"
+  }
+}
