@@ -25,6 +25,8 @@ public class StringUtils {
     public static BigInteger toBigInt (String input) {
         if (input.startsWith("0x")) {
             return new BigInteger(input.substring(2), 16);
+        } if (input.startsWith("-0x")) {
+            return new BigInteger(input.substring(3), 16).negate();
         } else {
             return new BigInteger(input, 10);
         }
