@@ -63,3 +63,15 @@ echo '{}' | jq \
 # Deploy SwapRouter
 echo '{}' | jq --arg _factory $factory_address '{_factory: $_factory}' > ./config/deploy/swaprouter/${endpoint}/params.json
 ./run.py -e ${endpoint} deploy swaprouter
+
+# Deploy NFTPositionDescriptor
+./run.py -e ${endpoint} deploy nftpositiondescriptor
+
+# Deploy NFTPositionManager
+_tokenDescriptor_=$(getAddress "nftpositiondescriptor" ${endpoint})
+echo '{}' | jq \
+  --arg _factory $factory_address \
+  --arg _tokenDescriptor_ $_tokenDescriptor_ \
+  '{_factory: $_factory, _tokenDescriptor_: $_tokenDescriptor_}' > ./config/deploy/nftpositionmanager/${endpoint}/params.json
+
+./run.py -e ${endpoint} deploy nftpositionmanager

@@ -22,6 +22,7 @@ import exchange.convexus.pool.Slot0;
 import exchange.convexus.positionmgr.PositionInformation;
 import score.Address;
 import score.Context;
+import score.annotation.External;
 
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonObject;
@@ -31,6 +32,17 @@ import exchange.convexus.librairies.PoolAddress;
 /// @notice Produces a string containing the data URI for a JSON metadata string
 public class NonfungibleTokenPositionDescriptor {
 
+  public NonfungibleTokenPositionDescriptor () {
+    // Nothing to do
+  }
+
+  /**
+   * Returns a tokenURI for a given tokenID
+   * @param positionManager
+   * @param tokenId
+   * @return
+   */
+  @External(readonly = true)
   public String tokenURI (Address positionManager, BigInteger tokenId) {
     var position = PositionInformation.fromMap(Context.call(positionManager, "positions", tokenId));
     var factory = (Address) Context.call(positionManager, "factory");

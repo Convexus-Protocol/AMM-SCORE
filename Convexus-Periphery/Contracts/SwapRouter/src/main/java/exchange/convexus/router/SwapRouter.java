@@ -379,8 +379,12 @@ public class SwapRouter {
 
         ByteArrayObjectWriter writer = Context.newByteArrayObjectWriter("RLPn");
         writer.write(data);
-        
-        var result = PairAmounts.fromMap(Context.call(getPool(tokenIn, tokenOut, fee), "swap",
+
+        Address targetPool = getPool(tokenIn, tokenOut, fee);
+        Context.require(targetPool != null, 
+            "exactInputInternal: Pool doesn't exist");
+
+        var result = PairAmounts.fromMap(Context.call(targetPool, "swap",
             recipient,
             zeroForOne,
             amountIn,
@@ -419,7 +423,11 @@ public class SwapRouter {
         ByteArrayObjectWriter writer = Context.newByteArrayObjectWriter("RLPn");
         writer.write(data);
 
-        var result = PairAmounts.fromMap(Context.call(getPool(tokenIn, tokenOut, fee), "swap",
+        Address targetPool = getPool(tokenIn, tokenOut, fee);
+        Context.require(targetPool != null, 
+            "exactInputInternal: Pool doesn't exist");
+        
+        var result = PairAmounts.fromMap(Context.call(targetPool, "swap",
             recipient,
             zeroForOne,
             amountOut.negate(),
@@ -486,6 +494,7 @@ public class SwapRouter {
                 break;
             }
 
+            // "pay" is coming from the Pool
             case "pay": {
                 // Accept the incoming token transfer
                 this.liquidityMgr.deposit(_from, token, _value);

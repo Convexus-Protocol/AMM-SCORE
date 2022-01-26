@@ -68,7 +68,7 @@ public class ExactInputSingleParams {
     public JsonObject toJson() {
         return Json.object()
             .add("tokenOut", tokenOut.toString())
-            .add("fee", fee)
+            .add("fee", Integer.toString(fee))
             .add("recipient", recipient.toString())
             .add("deadline", deadline.toString())
             .add("amountOutMinimum", amountOutMinimum.toString())

@@ -16,6 +16,8 @@ echo "SICX : "$(getAddress "sicx" ${endpoint})
 echo "Factory : "$(getAddress "factory" ${endpoint})
 echo "Pool (USDC/SICX) : "$(getAddress "iusdc-sicx-pool" ${endpoint})
 echo "SwapRouter : "$(getAddress "swaprouter" ${endpoint})
+echo "NFTPositionDescriptor : "$(getAddress "nftpositiondescriptor" ${endpoint})
+echo "NFTPositionManager : "$(getAddress "nftpositionmanager" ${endpoint})
 
 echo "=========================================================="
 
@@ -25,4 +27,6 @@ echo "  \"$(getAddress "sicx" ${endpoint})\": \"SICX\","
 echo "  \"$(getAddress "factory" ${endpoint})\": \"Factory\","
 echo "  \"$(getAddress "iusdc-sicx-pool" ${endpoint})\": \"Pool (USDC/SICX)\","
 echo "  \"$(getAddress "swaprouter" ${endpoint})\": \"SwapRouter\","
+echo "  \"$(getAddress "nftpositiondescriptor" ${endpoint})\": \"NFTPositionDescriptor\","
+echo "  \"$(getAddress "nftpositionmanager" ${endpoint})\": \"NFTPositionManager\","
 echo "}"
