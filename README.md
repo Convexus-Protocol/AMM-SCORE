@@ -35,3 +35,19 @@ See our introduction [Medium](https://convexus.medium.com/convexus-cbf2db4ce9e7)
 ## **Commons Documentation**
 
 - [Convexus Librairies](/Convexus-Commons/Librairies/docs/README.md)
+
+## **Frequently Asked Questions**
+
+<details>
+<summary>❓ I want to swap a token against another</summary>
+
+Please refer to the [`SwapRouter`](/Convexus-Periphery/Contracts/SwapRouter/docs/README.md) documentation. In most cases, you will need to call [`exactInputSingle`](/Convexus-Periphery/Contracts/SwapRouter/docs/README.md#swaprouterexactinputsingle).
+</details>
+
+
+<details>
+<summary>❓ I want to provide liquidity to a pool</summary>
+
+<!-- TODO -->
+</details>
+
