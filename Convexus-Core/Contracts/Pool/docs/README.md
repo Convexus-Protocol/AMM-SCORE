@@ -166,7 +166,7 @@ Result:
 }
 ```
 
-## `SwapRouter::Slot0`
+## `ConvexusPool::Slot0`
 
 ### ⚙️ Structure definition
 

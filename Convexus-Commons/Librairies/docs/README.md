@@ -2,9 +2,20 @@
 
 ---
 
+# What is Q64.96 price ?
+
+In Convexus, prices of tokens are stored in the 0th slot of the pool state. Storing the price values instead of deriving them allows pools to perform higher precision operations. The price is stored as a square root because of the geometric nature of the core AMM algorithm, x*y=k. Essentially, the math works out well when working with the square root of the price.
+
+In addition, you'll notice the X96 suffix at the end of the variable name. This X* naming convention is used throughout the Convexus codebase to indicate values that are encoded as binary fixed-point numbers. Fixed-point is excellent at representing fractions while maintaining consistent fidelity and high precision in integer-only environments like SCORE, making it a perfect fit for representing prices, which of course are ultimately fractions. The number after X indicates the number of fraction bits - 96 in this case - reserved for encoding the value after the decimal point. The number of integer bits can be trivially derived from the size of the variable and the number of fraction bits. In this case, sqrtPriceX96 is stored as a uint160, meaning that there are 160 - 96 = 64 integer bits.
+
+
 # How to encode a Q64.96 price
 
 - Given two amounts of tokens, the simple answer is : 
+
+> `sqrt(price) * 2**96`
+
+or 
 
 > `sqrt(amount1 / amount0) * 2**96`
 
@@ -61,6 +72,41 @@ console.assert(String(encodePriceSqrt(1, 1))  == "79228162514264337593543950336"
 console.assert(String(encodePriceSqrt(1, 10)) == "25054144837504793118641380156")
 ```
 
+Exemple:
+```java
+amount0 = 10
+amount1 = 1
+sqrtPriceX96 = sqrt(amount1 / amount0) * 2**96
+sqrtPriceX96 = sqrt(0.1) * 2**96
+sqrtPriceX96 = 25054144837504793118641380156
+```
+
+# How to decode a Q64.96 to a floating point price
+
+- The simple answer is : 
+
+> `price = sqrtPriceX96**2 / 2**192`
+
+The math for retrieving a price from a Q64.96 are pretty simple: 
+
+```java
+sqrtPriceX96 = sqrt(price) * 2 ** 96
+// divide both sides by 2 ** 96
+sqrtPriceX96 / (2 ** 96) = sqrt(price)
+// square both sides
+(sqrtPriceX96 / (2 ** 96)) ** 2 = price
+// expand the squared fraction
+(sqrtPriceX96 ** 2) / ((2 ** 96) ** 2)  = price
+// multiply the exponents in the denominator to get the final expression
+sqrtPriceX96 ** 2 / 2 ** 192 = price
+```
+
+Exemple:
+```java
+sqrtPriceX96 = 25054144837504793118641380156 // encodePriceSqrt(1, 10)
+price = sqrtPriceX96**2 / 2**192
+price = 0.1
+```
 
 ---
 
