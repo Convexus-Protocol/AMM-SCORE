@@ -527,7 +527,6 @@ public class SwapRouter {
     // ================================================
     /**
      * Check if transaction hasn't reached the deadline
-     * @param deadline
      */
     private void checkDeadline(BigInteger deadline) {
         Context.require(_blockTimestamp().compareTo(deadline) <= 0,

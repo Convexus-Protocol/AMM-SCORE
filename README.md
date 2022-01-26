@@ -48,6 +48,6 @@ Please refer to the [`SwapRouter`](/Convexus-Periphery/Contracts/SwapRouter/docs
 <details>
 <summary>❓ I want to provide liquidity to a pool</summary>
 
-<!-- TODO -->
+Please refer to the [`NonFungiblePositionManager`](/Convexus-Periphery/Contracts/NonFungiblePositionManager/docs/README.md) documentation. You will need first to deposit some funds using [`deposit`](/Convexus-Periphery/Contracts/NonFungiblePositionManager/docs/README.md#nonfungiblepositionmanagerdeposit), then create a new position wrapped in a NFT using [`mint`](/Convexus-Periphery/Contracts/NonFungiblePositionManager/docs/README.md#nonfungiblepositionmanagermint).
 </details>
 

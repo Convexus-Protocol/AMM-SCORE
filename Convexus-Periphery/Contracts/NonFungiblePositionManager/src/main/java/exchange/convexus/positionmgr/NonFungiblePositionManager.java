@@ -188,8 +188,10 @@ public class NonFungiblePositionManager extends IRC721Enumerable {
 
     /**
      * @notice Creates a new position wrapped in a NFT
-     * @dev Call this when the pool does exist and is initialized. Note that if the pool is created but not initialized
-     * a method does not exist, i.e. the pool is assumed to be initialized.
+     * 
+     * Access: Everyone
+     * 
+     * @dev Call this when the pool does exist and is initialized. Note that if the pool is created but not initialized, the call will fail.
      * @param params The params necessary to mint a position, encoded as `MintParams`
      * @return tokenId The ID of the token that represents the minted position
      * @return liquidity The amount of liquidity for this position
@@ -197,7 +199,9 @@ public class NonFungiblePositionManager extends IRC721Enumerable {
      * @return amount1 The amount of token1
      */
     @External
-    public MintResult mint (MintParams params) {
+    public MintResult mint (
+        MintParams params
+    ) {
         this.checkDeadline(params.deadline);
         var result = this.liquidityMgr.addLiquidity(new AddLiquidityParams(
             params.token0,
@@ -553,7 +557,6 @@ public class NonFungiblePositionManager extends IRC721Enumerable {
     // ================================================
     /**
      * Check if transaction hasn't reached the deadline
-     * @param deadline
      */
     private void checkDeadline(BigInteger deadline) {
         Context.require(_blockTimestamp().compareTo(deadline) <= 0,

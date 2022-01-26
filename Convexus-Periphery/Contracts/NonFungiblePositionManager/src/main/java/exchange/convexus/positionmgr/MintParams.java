@@ -21,16 +21,27 @@ import java.math.BigInteger;
 import score.Address;
 
 public class MintParams {
+    // The first token of a pool, unsorted
     public Address token0;
+    // The second token of a pool, unsorted
     public Address token1;
+    // The fee level of the pool
     public int fee;
+    // The lower tick of the position
     public int tickLower;
+    // The upper tick of the position
     public int tickUpper;
+    // The desired amount of token0 to be spent,
     public BigInteger amount0Desired;
+    // The desired amount of token1 to be spent,
     public BigInteger amount1Desired;
+    // The minimum amount of token0 to spend, which serves as a slippage check,
     public BigInteger amount0Min;
+    // The minimum amount of token1 to spend, which serves as a slippage check,
     public BigInteger amount1Min;
+    // The address that received the output of the swap
     public Address recipient;
+    // The unix time after which a mint will fail, to protect against long-pending transactions and wild swings in prices
     public BigInteger deadline;
 
     public MintParams() {}
