@@ -186,8 +186,7 @@ public class IRC721 {
    *
    * Emits a {Transfer} event.
    */
-  @External
-  public void _safeTransfer(
+  private void _safeTransfer(
       Address from,
       Address to,
       BigInteger tokenId,
