@@ -39,7 +39,7 @@ See our introduction [Medium](https://convexus.medium.com/convexus-cbf2db4ce9e7)
 ## **Frequently Asked Questions**
 
 <details>
-<summary>❓ I want to swap a token against another</summary>
+<summary>❓ How to swap a token against another ? </summary>
 
 Please refer to the [`SwapRouter`](/Convexus-Periphery/Contracts/SwapRouter/docs/README.md) documentation. In most cases, you will need to call the [`exactInputSingle`](/Convexus-Periphery/Contracts/SwapRouter/docs/README.md#swaprouterexactinputsingle) method.
 </details>
@@ -52,10 +52,16 @@ Please refer to the [`Slot0`](/Convexus-Core/Contracts/Pool/docs/README.md#conve
 </details>
 
 
-
 <details>
-<summary>❓ I want to provide liquidity to a pool</summary>
+<summary>❓ How to provide liquidity to a pool ?</summary>
 
 Please refer to the [`NonFungiblePositionManager`](/Convexus-Periphery/Contracts/NonFungiblePositionManager/docs/README.md) documentation. You will need first to deposit some funds using [`deposit`](/Convexus-Periphery/Contracts/NonFungiblePositionManager/docs/README.md#nonfungiblepositionmanagerdeposit), then create a new position wrapped in a NFT using [`mint`](/Convexus-Periphery/Contracts/NonFungiblePositionManager/docs/README.md#nonfungiblepositionmanagermint). The NFT represents the liquidity you provided to the pool.
+</details>
+
+
+<details>
+<summary>❓ How to get the list of my positions ?</summary>
+
+Firstly, get the number of positions with the [`balanceOf`](https://docs.openzeppelin.com/contracts/3.x/api/token/erc721#IERC721-balanceOf-address-) method from the `NonFungiblePositionManager` using your address, then call [`tokenOfOwnerByIndex`](https://docs.openzeppelin.com/contracts/3.x/api/token/erc721#IERC721Enumerable-tokenOfOwnerByIndex-address-uint256-), with an index starting from 0 to the value returned by `balanceOf`. You can get the details of the position using the `positions` method.
 </details>
 

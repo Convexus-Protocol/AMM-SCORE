@@ -145,11 +145,16 @@ public class NonFungiblePositionManager extends IRC721Enumerable {
     /**
      * @notice Returns the position information associated with a given token ID.
      * @dev Throws if the token ID is not valid.
+     * 
+     * Access: Everyone
+     * 
      * @param tokenId The ID of the token that represents the position
      * @return the position
      */
     @External(readonly = true)
-    public PositionInformation positions (BigInteger tokenId) {
+    public PositionInformation positions (
+        BigInteger tokenId
+    ) {
         NFTPosition position = this._positions.getOrDefault(tokenId, NFTPosition.empty());
         Context.require(!position.poolId.equals(ZERO),
             "positions: Invalid token ID");

@@ -137,3 +137,51 @@ public void IncreaseLiquidity (
 - `liquidity`: The amount by which liquidity for the NFT position was increased
 - `amount0`: The amount of token0 that was paid for the increase in liquidity
 - `amount1`: The amount of token1 that was paid for the increase in liquidity
+
+
+
+## `NonFungiblePositionManager::positions`
+
+### 📜 Method Call
+
+- Returns the position information associated with a given token ID. Throws if the token ID is not valid.
+- Access: Everyone
+
+```java
+@External(readonly = true)
+public PositionInformation positions (
+    BigInteger tokenId
+)
+```
+
+- `tokenId`: The ID of the token that represents the position
+
+### 🧪 Example call
+
+```java
+{
+  "to": NonFungiblePositionManager,
+  "method": "positions",
+  "params": {
+    "tokenId": "0x1"
+  }
+}
+```
+
+Result:
+```java
+{
+  "fee": "0xbb8",
+  "feeGrowthInside0LastX128": "0x0",
+  "feeGrowthInside1LastX128": "0x0",
+  "liquidity": "0x21e19e0c9bab240021f",
+  "nonce": "0x0",
+  "operator": "hx0000000000000000000000000000000000000000", // ZERO_ADDRESS
+  "tickLower": "-0xd89b4",
+  "tickUpper": "0xd89b4",
+  "token0": token0,
+  "token1": token1,
+  "tokensOwed0": "0x0",
+  "tokensOwed1": "0x0"
+}
+```
