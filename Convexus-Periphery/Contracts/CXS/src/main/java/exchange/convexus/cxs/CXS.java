@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package exchange.convexus.cvxs;
+package exchange.convexus.cxs;
 
 import static exchange.convexus.utils.AddressUtils.ZERO_ADDRESS;
 import static exchange.convexus.utils.TimeUtils.now;
@@ -34,23 +34,23 @@ import score.annotation.EventLog;
 import score.annotation.External;
 import score.annotation.Optional;
 
-public class CVXS {
+public class CXS {
     // ================================================
     // Consts
     // ================================================
     // Contract name
-    private final String NAME = "CVXS";
+    private final String NAME = "CXS";
 
     // IRC2 token name for this token
     private final String name = "Convexus Token";
 
     // IRC2 token symbol for this token
-    private final String symbol = "CVXS";
+    private final String symbol = "CXS";
 
     // IRC2 token decimals for this token
     private final int decimals = 18;
 
-    // Total number of tokens in circulation : 1 billion CVXS
+    // Total number of tokens in circulation : 1 billion CXS
     private final BigInteger INITIAL_TOTAL_SUPPLY = BigInteger.valueOf(1_000_000_000).multiply(MathUtils.pow10(18));;
     private final VarDB<BigInteger> totalSupply = Context.newVarDB(NAME + "_totalSupply", BigInteger.class);
 
@@ -108,12 +108,12 @@ public class CVXS {
     // Methods
     // ================================================
     /**
-     * @notice Construct a new CVXS token
+     * @notice Construct a new CXS token
      * @param account The initial account to grant all the tokens
      * @param minter_ The account with minting ability
      * @param mintingAllowedAfter_ The timestamp after which minting may occur
      */
-    public CVXS (
+    public CXS (
         Address account, 
         Address minter_, 
         BigInteger mintingAllowedAfter_
@@ -121,7 +121,7 @@ public class CVXS {
         // Initial deploy
         if (balances.get(account) == null) {
             Context.require(mintingAllowedAfter_.compareTo(now()) >= 0,
-            "CVXS: minting can only begin after deployment");
+            "CXS: minting can only begin after deployment");
 
             balances.set(account, INITIAL_TOTAL_SUPPLY);
             this.Transfer(ZERO_ADDRESS, account, INITIAL_TOTAL_SUPPLY, "genesis".getBytes());

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package exchange.convexus.cvxs;
+package exchange.convexus.cxs;
 
 import static java.math.BigInteger.ZERO;
 

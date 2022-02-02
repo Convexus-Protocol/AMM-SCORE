@@ -127,7 +127,7 @@ public class NonFungiblePositionManager extends IRC721Enumerable {
         Address _factory,
         Address _tokenDescriptor_
     ) {
-        super("Convexus Positions NFT-V1", "CVXS-POS");
+        super("Convexus Positions NFT-V1", "CXS-POS");
 
         this.liquidityMgr = new ConvexusLiquidityManagement(_factory);
         this.name = "Convexus NFT Position Manager";

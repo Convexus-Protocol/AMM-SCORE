@@ -36,7 +36,7 @@ import exchange.convexus.pairflash.PairFlash;
 import exchange.convexus.swap.Swap;
 import exchange.convexus.staker.ConvexusStaker;
 import exchange.convexus.swappay.ConvexusSwapPay;
-import exchange.convexus.cvxs.CVXS;
+import exchange.convexus.cxs.CXS;
 import exchange.convexus.positionmgr.NonFungiblePositionManager;
 import exchange.convexus.positiondescriptor.NonfungibleTokenPositionDescriptor;
 import exchange.convexus.testtokens.Baln;
@@ -145,12 +145,12 @@ public class ConvexusTest extends TestBase {
         return new ScoreSpy<ConvexusLiquidityManagement>(score, spy);
     }
     
-    public ScoreSpy<CVXS> deploy_cvxs () throws Exception {
-        Score score = sm.deploy(owner, CVXS.class);
+    public ScoreSpy<CXS> deploy_cxs () throws Exception {
+        Score score = sm.deploy(owner, CXS.class);
 
-        var spy = (CVXS) spy(score.getInstance());
+        var spy = (CXS) spy(score.getInstance());
         score.setInstance(spy);
-        return new ScoreSpy<CVXS>(score, spy);
+        return new ScoreSpy<CXS>(score, spy);
     }
     
     public ScoreSpy<NonFungiblePositionManager> deploy_nft (Address factory, Address tokenDescriptor) throws Exception {

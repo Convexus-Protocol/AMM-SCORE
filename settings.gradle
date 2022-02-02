@@ -25,7 +25,7 @@ include (
   ':Convexus-Periphery:Contracts:Quoter',
   ':Convexus-Periphery:Contracts:PairFlash',
   ':Convexus-Periphery:Contracts:Swap',
-  ':Convexus-Periphery:Contracts:CVXS',
+  ':Convexus-Periphery:Contracts:CXS',
   ':Convexus-Periphery:Contracts:Staker',
 
   // Tests
@@ -39,7 +39,7 @@ include (
   'Convexus-Periphery:Tests:Quoter-Test',
   'Convexus-Periphery:Tests:PairFlash-Test',
   'Convexus-Periphery:Tests:Swap-Test',
-  'Convexus-Periphery:Tests:CVXS-Test',
+  'Convexus-Periphery:Tests:CXS-Test',
   'Convexus-Periphery:Tests:Staker-Test',
   'Convexus-Periphery:Tests:Clients',
 

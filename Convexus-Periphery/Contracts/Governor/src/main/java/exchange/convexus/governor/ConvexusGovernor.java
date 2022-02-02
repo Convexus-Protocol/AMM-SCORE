@@ -43,7 +43,7 @@ public class ConvexusGovernor {
     private Address timelock;
 
     /// The address of the Convexus governance token
-    private Address cvxs;
+    private Address cxs;
 
     // ================================================
     // DB Variables
@@ -78,13 +78,13 @@ public class ConvexusGovernor {
     /// The number of votes in support of a proposal required in order for a quorum to be reached and for a vote to succeed
     @External(readonly = true)
     public BigInteger quorumVotes() {
-        return BigInteger.valueOf(400_000).multiply(MathUtils.pow10(18));  // 400,000 = 4% of Comp
+        return BigInteger.valueOf(400_000).multiply(MathUtils.pow10(18));  // 400,000 = 4% of CXS
     }
 
     /// The number of votes required in order for a voter to become a proposer
     @External(readonly = true)
     public BigInteger proposalThreshold() {
-        return BigInteger.valueOf(100_000).multiply(MathUtils.pow10(18)); // 100,000 = 1% of CVXS
+        return BigInteger.valueOf(100_000).multiply(MathUtils.pow10(18)); // 100,000 = 1% of CXS
     }
 
     /// The maximum number of actions that can be included in a proposal

@@ -19,7 +19,7 @@ dependencies {
     implementation project(':Convexus-Periphery:Contracts:Quoter')
     implementation project(':Convexus-Periphery:Contracts:PairFlash')
     implementation project(':Convexus-Periphery:Contracts:Swap')
-    implementation project(':Convexus-Periphery:Contracts:CVXS')
+    implementation project(':Convexus-Periphery:Contracts:CXS')
     implementation project(':Convexus-Periphery:Contracts:NonFungiblePositionManager')
     implementation project(':Convexus-Periphery:Contracts:NonfungibleTokenPositionDescriptor')
     implementation project(':Convexus-Periphery:Contracts:Governor')

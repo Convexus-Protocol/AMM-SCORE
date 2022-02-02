@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-package exchange.convexus.cvxs;
+package exchange.convexus.cxs;
 
 import exchange.convexus.utils.ConvexusTest;
 import exchange.convexus.utils.ScoreSpy;
 
-public class CVXSTest extends ConvexusTest {
+public class CXSTest extends ConvexusTest {
 
-  ScoreSpy<CVXS> cvxs;
+  ScoreSpy<CXS> cxs;
 
-  void setup_cvxs () throws Exception {
-    cvxs = deploy_cvxs();
+  void setup_cxs () throws Exception {
+    cxs = deploy_cxs();
   }
 }
