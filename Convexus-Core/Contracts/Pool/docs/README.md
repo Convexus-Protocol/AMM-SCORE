@@ -149,7 +149,7 @@ public Slot0 slot0 ()
 
 ```java
 {
-  "to": KarmaCustomTreasury,
+  "to": ConvexusPool,
   "method": "slot0"
 }
 ```

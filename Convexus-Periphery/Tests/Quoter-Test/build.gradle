@@ -8,6 +8,7 @@ dependencies {
     testImplementation project(':Convexus-Core:Contracts:Factory')
 
     testImplementation project(':Convexus-Commons:ICON:unittest')
+    testImplementation project(':Convexus-Periphery:Tests:Clients')
     
     testImplementation 'org.mockito:mockito-inline:3.11.0'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.0'

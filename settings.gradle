@@ -41,6 +41,7 @@ include (
   'Convexus-Periphery:Tests:Swap-Test',
   'Convexus-Periphery:Tests:CVXS-Test',
   'Convexus-Periphery:Tests:Staker-Test',
+  'Convexus-Periphery:Tests:Clients',
 
   // -----------------------
   // --- Convexus Common ---

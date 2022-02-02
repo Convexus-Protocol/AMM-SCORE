@@ -33,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class ConvexusPoolInitializerUtils {
 
   // Mock createAndInitializePoolIfNecessary until SCORE deployers supported by unittest
-  public static void createAndInitializePoolIfNecessary (
+  public static ScoreSpy<?> createAndInitializePoolIfNecessary (
     Class<?> poolClass, 
     Account from, 
     ScoreSpy<ConvexusFactoryMock> factory,
@@ -53,9 +53,12 @@ public class ConvexusPoolInitializerUtils {
       ScoreSpy<?> pool = ConvexusTest.deploy(poolClass, token0, token1, factory.getAddress(), fee, tickSpacing);
       pool.invoke(from, "initialize", price);
       ConvexusFactoryUtils.createPool(factory, from, token0, token1, fee, pool.getAddress());
+      return pool;
     } catch (Exception e) {
       assertEquals(e.getMessage(), "");
     }
+
+    return null;
   }
 
 }

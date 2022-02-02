@@ -23,7 +23,7 @@ public class QuoteResult {
     public BigInteger sqrtPriceX96After;
     public int initializedTicksCrossed;
 
-    public QuoteResult(
+    public QuoteResult (
         BigInteger amountOut,
         BigInteger sqrtPriceX96After,
         int initializedTicksCrossed

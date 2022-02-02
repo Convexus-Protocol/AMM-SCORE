@@ -17,13 +17,52 @@
 package exchange.convexus.quoter;
 
 import exchange.convexus.factory.ConvexusFactoryMock;
+import exchange.convexus.positiondescriptor.NonfungibleTokenPositionDescriptor;
+import exchange.convexus.positionmgr.NonFungiblePositionManager;
+import exchange.convexus.router.SwapRouter;
 import exchange.convexus.utils.ConvexusTest;
+import exchange.convexus.utils.IntUtils;
 import exchange.convexus.utils.ScoreSpy;
+import exchange.convexus.testtokens.Sicx;
+import exchange.convexus.testtokens.Usdc;
 
 public class QuoterTest extends ConvexusTest {
 
   ScoreSpy<ConvexusFactoryMock> factory;
   ScoreSpy<Quoter> quoter;
+  ScoreSpy<Sicx> sicx;
+  ScoreSpy<Usdc> usdc;
+  ScoreSpy<NonFungiblePositionManager> nft;
+  ScoreSpy<SwapRouter> router;
+
+  final int TICK_SPACINGS[] = {10, 60, 200};
+  final int FEE_AMOUNTS[] = {500, 3000, 10000};
+  final int LOW = 0;
+  final int MEDIUM = 1;
+  final int HIGH = 2;
+  int FEE = FEE_AMOUNTS[MEDIUM];
+  int tickSpacing = TICK_SPACINGS[MEDIUM];
+
+  void setup_router () throws Exception {
+    router = deploy_router(factory.getAddress());
+  }
+
+  void setup_nft () throws Exception {
+    ScoreSpy<NonfungibleTokenPositionDescriptor> positiondescriptor = deploy_positiondescriptor();
+    nft = deploy_nft(factory.getAddress(), positiondescriptor.getAddress());
+  }
+
+  void setup_tokens () throws Exception {
+    sicx = deploy_sicx();
+    usdc = deploy_usdc();
+    
+    // Transfer some funds to Alice
+    sicx.invoke(owner, "mintTo", alice.getAddress(), IntUtils.MAX_UINT256);
+    usdc.invoke(owner, "mintTo", alice.getAddress(), IntUtils.MAX_UINT256);
+    // Transfer some funds to Bob
+    sicx.invoke(owner, "mintTo", bob.getAddress(), IntUtils.MAX_UINT256);
+    usdc.invoke(owner, "mintTo", bob.getAddress(), IntUtils.MAX_UINT256);
+  }
 
   void setup_quoter () throws Exception {
     factory = deploy_factory();

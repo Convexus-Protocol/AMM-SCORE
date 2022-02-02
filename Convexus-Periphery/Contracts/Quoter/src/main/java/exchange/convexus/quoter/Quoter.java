@@ -24,7 +24,6 @@ import java.math.BigInteger;
 
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonObject;
-import com.eclipsesource.json.JsonValue;
 
 import exchange.convexus.librairies.CallbackValidation;
 import exchange.convexus.librairies.Path;
@@ -43,9 +42,6 @@ import score.VarDB;
 import score.annotation.EventLog;
 import score.annotation.External;
 import score.annotation.Optional;
-import scorex.io.Reader;
-import scorex.io.StringReader;
-import scorex.util.StringTokenizer;
 
 /**
  * @title Provides quotes for swaps
@@ -139,12 +135,11 @@ public class Quoter {
         int tickAfter = slot0.tick;
 
         JsonObject reason = Json.object()
-            .add("sqrtPriceX96", sqrtPriceX96After.toString())
-            .add("tick", BigInteger.valueOf(tickAfter).toString());
+            .add("sqrtPriceX96After", sqrtPriceX96After.toString())
+            .add("tickAfter", BigInteger.valueOf(tickAfter).toString());
 
         if (isExactInput) {
-            reason.add("amount", amountReceived.toString());
-            Context.revert(reason.toString());
+            reason.add("amountOut", amountReceived.toString());
         } else {
             BigInteger amountOutCached = this.amountOutCached.get();
             if (!amountOutCached.equals(ZERO)) {
@@ -152,9 +147,10 @@ public class Quoter {
                     "convexusSwapCallback: amountReceived == amountOutCached");
             }
 
-            reason.add("amount", amountToPay.toString());
-            Context.revert(reason.toString());
+            reason.add("amountOut", amountToPay.toString());
         }
+
+        Context.revert(reason.toString());
     }
 
     /**
@@ -167,12 +163,12 @@ public class Quoter {
         Context.require(reason.startsWith(prefix), reason);
 
         // Remove the prefixed error message from Context.revert()
-        reason = reason.replace(prefix, "");
+        reason = reason.substring(prefix.length());
 
         JsonObject json = JSONUtils.parse(reason);
-        BigInteger amountReceived = StringUtils.toBigInt(json.get("amount").asString());
-        BigInteger sqrtPriceX96After = StringUtils.toBigInt(json.get("sqrtPriceX96").asString());
-        int tickAfter = StringUtils.toBigInt(json.get("tick").asString()).intValue();
+        BigInteger amountReceived = StringUtils.toBigInt(json.get("amountOut").asString());
+        BigInteger sqrtPriceX96After = StringUtils.toBigInt(json.get("sqrtPriceX96After").asString());
+        int tickAfter = StringUtils.toBigInt(json.get("tickAfter").asString()).intValue();
         return new RevertReason(amountReceived, sqrtPriceX96After, tickAfter);
     }
 
@@ -306,7 +302,7 @@ public class Quoter {
                     : params.sqrtPriceLimitX96,
                 Path.encodePath(new PoolData(params.tokenIn, params.tokenOut, params.fee))
             );
-        } catch (UserRevertedException | AssertionError exception) { // TODO: test this behavior onchain (check flashtest.java)
+        } catch (UserRevertedException | AssertionError exception) {
             return handleRevert(exception.getMessage(), pool);
         }
 
