@@ -33,6 +33,7 @@ import exchange.convexus.librairies.PoolData;
 import exchange.convexus.librairies.TickMath;
 import exchange.convexus.utils.AddressUtils;
 import exchange.convexus.utils.BytesUtils;
+import exchange.convexus.utils.JSONUtils;
 import exchange.convexus.utils.StringUtils;
 import exchange.convexus.pool.Slot0;
 import score.Address;
@@ -137,15 +138,22 @@ public class Quoter {
         BigInteger sqrtPriceX96After = slot0.sqrtPriceX96;
         int tickAfter = slot0.tick;
 
+        JsonObject reason = Json.object()
+            .add("sqrtPriceX96", sqrtPriceX96After.toString())
+            .add("tick", BigInteger.valueOf(tickAfter).toString());
+
         if (isExactInput) {
-            Context.revert(amountReceived + ";" + sqrtPriceX96After + ";" + tickAfter);
+            reason.add("amount", amountReceived.toString());
+            Context.revert(reason.toString());
         } else {
             BigInteger amountOutCached = this.amountOutCached.get();
             if (!amountOutCached.equals(ZERO)) {
                 Context.require(amountReceived.equals(amountOutCached),
                     "convexusSwapCallback: amountReceived == amountOutCached");
             }
-            Context.revert(amountToPay + ";" + sqrtPriceX96After + ";" + tickAfter);
+
+            reason.add("amount", amountToPay.toString());
+            Context.revert(reason.toString());
         }
     }
 
@@ -161,10 +169,10 @@ public class Quoter {
         // Remove the prefixed error message from Context.revert()
         reason = reason.replace(prefix, "");
 
-        StringTokenizer scanner = new StringTokenizer(reason, ";");
-        BigInteger amountReceived = StringUtils.toBigInt(scanner.nextToken());
-        BigInteger sqrtPriceX96After = StringUtils.toBigInt(scanner.nextToken());
-        int tickAfter = StringUtils.toBigInt(scanner.nextToken()).intValue();
+        JsonObject json = JSONUtils.parse(reason);
+        BigInteger amountReceived = StringUtils.toBigInt(json.get("amount").asString());
+        BigInteger sqrtPriceX96After = StringUtils.toBigInt(json.get("sqrtPriceX96").asString());
+        int tickAfter = StringUtils.toBigInt(json.get("tick").asString()).intValue();
         return new RevertReason(amountReceived, sqrtPriceX96After, tickAfter);
     }
 
@@ -449,9 +457,7 @@ public class Quoter {
 
     @External
     public void tokenFallback (Address _from, BigInteger _value, @Optional byte[] _data) throws Exception {
-        Reader reader = new StringReader(new String(_data));
-        JsonValue input = Json.parse(reader);
-        JsonObject root = input.asObject();
+        JsonObject root = JSONUtils.parse(_data);
         String method = root.get("method").asString();
         // Address token = Context.getCaller();
 
