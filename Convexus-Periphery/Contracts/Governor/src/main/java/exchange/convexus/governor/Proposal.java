@@ -39,6 +39,7 @@ public class Proposal {
     // Methods to be called
     MethodCall[] calls;
     
+    /// @notice The block at which voting begins: holders must delegate their votes prior to this block
     long startBlock;
 
     /// @notice The block at which voting ends: votes must be cast prior to this block

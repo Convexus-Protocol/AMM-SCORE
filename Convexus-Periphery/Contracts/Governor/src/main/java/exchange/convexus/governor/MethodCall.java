@@ -19,26 +19,25 @@ package exchange.convexus.governor;
 import java.math.BigInteger;
 
 import score.Address;
-import score.Context;
 import score.ObjectReader;
 import score.ObjectWriter;
 
 /// @notice the ordered list of target addresses for calls to be made
 public class MethodCall {
-  /// @notice The ordered list of values (i.e. msg.value) to be passed to the calls to be made
+  /// @notice target addresses for calls to be made
   public Address target;
-  /// @notice The ordered list of function methods names to be called
+  /// @notice value (i.e. ICX) to be passed to the call to be made
   public BigInteger value;
-  /// @notice The ordered list of params to be used for each call
+  /// @notice function method name to be called
   public String method;
-  /// @notice The block at which voting begins: holders must delegate their votes prior to this block
-  public Object[] params;
+  /// @notice params to be used
+  public MethodParam[] params;
 
   public MethodCall (
     Address target,
     BigInteger value,
     String method,
-    Object[] params
+    MethodParam[] params
   ) {
     this.target = target;
     this.value = value;
@@ -46,27 +45,32 @@ public class MethodCall {
     this.params = params;
   }
 
-  public static MethodCall readObject(ObjectReader r) {
-    
+  public static MethodCall readObject (ObjectReader r) {
     var target = r.readAddress();
     var value = r.readBigInteger();
     var method = r.readString();
     var nParams = r.readInt();
-    Object[] params = new Object[nParams];
+    MethodParam[] params = new MethodParam[nParams];
 
     r.beginList();
     for (int i = 0; i < nParams; i++) {
-      // params[i] = 
-      // TODO
+      params[i] = r.read(MethodParam.class);
     }
     r.end();
 
-    return new MethodCall(target, value, method, params);
+    return new MethodCall (target, value, method, params);
   }
 
-  public static void writeObject(ObjectWriter w, MethodCall obj) {
-      // w.write(obj.fromBlock);
-      // w.write(obj.votes);
-      // TODO
+  public static void writeObject (ObjectWriter w, MethodCall obj) {
+    int nParams = obj.params.length;
+    w.write(obj.target);
+    w.write(obj.value);
+    w.write(obj.method);
+    w.write(nParams);
+    w.beginList(nParams);
+    for (int i = 0; i < nParams; i++) {
+      w.write(obj.params[i]);
+    }
+    w.end();
   }
 }
