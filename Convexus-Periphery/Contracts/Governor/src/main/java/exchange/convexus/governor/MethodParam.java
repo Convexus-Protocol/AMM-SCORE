@@ -143,6 +143,7 @@ public class MethodParam {
       case "map": {
         HashMap<String, MethodParam> map = (HashMap<String, MethodParam>) obj.value;
         int mapLength = map.size();
+        w.write(mapLength);
         w.beginList(mapLength);
         for (var entry : map.entrySet()) {
           w.write(entry.getKey());
