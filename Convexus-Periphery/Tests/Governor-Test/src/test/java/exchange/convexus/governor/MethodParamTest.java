@@ -22,9 +22,9 @@ public class MethodParamTest extends ConvexusGovernorTest {
   }
 
   @Test
-  void testInt () {
+  void testBigInteger () {
     var value = BigInteger.ONE;
-    MethodParam param = new MethodParam("int", value);
+    MethodParam param = new MethodParam("BigInteger", value);
     ByteArrayObjectWriter writer = Context.newByteArrayObjectWriter("RLPn");
     MethodParam.writeObject(writer, param);
 
@@ -37,7 +37,7 @@ public class MethodParamTest extends ConvexusGovernorTest {
   @Test
   void testString () {
     var value = "myString";
-    MethodParam param = new MethodParam("string", value);
+    MethodParam param = new MethodParam("String", value);
     ByteArrayObjectWriter writer = Context.newByteArrayObjectWriter("RLPn");
     MethodParam.writeObject(writer, param);
 
@@ -63,7 +63,7 @@ public class MethodParamTest extends ConvexusGovernorTest {
   @Test
   void testAddress () {
     var value = AddressUtils.ZERO_ADDRESS;
-    MethodParam param = new MethodParam("address", value);
+    MethodParam param = new MethodParam("Address", value);
     ByteArrayObjectWriter writer = Context.newByteArrayObjectWriter("RLPn");
     MethodParam.writeObject(writer, param);
 
@@ -76,7 +76,7 @@ public class MethodParamTest extends ConvexusGovernorTest {
   @Test
   void testBytes () {
     var value = new byte[]{(byte) 0x1, (byte) 0x2, (byte) 0x3};
-    MethodParam param = new MethodParam("bytes", value);
+    MethodParam param = new MethodParam("byte[]", value);
     ByteArrayObjectWriter writer = Context.newByteArrayObjectWriter("RLPn");
     MethodParam.writeObject(writer, param);
 
@@ -88,38 +88,38 @@ public class MethodParamTest extends ConvexusGovernorTest {
 
   @Test
   void testArray () {
-    var value = new MethodParam[] {
-      new MethodParam("address", AddressUtils.ZERO_ADDRESS),
-      new MethodParam("int", BigInteger.ONE),
-      new MethodParam("string", "myString")
+    var value = new BigInteger[] {
+      BigInteger.valueOf(1),
+      BigInteger.valueOf(2),
+      BigInteger.valueOf(3)
     };
-    MethodParam param = new MethodParam("array", value);
+    MethodParam param = new MethodParam("Array", "BigInteger", value);
     ByteArrayObjectWriter writer = Context.newByteArrayObjectWriter("RLPn");
     MethodParam.writeObject(writer, param);
 
     ObjectReader reader = Context.newByteArrayObjectReader("RLPn", writer.toByteArray());
     MethodParam result = MethodParam.readObject(reader);
 
-    MethodParam[] resultValues = (MethodParam[]) result.value;
-    assertEquals((Address) value[0].value, (Address) resultValues[0].value);
-    assertEquals((BigInteger) value[1].value, (BigInteger) resultValues[1].value);
-    assertEquals((String) value[2].value, (String) resultValues[2].value);
+    BigInteger[] resultValues = (BigInteger[]) result.value;
+    assertEquals((BigInteger) value[0], (BigInteger) resultValues[0]);
+    assertEquals((BigInteger) value[1], (BigInteger) resultValues[1]);
+    assertEquals((BigInteger) value[2], (BigInteger) resultValues[2]);
     
-    Object[] converted = (Object[]) result.convert();
-    assertEquals((Address) value[0].value, (Address) converted[0]);
-    assertEquals((BigInteger) value[1].value, (BigInteger) converted[1]);
-    assertEquals((String) value[2].value, (String) converted[2]);
+    BigInteger[] converted = (BigInteger[]) result.convert();
+    assertEquals((BigInteger) value[0], (BigInteger) converted[0]);
+    assertEquals((BigInteger) value[1], (BigInteger) converted[1]);
+    assertEquals((BigInteger) value[2], (BigInteger) converted[2]);
   }
 
   @SuppressWarnings("unchecked")
   @Test
   void testMap () {
     var value = new HashMap<String, MethodParam>();
-    value.put("key1", new MethodParam("address", AddressUtils.ZERO_ADDRESS));
-    value.put("key2", new MethodParam("int", BigInteger.ONE));
-    value.put("key3", new MethodParam("string", "myString"));
+    value.put("key1", new MethodParam("Address", AddressUtils.ZERO_ADDRESS));
+    value.put("key2", new MethodParam("BigInteger", BigInteger.ONE));
+    value.put("key3", new MethodParam("String", "myString"));
 
-    MethodParam param = new MethodParam("map", value);
+    MethodParam param = new MethodParam("Map", value);
     ByteArrayObjectWriter writer = Context.newByteArrayObjectWriter("RLPn");
     MethodParam.writeObject(writer, param);
 
@@ -135,53 +135,45 @@ public class MethodParamTest extends ConvexusGovernorTest {
   @SuppressWarnings("unchecked")
   @Test
   void testNested () {
-    var map = new HashMap<String, MethodParam>();
-    map.put("subkey1", new MethodParam("address", AddressUtils.ZERO_ADDRESS));
-    map.put("subkey2", new MethodParam("int", BigInteger.ONE));
-    map.put("subkey3", new MethodParam("string", "myString"));
 
     var value = new HashMap<String, MethodParam>();
-    value.put("key1", new MethodParam("address", AddressUtils.ZERO_ADDRESS));
-    value.put("key2", new MethodParam("array", new MethodParam[] {
-      new MethodParam("address", AddressUtils.ZERO_ADDRESS),
-      new MethodParam("int", BigInteger.ONE),
-      new MethodParam("map", map)
-    }));
-    value.put("key3", new MethodParam("string", "myString"));
 
-    MethodParam param = new MethodParam("map", value);
+    var map1 = new HashMap<String, MethodParam>();
+    map1.put("subkeymap1", new MethodParam("BigInteger", BigInteger.valueOf(1337)));
+    var map2 = new HashMap<String, MethodParam>();
+    map2.put("subkeymap2", new MethodParam("BigInteger", BigInteger.valueOf(1337)));
+    var map3 = new HashMap<String, MethodParam>();
+    map3.put("subkeymap3", new MethodParam("BigInteger", BigInteger.valueOf(1337)));
+
+    value.put("key1", new MethodParam("Address", AddressUtils.ZERO_ADDRESS));
+    value.put("key2", new MethodParam("Array", "Map", new HashMap[] { map1, map2, map3 }));
+    value.put("key3", new MethodParam("String", "myString"));
+
+    MethodParam param = new MethodParam("Map", value);
     ByteArrayObjectWriter writer = Context.newByteArrayObjectWriter("RLPn");
     MethodParam.writeObject(writer, param);
 
     ObjectReader reader = Context.newByteArrayObjectReader("RLPn", writer.toByteArray());
     MethodParam result = MethodParam.readObject(reader);
 
-    var converted = (HashMap<String, Object>) result.convert();
+    var converted = (HashMap<String, Object>) param.convert();
+    HashMap<String, MethodParam> resultValues = (HashMap<String, MethodParam>) result.value;
 
     // check key 1
-    HashMap<String, MethodParam> resultValues = (HashMap<String, MethodParam>) result.value;
     assertEquals((Address) value.get("key1").value, (Address) resultValues.get("key1").value);
     assertEquals((Address) converted.get("key1"), (Address) resultValues.get("key1").value);
 
     // check key 2
-    MethodParam[] resultArrayValues = (MethodParam[]) resultValues.get("key2").value;
-    MethodParam[] originArrayValues = (MethodParam[]) value.get("key2").value;
-    Object[] convertedArrayValues = (Object[]) converted.get("key2");
-    
-    assertEquals((Address) originArrayValues[0].value, (Address) resultArrayValues[0].value);
-    assertEquals((BigInteger) originArrayValues[1].value, (BigInteger) resultArrayValues[1].value);
-    assertEquals((Address) convertedArrayValues[0], (Address) resultArrayValues[0].value);
-    assertEquals((BigInteger) convertedArrayValues[1], (BigInteger) resultArrayValues[1].value);
-    
-    HashMap<String, MethodParam> resultSubkey3 = (HashMap<String, MethodParam>) resultArrayValues[2].value;
-    HashMap<String, MethodParam> originSubkey3 = (HashMap<String, MethodParam>) originArrayValues[2].value;
-    HashMap<String, Object> convertSubkey3 = (HashMap<String, Object>) convertedArrayValues[2];
-    assertEquals((Address) originSubkey3.get("subkey1").value, (Address) resultSubkey3.get("subkey1").value);
-    assertEquals((BigInteger) originSubkey3.get("subkey2").value, (BigInteger) resultSubkey3.get("subkey2").value);
-    assertEquals((String) originSubkey3.get("subkey3").value, (String) resultSubkey3.get("subkey3").value);
-    assertEquals((Address) convertSubkey3.get("subkey1"), (Address) resultSubkey3.get("subkey1").value);
-    assertEquals((BigInteger) convertSubkey3.get("subkey2"), (BigInteger) resultSubkey3.get("subkey2").value);
-    assertEquals((String) convertSubkey3.get("subkey3"), (String) resultSubkey3.get("subkey3").value);
+    var valueKey2 = (HashMap<String, MethodParam>[]) value.get("key2").value;
+    var resultKey2 = (HashMap<String, MethodParam>[]) resultValues.get("key2").value;
+    var converted2 = (HashMap<String, MethodParam>[]) value.get("key2").convert();
+    assertEquals(valueKey2[0].get("subkeymap1").value, resultKey2[0].get("subkeymap1").value);
+    assertEquals(valueKey2[1].get("subkeymap2").value, resultKey2[1].get("subkeymap2").value);
+    assertEquals(valueKey2[2].get("subkeymap3").value, resultKey2[2].get("subkeymap3").value);
+
+    assertEquals(valueKey2[0].get("subkeymap1").value, converted2[0].get("subkeymap1").value);
+    assertEquals(valueKey2[1].get("subkeymap2").value, converted2[1].get("subkeymap2").value);
+    assertEquals(valueKey2[2].get("subkeymap3").value, converted2[2].get("subkeymap3").value);
 
     // check key 3
     assertEquals((String) value.get("key3").value, (String) resultValues.get("key3").value);

@@ -19,6 +19,7 @@ package exchange.convexus.governor;
 import java.math.BigInteger;
 
 import score.Address;
+import score.Context;
 import score.ObjectReader;
 import score.ObjectWriter;
 
@@ -41,6 +42,17 @@ public class MethodCall {
   ) {
     this.target = target;
     this.value = value;
+    this.method = method;
+    this.params = params;
+  }
+
+  public MethodCall (
+    Address target,
+    String method,
+    MethodParam[] params
+  ) {
+    this.target = target;
+    this.value = BigInteger.ZERO;
     this.method = method;
     this.params = params;
   }
@@ -72,5 +84,13 @@ public class MethodCall {
       w.write(obj.params[i]);
     }
     w.end();
+  }
+
+  public Object call () {
+    Object[] convertedParams = new Object[this.params.length];
+    for (int i = 0; i < this.params.length; i++) {
+      convertedParams[i] = this.params[i].convert();
+    }
+    return Context.call(this.value, this.target, this.method, convertedParams);
   }
 }

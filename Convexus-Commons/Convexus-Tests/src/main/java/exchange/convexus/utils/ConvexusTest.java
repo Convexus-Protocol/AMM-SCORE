@@ -56,7 +56,7 @@ public class ConvexusTest extends TestBase {
     protected final static ServiceManager sm = getServiceManager();
 
     // Roles
-    protected final static Account owner = sm.createAccount();
+    protected final static Account owner = sm.createAccount(10000);
     protected final Account minter = sm.createAccount();
     protected final Account burner = sm.createAccount();
     protected final Account admin = sm.createAccount();

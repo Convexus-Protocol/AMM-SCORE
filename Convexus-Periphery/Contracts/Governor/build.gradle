@@ -8,7 +8,7 @@ dependencies {
 }
 
 optimizedJar {
-    mainClassName = 'exchange.convexus.governor.Governor'
+    mainClassName = 'exchange.convexus.governor.ConvexusGovernor'
     // setEnableDebug(true)
     from {
         configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }

@@ -17,6 +17,7 @@
 package com.iconloop.score.test;
 
 import score.Address;
+import score.Context;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -123,8 +124,16 @@ public class ServiceManager {
 
     public Object call(Class<?> caller, BigInteger value, Address targetAddress, String method, Object... params) {
         Score from = getScoreFromClass(caller);
-        if ("fallback".equals(method) || "".equals(method)) {
+        
+        if (value.compareTo(BigInteger.ZERO) > 0) {
             transfer(from.getAccount(), targetAddress, value);
+        }
+        
+        if ("fallback".equals(method) || "".equals(method)) {
+            getBlock().increase();
+            if (targetAddress.isContract()) {
+                call(from.getAccount(), value, targetAddress, "fallback");
+            }
             return null;
         } else {
             return call(from.getAccount(), value, targetAddress, method, params);
@@ -132,7 +141,6 @@ public class ServiceManager {
     }
 
     public void transfer(Account from, Address targetAddress, BigInteger value) {
-        getBlock().increase();
         var fromBalance = from.getBalance();
         if (fromBalance.compareTo(value) < 0) {
             throw new IllegalStateException("OutOfBalance");
@@ -143,9 +151,6 @@ public class ServiceManager {
         }
         from.subtractBalance("ICX", value);
         to.addBalance("ICX", value);
-        if (targetAddress.isContract()) {
-            call(from, value, targetAddress, "fallback");
-        }
     }
 
     public void putStorage(String key, Object value) {
