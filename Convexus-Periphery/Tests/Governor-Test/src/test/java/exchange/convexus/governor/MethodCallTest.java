@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 
 import exchange.convexus.governor.mocks.MockCaller;
 import exchange.convexus.governor.mocks.MockScore;
+import exchange.convexus.structs.MethodParam;
 import exchange.convexus.utils.AddressUtils;
 import exchange.convexus.utils.ScoreSpy;
 import score.Address;

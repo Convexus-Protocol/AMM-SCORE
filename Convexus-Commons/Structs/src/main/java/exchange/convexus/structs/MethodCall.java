@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package exchange.convexus.governor;
+package exchange.convexus.structs;
 
 import java.math.BigInteger;
 
 import score.Address;
+import score.ByteArrayObjectWriter;
 import score.Context;
 import score.ObjectReader;
 import score.ObjectWriter;
@@ -84,6 +85,12 @@ public class MethodCall {
       w.write(obj.params[i]);
     }
     w.end();
+  }
+
+  public byte[] toBytes () {
+    ByteArrayObjectWriter writer = Context.newByteArrayObjectWriter("RLPn");
+    writer.write(this);
+    return writer.toByteArray();
   }
 
   public Object call () {

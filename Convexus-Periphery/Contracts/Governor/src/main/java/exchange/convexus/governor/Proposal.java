@@ -18,6 +18,7 @@ package exchange.convexus.governor;
 
 import java.math.BigInteger;
 
+import exchange.convexus.structs.MethodCall;
 import score.Address;
 import score.Context;
 import score.ObjectReader;
@@ -58,8 +59,8 @@ public class Proposal {
     boolean executed;
 
     /// @notice Receipts of ballots for the entire set of voters
-    private final VarDB<Receipt> receipts (Address voter) {
-        return Context.newVarDB(NAME + "_receipts_" + voter.toString(), Receipt.class);
+    public final VarDB<Receipt> receipts (Address voter) {
+        return Context.newVarDB(NAME + "_receipts_" + this.id + "_" + voter.toString(), Receipt.class);
     }
 
     public Proposal (

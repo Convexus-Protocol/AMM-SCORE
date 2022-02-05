@@ -8,6 +8,7 @@ import java.math.BigInteger;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import exchange.convexus.structs.MethodParam;
 import exchange.convexus.utils.AddressUtils;
 import score.Address;
 import score.ByteArrayObjectWriter;

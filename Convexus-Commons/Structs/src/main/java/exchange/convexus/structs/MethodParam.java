@@ -1,4 +1,4 @@
-package exchange.convexus.governor;
+package exchange.convexus.structs;
 
 import java.math.BigInteger;
 
@@ -9,9 +9,12 @@ import score.ObjectWriter;
 import scorex.util.HashMap;
 
 public class MethodParam {
-  String type;
-  String subtype;
-  Object value;
+  // the parameter runtime type
+  public String type;
+  // for complex types, the runtime subtype 
+  public String subtype;
+  // the runtime value
+  public Object value;
 
   public MethodParam (
     String type,
