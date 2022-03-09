@@ -31,7 +31,7 @@ public class Env {
     private static Chain chain;
 
     static {
-        String envFile = System.getProperty("env.props", "conf/env.props");
+        String envFile = System.getProperty("env.props");
         Properties props = new Properties();
         try {
             LOG.info("Using env.props: " + envFile);

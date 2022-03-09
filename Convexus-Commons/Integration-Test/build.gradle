@@ -33,8 +33,10 @@ test {
 
 def pooljar = project(':Convexus-Core:Contracts:Pool').getTasks().getByName('optimizedJar')
 def factoryjar = project(':Convexus-Core:Contracts:Factory').getTasks().getByName('optimizedJar')
+def irc2jar = project(':Convexus-Commons:ICON:irc2').getTasks().getByName('optimizedJar')
 
 task integrationTest(type: Test) {
+    useTestNG()
     useJUnitPlatform()
     description = 'Runs integration tests.'
     group = 'verification'
@@ -44,12 +46,12 @@ task integrationTest(type: Test) {
     testLogging.showStandardStreams = true
 
     // use the common config files
-    systemProperty('env.props', new File(project(':Convexus-Commons:ICON:testinteg').projectDir, 'conf/env.props'))
+    systemProperty('env.props', new File(project(':Convexus-Commons:Integration-Test').projectDir, 'conf/env.props'))
 
     def prefix = 'score.path.'
     systemProperty(prefix + 'Convexus-Core:Contracts:Factory', factoryjar.outputJarName)
     systemProperty(prefix + 'Convexus-Core:Contracts:Pool', pooljar.outputJarName)
-    systemProperty(prefix + 'IRC2BasicToken', new File(project(':Convexus-Commons:ICON:testinteg').projectDir, 'jar/irc2-token-debug.jar'))
+    systemProperty(prefix + 'Convexus-Commons:ICON:irc2', irc2jar.outputJarName)
 }
 
-integrationTest.dependsOn(factoryjar, pooljar)
+integrationTest.dependsOn(irc2jar, factoryjar, pooljar)

@@ -49,7 +49,7 @@ public class Score {
 
     public static String getFilePath(String pkgName) {
         String key = "score.path." + pkgName;
-        System.out.println("*** key = " + pkgName);
+        System.out.println("*** key = " + key);
         System.out.println("*** pth = " + System.getProperty(key));
         String path = System.getProperty(key);
         if (path == null) {

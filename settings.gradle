@@ -22,6 +22,7 @@ include (
   ':Convexus-Periphery:Contracts:PoolInitializer',
   ':Convexus-Periphery:Contracts:Governor',
   ':Convexus-Periphery:Contracts:Timelock',
+  ':Convexus-Periphery:Contracts:TreasuryVester',
   ':Convexus-Periphery:Contracts:TickLens',
   ':Convexus-Periphery:Contracts:Quoter',
   ':Convexus-Periphery:Contracts:PairFlash',

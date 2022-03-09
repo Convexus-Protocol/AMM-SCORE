@@ -5,12 +5,11 @@ dependencies {
     implementation 'foundation.icon:javaee-scorex:0.5.2'
 
     implementation project(':Convexus-Commons:Utils')
-    implementation project(':Convexus-Commons:Structs')
     implementation project(':Convexus-Commons:Interfaces')
 }
 
 optimizedJar {
-    mainClassName = 'exchange.convexus.timelock.Timelock'
+    mainClassName = 'exchange.convexus.treasuryvester.TreasuryVester'
     // setEnableDebug(true)
     from {
         configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
