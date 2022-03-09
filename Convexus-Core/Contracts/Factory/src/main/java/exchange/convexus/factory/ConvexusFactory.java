@@ -93,7 +93,6 @@ public class ConvexusFactory implements IConvexusPoolDeployer {
     // ================================================
     /**
      *  Contract constructor
-     *  
      */
     public ConvexusFactory() {
         this.poolDeployer = new ConvexusPoolDeployer();
@@ -133,7 +132,7 @@ public class ConvexusFactory implements IConvexusPoolDeployer {
      * @return pool The address of the newly created pool
      */
     @External
-    public Address createPool(
+    public Address createPool (
         Address tokenA,
         Address tokenB,
         int fee
@@ -182,7 +181,9 @@ public class ConvexusFactory implements IConvexusPoolDeployer {
      * @param _owner The new owner of the factory
      */
     @External
-    public void setOwner (Address _owner) {
+    public void setOwner (
+        Address _owner
+    ) {
         checkOwner();
 
         Address currentOwner = this.owner.get();
@@ -197,32 +198,39 @@ public class ConvexusFactory implements IConvexusPoolDeployer {
      * @param tickSpacing The spacing between ticks to be enforced for all pools created with the given fee amount
      */
     @External
-    public void enableFeeAmount (int fee, int tickSpacing) {
+    public void enableFeeAmount (
+        int fee, 
+        int tickSpacing
+    ) {
         checkOwner();
 
         Context.require(fee < 1000000, 
             "enableFeeAmount: fee needs to be lower than 1000000");
-        
+
         // tick spacing is capped at 16384 to prevent the situation where tickSpacing is so large that
         // TickBitmap#nextInitializedTickWithinOneWord overflows int24 container from a valid tick
         // 16384 ticks represents a >5x price change with ticks of 1 bips
         Context.require(tickSpacing > 0 && tickSpacing < 16384,
             "enableFeeAmount: tickSpacing > 0 && tickSpacing < 16384");
-        
+
         Context.require(this.feeAmountTickSpacing.get(fee) == 0,
-            "enableFeeAmount: fee amount is alreay enabled");
+            "enableFeeAmount: fee amount is already enabled");
 
         this.feeAmountTickSpacing.set(fee, tickSpacing);
         this.FeeAmountEnabled(fee, tickSpacing);
     }
 
     /**
+     * Set the pool contract bytes to be newly deployed with `createPool`
+     * 
      * Access: Owner
      * 
      * @param contractBytes
      */
     @External
-    public void setPoolContract (byte[] contractBytes) {
+    public void setPoolContract (
+        byte[] contractBytes
+    ) {
         // Access control
         checkOwner();
 
@@ -242,33 +250,65 @@ public class ConvexusFactory implements IConvexusPoolDeployer {
     // ================================================
     // Public variable getters
     // ================================================
+    /**
+     * Get the contract name
+     */
     @External(readonly = true)
     public String name() {
         return this.name;
     }
 
-    @External(readonly = true)
-    public byte[] poolContract () {
-        return this.poolContract.get();
-    }
-
+    /**
+     * Get the current owner of the Factory
+     */
     @External(readonly = true)
     public Address owner() {
         return this.owner.get();
     }
 
+    /**
+     * Get the current pool contract bytes of the Factory
+     */
+    @External(readonly = true)
+    public byte[] poolContract () {
+        return this.poolContract.get();
+    }
+
+    /**
+     * Get the deployed pools list size
+     */
     @External(readonly = true)
     public int poolsSize() {
         return this.pools.size();
     }
 
+    /**
+     * Get a deployed pools list item
+     * @param index the index of the item to read from the deployed pools list
+     * @return The pool address
+     */
     @External(readonly = true)
-    public Address pools(int index) {
+    public Address pools (
+        int index
+    ) {
         return this.pools.get(index);
     }
 
+    /**
+     * Get a deployed pool address from its parameters
+     * The `token0` and `token1` parameters can be inverted, it will return the same pool address
+     * 
+     * @param token0 One of the two tokens in the desired pool
+     * @param token1 The other of the two tokens in the desired pool
+     * @param fee The desired fee for the pool ; divide this value by 10000 to get the percent value
+     * @return The pool address if it exists
+     */
     @External(readonly = true)
-    public Address getPool(Address token0, Address token1, int fee) {
+    public Address getPool (
+        Address token0, 
+        Address token1, 
+        int fee
+    ) {
         return this.getPool.at(token0).at(token1).get(fee);
     }
 
