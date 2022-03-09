@@ -51,6 +51,6 @@ public class IRC2BasicToken extends Score {
 
     public static IRC2BasicToken install(TransactionHandler txHandler, Wallet wallet, RpcObject params)
             throws TransactionFailureException, ResultTimeoutException, IOException {
-        return new IRC2BasicToken(txHandler.deploy(wallet, getFilePath("IRC2BasicToken"), params));
+        return new IRC2BasicToken(txHandler.deploy(wallet, getFilePath("Convexus-Commons:ICON:irc2"), params));
     }
 }
