@@ -18,6 +18,7 @@ package exchange.convexus.factory;
 
 import exchange.convexus.utils.AddressUtils;
 import score.Address;
+import score.ArrayDB;
 import score.BranchDB;
 import score.Context;
 import score.DictDB;
@@ -51,6 +52,7 @@ public class ConvexusFactory implements IConvexusPoolDeployer {
     protected final DictDB<Integer, Integer> feeAmountTickSpacing = Context.newDictDB(NAME + "_feeAmountTickSpacing", Integer.class);
     protected final BranchDB<Address, BranchDB<Address, DictDB<Integer, Address>>> getPool = Context.newBranchDB(NAME + "_getPool", Address.class);
     protected final VarDB<byte[]> poolContract = Context.newVarDB(NAME + "_poolContract", byte[].class);
+    protected final ArrayDB<Address> pools = Context.newArrayDB(NAME + "_pools", Address.class);
 
     // ================================================
     // Event Logs
@@ -166,6 +168,8 @@ public class ConvexusFactory implements IConvexusPoolDeployer {
         this.getPool.at(token0).at(token1).set(fee, pool);
         // populate mapping in the reverse direction, deliberate choice to avoid the cost of comparing addresses
         this.getPool.at(token1).at(token0).set(fee, pool);
+        // Add to the global pool list
+        this.pools.add(pool);
 
         this.PoolCreated(token0, token1, fee, tickSpacing, pool);
 
@@ -251,6 +255,16 @@ public class ConvexusFactory implements IConvexusPoolDeployer {
     @External(readonly = true)
     public Address owner() {
         return this.owner.get();
+    }
+
+    @External(readonly = true)
+    public int poolsSize() {
+        return this.pools.size();
+    }
+
+    @External(readonly = true)
+    public Address pools(int index) {
+        return this.pools.get(index);
     }
 
     @External(readonly = true)
