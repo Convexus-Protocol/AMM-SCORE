@@ -19,7 +19,8 @@ Convexus Pool is the most important part of the Core Layer. It performs all low 
 public void initialize (BigInteger sqrtPriceX96)
 ```
 
-- `sqrtPriceX96`: the initial sqrt price of the pool as a Q64.96
+- `sqrtPriceX96`: the initial sqrt price of the pool as a [Q64.96](/Convexus-Commons/Librairies/docs/README.md#how-to-encode-a-q6496-price)
+- Emits a [`Initialize`](#convexuspoolinitializeeventlog) event log
 
 ### 🧪 Example call
 
@@ -32,6 +33,20 @@ public void initialize (BigInteger sqrtPriceX96)
   },
 }
 ```
+
+## `ConvexusPool::Initialize (EventLog)`
+
+### 🔎 Event Log
+
+```java
+@EventLog
+protected void Initialize (BigInteger sqrtPriceX96, int tick)
+```
+
+-  Emitted exactly once by a pool when `initialize` is first called on the pool. 
+- `Mint`/`Burn`/`Swap` cannot be emitted by the pool before `Initialize`
+- `sqrtPriceX96`: The initial sqrt price of the pool, as a [Q64.96](/Convexus-Commons/Librairies/docs/README.md#how-to-encode-a-q6496-price)
+- `tick`: The initial tick of the pool, i.e. log base 1.0001 of the starting price of the pool
 
 # **Tokens Swap**
 
@@ -67,7 +82,7 @@ public PairAmounts swap (
 - `recipient`: The address to receive the output of the swap
 - `zeroForOne`: The direction of the swap, true for token0 to token1, false for token1 to token0
 - `amountSpecified`: The amount of the swap, which implicitly configures the swap as exact input (positive), or exact output (negative)
-- `sqrtPriceLimitX96`: The Q64.96 sqrt price limit. If zero for one, the price cannot be less than this
+- `sqrtPriceLimitX96`: The [Q64.96](/Convexus-Commons/Librairies/docs/README.md#how-to-encode-a-q6496-price) price limit. If zero for one, the price cannot be less than this
 - `data`: Any data to be passed through to the callback
 
 ### 🧪 Example call
@@ -85,6 +100,35 @@ public PairAmounts swap (
   },
 }
 ```
+
+
+## `ConvexusPool::Swap (EventLog)`
+
+### 🔎 Event Log
+
+- Emitted by the pool for any swaps between token0 and token1
+
+```java
+@EventLog(indexed = 2)
+protected void Swap (
+    Address sender,
+    Address recipient,
+    BigInteger amount0,
+    BigInteger amount1,
+    BigInteger sqrtPriceX96,
+    BigInteger liquidity,
+    int tick
+)
+```
+
+- `sender`: The address that initiated the swap call, and that received the callback
+- `recipient`: The address that received the output of the swap
+- `amount0`: The delta of the token0 balance of the pool
+- `amount1`: The delta of the token1 balance of the pool
+- `sqrtPriceX96`: The sqrt(price) of the pool after the swap, as a [Q64.96](/Convexus-Commons/Librairies/docs/README.md#how-to-encode-a-q6496-price)
+- `liquidity`: The liquidity of the pool after the swap
+- `tick`: The log base 1.0001 of price of the pool after the swap
+
 
 ## `Callee::convexusSwapCallback`
 
@@ -181,9 +225,83 @@ class Slot0 {
 }
 ```
 
-- `sqrtPriceX96`: The current price of the pool as a sqrt(token1/token0) Q64.96 value
+- `sqrtPriceX96`: The current price of the pool as a sqrt(token1/token0) [Q64.96](/Convexus-Commons/Librairies/docs/README.md#how-to-encode-a-q6496-price) value
 - `tick`: The current tick of the pool, i.e. according to the last tick transition that was run. This value may not always be equal to SqrtTickMath.getTickAtSqrtRatio(sqrtPriceX96) if the price is on a tick boundary.
 - `observationIndex`: The index of the last oracle observation that was written
 - `observationCardinality`: The current maximum number of observations that are being stored
 - `observationCardinalityNext`: The next maximum number of observations to store, triggered in observations.write
 - `feeProtocol`: The current protocol fee as a percentage of the swap fee taken on withdrawal represented as an integer denominator (1/x)%. Encoded as two 4 bit values, where the protocol fee of token1 is shifted 4 bits and the protocol fee of token0 is the lower 4 bits. Used as the denominator of a fraction of the swap fee, e.g. 4 means 1/4th of the swap fee.
+
+# Add liquidity
+
+
+## `ConvexusPool::mint`
+
+
+### 📜 Method Call
+
+- Adds liquidity for the given recipient/tickLower/tickUpper position
+- Access: Everyone
+- The caller of this method receives a callback in the form of convexusMintCallback in which they must pay any token0 or token1 owed for the liquidity. 
+- The amount of token0/token1 due depends on tickLower, tickUpper, the amount of liquidity, and the current price.
+
+```java
+@External
+public PairAmounts mint (
+    Address recipient,
+    int tickLower,
+    int tickUpper,
+    BigInteger amount,
+    byte[] data
+)
+```
+
+- `recipient`: The address for which the liquidity will be created
+- `tickLower`: The lower tick of the position in which to add liquidity
+- `tickUpper`: The upper tick of the position in which to add liquidity
+- `amount`: The amount of liquidity to mint
+- `data`: Any data that should be passed through to the callback
+
+- Emits a [`Mint`](#convexuspoolminteventlog) eventlog
+
+### 🧪 Example call
+
+```java
+{
+  "to": ConvexusPool,
+  "method": "mint",
+  "params": {
+    "recipient": "hx1234567890123456789012345678901234567890",
+    "tickLower": "-0xd89b4",
+    "tickUpper": "0xd89b4",
+    "amount": "0x10000",
+    "data": ""
+  },
+}
+```
+
+## `ConvexusPool::Mint (EventLog)`
+
+### 🔎 Event Log
+
+```java
+@EventLog(indexed = 3)
+protected void Mint (
+    Address recipient, 
+    int tickLower, 
+    int tickUpper, 
+    Address sender, 
+    BigInteger amount,
+    BigInteger amount0, 
+    BigInteger amount1
+) {}
+```
+
+- Emitted when liquidity is minted for a given position
+- `sender`: The address that minted the liquidity
+- `owner`: The owner of the position and recipient of any minted liquidity
+- `tickLower`: The lower tick of the position
+- `tickUpper`: The upper tick of the position
+- `amount`: The amount of liquidity minted to the position range
+- `amount0`: How much token0 was required for the minted liquidity
+- `amount1`: How much token1 was required for the minted liquidity
