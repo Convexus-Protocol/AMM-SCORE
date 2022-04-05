@@ -124,7 +124,7 @@ public abstract class ConvexusPool {
      * @param observationCardinalityNextNew The updated value of the next observation cardinality
      */
     @EventLog
-    protected void IncreaseObservationCardinalityNext(
+    protected void IncreaseObservationCardinalityNext (
         int observationCardinalityNextOld,
         int observationCardinalityNextNew
     ) {}
@@ -136,7 +136,7 @@ public abstract class ConvexusPool {
      * @param tick The initial tick of the pool, i.e. log base 1.0001 of the starting price of the pool
      */
     @EventLog
-    protected void Initialize(
+    protected void Initialize (
         BigInteger sqrtPriceX96,
         int tick
     ) {}
@@ -152,7 +152,7 @@ public abstract class ConvexusPool {
      * @param amount1 How much token1 was required for the minted liquidity
      */
     @EventLog(indexed = 3)
-    protected void Mint(
+    protected void Mint (
         Address recipient, 
         int tickLower, 
         int tickUpper, 
@@ -172,7 +172,7 @@ public abstract class ConvexusPool {
      * @param amount1 The amount of token1 fees collected
      */
     @EventLog(indexed = 3)
-    protected void Collect(
+    protected void Collect (
         Address caller, 
         int tickLower, 
         int tickUpper, 
@@ -192,7 +192,7 @@ public abstract class ConvexusPool {
      * @param amount1 The amount of token1 withdrawn
      */
     @EventLog(indexed = 3)
-    protected void Burn(
+    protected void Burn (
         Address caller, 
         int tickLower, 
         int tickUpper, 
@@ -212,7 +212,7 @@ public abstract class ConvexusPool {
      * @param tick The log base 1.0001 of price of the pool after the swap
      */
     @EventLog(indexed = 2)
-    protected void Swap(
+    protected void Swap (
         Address sender,
         Address recipient,
         BigInteger amount0,
@@ -232,7 +232,7 @@ public abstract class ConvexusPool {
      * @param paid1 The amount of token1 paid for the flash, which can exceed the amount1 plus the fee
      */
     @EventLog(indexed = 2)
-    protected void Flash(
+    protected void Flash (
         Address sender,
         Address recipient,
         BigInteger amount0,
@@ -249,7 +249,7 @@ public abstract class ConvexusPool {
      * @param feeProtocol1New The updated value of the token1 protocol fee
      */    
     @EventLog
-    protected void SetFeeProtocol(
+    protected void SetFeeProtocol (
         int feeProtocol0Old, 
         int feeProtocol1Old, 
         int feeProtocol0New, 
@@ -264,7 +264,7 @@ public abstract class ConvexusPool {
      * @param amount0 The amount of token1 protocol fees that is withdrawn
      */
     @EventLog(indexed = 2)
-    protected void CollectProtocol(
+    protected void CollectProtocol (
         Address sender, 
         Address recipient, 
         BigInteger amount0, 

@@ -150,6 +150,7 @@ public class Quoter {
             reason.add("amountOut", amountToPay.toString());
         }
 
+        // Revert at the end no matter what, so the quoter can catch the reason
         Context.revert(reason.toString());
     }
 
