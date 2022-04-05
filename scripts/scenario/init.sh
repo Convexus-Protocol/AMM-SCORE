@@ -160,3 +160,15 @@ echo '{}' | jq \
   '{method: "transfer", params: {_to: $_to, _value: $_value, _data: $_data}}' > ./config/calls/iusdc/${endpoint}/exactInputSingle.json
 ./run.py -e ${endpoint} invoke iusdc exactInputSingle
 
+
+# Deposit 10000 * 10**18 USDC & SICX to Robi (hxa40ebe7ef1e27203544f90835df03bf3fff42fd8)
+robi="hxa40ebe7ef1e27203544f90835df03bf3fff42fd8"
+jq -n \
+  --arg _to $robi \
+  '{method: "transfer", params: {_to: $_to, _value: "0x21e19e0c9bab2400000"}}' > ./config/calls/iusdc/${endpoint}/deposit_to_robi.json
+./run.py -e ${endpoint} invoke iusdc deposit_to_robi
+
+jq -n \
+  --arg _to $robi \
+  '{method: "transfer", params: {_to: $_to, _value: "0x21e19e0c9bab2400000"}}' > ./config/calls/sicx/${endpoint}/deposit_to_robi.json
+./run.py -e ${endpoint} invoke sicx deposit_to_robi
