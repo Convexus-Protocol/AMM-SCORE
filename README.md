@@ -53,6 +53,13 @@ Please refer to the [`Slot0`](/Convexus-Core/Contracts/Pool/docs/README.md#conve
 
 
 <details>
+<summary>❓ How to get the list of active pools ?</summary>
+
+Please refer to the [`poolsSize`](/Convexus-Core/Contracts/Factory/docs/README.md#convexusfactorypoolssize) and [`pools`](/Convexus-Core/Contracts/Factory/docs/README.md#convexusfactorypools) methods. The `poolsSize` method will return the total number of pools deployed. The `pools` method will return a pool address, given an index in the list.
+</details>
+
+
+<details>
 <summary>❓ How to provide liquidity to a pool ?</summary>
 
 Please refer to the [`NonFungiblePositionManager`](/Convexus-Periphery/Contracts/NonFungiblePositionManager/docs/README.md) documentation. You will need first to deposit some funds using [`deposit`](/Convexus-Periphery/Contracts/NonFungiblePositionManager/docs/README.md#nonfungiblepositionmanagerdeposit), then create a new position wrapped in a NFT using [`mint`](/Convexus-Periphery/Contracts/NonFungiblePositionManager/docs/README.md#nonfungiblepositionmanagermint). The NFT represents the liquidity you provided to the pool.
