@@ -152,12 +152,12 @@ abstract class ConvexusPool1 {
   
     /**
      * @notice Emitted exactly once by a pool when #initialize is first called on the pool
-     * @dev Mint/Burn/Swap cannot be emitted by the pool before Initialize
+     * @dev Mint/Burn/Swap cannot be emitted by the pool before Initialized
      * @param sqrtPriceX96 The initial sqrt price of the pool, as a Q64.96
      * @param tick The initial tick of the pool, i.e. log base 1.0001 of the starting price of the pool
      */
     @EventLog
-    protected void Initialize(
+    protected void Initialized(
         BigInteger sqrtPriceX96,
         int tick
     ) {}
@@ -507,7 +507,7 @@ abstract class ConvexusPool1 {
         // Unlock the pool
         this.poolLock.lock(false);
 
-        this.Initialize(sqrtPriceX96, tick);
+        this.Initialized(sqrtPriceX96, tick);
     }
 
     /**

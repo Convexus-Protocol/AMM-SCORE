@@ -136,7 +136,7 @@ public abstract class ConvexusPool {
      * @param tick The initial tick of the pool, i.e. log base 1.0001 of the starting price of the pool
      */
     @EventLog
-    protected void Initialize (
+    protected void Initialized (
         BigInteger sqrtPriceX96,
         int tick
     ) {}
@@ -487,7 +487,7 @@ public abstract class ConvexusPool {
         // Unlock the pool
         this.poolLock.lock(false);
 
-        this.Initialize(sqrtPriceX96, tick);
+        this.Initialized(sqrtPriceX96, tick);
     }
 
     /**
@@ -785,7 +785,7 @@ public abstract class ConvexusPool {
     }
 
     private void pay (Address token, Address recipient, BigInteger amount) {
-        Context.println("[Pool][pay][" + Context.call(token, "symbol") + "] " + amount);
+        // Context.println("[Pool][pay][" + Context.call(token, "symbol") + "] " + amount);
         Context.call(token, "transfer", recipient, amount, "{\"method\": \"pay\"}".getBytes());
     }
 

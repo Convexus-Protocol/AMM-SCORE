@@ -141,7 +141,7 @@ public class InitializeTest extends ConvexusPoolTest {
     // Get Initialize event
     ArgumentCaptor<BigInteger> _sqrtPriceX96 = ArgumentCaptor.forClass(BigInteger.class);
     ArgumentCaptor<Integer> _tick = ArgumentCaptor.forClass(Integer.class);
-    verify(pool.spy).Initialize(_sqrtPriceX96.capture(), _tick.capture());
+    verify(pool.spy).Initialized(_sqrtPriceX96.capture(), _tick.capture());
     assertEquals(_sqrtPriceX96.getValue(), sqrtPriceX96);
     assertEquals(_tick.getValue(), -6932);
   }
