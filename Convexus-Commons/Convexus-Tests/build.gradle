@@ -11,6 +11,10 @@ dependencies {
 
     implementation project(':Convexus-Core:Contracts:Pool')
     implementation project(':Convexus-Core:Contracts:Factory')
+    implementation project(':Convexus-Core:Interfaces:Pool')
+    implementation project(':Convexus-Core:Interfaces:Factory')
+    implementation project(':Convexus-Core:Structs:Pool')
+    implementation project(':Convexus-Core:Structs:Factory')
 
     implementation project(':Convexus-Periphery:Contracts:SwapRouter')
     implementation project(':Convexus-Periphery:Contracts:PoolInitializer')
@@ -27,6 +31,7 @@ dependencies {
 
     implementation project(':Convexus-Commons:Utils')
     implementation project(':Convexus-Commons:Librairies')
+    implementation project(':Convexus-Commons:Interfaces')
     implementation project(':Convexus-Commons:ICON:irc2')
     implementation project(':Convexus-Commons:ICON:irc721')
     implementation project(':Convexus-Commons:ICON:unittest')

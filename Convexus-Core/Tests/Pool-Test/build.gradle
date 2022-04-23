@@ -4,17 +4,20 @@ dependencies {
     compileOnly 'foundation.icon:javaee-api:0.9.0'
     implementation 'com.github.sink772:minimal-json:0.9.6'
 
-    testImplementation project(':Convexus-Core:Contracts:Pool')
-    testImplementation project(':Convexus-Core:Contracts:Factory')
+    testImplementation 'org.mockito:mockito-inline:3.11.0'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.6.0'
 
     testImplementation project(':Convexus-Commons:Utils')
     testImplementation project(':Convexus-Commons:Librairies')
     testImplementation project(':Convexus-Commons:Convexus-Tests')
     testImplementation project(':Convexus-Commons:ICON:unittest')
+    
+    testImplementation project(':Convexus-Core:Structs:Pool')
+    testImplementation project(':Convexus-Core:Structs:Factory')
 
-    testImplementation 'org.mockito:mockito-inline:3.11.0'
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.0'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.6.0'
+    testImplementation project(':Convexus-Core:Contracts:Pool')
+    testImplementation project(':Convexus-Core:Contracts:Factory')
 }
 
 test {

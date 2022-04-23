@@ -5,7 +5,7 @@ dependencies {
     implementation 'foundation.icon:javaee-scorex:0.5.2'
     implementation 'com.github.sink772:minimal-json:0.9.6'
 
-    implementation project(':Convexus-Core:Contracts:Pool')
+    implementation project(':Convexus-Core:Structs:Pool')
     
     implementation project(':Convexus-Commons:Utils')
     implementation project(':Convexus-Commons:Librairies')

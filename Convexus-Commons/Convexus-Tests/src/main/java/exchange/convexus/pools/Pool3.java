@@ -21,8 +21,9 @@ import static exchange.convexus.utils.IntUtils.uint256;
 import static java.math.BigInteger.ZERO;
 
 import java.math.BigInteger;
-
+import exchange.convexus.factory.IFactory;
 import exchange.convexus.factory.Parameters;
+import exchange.convexus.interfaces.irc2.IIRC2;
 import exchange.convexus.librairies.FixedPoint128;
 import exchange.convexus.librairies.FullMath;
 import exchange.convexus.librairies.LiquidityMath;
@@ -37,6 +38,7 @@ import exchange.convexus.librairies.Tick;
 import exchange.convexus.librairies.TickBitmap;
 import exchange.convexus.librairies.TickMath;
 import exchange.convexus.librairies.Ticks;
+import exchange.convexus.pool.IConvexusPoolCallee;
 import exchange.convexus.pool.ModifyPositionParams;
 import exchange.convexus.pool.ModifyPositionResult;
 import exchange.convexus.pool.PositionStorage;
@@ -47,6 +49,7 @@ import exchange.convexus.pool.StepComputations;
 import exchange.convexus.pool.SwapCache;
 import exchange.convexus.pool.SwapMath;
 import exchange.convexus.pool.SwapState;
+import exchange.convexus.utils.JSONUtils;
 import exchange.convexus.utils.ReentrancyLock;
 import score.Address;
 import score.Context;
@@ -101,16 +104,11 @@ abstract class ConvexusPool3 {
     // DB Variables
     // ================================================
     // The 0th storage slot in the pool stores many values, and is exposed as a single method to save steps when accessed externally.
-    // This value may not always be equal to SqrtTickMath.getTickAtSqrtRatio(sqrtPriceX96) if the price is on a tick
-    // boundary.
-    // Encoded as two 4 bit values, where the protocol fee of token1 is shifted 4 bits and the protocol fee of token0
-    // is the lower 4 bits. Used as the denominator of a fraction of the swap fee, e.g. 4 means 1/4th of the swap fee.
-    // unlocked Whether the pool is currently locked to reentrancy
     private final VarDB<Slot0> slot0 = Context.newVarDB(NAME + "_slot0", Slot0.class);
 
-    // whether the pool is locked
+    // Whether the pool is locked
     private final ReentrancyLock poolLock = new ReentrancyLock(NAME + "_poolLock");
-    
+
     // The fee growth as a Q128.128 fees of token0 collected per unit of liquidity for the entire life of the pool
     protected final VarDB<BigInteger> feeGrowthGlobal0X128 = Context.newVarDB(NAME + "_feeGrowthGlobal0X128", BigInteger.class);
     // The fee growth as a Q128.128 fees of token1 collected per unit of liquidity for the entire life of the pool
@@ -145,19 +143,19 @@ abstract class ConvexusPool3 {
      * @param observationCardinalityNextNew The updated value of the next observation cardinality
      */
     @EventLog
-    protected void IncreaseObservationCardinalityNext(
+    protected void IncreaseObservationCardinalityNext (
         int observationCardinalityNextOld,
         int observationCardinalityNextNew
     ) {}
   
     /**
      * @notice Emitted exactly once by a pool when #initialize is first called on the pool
-     * @dev Mint/Burn/Swap cannot be emitted by the pool before Initialized
+     * @dev Mint/Burn/Swap cannot be emitted by the pool before Initialize
      * @param sqrtPriceX96 The initial sqrt price of the pool, as a Q64.96
      * @param tick The initial tick of the pool, i.e. log base 1.0001 of the starting price of the pool
      */
     @EventLog
-    protected void Initialized(
+    protected void Initialized (
         BigInteger sqrtPriceX96,
         int tick
     ) {}
@@ -173,7 +171,7 @@ abstract class ConvexusPool3 {
      * @param amount1 How much token1 was required for the minted liquidity
      */
     @EventLog(indexed = 3)
-    protected void Mint(
+    protected void Mint (
         Address recipient, 
         int tickLower, 
         int tickUpper, 
@@ -193,7 +191,7 @@ abstract class ConvexusPool3 {
      * @param amount1 The amount of token1 fees collected
      */
     @EventLog(indexed = 3)
-    protected void Collect(
+    protected void Collect (
         Address caller, 
         int tickLower, 
         int tickUpper, 
@@ -213,7 +211,7 @@ abstract class ConvexusPool3 {
      * @param amount1 The amount of token1 withdrawn
      */
     @EventLog(indexed = 3)
-    protected void Burn(
+    protected void Burn (
         Address caller, 
         int tickLower, 
         int tickUpper, 
@@ -233,7 +231,7 @@ abstract class ConvexusPool3 {
      * @param tick The log base 1.0001 of price of the pool after the swap
      */
     @EventLog(indexed = 2)
-    protected void Swap(
+    protected void Swap (
         Address sender,
         Address recipient,
         BigInteger amount0,
@@ -253,7 +251,7 @@ abstract class ConvexusPool3 {
      * @param paid1 The amount of token1 paid for the flash, which can exceed the amount1 plus the fee
      */
     @EventLog(indexed = 2)
-    protected void Flash(
+    protected void Flash (
         Address sender,
         Address recipient,
         BigInteger amount0,
@@ -270,7 +268,7 @@ abstract class ConvexusPool3 {
      * @param feeProtocol1New The updated value of the token1 protocol fee
      */    
     @EventLog
-    protected void SetFeeProtocol(
+    protected void SetFeeProtocol (
         int feeProtocol0Old, 
         int feeProtocol1Old, 
         int feeProtocol0New, 
@@ -285,7 +283,7 @@ abstract class ConvexusPool3 {
      * @param amount0 The amount of token1 protocol fees that is withdrawn
      */
     @EventLog(indexed = 2)
-    protected void CollectProtocol(
+    protected void CollectProtocol (
         Address sender, 
         Address recipient, 
         BigInteger amount0, 
@@ -307,9 +305,8 @@ abstract class ConvexusPool3 {
         this.token1 = parameters.token1;
         this.fee = parameters.fee;
         this.tickSpacing = parameters.tickSpacing;
-
         this.maxLiquidityPerTick = Tick.tickSpacingToMaxLiquidityPerTick(this.tickSpacing);
-        this.name = "Convexus Pool " + Context.call(this.token0, "symbol") + "/" + Context.call(this.token1, "symbol");
+        this.name = "Convexus Pool (" + IIRC2.symbol(this.token0) + " / " + IIRC2.symbol(this.token1) + ")";
 
         // Default values
         if (this.liquidity.get() == null) {
@@ -325,7 +322,7 @@ abstract class ConvexusPool3 {
             this.protocolFees.set(new ProtocolFees(ZERO, ZERO));
         }
 
-        // locked by default
+        // pool is locked by default, need to initialize to unlock
         if (this.poolLock.get() == null) {
             this.poolLock.lock(true);
         }
@@ -344,16 +341,16 @@ abstract class ConvexusPool3 {
      * @notice Get the pool's balance of token0
      */
     private BigInteger balance0 () {
-        return (BigInteger) Context.call(this.token0, "balanceOf", Context.getAddress());
+        return IIRC2.balanceOf(this.token0, Context.getAddress());
     }
 
     /**
      * @notice Get the pool's balance of token1
      */
     private BigInteger balance1 () {
-        return (BigInteger) Context.call(this.token1, "balanceOf", Context.getAddress());
+        return IIRC2.balanceOf(this.token1, Context.getAddress());
     }
-    
+
     /**
      * @notice Returns a snapshot of the tick cumulative, seconds per liquidity and seconds inside a tick range
      * 
@@ -478,7 +475,7 @@ abstract class ConvexusPool3 {
     }
 
     /**
-     * @notice Sets the initial price for the pool
+     * Sets the initial price for the pool
      * 
      * Access: Everyone
      * 
@@ -492,7 +489,7 @@ abstract class ConvexusPool3 {
             "initialize: this pool is already initialized");
 
         int tick = TickMath.getTickAtSqrtRatio(sqrtPriceX96);
-        
+
         var result = observations.initialize(_blockTimestamp());
 
         this.slot0.set(new Slot0(
@@ -732,7 +729,7 @@ abstract class ConvexusPool3 {
             balance1Before = balance1();
         }
 
-        Context.call(caller, "convexusMintCallback", amount0, amount1, data);
+        IConvexusPoolCallee.convexusMintCallback(caller, amount0, amount1, data);
 
         if (amount0.compareTo(ZERO) > 0) {
             BigInteger expected = balance0Before.add(amount0);
@@ -805,8 +802,7 @@ abstract class ConvexusPool3 {
     }
 
     private void pay (Address token, Address recipient, BigInteger amount) {
-        Context.println("[Pool][pay][" + Context.call(token, "symbol") + "] " + amount);
-        Context.call(token, "transfer", recipient, amount, "{\"method\": \"pay\"}".getBytes());
+        IIRC2.transfer(token, recipient, amount, JSONUtils.method("pay"));
     }
 
     /**
@@ -864,8 +860,7 @@ abstract class ConvexusPool3 {
      * @param recipient The address to receive the output of the swap
      * @param zeroForOne The direction of the swap, true for token0 to token1, false for token1 to token0
      * @param amountSpecified The amount of the swap, which implicitly configures the swap as exact input (positive), or exact output (negative)
-     * @param sqrtPriceLimitX96 The Q64.96 sqrt price limit. If zero for one, the price cannot be less than this
-     * value after the swap. If one for zero, the price cannot be greater than this value after the swap
+     * @param sqrtPriceLimitX96 The Q64.96 sqrt price limit. If zero for one, the price cannot be less than this value after the swap. If one for zero, the price cannot be greater than this value after the swap.
      * @param data Any data to be passed through to the callback
      * @return amount0 The delta of the balance of token0 of the pool, exact when negative, minimum when positive
      * @return amount1 The delta of the balance of token1 of the pool, exact when negative, minimum when positive
@@ -886,7 +881,7 @@ abstract class ConvexusPool3 {
         
         Slot0 slot0Start = this.slot0.get();
 
-        Context.require(
+        Context.require (
             zeroForOne
                 ? sqrtPriceLimitX96.compareTo(slot0Start.sqrtPriceX96) < 0 && sqrtPriceLimitX96.compareTo(TickMath.MIN_SQRT_RATIO) > 0
                 : sqrtPriceLimitX96.compareTo(slot0Start.sqrtPriceX96) > 0 && sqrtPriceLimitX96.compareTo(TickMath.MAX_SQRT_RATIO) < 0,
@@ -1084,7 +1079,7 @@ abstract class ConvexusPool3 {
             }
 
             BigInteger balance0Before = balance0();
-            Context.call(caller, "convexusSwapCallback", amount0, amount1, data);
+            IConvexusPoolCallee.convexusSwapCallback(caller, amount0, amount1, data);
 
             Context.require(balance0Before.add(amount0).compareTo(balance0()) <= 0, 
                 "swap: the callback didn't charge the payment (1)");
@@ -1094,7 +1089,7 @@ abstract class ConvexusPool3 {
             }
 
             BigInteger balance1Before = balance1();
-            Context.call(caller, "convexusSwapCallback", amount0, amount1, data);
+            IConvexusPoolCallee.convexusSwapCallback(caller, amount0, amount1, data);
 
             Context.require(balance1Before.add(amount1).compareTo(balance1()) <= 0, 
                 "swap: the callback didn't charge the payment (2)");
@@ -1147,7 +1142,7 @@ abstract class ConvexusPool3 {
             pay(token1, recipient, amount1);
         }
 
-        Context.call(caller, "convexusFlashCallback", fee0, fee1, data);
+        IConvexusPoolCallee.convexusFlashCallback(caller, fee0, fee1, data);
 
         BigInteger balance0After = balance0();
         BigInteger balance1After = balance1();
@@ -1206,7 +1201,7 @@ abstract class ConvexusPool3 {
         this.poolLock.lock(true);
 
         // Access control
-        this.onlyFactoryOwner();
+        this.checkCallerIsFactoryOwner();
         
         // Check user input for protocol fees
         Context.require(
@@ -1238,7 +1233,7 @@ abstract class ConvexusPool3 {
      * @return amount1 The protocol fee collected in token1
      */
     @External
-    public PairAmounts collectProtocol(
+    public PairAmounts collectProtocol (
         Address recipient,
         BigInteger amount0Requested,
         BigInteger amount1Requested
@@ -1246,7 +1241,7 @@ abstract class ConvexusPool3 {
         this.poolLock.lock(true);
 
         // Access control
-        this.onlyFactoryOwner();
+        this.checkCallerIsFactoryOwner();
 
         // OK
         var _protocolFees = protocolFees.get();
@@ -1282,15 +1277,19 @@ abstract class ConvexusPool3 {
 
     @External
     public void tokenFallback (Address _from, BigInteger _value, @Optional byte[] _data) throws Exception {
-        Context.require(_from.isContract(), "tokenFallback: Pool shouldn't need to receive funds from EOA");
+        Context.require(_from.isContract(), 
+            "tokenFallback: Pool shouldn't need to receive tokens from EOA");
     }
 
     // ================================================
     // Checks
     // ================================================
-    private void onlyFactoryOwner() {
-        Context.require(Context.getCaller().equals(Context.call(this.factory, "owner")),
-            "onlyFactoryOwner: Only owner can call this method");
+    private void checkCallerIsFactoryOwner() {
+        final Address factoryOwner = IFactory.owner(this.factory);
+        final Address caller = Context.getCaller();
+
+        Context.require(caller.equals(factoryOwner),
+            "checkCallerIsFactoryOwner: Only owner can call this method");
     }
 
     // ================================================
@@ -1331,6 +1330,9 @@ abstract class ConvexusPool3 {
         return this.observations.get(index);
     }
 
+    /**
+     * The 0th storage slot in the pool stores many values, and is exposed as a single method to save steps when accessed externally.
+     */
     @External(readonly = true)
     public Slot0 slot0 () {
         return this.slot0.get();

@@ -7,6 +7,14 @@ include (
   // Contracts
   'Convexus-Core:Contracts:Factory',
   'Convexus-Core:Contracts:Pool',
+  
+  // Interfaces
+  'Convexus-Core:Interfaces:Factory',
+  'Convexus-Core:Interfaces:Pool',
+  
+  // Structs
+  'Convexus-Core:Structs:Factory',
+  'Convexus-Core:Structs:Pool',
 
   // Tests
   'Convexus-Core:Tests:Factory-Test',

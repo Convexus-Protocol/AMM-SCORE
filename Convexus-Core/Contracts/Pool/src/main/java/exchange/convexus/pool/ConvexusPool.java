@@ -21,8 +21,9 @@ import static exchange.convexus.utils.IntUtils.uint256;
 import static java.math.BigInteger.ZERO;
 
 import java.math.BigInteger;
-
+import exchange.convexus.factory.IFactory;
 import exchange.convexus.factory.Parameters;
+import exchange.convexus.interfaces.irc2.IIRC2;
 import exchange.convexus.librairies.FixedPoint128;
 import exchange.convexus.librairies.FullMath;
 import exchange.convexus.librairies.LiquidityMath;
@@ -37,6 +38,7 @@ import exchange.convexus.librairies.Tick;
 import exchange.convexus.librairies.TickBitmap;
 import exchange.convexus.librairies.TickMath;
 import exchange.convexus.librairies.Ticks;
+import exchange.convexus.utils.JSONUtils;
 import exchange.convexus.utils.ReentrancyLock;
 import score.Address;
 import score.Context;
@@ -281,15 +283,13 @@ public abstract class ConvexusPool {
      * See {@code ConvexusPoolFactored} constructor for the actual pool deployed on the network
      */
     protected ConvexusPool (Parameters parameters) {
-        // OK
         this.factory = parameters.factory;
         this.token0 = parameters.token0;
         this.token1 = parameters.token1;
         this.fee = parameters.fee;
         this.tickSpacing = parameters.tickSpacing;
-
         this.maxLiquidityPerTick = Tick.tickSpacingToMaxLiquidityPerTick(this.tickSpacing);
-        this.name = "Convexus Pool " + Context.call(this.token0, "symbol") + "/" + Context.call(this.token1, "symbol");
+        this.name = "Convexus Pool (" + IIRC2.symbol(this.token0) + " / " + IIRC2.symbol(this.token1) + ")";
 
         // Default values
         if (this.liquidity.get() == null) {
@@ -305,7 +305,7 @@ public abstract class ConvexusPool {
             this.protocolFees.set(new ProtocolFees(ZERO, ZERO));
         }
 
-        // locked by default
+        // pool is locked by default, need to initialize to unlock
         if (this.poolLock.get() == null) {
             this.poolLock.lock(true);
         }
@@ -324,16 +324,16 @@ public abstract class ConvexusPool {
      * @notice Get the pool's balance of token0
      */
     private BigInteger balance0 () {
-        return (BigInteger) Context.call(this.token0, "balanceOf", Context.getAddress());
+        return IIRC2.balanceOf(this.token0, Context.getAddress());
     }
 
     /**
      * @notice Get the pool's balance of token1
      */
     private BigInteger balance1 () {
-        return (BigInteger) Context.call(this.token1, "balanceOf", Context.getAddress());
+        return IIRC2.balanceOf(this.token1, Context.getAddress());
     }
-    
+
     /**
      * @notice Returns a snapshot of the tick cumulative, seconds per liquidity and seconds inside a tick range
      * 
@@ -712,7 +712,7 @@ public abstract class ConvexusPool {
             balance1Before = balance1();
         }
 
-        Context.call(caller, "convexusMintCallback", amount0, amount1, data);
+        IConvexusPoolCallee.convexusMintCallback(caller, amount0, amount1, data);
 
         if (amount0.compareTo(ZERO) > 0) {
             BigInteger expected = balance0Before.add(amount0);
@@ -785,8 +785,7 @@ public abstract class ConvexusPool {
     }
 
     private void pay (Address token, Address recipient, BigInteger amount) {
-        // Context.println("[Pool][pay][" + Context.call(token, "symbol") + "] " + amount);
-        Context.call(token, "transfer", recipient, amount, "{\"method\": \"pay\"}".getBytes());
+        IIRC2.transfer(token, recipient, amount, JSONUtils.method("pay"));
     }
 
     /**
@@ -1063,7 +1062,7 @@ public abstract class ConvexusPool {
             }
 
             BigInteger balance0Before = balance0();
-            Context.call(caller, "convexusSwapCallback", amount0, amount1, data);
+            IConvexusPoolCallee.convexusSwapCallback(caller, amount0, amount1, data);
 
             Context.require(balance0Before.add(amount0).compareTo(balance0()) <= 0, 
                 "swap: the callback didn't charge the payment (1)");
@@ -1073,7 +1072,7 @@ public abstract class ConvexusPool {
             }
 
             BigInteger balance1Before = balance1();
-            Context.call(caller, "convexusSwapCallback", amount0, amount1, data);
+            IConvexusPoolCallee.convexusSwapCallback(caller, amount0, amount1, data);
 
             Context.require(balance1Before.add(amount1).compareTo(balance1()) <= 0, 
                 "swap: the callback didn't charge the payment (2)");
@@ -1126,7 +1125,7 @@ public abstract class ConvexusPool {
             pay(token1, recipient, amount1);
         }
 
-        Context.call(caller, "convexusFlashCallback", fee0, fee1, data);
+        IConvexusPoolCallee.convexusFlashCallback(caller, fee0, fee1, data);
 
         BigInteger balance0After = balance0();
         BigInteger balance1After = balance1();
@@ -1185,7 +1184,7 @@ public abstract class ConvexusPool {
         this.poolLock.lock(true);
 
         // Access control
-        this.onlyFactoryOwner();
+        this.checkCallerIsFactoryOwner();
         
         // Check user input for protocol fees
         Context.require(
@@ -1225,7 +1224,7 @@ public abstract class ConvexusPool {
         this.poolLock.lock(true);
 
         // Access control
-        this.onlyFactoryOwner();
+        this.checkCallerIsFactoryOwner();
 
         // OK
         var _protocolFees = protocolFees.get();
@@ -1261,15 +1260,19 @@ public abstract class ConvexusPool {
 
     @External
     public void tokenFallback (Address _from, BigInteger _value, @Optional byte[] _data) throws Exception {
-        Context.require(_from.isContract(), "tokenFallback: Pool shouldn't need to receive funds from EOA");
+        Context.require(_from.isContract(), 
+            "tokenFallback: Pool shouldn't need to receive tokens from EOA");
     }
 
     // ================================================
     // Checks
     // ================================================
-    private void onlyFactoryOwner() {
-        Context.require(Context.getCaller().equals(Context.call(this.factory, "owner")),
-            "onlyFactoryOwner: Only owner can call this method");
+    private void checkCallerIsFactoryOwner() {
+        final Address factoryOwner = IFactory.owner(this.factory);
+        final Address caller = Context.getCaller();
+
+        Context.require(caller.equals(factoryOwner),
+            "checkCallerIsFactoryOwner: Only owner can call this method");
     }
 
     // ================================================

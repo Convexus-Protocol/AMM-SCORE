@@ -7,7 +7,10 @@ dependencies {
 
     implementation project(':Convexus-Commons:Utils')
     implementation project(':Convexus-Commons:Librairies')
-    implementation project(':Convexus-Core:Contracts:Pool')
+    
+    implementation project(':Convexus-Core:Structs:Pool')
+    implementation project(':Convexus-Core:Structs:Factory')
+    
     implementation project(':Convexus-Periphery:Contracts:NonFungiblePositionManager')
 }
 

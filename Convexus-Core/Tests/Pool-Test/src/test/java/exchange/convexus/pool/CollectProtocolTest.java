@@ -66,7 +66,7 @@ public class CollectProtocolTest extends ConvexusPoolTest {
   void testOnlyFactoryOwner () {
     AssertUtils.assertThrowsMessage(AssertionError.class, () -> 
       collectProtocolGetFeesOwed(bob, alice), 
-      "onlyFactoryOwner: Only owner can call this method");
+      "checkCallerIsFactoryOwner: Only owner can call this method");
   }
 
   @Test

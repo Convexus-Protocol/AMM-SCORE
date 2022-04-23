@@ -17,7 +17,6 @@
 package com.iconloop.score.test;
 
 import score.Address;
-import score.Context;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;

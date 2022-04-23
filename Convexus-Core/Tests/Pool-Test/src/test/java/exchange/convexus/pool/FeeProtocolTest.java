@@ -95,7 +95,7 @@ public class FeeProtocolTest extends ConvexusPoolTest {
   void testCannotBeChangedNotOwner () {
     AssertUtils.assertThrowsMessage(AssertionError.class, () ->
       pool.invoke(alice, "setFeeProtocol", 6, 6), 
-      "onlyFactoryOwner: Only owner can call this method");
+      "checkCallerIsFactoryOwner: Only owner can call this method");
   }
 
   @Test

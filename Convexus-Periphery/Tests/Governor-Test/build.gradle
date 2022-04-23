@@ -2,10 +2,12 @@
 
 dependencies {
     compileOnly 'foundation.icon:javaee-api:0.9.0'
+    testImplementation 'foundation.icon:javaee-scorex:0.5.2'
 
     testImplementation project(':Convexus-Periphery:Contracts:Governor')
 
     testImplementation project(':Convexus-Commons:Utils')
+    testImplementation project(':Convexus-Commons:Structs')
     testImplementation project(':Convexus-Commons:Convexus-Tests')
     testImplementation project(':Convexus-Commons:ICON:unittest')
     
