@@ -17,8 +17,8 @@ include (
   'Convexus-Core:Structs:Pool',
 
   // Tests
-  'Convexus-Core:Tests:Factory-Test',
-  'Convexus-Core:Tests:Pool-Test',
+  'Convexus-Core:Tests:Factory',
+  'Convexus-Core:Tests:Pool',
 
   // --------------------------
   // --- Convexus Periphery ---

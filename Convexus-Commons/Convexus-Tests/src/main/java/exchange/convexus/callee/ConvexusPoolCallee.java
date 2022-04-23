@@ -23,8 +23,10 @@ import java.math.BigInteger;
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
-
+import exchange.convexus.interfaces.irc2.IIRC2;
+import exchange.convexus.pool.IConvexusPool;
 import exchange.convexus.utils.IntUtils;
+import exchange.convexus.utils.JSONUtils;
 import exchange.convexus.utils.StringUtils;
 import score.Address;
 import score.BranchDB;
@@ -39,7 +41,6 @@ import scorex.io.Reader;
 import scorex.io.StringReader;
 
 public class ConvexusPoolCallee {
-
   // ================================================
   // Consts
   // ================================================
@@ -66,7 +67,7 @@ public class ConvexusPoolCallee {
     int tickUpper,
     BigInteger amount
   ) {
-    Context.call(pool, "mint", recipient, tickLower, tickUpper, amount, Context.getCaller().toByteArray());
+    IConvexusPool.mint(pool, recipient, tickLower, tickUpper, amount, Context.getCaller().toByteArray());
   }
 
   @External
@@ -81,11 +82,11 @@ public class ConvexusPoolCallee {
     this.MintCallback(amount0Owed, amount1Owed);
 
     if (amount0Owed.compareTo(ZERO) > 0) {
-      pay(sender, (Address) Context.call(caller, "token0"), caller, amount0Owed);
+      pay(sender, IConvexusPool.token0(caller), caller, amount0Owed);
     }
     
     if (amount1Owed.compareTo(ZERO) > 0) {
-      pay(sender, (Address) Context.call(caller, "token1"), caller, amount1Owed);
+      pay(sender, IConvexusPool.token1(caller), caller, amount1Owed);
     }
   }
 
@@ -101,9 +102,9 @@ public class ConvexusPoolCallee {
     this.SwapCallback(amount0Delta, amount1Delta);
 
     if (amount0Delta.compareTo(ZERO) > 0) {
-      pay(sender, (Address) Context.call(caller, "token0"), caller, amount0Delta);
+      pay(sender, IConvexusPool.token0(caller), caller, amount0Delta);
     } else if (amount1Delta.compareTo(ZERO) > 0) {
-      pay(sender, (Address) Context.call(caller, "token1"), caller, amount1Delta);
+      pay(sender, IConvexusPool.token1(caller), caller, amount1Delta);
     } else {
       // if both are not gt 0, both must be 0.
       Context.require(amount0Delta.equals(ZERO) && amount1Delta.equals(ZERO),
@@ -120,7 +121,7 @@ public class ConvexusPoolCallee {
     depositedUser.set(token, oldBalance.subtract(owed));
 
     // Actually transfer the tokens
-    Context.call(token, "transfer", destination, owed, "{\"method\": \"pay\"}".getBytes());
+    IIRC2.transfer(token, destination, owed, JSONUtils.method("pay"));
   }
 
   // @External - this method is external through tokenFallback
@@ -143,7 +144,7 @@ public class ConvexusPoolCallee {
     BigInteger amount = depositedUser.getOrDefault(caller, ZERO);
 
     if (amount.compareTo(ZERO) > 0) {
-      Context.call(token, "transfer", caller, amount, "withdraw".getBytes());
+      IIRC2.transfer(token, caller, amount, JSONUtils.method("withdraw"));
       depositedUser.set(token, ZERO);
     }
   }
@@ -218,7 +219,7 @@ public class ConvexusPoolCallee {
   ) {
     ByteArrayObjectWriter writer = Context.newByteArrayObjectWriter("RLPn");
     writer.write(new FlashData(Context.getCaller(), pay0, pay1));
-    Context.call(pool, "flash", recipient, amount0, amount1, writer.toByteArray());
+    IConvexusPool.flash(pool, recipient, amount0, amount1, writer.toByteArray());
   }
 
   @EventLog
@@ -241,39 +242,39 @@ public class ConvexusPoolCallee {
     BigInteger pay1 = flashData.pay1;
 
     if (pay0.compareTo(ZERO) > 0) {
-      Address token0 = (Address) Context.call(caller, "token0");
-      Context.println("[Callee][flashcallback] Paying " + pay0 + " " + Context.call(token0, "symbol") + " to the pool");
+      Address token0 = IConvexusPool.token0(caller);
+      Context.println("[Callee][flashcallback] Paying " + pay0 + " " + IIRC2.symbol(token0) + " to the pool");
       pay(sender, token0, caller, pay0);
     }
     if (pay1.compareTo(ZERO) > 0) {
-      Address token1 = (Address) Context.call(caller, "token1");
-      Context.println("[Callee][flashcallback] Paying " + pay1 + " " + Context.call(token1, "symbol") + " to the pool");
+      Address token1 = IConvexusPool.token1(caller);
+      Context.println("[Callee][flashcallback] Paying " + pay1 + " " + IIRC2.symbol(token1) + " to the pool");
       pay(sender, token1, caller, pay1);
     }
   }
 
   private void swapExact0For1 (Address pool, BigInteger amount0In, Address recipient, BigInteger sqrtPriceLimitX96, byte[] data) {
-    Context.call(pool, "swap", recipient, true, amount0In, sqrtPriceLimitX96, data);
+    IConvexusPool.swap(pool, recipient, true, amount0In, sqrtPriceLimitX96, data);
   }
 
   private void swap1ForExact0 (Address pool, BigInteger amount0Out, Address recipient, BigInteger sqrtPriceLimitX96, byte[] data) {
-    Context.call(pool, "swap", recipient, false, amount0Out.negate(), sqrtPriceLimitX96, data);
+    IConvexusPool.swap(pool, recipient, false, amount0Out.negate(), sqrtPriceLimitX96, data);
   }
 
   private void swap0ForExact1 (Address pool, BigInteger amount1Out, Address recipient, BigInteger sqrtPriceLimitX96, byte[] data) {
-    Context.call(pool, "swap", recipient, true, amount1Out.negate(), sqrtPriceLimitX96, data);
+    IConvexusPool.swap(pool, recipient, true, amount1Out.negate(), sqrtPriceLimitX96, data);
   }
 
   private void swapExact1For0 (Address pool, BigInteger amount1In, Address recipient, BigInteger sqrtPriceLimitX96, byte[] data) {
-    Context.call(pool, "swap", recipient, false, amount1In, sqrtPriceLimitX96, data);
+    IConvexusPool.swap(pool, recipient, false, amount1In, sqrtPriceLimitX96, data);
   }
 
   private void swapToLowerSqrtPrice (Address pool, BigInteger sqrtPriceX96, Address recipient, byte[] data) {
-    Context.call(pool, "swap", recipient, true, IntUtils.MAX_INT256, sqrtPriceX96, data);
+    IConvexusPool.swap(pool, recipient, true, IntUtils.MAX_INT256, sqrtPriceX96, data);
   }
 
   private void swapToHigherSqrtPrice (Address pool, BigInteger sqrtPriceX96, Address recipient, byte[] data) {
-    Context.call(pool, "swap", recipient, false, IntUtils.MAX_INT256, sqrtPriceX96, data);
+    IConvexusPool.swap(pool, recipient, false, IntUtils.MAX_INT256, sqrtPriceX96, data);
   }
 
   @External(readonly = true)
@@ -287,7 +288,7 @@ public class ConvexusPoolCallee {
   private void checkEnoughDeposited (Address address, Address token, BigInteger amount) {
     var depositedUser = this.deposited.at(address);
     BigInteger userBalance = depositedUser.getOrDefault(token, ZERO);
-    Context.println("[Callee][checkEnoughDeposited][" + Context.call(token, "symbol") + "]["+address+"] " + userBalance + " / " + amount);
+    Context.println("[Callee][checkEnoughDeposited][" + IIRC2.symbol(token) + "][" + address + "] " + userBalance + " / " + amount);
     Context.require(userBalance.compareTo(amount) >= 0,
         // "checkEnoughDeposited: user didn't deposit enough funds - " + userBalance + "/" + amount);
         "checkEnoughDeposited: user didn't deposit enough funds");
