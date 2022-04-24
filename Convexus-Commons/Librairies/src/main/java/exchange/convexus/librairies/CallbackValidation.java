@@ -33,7 +33,7 @@ public class CallbackValidation {
     return verifyCallback (factory, PoolAddress.getPoolKey(tokenA, tokenB, fee));
   }
 
-  private static String getName (Address address) {
+  private static String name (Address address) {
     return (String) Context.call(address, "name");
   }
 
@@ -45,7 +45,7 @@ public class CallbackValidation {
    */
   public static Address verifyCallback (Address factory, PoolAddress.PoolKey poolKey) {
     Address pool = PoolAddress.getPool(factory, poolKey);
-    Context.require(Context.getCaller().equals(pool), "verifyCallback: failed (" + getName(Context.getCaller()) + " / " + getName(pool) + ")");
+    Context.require(Context.getCaller().equals(pool), "verifyCallback: failed (" + name(Context.getCaller()) + " / " + name(pool) + ")");
     return pool;
   }
 }

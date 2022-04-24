@@ -9,8 +9,10 @@ dependencies {
     implementation project(':Convexus-Commons:Librairies')
 
     implementation project(':Convexus-Core:Structs:Pool')
+    implementation project(':Convexus-Core:Interfaces:Pool')
     
-    implementation project(':Convexus-Periphery:Contracts:NonFungiblePositionManager')
+    implementation project(':Convexus-Periphery:Interfaces:NonFungiblePositionManager')
+    implementation project(':Convexus-Periphery:Structs:NonFungiblePositionManager')
 }
 
 optimizedJar {

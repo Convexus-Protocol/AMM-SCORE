@@ -19,26 +19,25 @@ package exchange.convexus.staker;
 import java.math.BigInteger;
 
 import exchange.convexus.librairies.PoolAddress;
+import exchange.convexus.positionmgr.INonFungiblePositionManager;
 import exchange.convexus.positionmgr.PositionInformation;
 import score.Address;
-import score.Context;
 
 public class NFTPositionInfo {
-
-    /// @param factory The address of the Uniswap V3 Factory used in computing the pool address
+    /// @param factory The address of the Convexus Factory used in computing the pool address
     /// @param nonfungiblePositionManager The address of the nonfungible position manager to query
-    /// @param tokenId The unique identifier of an Uniswap V3 LP token
-    /// @return pool The address of the Uniswap V3 pool
-    /// @return tickLower The lower tick of the Uniswap V3 position
-    /// @return tickUpper The upper tick of the Uniswap V3 position
+    /// @param tokenId The unique identifier of an Convexus LP token
+    /// @return pool The address of the Convexus pool
+    /// @return tickLower The lower tick of the Convexus position
+    /// @return tickUpper The upper tick of the Convexus position
     /// @return liquidity The amount of liquidity staked
-  public static NFTPosition getPositionInfo(
+  public static NFTPosition getPositionInfo (
     Address factory, 
     Address nonfungiblePositionManager, 
     BigInteger tokenId
   ) {
-    var position = PositionInformation.fromMap(Context.call(nonfungiblePositionManager, "positions", tokenId));
+    PositionInformation position = INonFungiblePositionManager.positions(nonfungiblePositionManager, tokenId);
     PoolAddress.PoolKey poolKey = new PoolAddress.PoolKey(position.token0, position.token1, position.fee);
-    return new NFTPosition(PoolAddress.getPool(factory, poolKey), position.tickLower, position.tickUpper, position.liquidity);
+    return new NFTPosition (PoolAddress.getPool(factory, poolKey), position.tickLower, position.tickUpper, position.liquidity);
   }
 }

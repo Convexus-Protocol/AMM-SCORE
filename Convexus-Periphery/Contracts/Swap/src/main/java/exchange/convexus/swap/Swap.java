@@ -35,6 +35,7 @@ import exchange.convexus.router.ExactInputSingleParams;
 import exchange.convexus.router.ExactOutputParams;
 import exchange.convexus.router.ExactOutputSingleParams;
 import exchange.convexus.utils.BytesUtils;
+import exchange.convexus.utils.JSONUtils;
 import exchange.convexus.utils.ReentrancyLock;
 import exchange.convexus.utils.StringUtils;
 import static exchange.convexus.utils.TimeUtils.now;
@@ -121,13 +122,9 @@ public class Swap {
             ZERO
         );
 
-        // Forward tokenIn to the router and call the "exactInputSingle" method
-        JsonObject data = Json.object()
-            .add("method", "exactInputSingle")
-            .add("params", params.toJson());
-
         // The call to `exactInputSingle` executes the swap.
-        Context.call(tokenIn, "transfer", this.swapRouter, amountIn, data.toString().getBytes());
+        // Forward tokenIn to the router and call the "exactInputSingle" method
+        IIRC2.transfer(tokenIn, this.swapRouter, amountIn, JSONUtils.method("exactInputSingle", params.toJson()));
 
         reentreancy.lock(false);
     }
@@ -158,23 +155,18 @@ public class Swap {
             ZERO
         );
 
-        // Forward `tokenIn` to the router and call the "exactOutputSingle" method
-        JsonObject data = Json.object()
-            .add("method", "exactOutputSingle")
-            .add("params", params.toJson());
-
         // Executes the swap returning the token exceess not needed to spend to receive the desired amountOut.
-        Context.call(tokenIn, "transfer", this.swapRouter, amountInMaximum, data.toString().getBytes());
+        // Forward `tokenIn` to the router and call the "exactOutputSingle" method
+        IIRC2.transfer(tokenIn, this.swapRouter, amountInMaximum, JSONUtils.method("exactOutputSingle", params.toJson()));
 
-        BigInteger excess = (BigInteger) Context.call(tokenIn, "balanceOf", Context.getAddress());
+        BigInteger excess = IIRC2.balanceOf(tokenIn, Context.getAddress());
         // send back the tokens excess to the caller if there's any
         if (excess.compareTo(ZERO) > 0) {
-            Context.call(tokenIn, "transfer", caller, excess, "excess".getBytes());
+            IIRC2.transfer(tokenIn, caller, excess, JSONUtils.method("excess"));
         }
 
         reentreancy.lock(false);
     }
-
 
     // @External - this method is external through tokenFallback
     private void swapExactInputMultihop(Address caller, Address tokenIn, BigInteger amountIn) {
@@ -196,17 +188,12 @@ public class Swap {
             ZERO
         );
 
-        // Forward tokenIn to the router and call the "exactInput" method
-        JsonObject data = Json.object()
-            .add("method", "exactInput")
-            .add("params", params.toJson());
-
         // Executes the swap.
-        Context.call(tokenIn, "transfer", this.swapRouter, amountIn, data.toString().getBytes());
+        // Forward tokenIn to the router and call the "exactInput" method
+        IIRC2.transfer(tokenIn, this.swapRouter, amountIn, JSONUtils.method("exactInput", params.toJson()));
 
         reentreancy.lock(false);
     }
-
     
     /**
      * @notice swapExactOutputMultihop swaps a minimum possible amount of `tokenIn` for a fixed amount of WETH through an intermediary pool.
@@ -242,19 +229,15 @@ public class Swap {
             now(),
             amountOut
         );
-
-        // Forward `tokenIn` to the router and call the "exactOutput" method
-        JsonObject data = Json.object()
-            .add("method", "exactOutput")
-            .add("params", params.toJson());
-
+        
         // Executes the swap returning the token exceess not needed to spend to receive the desired amountOut.
-        Context.call(tokenIn, "transfer", this.swapRouter, amountInMaximum, data.toString().getBytes());
+        // Forward `tokenIn` to the router and call the "exactOutput" method
+        IIRC2.transfer(tokenIn, this.swapRouter, amountInMaximum, JSONUtils.method("exactOutput", params.toJson()));
 
-        BigInteger excess = (BigInteger) Context.call(tokenIn, "balanceOf", Context.getAddress());
+        BigInteger excess = IIRC2.balanceOf(tokenIn, Context.getAddress());
         // send back the tokens excess to the caller if there's any
         if (excess.compareTo(ZERO) > 0) {
-            Context.call(tokenIn, "transfer", caller, excess, "excess".getBytes());
+            IIRC2.transfer(tokenIn, caller, excess, JSONUtils.method("excess"));
         }
 
         reentreancy.lock(false);

@@ -16,9 +16,9 @@
 
 package exchange.convexus.librairies;
 
+import exchange.convexus.factory.IConvexusFactory;
 import exchange.convexus.utils.AddressUtils;
 import score.Address;
-import score.Context;
 import score.ObjectReader;
 import score.ObjectWriter;
 
@@ -69,6 +69,6 @@ public class PoolAddress {
   }
 
   public static Address getPool (Address factory, PoolKey key) {
-    return (Address) Context.call(factory, "getPool", key.token0, key.token1, key.fee);
+    return IConvexusFactory.getPool(factory, key.token0, key.token1, key.fee);
   }
 }

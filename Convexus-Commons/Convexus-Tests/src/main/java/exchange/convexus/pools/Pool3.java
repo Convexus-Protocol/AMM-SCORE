@@ -21,7 +21,7 @@ import static exchange.convexus.utils.IntUtils.uint256;
 import static java.math.BigInteger.ZERO;
 
 import java.math.BigInteger;
-import exchange.convexus.factory.IFactory;
+import exchange.convexus.factory.IConvexusFactory;
 import exchange.convexus.factory.Parameters;
 import exchange.convexus.interfaces.irc2.IIRC2;
 import exchange.convexus.librairies.FixedPoint128;
@@ -1285,7 +1285,7 @@ abstract class ConvexusPool3 {
     // Checks
     // ================================================
     private void checkCallerIsFactoryOwner() {
-        final Address factoryOwner = IFactory.owner(this.factory);
+        final Address factoryOwner = IConvexusFactory.owner(this.factory);
         final Address caller = Context.getCaller();
 
         Context.require(caller.equals(factoryOwner),

@@ -14,22 +14,21 @@
  * limitations under the License.
  */
 
-package exchange.convexus.staker;
+package exchange.convexus.positiondescriptor;
 
 import java.math.BigInteger;
-
 import score.Address;
+import score.Context;
 
-public class NFTPosition {
-  public Address pool;
-  public int tickLower;
-  public int tickUpper;
-  public BigInteger liquidity;
-
-  public NFTPosition(Address pool, int tickLower, int tickUpper, BigInteger liquidity) {
-    this.pool = pool;
-    this.tickLower = tickLower;
-    this.tickUpper = tickUpper;
-    this.liquidity = liquidity;
+public class INonfungibleTokenPositionDescriptor {
+  // Write methods
+  
+  // ReadOnly methods
+  public static String tokenURI (
+    Address positionDescriptor,
+    Address positionManager,
+    BigInteger tokenId
+  ) {
+    return (String) Context.call(positionDescriptor, "tokenURI", positionManager, tokenId);
   }
 }

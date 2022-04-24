@@ -34,6 +34,7 @@ import exchange.convexus.utils.AddressUtils;
 import exchange.convexus.utils.BytesUtils;
 import exchange.convexus.utils.JSONUtils;
 import exchange.convexus.utils.StringUtils;
+import exchange.convexus.pool.IConvexusPool;
 import exchange.convexus.pool.Slot0;
 import score.Address;
 import score.Context;
@@ -130,7 +131,8 @@ public class Quoter {
         }
 
         Address pool = getPool(tokenIn, tokenOut, fee);
-        var slot0 = Slot0.fromMap(Context.call(pool, "slot0"));
+
+        Slot0 slot0 = IConvexusPool.slot0(pool);
         BigInteger sqrtPriceX96After = slot0.sqrtPriceX96;
         int tickAfter = slot0.tick;
 
@@ -177,7 +179,7 @@ public class Quoter {
         String reason,
         Address pool
     ) {
-        var slot0 = Slot0.fromMap(Context.call(pool, "slot0"));
+        var slot0 = IConvexusPool.slot0(pool);
         int tickBefore = slot0.tick;
         var result = parseRevertReason(reason);
 
@@ -188,7 +190,7 @@ public class Quoter {
     }
 
     private BigInteger tickBitmap (Address pool, int pos) {
-        return (BigInteger) Context.call(pool, "tickBitmap", pos);
+        return IConvexusPool.tickBitmap(pool, pos);
     }
 
     /**
@@ -201,7 +203,7 @@ public class Quoter {
         int initializedTicksCrossed = 0;
 
         // Get the key and offset in the tick bitmap of the active tick before and after the swap.
-        int tickSpacing = ((BigInteger) Context.call(pool, "tickSpacing")).intValue();
+        int tickSpacing = IConvexusPool.tickSpacing(pool);
         int wordPos = (tickBefore / tickSpacing) >> 8;
         int bitPos = (tickBefore / tickSpacing) % 256;
 
@@ -294,9 +296,9 @@ public class Quoter {
         Address pool = getPool(params.tokenIn, params.tokenOut, params.fee);
 
         try {
-            Context.call(pool, "swap",
+            IConvexusPool.swap(pool, 
                 Context.getAddress(), // ZERO_ADDRESS might cause issues with some tokens
-                zeroForOne,
+                zeroForOne, 
                 params.amountIn,
                 params.sqrtPriceLimitX96.equals(ZERO)
                     ? (zeroForOne ? TickMath.MIN_SQRT_RATIO.add(ONE) : TickMath.MAX_SQRT_RATIO.subtract(ONE))
@@ -380,7 +382,7 @@ public class Quoter {
         }
 
         try {
-            Context.call(pool, "swap",
+            IConvexusPool.swap(pool, 
                 Context.getAddress(), // ZERO_ADDRESS might cause issues with some tokens
                 zeroForOne,
                 params.amount.negate(),

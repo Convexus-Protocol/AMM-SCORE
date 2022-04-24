@@ -23,6 +23,7 @@ include (
   // --------------------------
   // --- Convexus Periphery ---
   // --------------------------
+  // Contracts
   ':Convexus-Periphery:Contracts:SwapRouter',
   ':Convexus-Periphery:Contracts:LiquidityManagement',
   ':Convexus-Periphery:Contracts:NonFungiblePositionManager',
@@ -37,6 +38,14 @@ include (
   ':Convexus-Periphery:Contracts:Swap',
   ':Convexus-Periphery:Contracts:CXS',
   ':Convexus-Periphery:Contracts:Staker',
+
+  // Interfaces
+  ':Convexus-Periphery:Interfaces:NonfungibleTokenPositionDescriptor',
+  ':Convexus-Periphery:Interfaces:NonFungiblePositionManager',
+
+  // Structs
+  ':Convexus-Periphery:Structs:NonFungiblePositionManager',
+  ':Convexus-Periphery:Structs:Staker',
 
   // Tests
   'Convexus-Periphery:Tests:SwapRouter-Test',

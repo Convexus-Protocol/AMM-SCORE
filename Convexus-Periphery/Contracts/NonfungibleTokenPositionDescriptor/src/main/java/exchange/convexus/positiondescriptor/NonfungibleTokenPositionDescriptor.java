@@ -17,8 +17,8 @@
 package exchange.convexus.positiondescriptor;
 
 import java.math.BigInteger;
-
-import exchange.convexus.pool.Slot0;
+import exchange.convexus.pool.IConvexusPool;
+import exchange.convexus.positionmgr.INonFungiblePositionManager;
 import exchange.convexus.positionmgr.PositionInformation;
 import score.Address;
 import score.Context;
@@ -26,6 +26,7 @@ import score.annotation.External;
 
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonObject;
+import exchange.convexus.interfaces.irc2.IIRC2;
 import exchange.convexus.librairies.PoolAddress;
 
 /// @title Describes NFT token positions
@@ -44,8 +45,8 @@ public class NonfungibleTokenPositionDescriptor {
    */
   @External(readonly = true)
   public String tokenURI (Address positionManager, BigInteger tokenId) {
-    var position = PositionInformation.fromMap(Context.call(positionManager, "positions", tokenId));
-    var factory = (Address) Context.call(positionManager, "factory");
+    PositionInformation position = INonFungiblePositionManager.positions(positionManager, tokenId);
+    Address factory = INonFungiblePositionManager.factory(positionManager);
 
     PoolAddress.PoolKey poolKey = new PoolAddress.PoolKey(position.token0, position.token1, position.fee);
     Address pool = PoolAddress.getPool(factory, poolKey);
@@ -53,21 +54,21 @@ public class NonfungibleTokenPositionDescriptor {
     Boolean _flipRatio = false; // TODO: flipRatio implementation
     Address quoteTokenAddress = !_flipRatio ? position.token1 : position.token0;
     Address baseTokenAddress = !_flipRatio ? position.token0 : position.token1;
-    var slot0 = Slot0.fromMap(Context.call(pool, "slot0"));
+    var slot0 = IConvexusPool.slot0(pool);
 
     JsonObject tokenURI = Json.object()
       .add("tokenId", tokenId.toString(10))
       .add("quoteTokenAddress", quoteTokenAddress.toString())
       .add("baseTokenAddress", baseTokenAddress.toString())
-      .add("quoteTokenSymbol", (String) Context.call(quoteTokenAddress, "symbol"))
-      .add("baseTokenSymbol", (String) Context.call(baseTokenAddress, "symbol"))
-      .add("quoteTokenDecimals", ((BigInteger) Context.call(quoteTokenAddress, "decimals")).toString(10))
-      .add("baseTokenDecimals", ((BigInteger) Context.call(baseTokenAddress, "decimals")).toString(10))
+      .add("quoteTokenSymbol", IIRC2.symbol(quoteTokenAddress))
+      .add("baseTokenSymbol", IIRC2.symbol(baseTokenAddress))
+      .add("quoteTokenDecimals", Integer.toString(IIRC2.decimals(quoteTokenAddress)))
+      .add("baseTokenDecimals", Integer.toString(IIRC2.decimals(baseTokenAddress)))
       .add("flipRatio", _flipRatio.toString())
       .add("tickLower", Integer.toString(position.tickLower))
       .add("tickUpper", Integer.toString(position.tickUpper))
       .add("tickCurrent", Integer.toString(slot0.tick))
-      .add("tickSpacing", ((BigInteger) Context.call(pool, "tickSpacing")).toString(10))
+      .add("tickSpacing", Integer.toString(IConvexusPool.tickSpacing(pool)))
       .add("fee",       Integer.toString(position.fee))
       .add("poolAddress", pool.toString())
     ;

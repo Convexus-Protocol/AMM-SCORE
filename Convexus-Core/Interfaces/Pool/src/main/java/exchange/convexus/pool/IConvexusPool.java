@@ -17,13 +17,18 @@
 package exchange.convexus.pool;
 
 import java.math.BigInteger;
+import exchange.convexus.factory.Parameters;
+import exchange.convexus.librairies.PairAmounts;
+import exchange.convexus.librairies.Position;
+import exchange.convexus.librairies.Tick;
+import exchange.convexus.librairies.Tick.Info;
 import score.Address;
 import score.Context;
 
 public class IConvexusPool {
 
   // Write methods
-  public static void mint (
+  public static PairAmounts mint (
     Address pool, 
     Address recipient, 
     int tickLower, 
@@ -31,7 +36,9 @@ public class IConvexusPool {
     BigInteger amount, 
     byte[] data
   ) {
-    Context.call(pool, "mint", recipient, tickLower, tickUpper, amount, data);
+    return PairAmounts.fromMap (
+      Context.call(pool, "mint", recipient, tickLower, tickUpper, amount, data)
+    );
   }
 
   public static void flash (
@@ -44,7 +51,7 @@ public class IConvexusPool {
     Context.call(pool, "flash", recipient, amount0, amount1, data);
   }
 
-  public static void swap (
+  public static PairAmounts swap (
     Address pool,
     Address recipient,
     boolean zeroForOne,
@@ -52,10 +59,12 @@ public class IConvexusPool {
     BigInteger sqrtPriceLimitX96,
     byte[] data
   ) {
-    Context.call(pool, "swap", recipient, zeroForOne, amountSpecified, sqrtPriceLimitX96, data);
+    return PairAmounts.fromMap (
+      Context.call(pool, "swap", recipient, zeroForOne, amountSpecified, sqrtPriceLimitX96, data)
+    );
   }
 
-  public static void collect (
+  public static PairAmounts collect (
     Address pool,
     Address recipient,
     int tickLower,
@@ -63,7 +72,9 @@ public class IConvexusPool {
     BigInteger amount0Requested,
     BigInteger amount1Requested
   ) {
-    Context.call(pool, "collect", recipient, tickLower, tickUpper, amount0Requested, amount1Requested);
+    return PairAmounts.fromMap (
+      Context.call(pool, "collect", recipient, tickLower, tickUpper, amount0Requested, amount1Requested)
+    );
   }
 
   public static void collectProtocol (
@@ -75,13 +86,22 @@ public class IConvexusPool {
     Context.call(pool, "collectProtocol", recipient, amount0Requested, amount1Requested);
   }
 
-  public static void burn (
+  public static PairAmounts burn (
     Address pool,
     int tickLower,
     int tickUpper,
     BigInteger amount
   ) {
-    Context.call(pool, "burn", tickLower, tickUpper, amount);
+    return PairAmounts.fromMap (
+      Context.call(pool, "burn", tickLower, tickUpper, amount)
+    );
+  }
+
+  public static void initialize (
+    Address pool,
+    BigInteger sqrtPriceX96
+  ) {
+    Context.call(pool, "initialize", sqrtPriceX96);
   }
 
   // ReadOnly methods
@@ -91,5 +111,41 @@ public class IConvexusPool {
 
   public static Address token1 (Address pool) {
     return (Address) Context.call(pool, "token1");
+  }
+
+  public static Parameters parameters(Address pool) {
+    return Parameters.fromMap(Context.call(pool, "parameters"));
+  }
+
+  public static Slot0 slot0(Address pool) {
+    return Slot0.fromMap(Context.call(pool, "slot0"));
+  }
+
+  public static Position.Info positions(Address pool, byte[] positionKey) {
+    return Position.Info.fromMap(Context.call(pool, "positions", positionKey));
+  }
+
+  public static int tickSpacing (Address pool) {
+    return ((BigInteger) Context.call(pool, "tickSpacing")).intValue();
+  }
+
+  public static BigInteger tickBitmap (Address pool, int pos) {
+    return (BigInteger) Context.call(pool, "tickBitmap", pos);
+  }
+
+  public static SnapshotCumulativesInsideResult snapshotCumulativesInside (
+    Address pool,
+    int tickLower,
+    int tickUpper
+  ) {
+    return SnapshotCumulativesInsideResult.fromMap(
+      Context.call(pool, "snapshotCumulativesInside", tickLower, tickUpper)
+    );
+  }
+
+  public static Tick.Info ticks (Address pool, int populatedTick) {
+    return Tick.Info.fromMap(
+      Context.call(pool, "ticks", populatedTick)
+    );
   }
 }

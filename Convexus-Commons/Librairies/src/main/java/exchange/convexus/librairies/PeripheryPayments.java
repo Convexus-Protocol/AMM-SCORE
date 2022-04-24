@@ -17,9 +17,9 @@
 package exchange.convexus.librairies;
 
 import java.math.BigInteger;
-
+import exchange.convexus.interfaces.irc2.IIRC2;
+import exchange.convexus.utils.JSONUtils;
 import score.Address;
-import score.Context;
 
 public class PeripheryPayments {
 
@@ -34,6 +34,6 @@ public class PeripheryPayments {
     BigInteger value
   ) {
     // TODO: ICX payment
-    Context.call(token, "transfer", recipient, value, "{\"method\": \"pay\"}".getBytes());
+    IIRC2.transfer(token, recipient, value, JSONUtils.method("pay"));
   }
 }

@@ -27,9 +27,13 @@ import java.math.BigInteger;
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
-
+import exchange.convexus.interfaces.irc2.IIRC2;
+import exchange.convexus.interfaces.irc721.IIRC721;
+import exchange.convexus.pool.IConvexusPool;
 import exchange.convexus.pool.SnapshotCumulativesInsideResult;
+import exchange.convexus.positionmgr.INonFungiblePositionManager;
 import exchange.convexus.positionmgr.PositionInformation;
+import exchange.convexus.utils.JSONUtils;
 import exchange.convexus.utils.StringUtils;
 import static exchange.convexus.utils.TimeUtils.now;
 import score.Address;
@@ -118,8 +122,8 @@ public class ConvexusStaker implements IRC721Receiver {
         Address oldOwner, 
         Address newOwner) {}
     
-    /// @notice Event emitted when a Uniswap V3 LP token has been unstaked
-    /// @param tokenId The unique identifier of an Uniswap V3 LP token
+    /// @notice Event emitted when a Convexus LP token has been unstaked
+    /// @param tokenId The unique identifier of an Convexus LP token
     /// @param incentiveId The incentive in which the token is staking
     @EventLog
     protected void TokenUnstaked(BigInteger tokenId, byte[] incentiveId) {}
@@ -130,8 +134,8 @@ public class ConvexusStaker implements IRC721Receiver {
     @EventLog
     protected void RewardClaimed(Address to, BigInteger reward) {}
 
-    /// @notice Event emitted when a Uniswap V3 LP token has been staked
-    /// @param tokenId The unique identifier of an Uniswap V3 LP token
+    /// @notice Event emitted when a Convexus LP token has been staked
+    /// @param tokenId The unique identifier of an Convexus LP token
     /// @param liquidity The amount of liquidity staked
     /// @param incentiveId The incentive in which the token is staking
     @EventLog
@@ -219,7 +223,7 @@ public class ConvexusStaker implements IRC721Receiver {
         incentiveStorage.totalRewardUnclaimed = ZERO;
         this.incentives.set(incentiveId, incentiveStorage);
 
-        Context.call(key.rewardToken, "transfer", key.refundee, refund, "refund".getBytes());
+        IIRC2.transfer(key.rewardToken, key.refundee, refund, JSONUtils.method("refund"));
 
         // @dev we never clear totalSecondsClaimedX128
 
@@ -228,7 +232,7 @@ public class ConvexusStaker implements IRC721Receiver {
     }
     
     /**
-     * @notice Upon receiving a Uniswap V3 ERC721, creates the token deposit setting owner to `from`. Also stakes token
+     * @notice Upon receiving a Convexus ERC721, creates the token deposit setting owner to `from`. Also stakes token
      * in one or more incentives if properly formatted `data` has a length > 0.
      */
     @External
@@ -236,7 +240,7 @@ public class ConvexusStaker implements IRC721Receiver {
         Context.require(Context.getCaller().equals(this.nonfungiblePositionManager),
             "onIRC721Received: not a Convexus NFT");
         
-        var position = PositionInformation.fromMap(Context.call(this.nonfungiblePositionManager, "positions", tokenId));
+        PositionInformation position = INonFungiblePositionManager.positions(this.nonfungiblePositionManager, tokenId);
         var deposit = new Deposit(from, ZERO, position.tickLower, position.tickUpper);
         this.deposits.set(tokenId, deposit);
 
@@ -283,6 +287,8 @@ public class ConvexusStaker implements IRC721Receiver {
             "withdrawToken: cannot withdraw to staker");
 
         Deposit deposit = deposits.get(tokenId);
+        Context.require(deposit != null,
+            "withdrawToken: invalid token ID");
 
         Context.require(deposit.numberOfStakes.equals(ZERO), 
             "withdrawToken: cannot withdraw token while staked");
@@ -293,10 +299,10 @@ public class ConvexusStaker implements IRC721Receiver {
         this.deposits.set(tokenId, null);
         this.DepositTransferred(tokenId, deposit.owner, ZERO_ADDRESS);
 
-        Context.call(nonfungiblePositionManager, "safeTransferFrom", thisAddress, to, tokenId, data);
+        IIRC721.safeTransferFrom(this.nonfungiblePositionManager, thisAddress, to, tokenId, data);
     }
 
-    /// @notice Stakes a Uniswap V3 LP token
+    /// @notice Stakes a Convexus LP token
     /// @param key The key of the incentive for which to stake the NFT
     /// @param tokenId The ID of the token to stake
     @External
@@ -308,7 +314,7 @@ public class ConvexusStaker implements IRC721Receiver {
         _stakeToken(key, tokenId);
     }
 
-    /// @notice Unstakes a Uniswap V3 LP token
+    /// @notice Unstakes a Convexus LP token
     /// @param key The key of the incentive for which to unstake the NFT
     /// @param tokenId The ID of the token to unstake
     @External
@@ -339,23 +345,22 @@ public class ConvexusStaker implements IRC721Receiver {
         incentive.numberOfStakes = incentive.numberOfStakes.subtract(ONE);
         incentives.set(incentiveId, incentive);
 
-        var snapshot = SnapshotCumulativesInsideResult.fromMap(Context.call(key.pool, "snapshotCumulativesInside", deposit.tickLower, deposit.tickUpper));
+        SnapshotCumulativesInsideResult snapshot = IConvexusPool.snapshotCumulativesInside(key.pool, deposit.tickLower, deposit.tickUpper);
         BigInteger secondsPerLiquidityInsideX128 = snapshot.secondsPerLiquidityInsideX128;
 
-        var result =
-            RewardMath.computeRewardAmount(
-                incentive.totalRewardUnclaimed,
-                incentive.totalSecondsClaimedX128,
-                key.startTime,
-                key.endTime,
-                liquidity,
-                secondsPerLiquidityInsideInitialX128,
-                secondsPerLiquidityInsideX128,
-                now
-            );
-        
-        BigInteger rewardAmount = result.reward;
-        BigInteger secondsInsideX128 = result.secondsInsideX128;
+        var rewardInfo = RewardMath.computeRewardAmount(
+            incentive.totalRewardUnclaimed,
+            incentive.totalSecondsClaimedX128,
+            key.startTime,
+            key.endTime,
+            liquidity,
+            secondsPerLiquidityInsideInitialX128,
+            secondsPerLiquidityInsideX128,
+            now
+        );
+
+        BigInteger rewardAmount = rewardInfo.reward;
+        BigInteger secondsInsideX128 = rewardInfo.secondsInsideX128;
 
         // if this overflows, e.g. after 2^32-1 full liquidity seconds have been claimed,
         // reward rate will fall drastically so it's safe
@@ -400,7 +405,7 @@ public class ConvexusStaker implements IRC721Receiver {
 
         var rewardTokenDict = rewards.at(rewardToken);
         rewardTokenDict.set(caller, rewardTokenDict.get(caller).subtract(reward));
-        Context.call(rewardToken, "transfer", to, reward, "claimReward".getBytes());
+        IIRC2.transfer(rewardToken, to, reward, JSONUtils.method("claimReward"));
 
         this.RewardClaimed(to, reward);
         return reward;
@@ -426,9 +431,9 @@ public class ConvexusStaker implements IRC721Receiver {
         Deposit deposit = deposits.get(tokenId);
         Incentive incentive = incentives.get(incentiveId);
 
-        var snapshot = SnapshotCumulativesInsideResult.fromMap(Context.call(key.pool, "snapshotCumulativesInside", deposit.tickLower, deposit.tickUpper));
+        SnapshotCumulativesInsideResult snapshot = IConvexusPool.snapshotCumulativesInside(key.pool, deposit.tickLower, deposit.tickUpper);
         BigInteger secondsPerLiquidityInsideX128 = snapshot.secondsPerLiquidityInsideX128;
-        
+
         return RewardMath.computeRewardAmount (
             incentive.totalRewardUnclaimed,
             incentive.totalSecondsClaimedX128,
@@ -477,7 +482,7 @@ public class ConvexusStaker implements IRC721Receiver {
         incentive.numberOfStakes = incentive.numberOfStakes.add(ONE);
         incentives.set(incentiveId, incentive);
 
-        var snapshot = SnapshotCumulativesInsideResult.fromMap(Context.call(key.pool, "snapshotCumulativesInside", tickLower, tickUpper));
+        SnapshotCumulativesInsideResult snapshot = IConvexusPool.snapshotCumulativesInside(key.pool, tickLower, tickUpper);
         BigInteger secondsPerLiquidityInsideX128 = snapshot.secondsPerLiquidityInsideX128;
 
         if (liquidity.compareTo(MAX_UINT96) >= 0) {

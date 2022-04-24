@@ -16,7 +16,6 @@
 
 package exchange.convexus.pool;
 
-import exchange.convexus.factory.Parameters;
 import score.Context;
 
 public class ConvexusPoolFactored extends ConvexusPool {
@@ -29,6 +28,6 @@ public class ConvexusPoolFactored extends ConvexusPool {
      * @dev This constructor should be called from the Convexus Factory
      */
     public ConvexusPoolFactored () {
-        super (Parameters.fromMap(Context.call(Context.getCaller(), "parameters")));
+        super (IConvexusPool.parameters(Context.getCaller()));
     }
 }

@@ -24,7 +24,6 @@ import exchange.convexus.utils.MathUtils;
 import score.Context;
 
 public class RewardMath {
-
   /// @notice Compute the amount of rewards owed given parameters of the incentive and stake
   /// @param totalRewardUnclaimed The total amount of unclaimed rewards left for an incentive
   /// @param totalSecondsClaimedX128 How many full liquidity-seconds have been already claimed for the incentive

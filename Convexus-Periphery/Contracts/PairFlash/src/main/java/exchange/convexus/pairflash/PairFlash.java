@@ -19,7 +19,7 @@ package exchange.convexus.pairflash;
 import static java.math.BigInteger.ZERO;
 
 import java.math.BigInteger;
-
+import exchange.convexus.interfaces.irc2.IIRC2;
 import exchange.convexus.librairies.CallbackValidation;
 import exchange.convexus.librairies.PeripheryPayments;
 import exchange.convexus.librairies.PoolAddress;
@@ -41,6 +41,7 @@ import com.eclipsesource.json.JsonValue;
 import exchange.convexus.liquidity.AddLiquidityParams;
 import exchange.convexus.liquidity.AddLiquidityResult;
 import exchange.convexus.liquidity.ConvexusLiquidityManagement;
+import exchange.convexus.pool.IConvexusPool;
 
 /**
  * @title Flash contract implementation
@@ -86,7 +87,7 @@ public class PairFlash {
     private BigInteger routerExactInputSingle (Address tokenIn, BigInteger amountIn, Address tokenOut, BigInteger amountOutMinimum, int poolFee) {
         final Address thisAddress = Context.getAddress();
 
-        BigInteger amountBefore = (BigInteger) Context.call(tokenOut, "balanceOf", thisAddress);
+        BigInteger amountBefore = IIRC2.balanceOf(tokenOut, thisAddress);
 
         var params = new ExactInputSingleParams(
             tokenOut, 
@@ -103,9 +104,9 @@ public class PairFlash {
             .add("params", params.toJson());
 
         // The call to `exactInputSingle` executes the swap.
-        Context.call(tokenIn, "transfer", this.swapRouter, amountIn, data.toString().getBytes());
+        IIRC2.transfer(tokenIn, this.swapRouter, amountIn, data.toString().getBytes());
 
-        BigInteger amountAfter  = (BigInteger) Context.call(tokenOut, "balanceOf", thisAddress);
+        BigInteger amountAfter = IIRC2.balanceOf(tokenOut, thisAddress);
         BigInteger amountOut = amountAfter.subtract(amountBefore);
 
         return amountOut;
@@ -193,12 +194,7 @@ public class PairFlash {
         // amount of token1 requested to borrow
         // need amount 0 and amount1 in callback to pay back pool
         // recipient of flash should be THIS contract
-        Context.call(pool, "flash", 
-            thisAddress,
-            params.amount0,
-            params.amount1,
-            writer.toByteArray()
-        );
+        IConvexusPool.flash(pool, thisAddress, params.amount0, params.amount1, writer.toByteArray());
     }
  
     // ================================================

@@ -23,6 +23,7 @@ import com.iconloop.score.test.TestBase;
 
 import exchange.convexus.pool.ConvexusPool;
 import exchange.convexus.pool.ConvexusPoolMock;
+import exchange.convexus.positiondescriptor.NonfungibleTokenPositionDescriptor;
 import exchange.convexus.factory.ConvexusFactoryMock;
 import exchange.convexus.governor.ConvexusGovernor;
 import exchange.convexus.initializer.ConvexusPoolInitializer;
@@ -38,7 +39,6 @@ import exchange.convexus.staker.ConvexusStaker;
 import exchange.convexus.swappay.ConvexusSwapPay;
 import exchange.convexus.cxs.CXS;
 import exchange.convexus.positionmgr.NonFungiblePositionManager;
-import exchange.convexus.positiondescriptor.NonfungibleTokenPositionDescriptor;
 import exchange.convexus.testtokens.Baln;
 import exchange.convexus.testtokens.RewardToken;
 import exchange.convexus.testtokens.Sicx;

@@ -6,6 +6,8 @@ dependencies {
     implementation project(':Convexus-Commons:Utils')
     
     implementation project(':Convexus-Core:Structs:Pool')
+    implementation project(':Convexus-Core:Interfaces:Pool')
+    implementation project(':Convexus-Core:Interfaces:Factory')
 }
 
 optimizedJar {

@@ -20,8 +20,7 @@ import score.ByteArrayObjectWriter;
 import score.Context;
 
 public class IncentiveId {
-
-  public static byte[] compute(IncentiveKey key) {
+  public static byte[] compute (IncentiveKey key) {
     ByteArrayObjectWriter writer = Context.newByteArrayObjectWriter("RLPn");
     writer.write(key);
     return Context.hash("sha3-256", writer.toByteArray());

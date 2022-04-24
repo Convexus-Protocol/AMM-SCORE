@@ -75,7 +75,7 @@ public class PositionInformation {
       this.tokensOwed1 = tokensOwed1;
     }
 
-    public static PositionInformation fromMap(Object call) {
+    public static PositionInformation fromMap (Object call) {
       @SuppressWarnings("unchecked")
       Map<String,Object> map = (Map<String,Object>) call;
       return new PositionInformation(

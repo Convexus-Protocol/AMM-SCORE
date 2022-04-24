@@ -19,8 +19,8 @@ package exchange.convexus.ticklens;
 import java.math.BigInteger;
 
 import exchange.convexus.librairies.Tick;
+import exchange.convexus.pool.IConvexusPool;
 import score.Address;
-import score.Context;
 import score.annotation.External;
 
 /**
@@ -51,7 +51,7 @@ public class TickLens {
     public PopulatedTick[] getPopulatedTicksInWord (Address pool, int tickBitmapIndex) {
 
         // fetch bitmap
-        BigInteger bitmap = (BigInteger) Context.call(pool, "tickBitmap", tickBitmapIndex);
+        BigInteger bitmap = IConvexusPool.tickBitmap(pool, tickBitmapIndex);
 
         // calculate the number of populated ticks
         int numberOfPopulatedTicks = 0;
@@ -62,13 +62,13 @@ public class TickLens {
         }
 
         // fetch populated tick data
-        int tickSpacing = ((BigInteger) Context.call(pool, "tickSpacing")).intValue();
+        int tickSpacing = IConvexusPool.tickSpacing(pool);
         PopulatedTick[] populatedTicks = new PopulatedTick[numberOfPopulatedTicks];
 
         for (int i = 0; i < 256; i++) {
             if (hit(bitmap, i)) {
                 int populatedTick = ((tickBitmapIndex << 8) + i) * tickSpacing;
-                Tick.Info result = Tick.Info.fromMap(Context.call(pool, "ticks", populatedTick));
+                Tick.Info result = IConvexusPool.ticks(pool, populatedTick);
                 populatedTicks[--numberOfPopulatedTicks] = new PopulatedTick(
                     populatedTick, 
                     result.liquidityNet, 

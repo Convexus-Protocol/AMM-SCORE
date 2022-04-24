@@ -20,7 +20,9 @@ import java.math.BigInteger;
 import java.util.Map;
 
 public class PairAmounts {
+    // Amount of token0
     public BigInteger amount0;
+    // Amount of token1
     public BigInteger amount1;
 
     public PairAmounts (BigInteger amount0, BigInteger amount1) {

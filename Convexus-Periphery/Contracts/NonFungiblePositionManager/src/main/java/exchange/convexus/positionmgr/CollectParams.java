@@ -21,9 +21,13 @@ import java.math.BigInteger;
 import score.Address;
 
 public class CollectParams {
+    // The ID of the NFT for which tokens are being collected
     public BigInteger tokenId;
+    // The account that should receive the tokens
     public Address recipient;
+    // The maximum amount of token0 to collect
     public BigInteger amount0Max;
+    // The maximum amount of token1 to collect
     public BigInteger amount1Max;
 
     public CollectParams() {}

@@ -48,6 +48,8 @@ import static exchange.convexus.utils.IntUtils.uint128;
 import exchange.convexus.liquidity.AddLiquidityParams;
 import exchange.convexus.liquidity.AddLiquidityResult;
 import exchange.convexus.liquidity.ConvexusLiquidityManagement;
+import exchange.convexus.pool.IConvexusPool;
+import exchange.convexus.positiondescriptor.INonfungibleTokenPositionDescriptor;
 
 // @title NFT positions
 // @notice Wraps Convexus positions in the IRC non-fungible token interface
@@ -231,8 +233,8 @@ public class NonFungiblePositionManager extends IRC721Enumerable {
         this._nextId.set(tokenId.add(ONE));
         this._mint(params.recipient, tokenId);
 
-        var positionKey = Positions.getKey(Context.getAddress(), params.tickLower, params.tickUpper);
-        var poolPos = Position.Info.fromMap(Context.call(pool, "positions", positionKey));
+        byte[] positionKey = Positions.getKey(Context.getAddress(), params.tickLower, params.tickUpper);
+        Position.Info poolPos = IConvexusPool.positions(pool, positionKey);
         
         // idempotent set
         BigInteger poolId = cachePoolKey(pool, PoolAddress.getPoolKey(params.token0, params.token1, params.fee));
@@ -258,7 +260,7 @@ public class NonFungiblePositionManager extends IRC721Enumerable {
     @External(readonly = true)
     public String tokenURI (BigInteger tokenId) {
         _exists(tokenId);
-        return (String) Context.call(this._tokenDescriptor, "tokenURI", Context.getAddress(), tokenId);
+        return INonfungibleTokenPositionDescriptor.tokenURI(this._tokenDescriptor, Context.getAddress(), tokenId);
     }
 
     /**
@@ -298,10 +300,10 @@ public class NonFungiblePositionManager extends IRC721Enumerable {
         BigInteger amount1 = result.amount1;
         Address pool = result.pool;
 
-        var positionKey = Positions.getKey(Context.getAddress(), positionStorage.tickLower, positionStorage.tickUpper);
+        byte[] positionKey = Positions.getKey(Context.getAddress(), positionStorage.tickLower, positionStorage.tickUpper);
 
         // this is now updated to the current transaction
-        var poolPos = Position.Info.fromMap(Context.call(pool, "positions", positionKey));
+        Position.Info poolPos = IConvexusPool.positions(pool, positionKey);
 
         BigInteger feeGrowthInside0LastX128 = poolPos.feeGrowthInside0LastX128;
         BigInteger feeGrowthInside1LastX128 = poolPos.feeGrowthInside1LastX128;
@@ -349,16 +351,17 @@ public class NonFungiblePositionManager extends IRC721Enumerable {
 
         PoolAddress.PoolKey poolKey = this._poolIdToPoolKey.get(positionStorage.poolId);
         Address pool = PoolAddress.getPool(this.factory, poolKey);
-        var pairAmounts = PairAmounts.fromMap(Context.call(pool, "burn", positionStorage.tickLower, positionStorage.tickUpper, params.liquidity));
+
+        PairAmounts pairAmounts = IConvexusPool.burn(pool, positionStorage.tickLower, positionStorage.tickUpper, params.liquidity);
         amount0 = pairAmounts.amount0;
         amount1 = pairAmounts.amount1;
 
         Context.require(amount0.compareTo(params.amount0Min) >= 0 && amount1.compareTo(params.amount1Min) >= 0,
             "decreaseLiquidity: Price slippage check");
 
-        var positionKey = Positions.getKey(Context.getAddress(), positionStorage.tickLower, positionStorage.tickUpper);
+        byte[] positionKey = Positions.getKey(Context.getAddress(), positionStorage.tickLower, positionStorage.tickUpper);
         // this is now updated to the current transaction
-        var poolPos = Position.Info.fromMap(Context.call(pool, "positions", positionKey));
+        Position.Info poolPos = IConvexusPool.positions(pool, positionKey);
 
         BigInteger feeGrowthInside0LastX128 = poolPos.feeGrowthInside0LastX128;
         BigInteger feeGrowthInside1LastX128 = poolPos.feeGrowthInside1LastX128;
@@ -384,9 +387,9 @@ public class NonFungiblePositionManager extends IRC721Enumerable {
     /**
      * @notice Collects up to a maximum amount of fees owed to a specific position to the recipient
      * @param params tokenId The ID of the NFT for which tokens are being collected,
-     * recipient The account that should receive the tokens,
-     * amount0Max The maximum amount of token0 to collect,
-     * amount1Max The maximum amount of token1 to collect
+     *               recipient The account that should receive the tokens,
+     *               amount0Max The maximum amount of token0 to collect,
+     *               amount1Max The maximum amount of token1 to collect
      * @return amount0 The amount of fees collected in token0
      * @return amount1 The amount of fees collected in token1
      */
@@ -396,6 +399,7 @@ public class NonFungiblePositionManager extends IRC721Enumerable {
 
         Context.require(params.amount0Max.compareTo(ZERO) > 0 || params.amount1Max.compareTo(ZERO) > 0,
             "collect: amount0Max and amount1Max cannot be both zero");
+
         // allow collecting to the nft position manager address with address 0
         Address recipient = params.recipient.equals(ZERO_ADDRESS) ? Context.getAddress() : params.recipient;
 
@@ -408,9 +412,9 @@ public class NonFungiblePositionManager extends IRC721Enumerable {
 
         // trigger an update of the position fees owed and fee growth snapshots if it has any liquidity
         if (positionStorage.liquidity.compareTo(ZERO) > 0) {
-            Context.call(pool, "burn", positionStorage.tickLower, positionStorage.tickUpper, ZERO);
+            IConvexusPool.burn(pool, positionStorage.tickLower, positionStorage.tickUpper, ZERO);
             var positionKey = Positions.getKey(Context.getAddress(), positionStorage.tickLower, positionStorage.tickUpper);
-            var poolPos = Position.Info.fromMap(Context.call(pool, "positions", positionKey));
+            Position.Info poolPos = IConvexusPool.positions(pool, positionKey);
             BigInteger feeGrowthInside0LastX128 = poolPos.feeGrowthInside0LastX128;
             BigInteger feeGrowthInside1LastX128 = poolPos.feeGrowthInside1LastX128;
 
@@ -428,16 +432,17 @@ public class NonFungiblePositionManager extends IRC721Enumerable {
         amount1Collect = (params.amount1Max.compareTo(tokensOwed1) > 0) ? tokensOwed1 : params.amount1Max;
         
         // the actual amounts collected are returned
-        var result = PairAmounts.fromMap(Context.call(pool, "collect", 
+        PairAmounts collected = IConvexusPool.collect (
+            pool,
             recipient,
             positionStorage.tickLower,
             positionStorage.tickUpper,
             amount0Collect,
             amount1Collect
-        ));
-        BigInteger amount0 = result.amount0;
-        BigInteger amount1 = result.amount1;
-        
+        );
+        BigInteger amount0 = collected.amount0;
+        BigInteger amount1 = collected.amount1;
+
         // sometimes there will be a few less loops than expected due to rounding down in core, but we just subtract the full amount expected
         // instead of the actual amount so we can burn the token
         positionStorage.tokensOwed0 = tokensOwed0.subtract(amount0Collect);

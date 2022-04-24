@@ -21,9 +21,9 @@ import static java.math.BigInteger.ZERO;
 
 /// @notice Represents a staked liquidity NFT
 public class Stake {
-    BigInteger secondsPerLiquidityInsideInitialX128;
-    BigInteger liquidityNoOverflow;
-    BigInteger liquidityIfOverflow;
+    public BigInteger secondsPerLiquidityInsideInitialX128;
+    public BigInteger liquidityNoOverflow;
+    public BigInteger liquidityIfOverflow;
 
     public Stake (
         BigInteger secondsPerLiquidityInsideInitialX128,

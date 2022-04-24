@@ -16,6 +16,7 @@
 
 package exchange.convexus.liquidity;
 
+import exchange.convexus.interfaces.irc2.IIRC2;
 import exchange.convexus.librairies.CallbackValidation;
 import exchange.convexus.librairies.LiquidityAmounts;
 import exchange.convexus.librairies.MintCallbackData;
@@ -29,9 +30,8 @@ import score.ByteArrayObjectWriter;
 import score.Context;
 import score.DictDB;
 import score.ObjectReader;
-
-import exchange.convexus.pool.Slot0;
-
+import exchange.convexus.pool.IConvexusPool;
+import exchange.convexus.utils.JSONUtils;
 import static java.math.BigInteger.ZERO;
 
 import java.math.BigInteger;
@@ -120,9 +120,7 @@ public class ConvexusLiquidityManagement {
         Context.require(pool != null, "addLiquidity: pool doesn't exist");
         
         // compute the liquidity amount
-        var result = Slot0.fromMap(Context.call(pool, "slot0"));
-
-        BigInteger sqrtPriceX96 = result.sqrtPriceX96;
+        BigInteger sqrtPriceX96 = IConvexusPool.slot0(pool).sqrtPriceX96;
         BigInteger sqrtRatioAX96 = TickMath.getSqrtRatioAtTick(params.tickLower);
         BigInteger sqrtRatioBX96 = TickMath.getSqrtRatioAtTick(params.tickUpper);
 
@@ -137,13 +135,14 @@ public class ConvexusLiquidityManagement {
         ByteArrayObjectWriter writer = Context.newByteArrayObjectWriter("RLPn");
         writer.write(new MintCallbackData(poolKey, Context.getCaller()));
 
-        PairAmounts amounts = PairAmounts.fromMap(Context.call(pool, "mint", 
-            params.recipient,
-            params.tickLower,
-            params.tickUpper,
-            liquidity,
+        PairAmounts amounts = IConvexusPool.mint (
+            pool, 
+            params.recipient, 
+            params.tickLower, 
+            params.tickUpper, 
+            liquidity, 
             writer.toByteArray()
-        ));
+        );
 
         Context.require(
             amounts.amount0.compareTo(params.amount0Min) >= 0
@@ -171,7 +170,7 @@ public class ConvexusLiquidityManagement {
         var depositedUser = this.deposited.at(caller);
         BigInteger oldBalance = depositedUser.getOrDefault(tokenIn, ZERO);
         depositedUser.set(tokenIn, oldBalance.add(amountIn));
-        Context.println("LM: deposit(" + caller + ")(" + Context.call(tokenIn, "symbol") + ") = " + this.deposited.at(caller).get(tokenIn));
+        // Context.println("LM: deposit(" + caller + ")(" + IIRC2.symbol(tokenIn) + ") = " + this.deposited.at(caller).get(tokenIn));
     }
 
     /**
@@ -184,7 +183,7 @@ public class ConvexusLiquidityManagement {
         BigInteger amount = depositedUser.getOrDefault(token, ZERO);
 
         if (amount.compareTo(ZERO) > 0) {
-            Context.call(token, "transfer", caller, amount, "withdraw".getBytes());
+            IIRC2.transfer(token, caller, amount, JSONUtils.method("withdraw"));
             depositedUser.set(token, ZERO);
         }
     }
@@ -195,7 +194,7 @@ public class ConvexusLiquidityManagement {
     private void checkEnoughDeposited (Address address, Address token, BigInteger amount) {
         var depositedUser = this.deposited.at(address);
         BigInteger userBalance = depositedUser.getOrDefault(token, ZERO);
-        Context.println("[Callee][checkEnoughDeposited][" + Context.call(token, "symbol") + "] " + userBalance + " / " + amount);
+        // Context.println("[Callee][checkEnoughDeposited][" + IIRC2.symbol(token) + "] " + userBalance + " / " + amount);
         Context.require(userBalance.compareTo(amount) >= 0,
             "checkEnoughDeposited: user didn't deposit enough funds");
     }

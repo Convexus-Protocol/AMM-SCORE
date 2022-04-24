@@ -110,41 +110,41 @@ public class CXS {
     /**
      * @notice Construct a new CXS token
      * @param account The initial account to grant all the tokens
-     * @param minter_ The account with minting ability
-     * @param mintingAllowedAfter_ The timestamp after which minting may occur
+     * @param minter The account with minting ability
+     * @param mintingAllowedAfter The timestamp after which minting may occur
      */
     public CXS (
         Address account, 
-        Address minter_, 
-        BigInteger mintingAllowedAfter_
+        Address minter, 
+        BigInteger mintingAllowedAfter
     ) {
         // Initial deploy
         if (balances.get(account) == null) {
-            Context.require(mintingAllowedAfter_.compareTo(now()) >= 0,
+            Context.require(mintingAllowedAfter.compareTo(now()) >= 0,
             "CXS: minting can only begin after deployment");
 
             balances.set(account, INITIAL_TOTAL_SUPPLY);
             this.Transfer(ZERO_ADDRESS, account, INITIAL_TOTAL_SUPPLY, "genesis".getBytes());
             
-            this.minter.set(minter_);
-            this.MinterChanged(ZERO_ADDRESS, minter_);
+            this.minter.set(minter);
+            this.MinterChanged(ZERO_ADDRESS, minter);
 
-            this.mintingAllowedAfter.set(mintingAllowedAfter_);
+            this.mintingAllowedAfter.set(mintingAllowedAfter);
         }
     }
 
     /**
      * @notice Change the minter address
-     * @param minter_ The address of the new minter
+     * @param minter The address of the new minter
      */
     @External
-    public void setMinter (Address minter_) {
+    public void setMinter (Address minter) {
         Address oldMinter = this.minter.get();
         Context.require(Context.getCaller().equals(oldMinter), 
             "setMinter: Only the minter can change the minter address");
 
-        this.MinterChanged(oldMinter, minter_);
-        this.minter.set(minter_);
+        this.MinterChanged(oldMinter, minter);
+        this.minter.set(minter);
     }
 
     /**
@@ -272,6 +272,9 @@ public class CXS {
         return this.checkpoints.at(account).get(lower).votes;
     }
 
+    // ================================================
+    // Private methods
+    // ================================================
     private void _delegate(Address delegator, Address delegatee) {
         Address currentDelegate = this.delegates.get(delegator);
         BigInteger delegatorBalance = this.balances.get(delegator);
@@ -370,7 +373,6 @@ public class CXS {
     public String symbol() {
         return this.symbol;
     }
-    
 
     @External(readonly = true)
     public Address minter() {

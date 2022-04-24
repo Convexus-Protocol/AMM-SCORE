@@ -31,11 +31,14 @@ import exchange.convexus.librairies.PoolAddress;
 import exchange.convexus.librairies.PoolData;
 import exchange.convexus.librairies.TickMath;
 import exchange.convexus.liquidity.ConvexusLiquidityManagement;
+import exchange.convexus.pool.IConvexusPool;
+import exchange.convexus.interfaces.irc2.IIRC2;
 import exchange.convexus.librairies.CallbackValidation;
 import exchange.convexus.librairies.PairAmounts;
 import exchange.convexus.utils.AddressUtils;
 import exchange.convexus.utils.BytesUtils;
 import exchange.convexus.utils.IntUtils;
+import exchange.convexus.utils.JSONUtils;
 import exchange.convexus.utils.ReentrancyLock;
 import score.Address;
 import score.ByteArrayObjectWriter;
@@ -246,7 +249,7 @@ public class SwapRouter {
         // send back the tokens excess to the caller if there's any
         BigInteger excess = amountInMaximum.subtract(amountIn);
         if (excess.compareTo(ZERO) > 0) {
-            Context.call(tokenIn, "transfer", caller, excess, "{\"method\": \"excess\"}".getBytes());
+            IIRC2.transfer(tokenIn, caller, excess, JSONUtils.method("excess"));
         }
 
         reentreancy.lock(false);
@@ -384,7 +387,7 @@ public class SwapRouter {
         Context.require(targetPool != null, 
             "exactInputInternal: Pool doesn't exist");
 
-        var result = PairAmounts.fromMap(Context.call(targetPool, "swap",
+        PairAmounts result = IConvexusPool.swap(targetPool, 
             recipient,
             zeroForOne,
             amountIn,
@@ -392,7 +395,7 @@ public class SwapRouter {
                 ? (zeroForOne ? TickMath.MIN_SQRT_RATIO.add(ONE) : TickMath.MAX_SQRT_RATIO.subtract(ONE))
                 : sqrtPriceLimitX96,
             writer.toByteArray()
-        ));
+        );
 
         return zeroForOne ? result.amount1.negate() : result.amount0.negate();
     }
@@ -427,7 +430,7 @@ public class SwapRouter {
         Context.require(targetPool != null, 
             "exactInputInternal: Pool doesn't exist");
         
-        var result = PairAmounts.fromMap(Context.call(targetPool, "swap",
+        PairAmounts result = IConvexusPool.swap(targetPool, 
             recipient,
             zeroForOne,
             amountOut.negate(),
@@ -435,7 +438,7 @@ public class SwapRouter {
                 ? (zeroForOne ? TickMath.MIN_SQRT_RATIO.add(ONE) : TickMath.MAX_SQRT_RATIO.subtract(ONE))
                 : sqrtPriceLimitX96,
             writer.toByteArray()
-        ));
+        );
 
         BigInteger amount0Delta = result.amount0;
         BigInteger amount1Delta = result.amount1;
