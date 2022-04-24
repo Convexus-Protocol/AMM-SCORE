@@ -48,20 +48,22 @@ public class ConvexusFactoryScore extends Score {
         return new ConvexusFactoryScore(score);
     }
 
-    public TransactionResult createPool(Wallet fromWallet, Address tokenA, Address tokenB, int fee, Address pool)
-            throws IOException, ResultTimeoutException {
+    public Address createPool (
+        Wallet fromWallet, 
+        Address tokenA, 
+        Address tokenB, 
+        int fee
+    ) throws IOException, ResultTimeoutException {
         RpcObject params = new RpcObject.Builder()
                 .put("tokenA", new RpcValue(tokenA))
                 .put("tokenB", new RpcValue(tokenB))
                 .put("fee", new RpcValue(BigInteger.valueOf(fee)))
-                .put("pool", new RpcValue(pool))
                 .build();
         TransactionResult result = invokeAndWaitResult(fromWallet, "createPool", params);
-        ensurePoolCreated(result, tokenA, tokenB, fee);
-        return result;
+        return ensurePoolCreated(result, tokenA, tokenB, fee);
     }
 
-    public TransactionResult setPoolContract(Wallet fromWallet, byte[] contractBytes)
+    public TransactionResult setPoolContract (Wallet fromWallet, byte[] contractBytes)
             throws IOException, ResultTimeoutException {
         RpcObject params = new RpcObject.Builder()
                 .put("contractBytes", new RpcValue(contractBytes))

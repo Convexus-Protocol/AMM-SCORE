@@ -40,7 +40,6 @@ public class ConvexusPoolScore extends Score {
     public static ConvexusPoolScore mustDeploy(
       TransactionHandler txHandler, 
       Wallet wallet,
-      // Patch this after SCORE can deploy other SCOREs
       Address _token0,
       Address _token1,
       Address _factory,
@@ -48,13 +47,19 @@ public class ConvexusPoolScore extends Score {
       int tickSpacing
     ) throws IOException, TransactionFailureException, ResultTimeoutException {
         LOG.infoEntering("deploy", "ConvexusPool");
-        RpcObject params = new RpcObject.Builder()
-                .put("_token0", new RpcValue(_token0))
-                .put("_token1", new RpcValue(_token1))
-                .put("_factory", new RpcValue(_factory))
+        
+        RpcObject parameters = new RpcObject.Builder()
+                .put("token0", new RpcValue(_token0))
+                .put("token1", new RpcValue(_token1))
+                .put("factory", new RpcValue(_factory))
                 .put("fee", new RpcValue(BigInteger.valueOf(fee)))
                 .put("tickSpacing", new RpcValue(BigInteger.valueOf(tickSpacing)))
                 .build();
+        
+        RpcObject params = new RpcObject.Builder()
+                .put("parameters", parameters)
+                .build();
+
         Score score = txHandler.deploy(wallet, getFilePath("Convexus-Core:Contracts:Pool"), params);
         LOG.info("ConvexusPool deployed at: " + score.getAddress());
         LOG.infoExiting();

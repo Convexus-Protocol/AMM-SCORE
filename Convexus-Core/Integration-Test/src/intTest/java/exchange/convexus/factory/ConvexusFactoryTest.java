@@ -29,7 +29,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import exchange.convexus.score.ConvexusFactoryScore;
-import exchange.convexus.score.ConvexusPoolScore;
 import exchange.convexus.score.IRC2BasicToken;
 import exchange.convexus.utils.MathUtils;
 
@@ -100,23 +99,11 @@ public class ConvexusFactoryTest extends TestBase {
         byte[] fileContent = Files.readAllBytes(new File(Score.getFilePath("Convexus-Core:Contracts:Pool")).toPath());
         factory.setPoolContract(ownerWallet, fileContent);
 
-        LOG.info("Deploying a new SICX / USDC pool (until SCORE can deploy other SCOREs)");
-        // Faking it until SCORE can deploy other SCOREs
-        ConvexusPoolScore pool = ConvexusPoolScore.mustDeploy(
-            txHandler, wallets[0], 
-            sicx.getAddress(), 
-            usdc.getAddress(), 
-            factory.getAddress(), 
-            FEE_AMOUNTS[MEDIUM], 
-            TICK_SPACINGS[MEDIUM]
-        );
-
-        LOG.info("Creating a new pool using the factory");
+        LOG.info("Creating a new SICX / USDC pool using the factory");
         factory.createPool(ownerWallet, 
             sicx.getAddress(), 
             usdc.getAddress(), 
-            FEE_AMOUNTS[MEDIUM],
-            pool.getAddress()
+            FEE_AMOUNTS[MEDIUM]
         );
 
         LOG.infoExiting();
