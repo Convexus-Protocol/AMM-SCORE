@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 ICONation
+ * Copyright 2022 ICONation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,6 +53,35 @@ public class IConvexusPool {
     byte[] data
   ) {
     Context.call(pool, "swap", recipient, zeroForOne, amountSpecified, sqrtPriceLimitX96, data);
+  }
+
+  public static void collect (
+    Address pool,
+    Address recipient,
+    int tickLower,
+    int tickUpper,
+    BigInteger amount0Requested,
+    BigInteger amount1Requested
+  ) {
+    Context.call(pool, "collect", recipient, tickLower, tickUpper, amount0Requested, amount1Requested);
+  }
+
+  public static void collectProtocol (
+    Address pool,
+    Address recipient,
+    BigInteger amount0Requested,
+    BigInteger amount1Requested
+  ) {
+    Context.call(pool, "collectProtocol", recipient, amount0Requested, amount1Requested);
+  }
+
+  public static void burn (
+    Address pool,
+    int tickLower,
+    int tickUpper,
+    BigInteger amount
+  ) {
+    Context.call(pool, "burn", tickLower, tickUpper, amount);
   }
 
   // ReadOnly methods

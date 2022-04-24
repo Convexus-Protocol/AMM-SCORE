@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 ICONation
+ * Copyright 2022 ICONation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -365,7 +365,7 @@ public class IRC721 {
       byte[] _data
   ) {
     if (to.isContract()) {
-        Context.call(to, "onIRC721Received", Context.getCaller(), from, tokenId, _data != null ? _data : "".getBytes());
+      IIRC721Receiver.onIRC721Received(to, Context.getCaller(), from, tokenId, _data != null ? _data : "".getBytes());
     }
 
     return true;

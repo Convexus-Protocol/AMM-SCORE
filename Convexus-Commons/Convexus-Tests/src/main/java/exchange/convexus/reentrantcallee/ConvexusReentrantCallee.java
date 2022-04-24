@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 ICONation
+ * Copyright 2022 ICONation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,8 +25,10 @@ import java.math.BigInteger;
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
-
+import exchange.convexus.interfaces.irc2.IIRC2;
 import exchange.convexus.librairies.TickMath;
+import exchange.convexus.pool.IConvexusPool;
+import exchange.convexus.utils.JSONUtils;
 import score.Address;
 import score.BranchDB;
 import score.Context;
@@ -53,7 +55,7 @@ public class ConvexusReentrantCallee {
 
   @External
   public void swapToReenter (Address pool) {
-    Context.call(pool, "swap", ZERO_ADDRESS, false, ONE, TickMath.MAX_SQRT_RATIO.subtract(ONE), new byte[0]);
+    IConvexusPool.swap(pool, ZERO_ADDRESS, false, ONE, TickMath.MAX_SQRT_RATIO.subtract(ONE), new byte[0]);
   }
 
   @External
@@ -64,42 +66,42 @@ public class ConvexusReentrantCallee {
   ) {
     // try to reenter swap
     try {
-      Context.call(Context.getCaller(), "swap", ZERO_ADDRESS, false, ONE, ZERO, new byte[0]);
+      IConvexusPool.swap(Context.getCaller(), ZERO_ADDRESS, false, ONE, ZERO, new byte[0]);
     } catch (AssertionError e) {
       Context.require(e.getMessage().equals(expectedReason));
     }
 
     // try to reenter mint
     try {
-      Context.call(Context.getCaller(), "mint", ZERO_ADDRESS, 0, 0, ZERO, new byte[0]);
+      IConvexusPool.mint(Context.getCaller(), ZERO_ADDRESS, 0, 0, ZERO, new byte[0]);
     } catch (AssertionError e) {
       Context.require(e.getMessage().equals(expectedReason));
     }
 
     // try to reenter collect
     try {
-      Context.call(Context.getCaller(), "collect", ZERO_ADDRESS, 0, 0, ZERO, ZERO);
+      IConvexusPool.collect(Context.getCaller(), ZERO_ADDRESS, 0, 0, ZERO, ZERO);
     } catch (AssertionError e) {
       Context.require(e.getMessage().equals(expectedReason));
     }
     
     // try to reenter burn
     try {
-      Context.call(Context.getCaller(), "burn", 0, 0, ZERO);
+      IConvexusPool.burn(Context.getCaller(), 0, 0, ZERO);
     } catch (AssertionError e) {
       Context.require(e.getMessage().equals(expectedReason));
     }
     
     // try to reenter flash
     try {
-      Context.call(Context.getCaller(), "flash", ZERO_ADDRESS, ZERO, ZERO, new byte[0]);
+      IConvexusPool.flash(Context.getCaller(), ZERO_ADDRESS, ZERO, ZERO, new byte[0]);
     } catch (AssertionError e) {
       Context.require(e.getMessage().equals(expectedReason));
     }
 
     // try to reenter collectProtocol
     try {
-      Context.call(Context.getCaller(), "collectProtocol", ZERO_ADDRESS, ZERO, ZERO);
+      IConvexusPool.collectProtocol(Context.getCaller(), ZERO_ADDRESS, ZERO, ZERO);
     } catch (AssertionError e) {
       Context.require(e.getMessage().equals(expectedReason));
     }
@@ -127,7 +129,7 @@ public class ConvexusReentrantCallee {
     BigInteger amount = depositedUser.getOrDefault(caller, ZERO);
 
     if (amount.compareTo(ZERO) > 0) {
-      Context.call(token, "transfer", caller, amount, "withdraw".getBytes());
+      IIRC2.transfer(token, caller, amount, JSONUtils.method("withdraw"));
       depositedUser.set(token, ZERO);
     }
   }

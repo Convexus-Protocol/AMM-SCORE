@@ -14,17 +14,11 @@
  * limitations under the License.
  */
 
-package exchange.convexus.utils;
+package team.iconation.standards.token.irc721;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import java.math.BigInteger;
+import score.Address;
 
-import org.junit.jupiter.api.function.Executable;
-
-public class AssertUtils {
-  public static <T extends Throwable> void assertThrowsMessage (Class<T> expectedType, Executable executable, String message) {
-    assertEquals(
-      message,
-      assertThrows(expectedType, executable).getMessage());
-  }
+public interface IRC721Receiver {
+  public void onIRC721Received (Address caller, Address from, BigInteger tokenId, byte[] data);
 }

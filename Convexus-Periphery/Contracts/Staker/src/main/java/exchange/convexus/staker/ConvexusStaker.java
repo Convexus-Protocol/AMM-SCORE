@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 ICONation
+ * Copyright 2022 ICONation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,11 +42,12 @@ import score.annotation.External;
 import score.annotation.Optional;
 import scorex.io.Reader;
 import scorex.io.StringReader;
+import team.iconation.standards.token.irc721.IRC721Receiver;
 
 /**
  * @title Convexus canonical staking interface
  */
-public class ConvexusStaker {
+public class ConvexusStaker implements IRC721Receiver {
 
     // ================================================
     // Consts

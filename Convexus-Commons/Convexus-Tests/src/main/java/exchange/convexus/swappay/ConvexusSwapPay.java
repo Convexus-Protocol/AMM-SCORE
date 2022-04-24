@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 ICONation
+ * Copyright 2022 ICONation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,9 @@ import java.math.BigInteger;
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
-
+import exchange.convexus.interfaces.irc2.IIRC2;
+import exchange.convexus.pool.IConvexusPool;
+import exchange.convexus.utils.JSONUtils;
 import score.Address;
 import score.BranchDB;
 import score.ByteArrayObjectWriter;
@@ -63,7 +65,7 @@ public class ConvexusSwapPay {
     writer.write(Context.getCaller().toByteArray());
     writer.write(pay0);
     writer.write(pay1);
-    Context.call(pool, "swap", recipient, zeroForOne, amountSpecified, sqrtPriceX96, writer.toByteArray());
+    IConvexusPool.swap(pool, recipient, zeroForOne, amountSpecified, sqrtPriceX96, writer.toByteArray());
   }
 
   @External
@@ -79,9 +81,9 @@ public class ConvexusSwapPay {
     final Address caller = Context.getCaller();
 
     if (pay0.compareTo(ZERO) > 0) {
-      pay(sender, (Address) Context.call(caller, "token0"), caller, pay0);
+      pay(sender, IConvexusPool.token0(caller), caller, pay0);
     } else if (pay1.compareTo(ZERO) > 0) {
-      pay(sender, (Address) Context.call(caller, "token1"), caller, pay1);
+      pay(sender, IConvexusPool.token1(caller), caller, pay1);
     }
   }
 
@@ -94,7 +96,7 @@ public class ConvexusSwapPay {
     depositedUser.set(token, oldBalance.subtract(owed));
 
     // Actually transfer the tokens
-    Context.call(token, "transfer", destination, owed, "{\"method\": \"pay\"}".getBytes());
+    IIRC2.transfer(token, destination, owed, JSONUtils.method("pay"));
   }
 
   // @External - this method is external through tokenFallback
@@ -117,7 +119,7 @@ public class ConvexusSwapPay {
     BigInteger amount = depositedUser.getOrDefault(caller, ZERO);
 
     if (amount.compareTo(ZERO) > 0) {
-      Context.call(token, "transfer", caller, amount, "withdraw".getBytes());
+      IIRC2.transfer(token, caller, amount, JSONUtils.method("withdraw"));
       depositedUser.set(token, ZERO);
     }
   }
@@ -148,7 +150,7 @@ public class ConvexusSwapPay {
   private void checkEnoughDeposited (Address address, Address token, BigInteger amount) {
     var depositedUser = this.deposited.at(address);
     BigInteger userBalance = depositedUser.getOrDefault(token, ZERO);
-    Context.println("[Callee][checkEnoughDeposited][" + Context.call(token, "symbol") + "] " + userBalance + " / " + amount);
+    // Context.println("[Callee][checkEnoughDeposited][" + IIRC2.symbol(token) + "] " + userBalance + " / " + amount);
     Context.require(userBalance.compareTo(amount) >= 0,
         // "checkEnoughDeposited: user didn't deposit enough funds - " + userBalance + "/" + amount);
         "checkEnoughDeposited: user didn't deposit enough funds");
