@@ -22,7 +22,7 @@ import java.util.Map;
 import score.ObjectReader;
 import score.ObjectWriter;
 
-public class Tick {
+public class TickLib {
     public static class Info {
       // the total position liquidity that references this tick
       public BigInteger liquidityGross;
@@ -53,7 +53,7 @@ public class Tick {
       // a specific position.
       public boolean initialized;
 
-      public Info(
+      public Info (
         BigInteger liquidityGross,
         BigInteger liquidityNet,
         BigInteger feeGrowthOutside0X128,

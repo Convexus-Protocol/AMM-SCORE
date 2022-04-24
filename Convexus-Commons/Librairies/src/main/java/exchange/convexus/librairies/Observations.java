@@ -21,7 +21,7 @@ import static java.math.BigInteger.ZERO;
 
 import java.math.BigInteger;
 
-import exchange.convexus.librairies.Oracle.Observation;
+import exchange.convexus.pool.Oracle;
 import exchange.convexus.utils.MathUtils;
 import score.Context;
 import score.DictDB;
@@ -47,10 +47,10 @@ public class Observations {
   // ================================================
   // Methods
   // ================================================
-  public Observation get (int index) {
+  public Oracle.Observation get (int index) {
     return this.observations.getOrDefault(index, emptyObservation());
   }
-  public void set (int index, Observation observation) {
+  public void set (int index, Oracle.Observation observation) {
     this.observations.set(index, observation);
   }
 
@@ -67,7 +67,7 @@ public class Observations {
   }
 
   public InitializeResult initialize(BigInteger time) {
-    Observation observation = new Observation(time, ZERO, ZERO, true);
+    Oracle.Observation observation = new Oracle.Observation(time, ZERO, ZERO, true);
     this.set(0, observation);
     return new InitializeResult(1, 1);
   }
@@ -93,8 +93,8 @@ public class Observations {
     int r = l + cardinality - 1; // newest observation
     int i;
 
-    Observation beforeOrAt = null;
-    Observation atOrAfter = null;
+    Oracle.Observation beforeOrAt = null;
+    Oracle.Observation atOrAfter = null;
 
     while (true) {
       i = (l + r) / 2;
@@ -135,17 +135,17 @@ public class Observations {
     int cardinality
   ) {
     // optimistically set before to the newest observation
-    Observation beforeOrAt = this.get(index);
+    Oracle.Observation beforeOrAt = this.get(index);
 
     // if the target is chronologically at or after the newest observation, we can early return
     if (lte(time, beforeOrAt.blockTimestamp, target)) {
       if (beforeOrAt.blockTimestamp.equals(target)) {
         // if newest observation equals target, we're in the same block, so we can ignore atOrAfter
-        Observation atOrAfter = new Observation(ZERO, ZERO, ZERO, false);
+        Oracle.Observation atOrAfter = new Oracle.Observation(ZERO, ZERO, ZERO, false);
         return new BeforeAfterObservation(beforeOrAt, atOrAfter);
       } else {
         // otherwise, we need to transform
-        return new BeforeAfterObservation(beforeOrAt, beforeOrAt.transform(target, tick, liquidity));
+        return new BeforeAfterObservation(beforeOrAt, OracleLib.transform(beforeOrAt, target, tick, liquidity));
       }
     }
 
@@ -175,9 +175,9 @@ public class Observations {
 
   public ObserveSingleResult observeSingle (BigInteger time, BigInteger secondsAgo, int tick, int index, BigInteger liquidity, int cardinality) {
     if (secondsAgo.equals(ZERO)) {
-      Observation last = this.get(index);
+      Oracle.Observation last = this.get(index);
       if (!last.blockTimestamp.equals(time)) {
-        last = last.transform(time, tick, liquidity);
+        last = OracleLib.transform(last, time, tick, liquidity);
         return new ObserveSingleResult(last.tickCumulative, last.secondsPerLiquidityCumulativeX128);
       }
     }
@@ -185,8 +185,8 @@ public class Observations {
     BigInteger target = time.subtract(secondsAgo);
 
     BeforeAfterObservation result = getSurroundingObservations(time, target, tick, index, liquidity, cardinality);
-    Observation beforeOrAt = result.beforeOrAt;
-    Observation atOrAfter = result.atOrAfter;
+    Oracle.Observation beforeOrAt = result.beforeOrAt;
+    Oracle.Observation atOrAfter = result.atOrAfter;
 
     if (target.equals(beforeOrAt.blockTimestamp)) {
       // we're at the left boundary
@@ -243,7 +243,7 @@ public class Observations {
 
       // this data will not be used because the initialized boolean is still false
       for (int i = current; i < next; i++) {
-         Observation observation = this.get(i);
+        Oracle.Observation observation = this.get(i);
          observation.blockTimestamp = ONE;
          this.set(i, observation);
       }
@@ -259,7 +259,7 @@ public class Observations {
     int cardinality, 
     int cardinalityNext
   ) {
-    Observation last = this.get(index);
+    Oracle.Observation last = this.get(index);
     
     // early return if we've already written an observation this block
     if (last.blockTimestamp.equals(blockTimestamp)) {
@@ -273,7 +273,7 @@ public class Observations {
     }
 
     int indexUpdated = (index + 1) % cardinalityUpdated;
-    this.set(indexUpdated, last.transform(blockTimestamp, tick, liquidity));
+    this.set(indexUpdated, OracleLib.transform(last, blockTimestamp, tick, liquidity));
 
     return new WriteResult(indexUpdated, cardinalityUpdated);
   }

@@ -94,7 +94,7 @@ public class ClaimRewardTest extends ConvexusStakerTest {
     subject(lpUser0, rwtk.getAddress(), lpUser0.getAddress(), ZERO);
     verify(staker.spy).RewardClaimed(lpUser0.getAddress(), claimable);
   }
-  
+
   @Test
   void testFullAmountTransfersTheCorrectRewardAmountToDestinationAddress () {
     BigInteger balance = (BigInteger) rwtk.call("balanceOf", lpUser0.getAddress());

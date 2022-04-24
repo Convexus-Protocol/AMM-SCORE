@@ -26,9 +26,7 @@ import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
 import exchange.convexus.librairies.FixedPoint128;
 import exchange.convexus.librairies.FullMath;
-import exchange.convexus.librairies.PairAmounts;
 import exchange.convexus.librairies.PoolAddress;
-import exchange.convexus.librairies.Position;
 import exchange.convexus.librairies.Positions;
 import team.iconation.standards.token.irc721.IRC721Enumerable;
 
@@ -49,6 +47,8 @@ import exchange.convexus.liquidity.AddLiquidityParams;
 import exchange.convexus.liquidity.AddLiquidityResult;
 import exchange.convexus.liquidity.ConvexusLiquidityManagement;
 import exchange.convexus.pool.IConvexusPool;
+import exchange.convexus.pool.PairAmounts;
+import exchange.convexus.pool.Position;
 import exchange.convexus.positiondescriptor.INonfungibleTokenPositionDescriptor;
 
 // @title NFT positions

@@ -19,7 +19,7 @@ package exchange.convexus.librairies;
 import static java.math.BigInteger.ZERO;
 
 import java.math.BigInteger;
-
+import exchange.convexus.pool.Tick;
 import score.Context;
 import score.DictDB;
 

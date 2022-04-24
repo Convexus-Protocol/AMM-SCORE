@@ -18,7 +18,7 @@
 package exchange.convexus.librairies;
 
 import static java.math.BigInteger.ZERO;
-
+import exchange.convexus.pool.Position;
 import exchange.convexus.utils.BytesUtils;
 import score.Address;
 import score.Context;

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package exchange.convexus.librairies;
+package exchange.convexus.pool;
 
 import java.math.BigInteger;
 import java.util.Map;

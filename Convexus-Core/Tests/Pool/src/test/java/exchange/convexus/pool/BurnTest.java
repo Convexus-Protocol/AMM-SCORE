@@ -32,9 +32,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import exchange.convexus.factory.ConvexusFactoryUtils;
-import exchange.convexus.librairies.Position;
 import exchange.convexus.librairies.Positions;
-import exchange.convexus.librairies.Tick;
 import exchange.convexus.liquidity.ConvexusLiquidityUtils;
 
 public class BurnTest extends ConvexusPoolTest {

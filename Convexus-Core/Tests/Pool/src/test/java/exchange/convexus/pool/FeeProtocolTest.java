@@ -30,7 +30,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import exchange.convexus.factory.ConvexusFactoryUtils;
-import exchange.convexus.librairies.Position;
 import exchange.convexus.librairies.Positions;
 import exchange.convexus.utils.AssertUtils;
 import exchange.convexus.utils.IntUtils;

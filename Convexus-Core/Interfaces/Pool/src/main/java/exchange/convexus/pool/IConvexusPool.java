@@ -18,10 +18,6 @@ package exchange.convexus.pool;
 
 import java.math.BigInteger;
 import exchange.convexus.factory.Parameters;
-import exchange.convexus.librairies.PairAmounts;
-import exchange.convexus.librairies.Position;
-import exchange.convexus.librairies.Tick;
-import exchange.convexus.librairies.Tick.Info;
 import score.Address;
 import score.Context;
 

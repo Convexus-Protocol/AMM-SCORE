@@ -28,7 +28,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
 import exchange.convexus.factory.ConvexusFactoryUtils;
-import exchange.convexus.librairies.Oracle.Observation;
 import exchange.convexus.utils.AssertUtils;
 import static exchange.convexus.utils.TimeUtils.now;
 
@@ -115,7 +114,7 @@ public class IncreaseObservationCardinalityNextTest extends ConvexusPoolTest {
     assertEquals(0, slot0.observationIndex);
     assertEquals(1, slot0.observationCardinalityNext);
 
-    var observation = Observation.fromMap(pool.call("observations", 0));
+    var observation = Oracle.Observation.fromMap(pool.call("observations", 0));
 
     assertEquals(ZERO, observation.secondsPerLiquidityCumulativeX128);
     assertEquals(ZERO, observation.tickCumulative);

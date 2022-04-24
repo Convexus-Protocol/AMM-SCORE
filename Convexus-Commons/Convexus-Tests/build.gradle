@@ -9,13 +9,34 @@ dependencies {
     implementation 'org.junit.jupiter:junit-jupiter-api:5.6.0'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.6.0'
 
-    implementation project(':Convexus-Core:Contracts:Pool')
-    implementation project(':Convexus-Core:Contracts:Factory')
+    /// Commons ///
+    implementation project(':Convexus-Commons:Utils')
+    implementation project(':Convexus-Commons:Librairies')
+    implementation project(':Convexus-Commons:Interfaces')
+    implementation project(':Convexus-Commons:ICON:irc2')
+    implementation project(':Convexus-Commons:ICON:irc721')
+    implementation project(':Convexus-Commons:ICON:unittest')
+
+    /// Core ///
+    // Interfaces
     implementation project(':Convexus-Core:Interfaces:Pool')
     implementation project(':Convexus-Core:Interfaces:Factory')
+
+    // Structs
     implementation project(':Convexus-Core:Structs:Pool')
     implementation project(':Convexus-Core:Structs:Factory')
 
+    // Contracts
+    implementation project(':Convexus-Core:Contracts:Pool')
+    implementation project(':Convexus-Core:Contracts:Factory')
+    
+    /// Periphery ///
+    // Interfaces
+    
+    // Structs
+    implementation project(':Convexus-Periphery:Structs:Staker')
+
+    // Contracts
     implementation project(':Convexus-Periphery:Contracts:SwapRouter')
     implementation project(':Convexus-Periphery:Contracts:PoolInitializer')
     implementation project(':Convexus-Periphery:Contracts:LiquidityManagement')
@@ -28,11 +49,4 @@ dependencies {
     implementation project(':Convexus-Periphery:Contracts:NonfungibleTokenPositionDescriptor')
     implementation project(':Convexus-Periphery:Contracts:Governor')
     implementation project(':Convexus-Periphery:Contracts:Staker')
-
-    implementation project(':Convexus-Commons:Utils')
-    implementation project(':Convexus-Commons:Librairies')
-    implementation project(':Convexus-Commons:Interfaces')
-    implementation project(':Convexus-Commons:ICON:irc2')
-    implementation project(':Convexus-Commons:ICON:irc721')
-    implementation project(':Convexus-Commons:ICON:unittest')
 }

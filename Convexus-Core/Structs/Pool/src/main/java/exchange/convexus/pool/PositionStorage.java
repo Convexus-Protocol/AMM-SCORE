@@ -16,14 +16,11 @@
 
 package exchange.convexus.pool;
 
-import exchange.convexus.librairies.Position;
-import exchange.convexus.librairies.Position.Info;
-
 public class PositionStorage {
     public Position.Info position;
     public byte[] key;
     
-    public PositionStorage(Info position, byte[] positionKey) {
+    public PositionStorage(Position.Info position, byte[] positionKey) {
         this.position = position;
         this.key = positionKey;
     }

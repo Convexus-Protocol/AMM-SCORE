@@ -27,8 +27,8 @@ import org.mockito.ArgumentCaptor;
 
 import exchange.convexus.factory.ConvexusFactoryMock;
 import exchange.convexus.initializer.ConvexusPoolInitializer;
-import exchange.convexus.librairies.PairAmounts;
 import exchange.convexus.pool.ConvexusPool;
+import exchange.convexus.pool.PairAmounts;
 import exchange.convexus.positiondescriptor.NonfungibleTokenPositionDescriptor;
 import exchange.convexus.router.SwapRouter;
 import exchange.convexus.testtokens.Sicx;

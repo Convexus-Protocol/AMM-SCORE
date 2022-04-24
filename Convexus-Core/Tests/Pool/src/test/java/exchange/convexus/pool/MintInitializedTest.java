@@ -36,10 +36,7 @@ import org.mockito.ArgumentCaptor;
 
 import exchange.convexus.factory.ConvexusFactoryUtils;
 import exchange.convexus.librairies.TickMath;
-import exchange.convexus.librairies.Oracle;
-import exchange.convexus.librairies.Position;
 import exchange.convexus.librairies.Positions;
-import exchange.convexus.librairies.Tick;
 import exchange.convexus.liquidity.ConvexusLiquidityUtils;
 import exchange.convexus.utils.AssertUtils;
 import exchange.convexus.utils.IntUtils;

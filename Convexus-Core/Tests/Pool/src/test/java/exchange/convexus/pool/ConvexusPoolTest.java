@@ -39,10 +39,8 @@ import org.mockito.ArgumentCaptor;
 
 import exchange.convexus.callee.ConvexusPoolCallee;
 import exchange.convexus.factory.ConvexusFactoryMock;
-import exchange.convexus.librairies.Position;
 import exchange.convexus.librairies.Positions;
 import exchange.convexus.librairies.TickMath;
-import exchange.convexus.librairies.Oracle.Observation;
 import exchange.convexus.liquidity.ConvexusLiquidityUtils;
 import exchange.convexus.reentrantcallee.ConvexusReentrantCallee;
 import exchange.convexus.swappay.ConvexusSwapPay;
@@ -83,7 +81,7 @@ public class ConvexusPoolTest extends ConvexusTest {
     factory = deploy_factory();
   }
 
-  protected void assertObservationEquals(Observation expected, Observation actual) {
+  protected void assertObservationEquals(Oracle.Observation expected, Oracle.Observation actual) {
     assertEquals(expected.initialized, actual.initialized);
     assertEquals(expected.tickCumulative, actual.tickCumulative);
     assertEquals(expected.secondsPerLiquidityCumulativeX128, actual.secondsPerLiquidityCumulativeX128);

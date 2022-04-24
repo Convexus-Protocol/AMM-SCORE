@@ -16,11 +16,13 @@
 
 package exchange.convexus.librairies;
 
+import exchange.convexus.pool.Oracle;
+
 public class BeforeAfterObservation {
   public Oracle.Observation beforeOrAt;
   public Oracle.Observation atOrAfter;
 
-  BeforeAfterObservation (Oracle.Observation beforeOrAt, Oracle.Observation atOrAfter) {
+  public BeforeAfterObservation (Oracle.Observation beforeOrAt, Oracle.Observation atOrAfter) {
     this.beforeOrAt = beforeOrAt;
     this.atOrAfter = atOrAfter;
   }

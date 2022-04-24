@@ -29,18 +29,19 @@ import exchange.convexus.librairies.FullMath;
 import exchange.convexus.librairies.LiquidityMath;
 import exchange.convexus.librairies.Observations;
 import exchange.convexus.librairies.ObserveResult;
-import exchange.convexus.librairies.Oracle;
-import exchange.convexus.librairies.PairAmounts;
-import exchange.convexus.librairies.Position;
+import exchange.convexus.librairies.PositionLib;
 import exchange.convexus.librairies.Positions;
 import exchange.convexus.librairies.SqrtPriceMath;
-import exchange.convexus.librairies.Tick;
+import exchange.convexus.librairies.TickLib;
 import exchange.convexus.librairies.TickBitmap;
 import exchange.convexus.librairies.TickMath;
 import exchange.convexus.librairies.Ticks;
 import exchange.convexus.pool.IConvexusPoolCallee;
 import exchange.convexus.pool.ModifyPositionParams;
 import exchange.convexus.pool.ModifyPositionResult;
+import exchange.convexus.pool.Oracle;
+import exchange.convexus.pool.PairAmounts;
+import exchange.convexus.pool.Position;
 import exchange.convexus.pool.PositionStorage;
 import exchange.convexus.pool.ProtocolFees;
 import exchange.convexus.pool.Slot0;
@@ -49,6 +50,7 @@ import exchange.convexus.pool.StepComputations;
 import exchange.convexus.pool.SwapCache;
 import exchange.convexus.pool.SwapMath;
 import exchange.convexus.pool.SwapState;
+import exchange.convexus.pool.Tick;
 import exchange.convexus.utils.JSONUtils;
 import exchange.convexus.utils.ReentrancyLock;
 import score.Address;
@@ -305,7 +307,7 @@ abstract class ConvexusPool1 {
         this.token1 = parameters.token1;
         this.fee = parameters.fee;
         this.tickSpacing = parameters.tickSpacing;
-        this.maxLiquidityPerTick = Tick.tickSpacingToMaxLiquidityPerTick(this.tickSpacing);
+        this.maxLiquidityPerTick = TickLib.tickSpacingToMaxLiquidityPerTick(this.tickSpacing);
         this.name = "Convexus Pool (" + IIRC2.symbol(this.token0) + " / " + IIRC2.symbol(this.token1) + ")";
 
         // Default values
@@ -583,7 +585,7 @@ abstract class ConvexusPool1 {
         BigInteger feeGrowthInside0X128 = result.feeGrowthInside0X128;
         BigInteger feeGrowthInside1X128 = result.feeGrowthInside1X128;
 
-        position.update(liquidityDelta, feeGrowthInside0X128, feeGrowthInside1X128);
+        PositionLib.update(position, liquidityDelta, feeGrowthInside0X128, feeGrowthInside1X128);
 
         // clear any tick data that is no longer needed
         if (liquidityDelta.compareTo(ZERO) < 0) {

@@ -18,8 +18,8 @@ package exchange.convexus.ticklens;
 
 import java.math.BigInteger;
 
-import exchange.convexus.librairies.Tick;
 import exchange.convexus.pool.IConvexusPool;
+import exchange.convexus.pool.Tick;
 import score.Address;
 import score.annotation.External;
 

@@ -14,14 +14,11 @@
  * limitations under the License.
  */
 
-package exchange.convexus.librairies;
-
-import static exchange.convexus.utils.IntUtils.uint128;
+package exchange.convexus.pool;
 
 import java.math.BigInteger;
 import java.util.Map;
 
-import score.Context;
 import score.ObjectReader;
 import score.ObjectWriter;
 
@@ -72,47 +69,6 @@ public class Position {
             );
         }
 
-        /**
-         * @notice Credits accumulated fees to a user's position
-         * @param self The individual position to update
-         * @param liquidityDelta The change in pool liquidity as a result of the position update
-         * @param feeGrowthInside0X128 The all-time fee growth in token0, per unit of liquidity, inside the position's tick boundaries
-         * @param feeGrowthInside1X128 The all-time fee growth in token1, per unit of liquidity, inside the position's tick boundaries
-         */
-        public void update(
-            BigInteger liquidityDelta, 
-            BigInteger feeGrowthInside0X128,
-            BigInteger feeGrowthInside1X128
-        ) {
-            BigInteger liquidityNext;
-            
-            if (liquidityDelta.equals(BigInteger.ZERO)) {
-                Context.require(this.liquidity.compareTo(BigInteger.ZERO) > 0, 
-                    "update: pokes aren't allowed for 0 liquidity positions"); // disallow pokes for 0 liquidity positions
-                liquidityNext = this.liquidity;
-            } else {
-                liquidityNext = LiquidityMath.addDelta(this.liquidity, liquidityDelta);
-            }
-
-            // calculate accumulated fees
-            BigInteger tokensOwed0 = uint128(FullMath.mulDiv(feeGrowthInside0X128.subtract(this.feeGrowthInside0LastX128), this.liquidity, FixedPoint128.Q128));
-            BigInteger tokensOwed1 = uint128(FullMath.mulDiv(feeGrowthInside1X128.subtract(this.feeGrowthInside1LastX128), this.liquidity, FixedPoint128.Q128));
-
-            // update the position
-            if (!liquidityDelta.equals(BigInteger.ZERO)) {
-                this.liquidity = liquidityNext;
-            }
-
-            this.feeGrowthInside0LastX128 = feeGrowthInside0X128;
-            this.feeGrowthInside1LastX128 = feeGrowthInside1X128;
-
-            if (tokensOwed0.compareTo(BigInteger.ZERO) > 0 || tokensOwed1.compareTo(BigInteger.ZERO) > 0) {
-                // overflow is acceptable, have to withdraw before you hit type(uint128).max fees
-                this.tokensOwed0 = uint128(this.tokensOwed0.add(tokensOwed0));
-                this.tokensOwed1 = uint128(this.tokensOwed1.add(tokensOwed1));
-            }
-        }
-
         public static Info fromMap(Object call) {
             @SuppressWarnings("unchecked")
             Map<String,Object> map = (Map<String,Object>) call;
@@ -125,5 +81,4 @@ public class Position {
             );
         }
     }
-    
 }

@@ -21,7 +21,6 @@ import exchange.convexus.pool.IConvexusPool;
 import exchange.convexus.positionmgr.INonFungiblePositionManager;
 import exchange.convexus.positionmgr.PositionInformation;
 import score.Address;
-import score.Context;
 import score.annotation.External;
 
 import com.eclipsesource.json.Json;

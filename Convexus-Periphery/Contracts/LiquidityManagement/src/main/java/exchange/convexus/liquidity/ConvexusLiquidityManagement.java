@@ -20,7 +20,6 @@ import exchange.convexus.interfaces.irc2.IIRC2;
 import exchange.convexus.librairies.CallbackValidation;
 import exchange.convexus.librairies.LiquidityAmounts;
 import exchange.convexus.librairies.MintCallbackData;
-import exchange.convexus.librairies.PairAmounts;
 import exchange.convexus.librairies.PeripheryPayments;
 import exchange.convexus.librairies.PoolAddress;
 import exchange.convexus.librairies.TickMath;
@@ -31,6 +30,7 @@ import score.Context;
 import score.DictDB;
 import score.ObjectReader;
 import exchange.convexus.pool.IConvexusPool;
+import exchange.convexus.pool.PairAmounts;
 import exchange.convexus.utils.JSONUtils;
 import static java.math.BigInteger.ZERO;
 
