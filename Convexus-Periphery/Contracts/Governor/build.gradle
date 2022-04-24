@@ -4,11 +4,13 @@ dependencies {
     compileOnly 'foundation.icon:javaee-api:0.9.0'
     implementation 'foundation.icon:javaee-scorex:0.5.2'
 
-    implementation project(':Convexus-Periphery:Contracts:Timelock')
-
     implementation project(':Convexus-Commons:Utils')
-    implementation project(':Convexus-Commons:Structs')
     implementation project(':Convexus-Commons:Interfaces')
+
+    implementation project(':Convexus-Periphery:Interfaces:Timelock')
+    implementation project(':Convexus-Periphery:Structs:Governor')
+    
+    implementation project(':Convexus-Periphery:Contracts:Timelock')
 }
 
 optimizedJar {

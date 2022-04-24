@@ -48,10 +48,12 @@ include (
   // Interfaces
   ':Convexus-Periphery:Interfaces:NonfungibleTokenPositionDescriptor',
   ':Convexus-Periphery:Interfaces:NonFungiblePositionManager',
+  ':Convexus-Periphery:Interfaces:Timelock',
 
   // Structs
   ':Convexus-Periphery:Structs:NonFungiblePositionManager',
   ':Convexus-Periphery:Structs:Staker',
+  ':Convexus-Periphery:Structs:Governor',
 
   // Tests
   'Convexus-Periphery:Tests:SwapRouter-Test',
@@ -76,10 +78,8 @@ include (
   ':Convexus-Commons:Librairies',
   ':Convexus-Commons:Interfaces',
   ':Convexus-Commons:Utils',
-  ':Convexus-Commons:Structs',
   ':Convexus-Commons:Convexus-Tests',
   ':Convexus-Commons:Integration-Test',
-  ':Convexus-Commons:Librairies-Test',
   
   // ICON related code
   ':Convexus-Commons:ICON:irc2',

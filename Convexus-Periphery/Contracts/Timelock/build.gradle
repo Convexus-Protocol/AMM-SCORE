@@ -5,8 +5,9 @@ dependencies {
     implementation 'foundation.icon:javaee-scorex:0.5.2'
 
     implementation project(':Convexus-Commons:Utils')
-    implementation project(':Convexus-Commons:Structs')
     implementation project(':Convexus-Commons:Interfaces')
+
+    implementation project(':Convexus-Periphery:Structs:Governor')
 }
 
 optimizedJar {

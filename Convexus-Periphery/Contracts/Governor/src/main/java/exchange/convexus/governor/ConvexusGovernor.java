@@ -19,8 +19,7 @@ package exchange.convexus.governor;
 import java.math.BigInteger;
 
 import exchange.convexus.interfaces.cxs.ICXS;
-import exchange.convexus.interfaces.timelock.ITimelock;
-import exchange.convexus.structs.MethodCall;
+import exchange.convexus.timelock.ITimelock;
 import exchange.convexus.timelock.Timelock;
 import exchange.convexus.utils.MathUtils;
 import exchange.convexus.utils.TimeUtils;

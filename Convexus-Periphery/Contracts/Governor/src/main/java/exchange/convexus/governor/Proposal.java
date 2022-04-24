@@ -18,7 +18,6 @@ package exchange.convexus.governor;
 
 import java.math.BigInteger;
 
-import exchange.convexus.structs.MethodCall;
 import score.Address;
 import score.Context;
 import score.ObjectReader;

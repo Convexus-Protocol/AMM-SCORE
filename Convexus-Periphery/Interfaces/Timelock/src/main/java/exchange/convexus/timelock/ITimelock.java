@@ -1,8 +1,7 @@
-package exchange.convexus.interfaces.timelock;
+package exchange.convexus.timelock;
 
 import java.math.BigInteger;
-
-import exchange.convexus.structs.MethodCall;
+import exchange.convexus.governor.MethodCall;
 import score.Address;
 import score.Context;
 

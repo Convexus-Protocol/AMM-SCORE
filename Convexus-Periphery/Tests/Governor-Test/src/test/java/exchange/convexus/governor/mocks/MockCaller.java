@@ -1,9 +1,8 @@
 package exchange.convexus.governor.mocks;
 
 import java.math.BigInteger;
-
-import exchange.convexus.structs.MethodCall;
-import exchange.convexus.structs.MethodParam;
+import exchange.convexus.governor.MethodCall;
+import exchange.convexus.governor.MethodParam;
 import score.Address;
 import score.annotation.External;
 

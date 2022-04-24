@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package exchange.convexus.structs;
+package exchange.convexus.governor;
 
 import java.math.BigInteger;
 
