@@ -47,7 +47,7 @@ task integrationTest(type: Test) {
     testLogging.showStandardStreams = true
 
     // use the common config files
-    systemProperty('env.props', new File(project(':Convexus-Core:Integration-Test').projectDir, 'conf/env.props'))
+    systemProperty('env.props', new File(project(':Convexus-Core:Tests:Integration').projectDir, 'conf/env.props'))
 
     def prefix = 'score.path.'
     systemProperty(prefix + 'Convexus-Core:Contracts:Factory', factoryjar.outputJarName)

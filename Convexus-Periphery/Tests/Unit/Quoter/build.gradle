@@ -19,7 +19,7 @@ dependencies {
     testImplementation project(':Convexus-Periphery:Contracts:NonFungiblePositionManager')
     testImplementation project(':Convexus-Periphery:Contracts:NonfungibleTokenPositionDescriptor')
 
-    testImplementation project(':Convexus-Periphery:Tests:Clients')
+    testImplementation project(':Convexus-Periphery:Tests:Unit:Clients')
 }
 
 test {

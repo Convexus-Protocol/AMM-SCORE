@@ -20,11 +20,9 @@ include (
   'Convexus-Core:Structs:Pool',
 
   // Tests
-  'Convexus-Core:Tests:Factory',
-  'Convexus-Core:Tests:Pool',
-  // 'Convexus-Core:Integration-Test:Score',
-  // 'Convexus-Core:Integration-Test:Pool',
-  'Convexus-Core:Integration-Test',
+  'Convexus-Core:Tests:Unit-Factory',
+  'Convexus-Core:Tests:Unit-Pool',
+  'Convexus-Core:Tests:Integration',
 
   // --------------------------
   // --- Convexus Periphery ---
@@ -60,20 +58,20 @@ include (
   ':Convexus-Periphery:Structs:Governor',
 
   // Tests
-  'Convexus-Periphery:Tests:SwapRouter',
-  'Convexus-Periphery:Tests:LiquidityManagement',
-  'Convexus-Periphery:Tests:NonFungiblePositionManager',
-  'Convexus-Periphery:Tests:NonfungibleTokenPositionDescriptor',
-  'Convexus-Periphery:Tests:PoolInitializer',
-  'Convexus-Periphery:Tests:Governor',
-  'Convexus-Periphery:Tests:TickLens',
-  'Convexus-Periphery:Tests:Quoter',
-  'Convexus-Periphery:Tests:PairFlash',
-  'Convexus-Periphery:Tests:Swap',
-  'Convexus-Periphery:Tests:CXS',
-  'Convexus-Periphery:Tests:Staker',
-  'Convexus-Periphery:Tests:Clients',
-  'Convexus-Periphery:Tests:Librairies',
+  'Convexus-Periphery:Tests:Unit:SwapRouter',
+  'Convexus-Periphery:Tests:Unit:LiquidityManagement',
+  'Convexus-Periphery:Tests:Unit:NonFungiblePositionManager',
+  'Convexus-Periphery:Tests:Unit:NonfungibleTokenPositionDescriptor',
+  'Convexus-Periphery:Tests:Unit:PoolInitializer',
+  'Convexus-Periphery:Tests:Unit:Governor',
+  'Convexus-Periphery:Tests:Unit:TickLens',
+  'Convexus-Periphery:Tests:Unit:Quoter',
+  'Convexus-Periphery:Tests:Unit:PairFlash',
+  'Convexus-Periphery:Tests:Unit:Swap',
+  'Convexus-Periphery:Tests:Unit:CXS',
+  'Convexus-Periphery:Tests:Unit:Staker',
+  'Convexus-Periphery:Tests:Unit:Clients',
+  'Convexus-Periphery:Tests:Unit:Librairies',
 
   // -----------------------
   // --- Convexus Common ---
