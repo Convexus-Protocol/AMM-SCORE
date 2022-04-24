@@ -8,7 +8,7 @@ dependencies {
     implementation project(':Convexus-Periphery:Contracts:SwapRouter')
     implementation project(':Convexus-Periphery:Contracts:LiquidityManagement')
     implementation project(':Convexus-Commons:Utils')
-    implementation project(':Convexus-Commons:Interfaces')
+    implementation project(':Convexus-Commons:Tokens:Interfaces:irc2')
 }
 
 optimizedJar {

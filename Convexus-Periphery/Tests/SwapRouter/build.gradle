@@ -9,8 +9,8 @@ dependencies {
 
     testImplementation project(':Convexus-Commons:Utils')
     testImplementation project(':Convexus-Commons:Librairies')
-    testImplementation project(':Convexus-Commons:Convexus-Tests')
-    testImplementation project(':Convexus-Commons:ICON:unittest')
+    testImplementation project(':Convexus-Commons:Tests')
+    testImplementation project(':Test-Framework:unittest')
 
     testImplementation project(':Convexus-Core:Contracts:Pool')
     testImplementation project(':Convexus-Core:Contracts:Factory')

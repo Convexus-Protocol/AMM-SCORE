@@ -14,18 +14,18 @@ dependencies {
     implementation  'com.github.sink772:javaee-tokens:0.6.1'
 
     testImplementation project(':Convexus-Commons:Utils')
-    testImplementation project(':Convexus-Commons:Convexus-Tests')
+    testImplementation project(':Convexus-Commons:Tests')
     testImplementation project(':Convexus-Core:Contracts:Factory')
-    testImplementation project(':Convexus-Commons:ICON:unittest')
+    testImplementation project(':Test-Framework:unittest')
     
     testImplementation 'org.mockito:mockito-inline:3.11.0'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.0'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.6.0'
     
     testImplementation 'foundation.icon:icon-sdk:2.0.0'
-    testImplementation project(':Convexus-Commons:ICON:testinteg')
-    intTestImplementation project(':Convexus-Core:Contracts:Factory')
-    intTestImplementation project(':Convexus-Commons:Integration-Test')
+    testImplementation project(':Test-Framework:testinteg')
+
+    testImplementation project(':Convexus-Core:Contracts:Factory')
 }
 
 test {
@@ -34,7 +34,7 @@ test {
 
 def pooljar = project(':Convexus-Core:Contracts:Pool').getTasks().getByName('optimizedJar')
 def factoryjar = project(':Convexus-Core:Contracts:Factory').getTasks().getByName('optimizedJar')
-def irc2jar = project(':Convexus-Commons:ICON:irc2').getTasks().getByName('optimizedJar')
+def irc2jar = project(':Convexus-Commons:Tokens:Contracts:irc2').getTasks().getByName('optimizedJar')
 
 task integrationTest(type: Test) {
     useTestNG()
@@ -52,7 +52,7 @@ task integrationTest(type: Test) {
     def prefix = 'score.path.'
     systemProperty(prefix + 'Convexus-Core:Contracts:Factory', factoryjar.outputJarName)
     systemProperty(prefix + 'Convexus-Core:Contracts:Pool', pooljar.outputJarName)
-    systemProperty(prefix + 'Convexus-Commons:ICON:irc2', irc2jar.outputJarName)
+    systemProperty(prefix + 'Convexus-Commons:Tokens:Contracts:irc2', irc2jar.outputJarName)
 }
 
 integrationTest.dependsOn(irc2jar, factoryjar, pooljar)

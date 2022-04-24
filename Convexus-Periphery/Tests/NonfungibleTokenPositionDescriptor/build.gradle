@@ -6,8 +6,8 @@ dependencies {
     testImplementation project(':Convexus-Periphery:Contracts:NonFungiblePositionManager')
 
     testImplementation project(':Convexus-Commons:Utils')
-    testImplementation project(':Convexus-Commons:Convexus-Tests')
-    testImplementation project(':Convexus-Commons:ICON:unittest')
+    testImplementation project(':Convexus-Commons:Tests')
+    testImplementation project(':Test-Framework:unittest')
     
     testImplementation 'org.mockito:mockito-inline:3.11.0'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.0'

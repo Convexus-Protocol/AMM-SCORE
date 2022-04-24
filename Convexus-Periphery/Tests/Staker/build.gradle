@@ -7,10 +7,10 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.0'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.6.0'
 
-    testImplementation project(':Convexus-Commons:ICON:unittest')
-    testImplementation project(':Convexus-Commons:ICON:irc721')
+    testImplementation project(':Test-Framework:unittest')
+    testImplementation project(':Convexus-Commons:Tokens:Contracts:irc721')
     testImplementation project(':Convexus-Commons:Utils')
-    testImplementation project(':Convexus-Commons:Convexus-Tests')
+    testImplementation project(':Convexus-Commons:Tests')
 
     // Core
     testImplementation project(':Convexus-Core:Structs:Pool')

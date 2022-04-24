@@ -80,14 +80,20 @@ include (
   // -----------------------
   // Librairies & common code
   ':Convexus-Commons:Librairies',
-  ':Convexus-Commons:Interfaces',
   ':Convexus-Commons:Utils',
-  ':Convexus-Commons:Convexus-Tests',
-  ':Convexus-Commons:Integration-Test',
+  ':Convexus-Commons:Tests',
   
-  // ICON related code
-  ':Convexus-Commons:ICON:irc2',
-  ':Convexus-Commons:ICON:irc721',
-  ':Convexus-Commons:ICON:unittest',
-  ':Convexus-Commons:ICON:testinteg',
+  // -----------------------
+  // --- Tokens Common ---
+  // -----------------------
+  ':Convexus-Commons:Tokens:Contracts:irc2',
+  ':Convexus-Commons:Tokens:Contracts:irc721',
+  ':Convexus-Commons:Tokens:Interfaces:irc2',
+  ':Convexus-Commons:Tokens:Interfaces:irc721',
+
+  // -----------------------
+  // --- Test Framework ---
+  // -----------------------
+  ':Test-Framework:unittest',
+  ':Test-Framework:testinteg',
 )

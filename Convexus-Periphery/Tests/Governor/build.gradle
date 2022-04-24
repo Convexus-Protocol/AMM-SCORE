@@ -9,8 +9,8 @@ dependencies {
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.6.0'
 
     testImplementation project(':Convexus-Commons:Utils')
-    testImplementation project(':Convexus-Commons:Convexus-Tests')
-    testImplementation project(':Convexus-Commons:ICON:unittest')
+    testImplementation project(':Convexus-Commons:Tests')
+    testImplementation project(':Test-Framework:unittest')
     
     testImplementation project(':Convexus-Periphery:Structs:Governor')
     testImplementation project(':Convexus-Periphery:Contracts:Governor')

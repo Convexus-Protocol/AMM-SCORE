@@ -7,7 +7,7 @@ dependencies {
 
     implementation project(':Convexus-Commons:Utils')
     implementation project(':Convexus-Commons:Librairies')
-    implementation project(':Convexus-Commons:Interfaces')
+    implementation project(':Convexus-Commons:Tokens:Interfaces:irc2')
 
     implementation project(':Convexus-Core:Interfaces:Pool')
     implementation project(':Convexus-Core:Interfaces:Factory')

@@ -12,10 +12,10 @@ dependencies {
     /// Commons ///
     implementation project(':Convexus-Commons:Utils')
     implementation project(':Convexus-Commons:Librairies')
-    implementation project(':Convexus-Commons:Interfaces')
-    implementation project(':Convexus-Commons:ICON:irc2')
-    implementation project(':Convexus-Commons:ICON:irc721')
-    implementation project(':Convexus-Commons:ICON:unittest')
+    implementation project(':Convexus-Commons:Tokens:Interfaces:irc2')
+    implementation project(':Convexus-Commons:Tokens:Contracts:irc2')
+    implementation project(':Convexus-Commons:Tokens:Contracts:irc721')
+    implementation project(':Test-Framework:unittest')
 
     /// Core ///
     implementation project(':Convexus-Core:Librairies')

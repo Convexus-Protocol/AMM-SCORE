@@ -12,10 +12,10 @@ dependencies {
     runtimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.6.0'
 
     implementation 'com.github.sink772:minimal-json:0.9.6'
-    implementation project(':Convexus-Commons:ICON:unittest')
+    implementation project(':Test-Framework:unittest')
 
-    implementation project(':Convexus-Commons:ICON:irc2')
-    implementation project(':Convexus-Commons:Convexus-Tests')
+    implementation project(':Convexus-Commons:Tokens:Contracts:irc2')
+    implementation project(':Convexus-Commons:Tests')
     implementation project(':Convexus-Commons:Utils')
 
     implementation project(':Convexus-Periphery:Contracts:Quoter')
