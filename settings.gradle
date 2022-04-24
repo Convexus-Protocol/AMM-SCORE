@@ -20,8 +20,8 @@ include (
   ':Convexus-Core:Structs:Pool',
 
   // Tests
-  ':Convexus-Core:Tests:Unit-Factory',
-  ':Convexus-Core:Tests:Unit-Pool',
+  ':Convexus-Core:Tests:Unit:Factory',
+  ':Convexus-Core:Tests:Unit:Pool',
   ':Convexus-Core:Tests:Integration',
 
   // --------------------------

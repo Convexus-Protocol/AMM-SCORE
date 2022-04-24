@@ -14,24 +14,25 @@
  * limitations under the License.
  */
 
-package exchange.convexus.core.librairies;
+package exchange.convexus.pool.db;
 
 import static exchange.convexus.utils.IntUtils.uint8;
 import static java.math.BigInteger.ONE;
 import static java.math.BigInteger.ZERO;
 
 import java.math.BigInteger;
+import exchange.convexus.core.librairies.BitMath;
 import exchange.convexus.utils.IntUtils;
 import score.Context;
 import score.DictDB;
 
-public class TickBitmap {
+public class TickBitmapDB {
   
   // ================================================
   // Consts
   // ================================================
   // Class name
-  private static final String NAME = "Ticks";
+  private static final String NAME = "TickBitmapDB";
 
   // ================================================
   // DB Variables

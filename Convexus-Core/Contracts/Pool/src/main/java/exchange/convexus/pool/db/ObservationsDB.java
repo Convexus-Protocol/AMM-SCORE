@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package exchange.convexus.core.librairies;
+package exchange.convexus.pool.db;
 
 import static java.math.BigInteger.ONE;
 import static java.math.BigInteger.ZERO;
 
 import java.math.BigInteger;
+import exchange.convexus.core.librairies.OracleLib;
 import exchange.convexus.pool.BeforeAfterObservation;
 import exchange.convexus.pool.InitializeResult;
 import exchange.convexus.pool.ObserveResult;
@@ -28,12 +29,12 @@ import exchange.convexus.utils.MathUtils;
 import score.Context;
 import score.DictDB;
 
-public class Observations {
+public class ObservationsDB {
   // ================================================
   // Consts
   // ================================================
   // Contract class name
-  private static final String NAME = "Observations";
+  private static final String NAME = "ObservationsDB";
   private static final BigInteger TWO_POWER_32 = MathUtils.pow(BigInteger.TWO, 32);
 
   // ================================================

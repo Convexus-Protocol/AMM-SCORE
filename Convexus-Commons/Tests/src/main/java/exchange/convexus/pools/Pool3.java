@@ -41,14 +41,14 @@ import exchange.convexus.pool.StepComputations;
 import exchange.convexus.pool.SwapCache;
 import exchange.convexus.pool.SwapState;
 import exchange.convexus.pool.Tick;
+import exchange.convexus.pool.db.ObservationsDB;
 import exchange.convexus.pool.db.PositionsDB;
+import exchange.convexus.pool.db.TickBitmapDB;
 import exchange.convexus.pool.db.TicksDB;
 import exchange.convexus.core.librairies.LiquidityMath;
-import exchange.convexus.core.librairies.Observations;
 import exchange.convexus.core.librairies.PositionLib;
 import exchange.convexus.core.librairies.SqrtPriceMath;
 import exchange.convexus.core.librairies.SwapMath;
-import exchange.convexus.core.librairies.TickBitmap;
 import exchange.convexus.core.librairies.TickLib;
 import exchange.convexus.utils.JSONUtils;
 import exchange.convexus.utils.ReentrancyLock;
@@ -126,13 +126,13 @@ abstract class ConvexusPool3 {
     private final TicksDB ticks = new TicksDB();
 
     // Returns 256 packed tick initialized boolean values. See TickBitmap for more information
-    private final TickBitmap tickBitmap = new TickBitmap();
+    private final TickBitmapDB tickBitmap = new TickBitmapDB();
     
     // Returns the information about a position by the position's key
     private final PositionsDB positions = new PositionsDB();
 
     // Returns data about a specific observation index
-    private final Observations observations = new Observations();
+    private final ObservationsDB observations = new ObservationsDB();
 
     // ================================================
     // Event Logs
@@ -396,7 +396,7 @@ abstract class ConvexusPool3 {
             );
         } else if (_slot0.tick < tickUpper) {
             BigInteger time = TimeUtils.now();
-            Observations.ObserveSingleResult result = observations.observeSingle(
+            ObservationsDB.ObserveSingleResult result = observations.observeSingle(
                 time, 
                 ZERO, 
                 _slot0.tick, 

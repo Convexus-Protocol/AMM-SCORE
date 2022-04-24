@@ -21,11 +21,9 @@ import static java.math.BigInteger.ZERO;
 
 import java.math.BigInteger;
 import exchange.convexus.core.librairies.LiquidityMath;
-import exchange.convexus.core.librairies.Observations;
 import exchange.convexus.core.librairies.PositionLib;
 import exchange.convexus.core.librairies.SqrtPriceMath;
 import exchange.convexus.core.librairies.SwapMath;
-import exchange.convexus.core.librairies.TickBitmap;
 import exchange.convexus.core.librairies.TickLib;
 import exchange.convexus.factory.IConvexusFactory;
 import exchange.convexus.factory.Parameters;
@@ -33,7 +31,9 @@ import exchange.convexus.interfaces.irc2.IIRC2;
 import exchange.convexus.librairies.FixedPoint128;
 import exchange.convexus.librairies.FullMath;
 import exchange.convexus.librairies.TickMath;
+import exchange.convexus.pool.db.ObservationsDB;
 import exchange.convexus.pool.db.PositionsDB;
+import exchange.convexus.pool.db.TickBitmapDB;
 import exchange.convexus.pool.db.TicksDB;
 import exchange.convexus.utils.JSONUtils;
 import exchange.convexus.utils.ReentrancyLock;
@@ -45,12 +45,14 @@ import score.annotation.EventLog;
 import score.annotation.External;
 import score.annotation.Optional;
 
+/**
+ * ConvexusPool is an abstract class, the concrete class that should be deployed on production is ConvexusPoolFactored.
+ * This class is abstract for testing purposes as it helps deploying a ConvexusPool without the ConvexusFactory.
+ */
 public abstract class ConvexusPool {
-
     // ================================================
     // Consts
     // ================================================
-    
     // Contract class name
     public static final String NAME = "ConvexusPool";
 
@@ -105,13 +107,13 @@ public abstract class ConvexusPool {
     private final TicksDB ticks = new TicksDB();
 
     // Returns 256 packed tick initialized boolean values. See TickBitmap for more information
-    private final TickBitmap tickBitmap = new TickBitmap();
+    private final TickBitmapDB tickBitmap = new TickBitmapDB();
     
     // Returns the information about a position by the position's key
     private final PositionsDB positions = new PositionsDB();
 
     // Returns data about a specific observation index
-    private final Observations observations = new Observations();
+    private final ObservationsDB observations = new ObservationsDB();
 
     // ================================================
     // Event Logs
@@ -375,7 +377,7 @@ public abstract class ConvexusPool {
             );
         } else if (_slot0.tick < tickUpper) {
             BigInteger time = TimeUtils.now();
-            Observations.ObserveSingleResult result = observations.observeSingle(
+            ObservationsDB.ObserveSingleResult result = observations.observeSingle(
                 time, 
                 ZERO, 
                 _slot0.tick, 
