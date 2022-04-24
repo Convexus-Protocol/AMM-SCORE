@@ -16,6 +16,7 @@
 
 package exchange.convexus.librairies;
 
+import exchange.convexus.pool.PoolAddress.PoolKey;
 import score.Address;
 import score.Context;
 
@@ -30,7 +31,7 @@ public class CallbackValidation {
    * @return pool The pool contract address
    */
   public static Address verifyCallback (Address factory, Address tokenA, Address tokenB, int fee) {
-    return verifyCallback (factory, PoolAddress.getPoolKey(tokenA, tokenB, fee));
+    return verifyCallback (factory, PoolAddressLib.getPoolKey(tokenA, tokenB, fee));
   }
 
   private static String name (Address address) {
@@ -43,8 +44,8 @@ public class CallbackValidation {
    * @param poolKey The identifying key of the pool
    * @return pool The pool contract address
    */
-  public static Address verifyCallback (Address factory, PoolAddress.PoolKey poolKey) {
-    Address pool = PoolAddress.getPool(factory, poolKey);
+  public static Address verifyCallback (Address factory, PoolKey poolKey) {
+    Address pool = PoolAddressLib.getPool(factory, poolKey);
     Context.require(Context.getCaller().equals(pool), "verifyCallback: failed (" + name(Context.getCaller()) + " / " + name(pool) + ")");
     return pool;
   }

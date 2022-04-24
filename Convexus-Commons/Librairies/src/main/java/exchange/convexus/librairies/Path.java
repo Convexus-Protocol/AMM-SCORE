@@ -17,7 +17,7 @@
 package exchange.convexus.librairies;
 
 import java.util.Arrays;
-
+import exchange.convexus.pool.PoolData;
 import exchange.convexus.utils.BytesUtils;
 import score.Address;
 import score.Context;

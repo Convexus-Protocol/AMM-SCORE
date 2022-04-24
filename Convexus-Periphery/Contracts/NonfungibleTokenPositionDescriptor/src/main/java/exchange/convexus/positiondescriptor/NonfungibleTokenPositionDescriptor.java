@@ -18,6 +18,7 @@ package exchange.convexus.positiondescriptor;
 
 import java.math.BigInteger;
 import exchange.convexus.pool.IConvexusPool;
+import exchange.convexus.pool.PoolAddress.PoolKey;
 import exchange.convexus.positionmgr.INonFungiblePositionManager;
 import exchange.convexus.positionmgr.PositionInformation;
 import score.Address;
@@ -26,7 +27,7 @@ import score.annotation.External;
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonObject;
 import exchange.convexus.interfaces.irc2.IIRC2;
-import exchange.convexus.librairies.PoolAddress;
+import exchange.convexus.librairies.PoolAddressLib;
 
 /// @title Describes NFT token positions
 /// @notice Produces a string containing the data URI for a JSON metadata string
@@ -47,8 +48,8 @@ public class NonfungibleTokenPositionDescriptor {
     PositionInformation position = INonFungiblePositionManager.positions(positionManager, tokenId);
     Address factory = INonFungiblePositionManager.factory(positionManager);
 
-    PoolAddress.PoolKey poolKey = new PoolAddress.PoolKey(position.token0, position.token1, position.fee);
-    Address pool = PoolAddress.getPool(factory, poolKey);
+    PoolKey poolKey = new PoolKey(position.token0, position.token1, position.fee);
+    Address pool = PoolAddressLib.getPool(factory, poolKey);
 
     Boolean _flipRatio = false; // TODO: flipRatio implementation
     Address quoteTokenAddress = !_flipRatio ? position.token1 : position.token0;

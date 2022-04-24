@@ -30,7 +30,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import exchange.convexus.factory.ConvexusFactoryUtils;
-import exchange.convexus.librairies.Positions;
+import exchange.convexus.librairies.PositionsDB;
 import exchange.convexus.utils.AssertUtils;
 import exchange.convexus.utils.IntUtils;
 
@@ -109,17 +109,17 @@ public class FeeProtocolTest extends ConvexusPoolTest {
   @Test
   void testSwapFeesAccumulateAsExpected0For1 () {
     doSwap(minTick, maxTick, expandTo18Decimals(1), true, true);
-    var position = Position.Info.fromMap(pool.call("positions", Positions.getKey(alice.getAddress(), minTick, maxTick)));
+    var position = Position.Info.fromMap(pool.call("positions", PositionsDB.getKey(alice.getAddress(), minTick, maxTick)));
     assertEquals(new BigInteger("499999999999999"), position.tokensOwed0);
     assertEquals(new BigInteger("0"), position.tokensOwed1);
 
     doSwap(minTick, maxTick, expandTo18Decimals(1), true, true);
-    position = Position.Info.fromMap(pool.call("positions", Positions.getKey(alice.getAddress(), minTick, maxTick)));
+    position = Position.Info.fromMap(pool.call("positions", PositionsDB.getKey(alice.getAddress(), minTick, maxTick)));
     assertEquals(new BigInteger("999999999999998"), position.tokensOwed0);
     assertEquals(new BigInteger("0"), position.tokensOwed1);
 
     doSwap(minTick, maxTick, expandTo18Decimals(1), true, true);
-    position = Position.Info.fromMap(pool.call("positions", Positions.getKey(alice.getAddress(), minTick, maxTick)));
+    position = Position.Info.fromMap(pool.call("positions", PositionsDB.getKey(alice.getAddress(), minTick, maxTick)));
     assertEquals(new BigInteger("1499999999999997"), position.tokensOwed0);
     assertEquals(new BigInteger("0"), position.tokensOwed1);
   }
@@ -127,17 +127,17 @@ public class FeeProtocolTest extends ConvexusPoolTest {
   @Test
   void testSwapFeesAccumulateAsExpected1For0 () {
     doSwap(minTick, maxTick, expandTo18Decimals(1), false, true);
-    var position = Position.Info.fromMap(pool.call("positions", Positions.getKey(alice.getAddress(), minTick, maxTick)));
+    var position = Position.Info.fromMap(pool.call("positions", PositionsDB.getKey(alice.getAddress(), minTick, maxTick)));
     assertEquals(new BigInteger("0"), position.tokensOwed0);
     assertEquals(new BigInteger("499999999999999"), position.tokensOwed1);
 
     doSwap(minTick, maxTick, expandTo18Decimals(1), false, true);
-    position = Position.Info.fromMap(pool.call("positions", Positions.getKey(alice.getAddress(), minTick, maxTick)));
+    position = Position.Info.fromMap(pool.call("positions", PositionsDB.getKey(alice.getAddress(), minTick, maxTick)));
     assertEquals(new BigInteger("0"), position.tokensOwed0);
     assertEquals(new BigInteger("999999999999998"), position.tokensOwed1);
 
     doSwap(minTick, maxTick, expandTo18Decimals(1), false, true);
-    position = Position.Info.fromMap(pool.call("positions", Positions.getKey(alice.getAddress(), minTick, maxTick)));
+    position = Position.Info.fromMap(pool.call("positions", PositionsDB.getKey(alice.getAddress(), minTick, maxTick)));
     assertEquals(new BigInteger("0"), position.tokensOwed0);
     assertEquals(new BigInteger("1499999999999997"), position.tokensOwed1);
   }

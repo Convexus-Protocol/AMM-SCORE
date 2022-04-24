@@ -18,7 +18,8 @@ package exchange.convexus.staker;
 
 import java.math.BigInteger;
 
-import exchange.convexus.librairies.PoolAddress;
+import exchange.convexus.librairies.PoolAddressLib;
+import exchange.convexus.pool.PoolAddress.PoolKey;
 import exchange.convexus.positionmgr.INonFungiblePositionManager;
 import exchange.convexus.positionmgr.PositionInformation;
 import score.Address;
@@ -37,7 +38,7 @@ public class NFTPositionInfo {
     BigInteger tokenId
   ) {
     PositionInformation position = INonFungiblePositionManager.positions(nonfungiblePositionManager, tokenId);
-    PoolAddress.PoolKey poolKey = new PoolAddress.PoolKey(position.token0, position.token1, position.fee);
-    return new NFTPosition (PoolAddress.getPool(factory, poolKey), position.tickLower, position.tickUpper, position.liquidity);
+    PoolKey poolKey = new PoolKey(position.token0, position.token1, position.fee);
+    return new NFTPosition (PoolAddressLib.getPool(factory, poolKey), position.tickLower, position.tickUpper, position.liquidity);
   }
 }

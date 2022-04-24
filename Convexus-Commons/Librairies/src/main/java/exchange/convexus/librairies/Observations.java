@@ -21,6 +21,8 @@ import static java.math.BigInteger.ZERO;
 
 import java.math.BigInteger;
 import exchange.convexus.pool.BeforeAfterObservation;
+import exchange.convexus.pool.InitializeResult;
+import exchange.convexus.pool.ObserveResult;
 import exchange.convexus.pool.Oracle;
 import exchange.convexus.utils.MathUtils;
 import score.Context;
@@ -32,7 +34,6 @@ public class Observations {
   // ================================================
   // Contract class name
   private static final String NAME = "Observations";
-
   private static final BigInteger TWO_POWER_32 = MathUtils.pow(BigInteger.TWO, 32);
 
   // ================================================
@@ -40,16 +41,14 @@ public class Observations {
   // ================================================
   // Returns data about a specific observation index
   private final DictDB<Integer, Oracle.Observation> observations = Context.newDictDB(NAME + "_observations", Oracle.Observation.class);
-  private Oracle.Observation emptyObservation () {
-    return new Oracle.Observation(ZERO, ZERO, ZERO, false);
-  }
 
   // ================================================
   // Methods
   // ================================================
   public Oracle.Observation get (int index) {
-    return this.observations.getOrDefault(index, emptyObservation());
+    return this.observations.getOrDefault(index, Oracle.Observation.empty());
   }
+
   public void set (int index, Oracle.Observation observation) {
     this.observations.set(index, observation);
   }
@@ -66,7 +65,7 @@ public class Observations {
     return aAdjusted.compareTo(bAdjusted) <= 0;
   }
 
-  public InitializeResult initialize(BigInteger time) {
+  public InitializeResult initialize (BigInteger time) {
     Oracle.Observation observation = new Oracle.Observation(time, ZERO, ZERO, true);
     this.set(0, observation);
     return new InitializeResult(1, 1);
@@ -251,7 +250,16 @@ public class Observations {
       return next;
   }
   
-  public WriteResult write(
+  public class WriteResult {
+    public int indexUpdated;
+    public int cardinalityUpdated;
+    public WriteResult (int indexUpdated, int cardinalityUpdated) {
+      this.indexUpdated = indexUpdated;
+      this.cardinalityUpdated = cardinalityUpdated;
+    }
+  }
+
+  public WriteResult write (
     int index, 
     BigInteger blockTimestamp, 
     int tick, 
@@ -260,12 +268,12 @@ public class Observations {
     int cardinalityNext
   ) {
     Oracle.Observation last = this.get(index);
-    
+
     // early return if we've already written an observation this block
     if (last.blockTimestamp.equals(blockTimestamp)) {
       return new WriteResult(index, cardinality);
     }
-    
+
     int cardinalityUpdated = cardinality;
     // if the conditions are right, we can bump the cardinality
     if (cardinalityNext > cardinality && index == (cardinality - 1)) {

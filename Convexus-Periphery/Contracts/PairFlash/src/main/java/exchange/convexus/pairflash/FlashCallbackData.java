@@ -2,7 +2,7 @@ package exchange.convexus.pairflash;
 
 import java.math.BigInteger;
 
-import exchange.convexus.librairies.PoolAddress;
+import exchange.convexus.pool.PoolAddress.PoolKey;
 import score.Address;
 import score.ObjectReader;
 import score.ObjectWriter;
@@ -12,7 +12,7 @@ public class FlashCallbackData {
     BigInteger amount0;
     BigInteger amount1;
     Address payer;
-    PoolAddress.PoolKey poolKey;
+    PoolKey poolKey;
     int poolFee2;
     int poolFee3;
 
@@ -20,7 +20,7 @@ public class FlashCallbackData {
         BigInteger amount0,
         BigInteger amount1,
         Address payer,
-        PoolAddress.PoolKey poolKey,
+        PoolKey poolKey,
         int poolFee2,
         int poolFee3
     ) {
@@ -36,7 +36,7 @@ public class FlashCallbackData {
         BigInteger amount0 = reader.readBigInteger();
         BigInteger amount1 = reader.readBigInteger();
         Address payer = reader.readAddress();
-        PoolAddress.PoolKey poolKey = reader.read(PoolAddress.PoolKey.class);
+        PoolKey poolKey = reader.read(PoolKey.class);
         int poolFee2 = reader.readInt();
         int poolFee3 = reader.readInt();
         return new FlashCallbackData(amount0, amount1, payer, poolKey, poolFee2, poolFee3);

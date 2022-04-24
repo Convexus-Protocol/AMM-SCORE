@@ -23,26 +23,25 @@ import java.math.BigInteger;
 import score.Context;
 
 public class LiquidityMath {
-  
-    /**
-     * @notice Add a signed liquidity delta to liquidity and revert if it overflows or underflows
-     * @param x The liquidity before change
-     * @param y The delta by which liquidity should be changed
-     * @return z The liquidity delta
-     */
-    public static BigInteger addDelta(BigInteger x, BigInteger y) {
-      BigInteger z;
+  /**
+   * @notice Add a signed liquidity delta to liquidity and revert if it overflows or underflows
+   * @param x The liquidity before change
+   * @param y The delta by which liquidity should be changed
+   * @return z The liquidity delta
+   */
+  public static BigInteger addDelta (BigInteger x, BigInteger y) {
+    BigInteger z;
 
-      if (y.compareTo(BigInteger.ZERO) < 0) {
-        z = uint128(x.subtract(y.negate()));
-        Context.require(z.compareTo(x) < 0, 
-          "addDelta: z < x");
-      } else {
-        z = uint128(x.add(y));
-        Context.require(z.compareTo(x) >= 0, 
-          "addDelta: z >= x");
-      }
+    if (y.compareTo(BigInteger.ZERO) < 0) {
+      z = uint128(x.subtract(y.negate()));
+      Context.require(z.compareTo(x) < 0, 
+        "addDelta: z < x");
+    } else {
+      z = uint128(x.add(y));
+      Context.require(z.compareTo(x) >= 0, 
+        "addDelta: z >= x");
+    }
 
-      return z;
+    return z;
   }
 }

@@ -39,7 +39,7 @@ import org.mockito.ArgumentCaptor;
 
 import exchange.convexus.callee.ConvexusPoolCallee;
 import exchange.convexus.factory.ConvexusFactoryMock;
-import exchange.convexus.librairies.Positions;
+import exchange.convexus.librairies.PositionsDB;
 import exchange.convexus.librairies.TickMath;
 import exchange.convexus.liquidity.ConvexusLiquidityUtils;
 import exchange.convexus.reentrantcallee.ConvexusReentrantCallee;
@@ -269,7 +269,7 @@ public class ConvexusPoolTest extends ConvexusTest {
   }
   
   protected Position.Info positions (Account account, int minTick, int maxTick) {
-    return Position.Info.fromMap(pool.call("positions", Positions.getKey(account.getAddress(), minTick, maxTick)));
+    return Position.Info.fromMap(pool.call("positions", PositionsDB.getKey(account.getAddress(), minTick, maxTick)));
   }
 
   protected void setFeeGrowthGlobal0X128(BigInteger _feeGrowthGlobal0X128) {

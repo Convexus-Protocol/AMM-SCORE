@@ -23,28 +23,25 @@ import exchange.convexus.pool.Tick;
 import score.Context;
 import score.DictDB;
 
-public class Ticks {
+public class TicksDB {
   // ================================================
   // Consts
   // ================================================
   // Class name
-  private static final String NAME = "Ticks";
+  private static final String NAME = "TicksDB";
   
   // ================================================
   // DB Variables
   // ================================================
   // Look up information about a specific tick in the pool
   private final DictDB<Integer, Tick.Info> ticks = Context.newDictDB(NAME + "_ticks", Tick.Info.class);
-  private Tick.Info emptyTick () {
-    return new Tick.Info(ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, false);
-  }
 
   // ================================================
   // Methods
   // ================================================
   public Tick.Info get (int key) {
     var result = this.ticks.get(key);
-    return result == null ? emptyTick() : result;
+    return result == null ? Tick.Info.empty() : result;
   }
 
   private void set (int key, Tick.Info value) {
@@ -66,7 +63,7 @@ public class Ticks {
    * @param maxLiquidity The maximum liquidity allocation for a single tick
    * @return flipped Whether the tick was flipped from initialized to uninitialized, or vice versa
    */
-  public boolean update(
+  public boolean update (
       int tick,
       int tickCurrent,
       BigInteger liquidityDelta,
@@ -119,7 +116,7 @@ public class Ticks {
     }
   }
 
-  public GetFeeGrowthInsideResult getFeeGrowthInside(
+  public GetFeeGrowthInsideResult getFeeGrowthInside (
     int tickLower, 
     int tickUpper, 
     int tickCurrent, 
@@ -178,7 +175,7 @@ public class Ticks {
    * @param time The current block.timestamp
    * @return liquidityNet The amount of liquidity added (subtracted) when tick is crossed from left to right (right to left)
    */
-  public BigInteger cross(
+  public BigInteger cross (
     int tick, 
     BigInteger feeGrowthGlobal0X128, 
     BigInteger feeGrowthGlobal1X128, 

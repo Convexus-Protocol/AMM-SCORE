@@ -32,7 +32,7 @@ public class SqrtPriceMath {
    * @param liquidity The change in liquidity for which to compute the amount0 delta
    * @return amount0 Amount of token0 corresponding to the passed liquidityDelta between the two prices
    */
-  public static BigInteger getAmount0Delta(
+  public static BigInteger getAmount0Delta (
     BigInteger sqrtRatioAX96, 
     BigInteger sqrtRatioBX96,
     BigInteger liquidity
@@ -42,7 +42,7 @@ public class SqrtPriceMath {
         : getAmount0Delta(sqrtRatioAX96, sqrtRatioBX96, liquidity, true);
   }
 
-  public static BigInteger getAmount0Delta(
+  public static BigInteger getAmount0Delta (
     BigInteger sqrtRatioAX96, 
     BigInteger sqrtRatioBX96, 
     BigInteger liquidity,
@@ -59,26 +59,25 @@ public class SqrtPriceMath {
 
     Context.require(sqrtRatioAX96.compareTo(ZERO) > 0);
 
-    return
-        roundUp
-            ? UnsafeMath.divRoundingUp(
-                FullMath.mulDivRoundingUp(numerator1, numerator2, sqrtRatioBX96),
-                sqrtRatioAX96
-            )
-            : FullMath.mulDiv(numerator1, numerator2, sqrtRatioBX96).divide(sqrtRatioAX96);
+    return roundUp ? 
+      UnsafeMath.divRoundingUp (
+          FullMath.mulDivRoundingUp(numerator1, numerator2, sqrtRatioBX96),
+          sqrtRatioAX96
+      )
+      : FullMath.mulDiv(numerator1, numerator2, sqrtRatioBX96).divide(sqrtRatioAX96);
   }
 
-  public static BigInteger getAmount1Delta(
+  public static BigInteger getAmount1Delta (
     BigInteger sqrtRatioAX96, 
     BigInteger sqrtRatioBX96,
     BigInteger liquidity
   ) {
     return liquidity.compareTo(ZERO) < 0
-        ? getAmount1Delta(sqrtRatioAX96, sqrtRatioBX96, liquidity.negate(), false).negate()
-        : getAmount1Delta(sqrtRatioAX96, sqrtRatioBX96, liquidity, true);
+      ? getAmount1Delta(sqrtRatioAX96, sqrtRatioBX96, liquidity.negate(), false).negate()
+      : getAmount1Delta(sqrtRatioAX96, sqrtRatioBX96, liquidity, true);
   }
 
-  public static BigInteger getAmount1Delta(
+  public static BigInteger getAmount1Delta (
     BigInteger sqrtRatioAX96, 
     BigInteger sqrtRatioBX96, 
     BigInteger liquidity,
@@ -91,9 +90,9 @@ public class SqrtPriceMath {
     }
 
     return
-        roundUp
-            ? FullMath.mulDivRoundingUp(liquidity, sqrtRatioBX96.subtract(sqrtRatioAX96), FixedPoint96.Q96)
-            : FullMath.mulDiv(liquidity, sqrtRatioBX96.subtract(sqrtRatioAX96), FixedPoint96.Q96);
+      roundUp
+        ? FullMath.mulDivRoundingUp(liquidity, sqrtRatioBX96.subtract(sqrtRatioAX96), FixedPoint96.Q96)
+        : FullMath.mulDiv(liquidity, sqrtRatioBX96.subtract(sqrtRatioAX96), FixedPoint96.Q96);
   }
 
   /**
@@ -109,7 +108,7 @@ public class SqrtPriceMath {
    * @param add Whether to add or remove the amount of token0
    * @return The price after adding or removing amount, depending on add
    */
-  private static BigInteger getNextSqrtPriceFromAmount0RoundingUp(
+  private static BigInteger getNextSqrtPriceFromAmount0RoundingUp (
     BigInteger sqrtPX96, 
     BigInteger liquidity,
     BigInteger amount, 
@@ -157,7 +156,7 @@ public class SqrtPriceMath {
    * @param add Whether to add, or remove, the amount of token1
    * @return The price after adding or removing `amount`
    */
-  private static BigInteger getNextSqrtPriceFromAmount1RoundingDown(
+  private static BigInteger getNextSqrtPriceFromAmount1RoundingDown (
     BigInteger sqrtPX96, 
     BigInteger liquidity,
     BigInteger amount, 
@@ -190,7 +189,7 @@ public class SqrtPriceMath {
    * @param zeroForOne Whether the amount in is token0 or token1
    * @return sqrtQX96 The price after adding the input amount to token0 or token1
    */
-  public static BigInteger getNextSqrtPriceFromInput(
+  public static BigInteger getNextSqrtPriceFromInput (
     BigInteger sqrtPX96, 
     BigInteger liquidity,
     BigInteger amountIn, 
@@ -214,7 +213,7 @@ public class SqrtPriceMath {
    * @param zeroForOne Whether the amount out is token0 or token1
    * @return sqrtQX96 The price after removing the output amount of token0 or token1
    */
-  public static BigInteger getNextSqrtPriceFromOutput(
+  public static BigInteger getNextSqrtPriceFromOutput (
     BigInteger sqrtPX96, 
     BigInteger liquidity,
     BigInteger amountOut,
@@ -224,9 +223,8 @@ public class SqrtPriceMath {
     Context.require(liquidity.compareTo(ZERO) > 0, "getNextSqrtPriceFromOutput: liquidity > 0");
 
     // round to make sure that we pass the target price
-    return
-        zeroForOne
-            ? getNextSqrtPriceFromAmount1RoundingDown(sqrtPX96, liquidity, amountOut, false)
-            : getNextSqrtPriceFromAmount0RoundingUp(sqrtPX96, liquidity, amountOut, false);
+    return zeroForOne ? 
+        getNextSqrtPriceFromAmount1RoundingDown(sqrtPX96, liquidity, amountOut, false)
+      : getNextSqrtPriceFromAmount0RoundingUp(sqrtPX96, liquidity, amountOut, false);
   }
 }

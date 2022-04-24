@@ -19,9 +19,8 @@ package exchange.convexus.liquidity;
 import exchange.convexus.interfaces.irc2.IIRC2;
 import exchange.convexus.librairies.CallbackValidation;
 import exchange.convexus.librairies.LiquidityAmounts;
-import exchange.convexus.librairies.MintCallbackData;
 import exchange.convexus.librairies.PeripheryPayments;
-import exchange.convexus.librairies.PoolAddress;
+import exchange.convexus.librairies.PoolAddressLib;
 import exchange.convexus.librairies.TickMath;
 import score.Address;
 import score.BranchDB;
@@ -30,7 +29,9 @@ import score.Context;
 import score.DictDB;
 import score.ObjectReader;
 import exchange.convexus.pool.IConvexusPool;
+import exchange.convexus.pool.MintCallbackData;
 import exchange.convexus.pool.PairAmounts;
+import exchange.convexus.pool.PoolAddress.PoolKey;
 import exchange.convexus.utils.JSONUtils;
 import static java.math.BigInteger.ZERO;
 
@@ -114,9 +115,9 @@ public class ConvexusLiquidityManagement {
      * @dev Liquidity must have been provided beforehand
      */
     public AddLiquidityResult addLiquidity (AddLiquidityParams params) {
-        PoolAddress.PoolKey poolKey = new PoolAddress.PoolKey(params.token0, params.token1, params.fee);
+        PoolKey poolKey = new PoolKey(params.token0, params.token1, params.fee);
 
-        Address pool = PoolAddress.getPool(this.factory, poolKey);
+        Address pool = PoolAddressLib.getPool(this.factory, poolKey);
         Context.require(pool != null, "addLiquidity: pool doesn't exist");
         
         // compute the liquidity amount

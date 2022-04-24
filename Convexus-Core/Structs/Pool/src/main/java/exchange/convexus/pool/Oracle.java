@@ -16,6 +16,7 @@
 
 package exchange.convexus.pool;
 
+import static java.math.BigInteger.ZERO;
 import java.math.BigInteger;
 import java.util.Map;
 
@@ -70,6 +71,10 @@ public class Oracle {
           (BigInteger) map.get("secondsPerLiquidityCumulativeX128"),
           (Boolean) map.get("initialized")
       );
+    }
+
+    public static Oracle.Observation empty () {
+      return new Oracle.Observation(ZERO, ZERO, ZERO, false);
     }
   }
 }

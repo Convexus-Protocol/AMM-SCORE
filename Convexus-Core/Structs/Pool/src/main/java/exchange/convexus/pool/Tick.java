@@ -16,6 +16,7 @@
 
 package exchange.convexus.pool;
 
+import static java.math.BigInteger.ZERO;
 import java.math.BigInteger;
 import java.util.Map;
 
@@ -110,6 +111,10 @@ public class Tick {
         (BigInteger) map.get("secondsOutside"), 
         (Boolean) map.get("initialized")
       );
+    }
+
+    public static Info empty() {
+      return new Tick.Info(ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, false);
     }
   }
 }

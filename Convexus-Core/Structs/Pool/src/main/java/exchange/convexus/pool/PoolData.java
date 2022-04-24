@@ -14,13 +14,22 @@
  * limitations under the License.
  */
 
-package exchange.convexus.librairies;
 
-public class InitializeResult {
-  public int cardinality;
-  public int cardinalityNext;
-  public InitializeResult (int cardinality, int cardinalityNext) {
-    this.cardinality = cardinality;
-    this.cardinalityNext = cardinalityNext;
+package exchange.convexus.pool;
+
+import score.Address;
+
+public class PoolData {
+  // The first token of the given pool
+  public Address tokenA;
+  // The second token of the given pool
+  public Address tokenB;
+  // The fee level of the pool
+  public int fee;
+
+  public PoolData (Address tokenA, Address tokenB, int fee) {
+    this.tokenA = tokenA;
+    this.tokenB = tokenB;
+    this.fee = fee;
   }
 }

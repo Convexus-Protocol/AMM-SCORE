@@ -27,14 +27,14 @@ import com.eclipsesource.json.JsonObject;
 
 import exchange.convexus.librairies.CallbackValidation;
 import exchange.convexus.librairies.Path;
-import exchange.convexus.librairies.PoolAddress;
-import exchange.convexus.librairies.PoolData;
+import exchange.convexus.librairies.PoolAddressLib;
 import exchange.convexus.librairies.TickMath;
 import exchange.convexus.utils.AddressUtils;
 import exchange.convexus.utils.BytesUtils;
 import exchange.convexus.utils.JSONUtils;
 import exchange.convexus.utils.StringUtils;
 import exchange.convexus.pool.IConvexusPool;
+import exchange.convexus.pool.PoolData;
 import exchange.convexus.pool.Slot0;
 import score.Address;
 import score.Context;
@@ -96,7 +96,7 @@ public class Quoter {
         Address tokenB,
         int fee
     ) {
-        return PoolAddress.getPool(factory, PoolAddress.getPoolKey(tokenA, tokenB, fee));
+        return PoolAddressLib.getPool(factory, PoolAddressLib.getPoolKey(tokenA, tokenB, fee));
     }
 
     @External

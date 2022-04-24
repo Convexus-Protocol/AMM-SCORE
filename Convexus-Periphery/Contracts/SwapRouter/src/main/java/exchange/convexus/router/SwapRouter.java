@@ -27,12 +27,12 @@ import com.eclipsesource.json.JsonValue;
 
 import exchange.convexus.librairies.Path;
 import exchange.convexus.librairies.PeripheryPayments;
-import exchange.convexus.librairies.PoolAddress;
-import exchange.convexus.librairies.PoolData;
+import exchange.convexus.librairies.PoolAddressLib;
 import exchange.convexus.librairies.TickMath;
 import exchange.convexus.liquidity.ConvexusLiquidityManagement;
 import exchange.convexus.pool.IConvexusPool;
 import exchange.convexus.pool.PairAmounts;
+import exchange.convexus.pool.PoolData;
 import exchange.convexus.interfaces.irc2.IIRC2;
 import exchange.convexus.librairies.CallbackValidation;
 import exchange.convexus.utils.AddressUtils;
@@ -107,7 +107,7 @@ public class SwapRouter {
         Address tokenB,
         int fee
     ) {
-        return PoolAddress.getPool(factory, PoolAddress.getPoolKey(tokenA, tokenB, fee));
+        return PoolAddressLib.getPool(factory, PoolAddressLib.getPoolKey(tokenA, tokenB, fee));
     }
 
     /**

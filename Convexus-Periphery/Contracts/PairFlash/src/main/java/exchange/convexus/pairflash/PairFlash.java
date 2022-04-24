@@ -22,7 +22,7 @@ import java.math.BigInteger;
 import exchange.convexus.interfaces.irc2.IIRC2;
 import exchange.convexus.librairies.CallbackValidation;
 import exchange.convexus.librairies.PeripheryPayments;
-import exchange.convexus.librairies.PoolAddress;
+import exchange.convexus.librairies.PoolAddressLib;
 import exchange.convexus.router.ExactInputSingleParams;
 import static exchange.convexus.utils.TimeUtils.now;
 import score.Address;
@@ -42,6 +42,7 @@ import exchange.convexus.liquidity.AddLiquidityParams;
 import exchange.convexus.liquidity.AddLiquidityResult;
 import exchange.convexus.liquidity.ConvexusLiquidityManagement;
 import exchange.convexus.pool.IConvexusPool;
+import exchange.convexus.pool.PoolAddress.PoolKey;
 
 /**
  * @title Flash contract implementation
@@ -171,8 +172,8 @@ public class PairFlash {
      */
     @External
     public void initFlash (FlashParams params) {
-        PoolAddress.PoolKey poolKey = new PoolAddress.PoolKey(params.token0, params.token1, params.fee1);
-        Address pool = PoolAddress.getPool(this.factory, poolKey);
+        PoolKey poolKey = new PoolKey(params.token0, params.token1, params.fee1);
+        Address pool = PoolAddressLib.getPool(this.factory, poolKey);
 
         final Address thisAddress = Context.getAddress();
         final Address caller = Context.getCaller();

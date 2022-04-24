@@ -26,8 +26,8 @@ import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
 import exchange.convexus.librairies.FixedPoint128;
 import exchange.convexus.librairies.FullMath;
-import exchange.convexus.librairies.PoolAddress;
-import exchange.convexus.librairies.Positions;
+import exchange.convexus.librairies.PoolAddressLib;
+import exchange.convexus.librairies.PositionsDB;
 import team.iconation.standards.token.irc721.IRC721Enumerable;
 
 import score.Address;
@@ -48,6 +48,7 @@ import exchange.convexus.liquidity.ConvexusLiquidityManagement;
 import exchange.convexus.pool.IConvexusPool;
 import exchange.convexus.pool.PairAmounts;
 import exchange.convexus.pool.Position;
+import exchange.convexus.pool.PoolAddress.PoolKey;
 import exchange.convexus.positiondescriptor.INonfungibleTokenPositionDescriptor;
 import exchange.convexus.utils.TimeUtils;
 
@@ -77,7 +78,7 @@ public class NonFungiblePositionManager extends IRC721Enumerable {
     private final DictDB<Address, BigInteger> _poolIds = Context.newDictDB(NAME + "_poolIds", BigInteger.class);
 
     /// @dev Pool keys by pool ID, to save on SSTOREs for position data
-    private final DictDB<BigInteger, PoolAddress.PoolKey> _poolIdToPoolKey = Context.newDictDB(NAME + "_poolIdToPoolKey", PoolAddress.PoolKey.class);
+    private final DictDB<BigInteger, PoolKey> _poolIdToPoolKey = Context.newDictDB(NAME + "_poolIdToPoolKey", PoolKey.class);
 
     /// @dev The token ID position data
     private final DictDB<BigInteger, NFTPosition> _positions = Context.newDictDB(NAME + "_positions", NFTPosition.class);
@@ -161,7 +162,7 @@ public class NonFungiblePositionManager extends IRC721Enumerable {
         Context.require(!position.poolId.equals(ZERO),
             "positions: Invalid token ID");
 
-        PoolAddress.PoolKey poolKey = this._poolIdToPoolKey.get(position.poolId);
+        PoolKey poolKey = this._poolIdToPoolKey.get(position.poolId);
         return new PositionInformation(
             position.nonce,
             position.operator,
@@ -179,7 +180,7 @@ public class NonFungiblePositionManager extends IRC721Enumerable {
     }
     
     /// @dev Caches a pool key
-    private BigInteger cachePoolKey (Address pool, PoolAddress.PoolKey poolKey) {
+    private BigInteger cachePoolKey (Address pool, PoolKey poolKey) {
         BigInteger poolId = this._poolIds.get(pool);
         if (poolId == null) {
             // increment poolId
@@ -233,11 +234,11 @@ public class NonFungiblePositionManager extends IRC721Enumerable {
         this._nextId.set(tokenId.add(ONE));
         this._mint(params.recipient, tokenId);
 
-        byte[] positionKey = Positions.getKey(Context.getAddress(), params.tickLower, params.tickUpper);
+        byte[] positionKey = PositionsDB.getKey(Context.getAddress(), params.tickLower, params.tickUpper);
         Position.Info poolPos = IConvexusPool.positions(pool, positionKey);
         
         // idempotent set
-        BigInteger poolId = cachePoolKey(pool, PoolAddress.getPoolKey(params.token0, params.token1, params.fee));
+        BigInteger poolId = cachePoolKey(pool, PoolAddressLib.getPoolKey(params.token0, params.token1, params.fee));
 
         this._positions.set(tokenId, new NFTPosition(
             ZERO,
@@ -280,7 +281,7 @@ public class NonFungiblePositionManager extends IRC721Enumerable {
         this.checkDeadline(params.deadline);
 
         NFTPosition positionStorage = this._positions.get(params.tokenId);
-        PoolAddress.PoolKey poolKey = this._poolIdToPoolKey.get(positionStorage.poolId);
+        PoolKey poolKey = this._poolIdToPoolKey.get(positionStorage.poolId);
 
         var result = this.liquidityMgr.addLiquidity(new AddLiquidityParams(
             poolKey.token0,
@@ -300,7 +301,7 @@ public class NonFungiblePositionManager extends IRC721Enumerable {
         BigInteger amount1 = result.amount1;
         Address pool = result.pool;
 
-        byte[] positionKey = Positions.getKey(Context.getAddress(), positionStorage.tickLower, positionStorage.tickUpper);
+        byte[] positionKey = PositionsDB.getKey(Context.getAddress(), positionStorage.tickLower, positionStorage.tickUpper);
 
         // this is now updated to the current transaction
         Position.Info poolPos = IConvexusPool.positions(pool, positionKey);
@@ -349,8 +350,8 @@ public class NonFungiblePositionManager extends IRC721Enumerable {
         Context.require(positionLiquidity.compareTo(params.liquidity) >= 0,
             "decreaseLiquidity: invalid liquidity");
 
-        PoolAddress.PoolKey poolKey = this._poolIdToPoolKey.get(positionStorage.poolId);
-        Address pool = PoolAddress.getPool(this.factory, poolKey);
+        PoolKey poolKey = this._poolIdToPoolKey.get(positionStorage.poolId);
+        Address pool = PoolAddressLib.getPool(this.factory, poolKey);
 
         PairAmounts pairAmounts = IConvexusPool.burn(pool, positionStorage.tickLower, positionStorage.tickUpper, params.liquidity);
         amount0 = pairAmounts.amount0;
@@ -359,7 +360,7 @@ public class NonFungiblePositionManager extends IRC721Enumerable {
         Context.require(amount0.compareTo(params.amount0Min) >= 0 && amount1.compareTo(params.amount1Min) >= 0,
             "decreaseLiquidity: Price slippage check");
 
-        byte[] positionKey = Positions.getKey(Context.getAddress(), positionStorage.tickLower, positionStorage.tickUpper);
+        byte[] positionKey = PositionsDB.getKey(Context.getAddress(), positionStorage.tickLower, positionStorage.tickUpper);
         // this is now updated to the current transaction
         Position.Info poolPos = IConvexusPool.positions(pool, positionKey);
 
@@ -404,8 +405,8 @@ public class NonFungiblePositionManager extends IRC721Enumerable {
         Address recipient = params.recipient.equals(ZERO_ADDRESS) ? Context.getAddress() : params.recipient;
 
         NFTPosition positionStorage = this._positions.get(params.tokenId);
-        PoolAddress.PoolKey poolKey = this._poolIdToPoolKey.get(positionStorage.poolId);
-        Address pool = PoolAddress.getPool(this.factory, poolKey);
+        PoolKey poolKey = this._poolIdToPoolKey.get(positionStorage.poolId);
+        Address pool = PoolAddressLib.getPool(this.factory, poolKey);
 
         BigInteger tokensOwed0 = positionStorage.tokensOwed0;
         BigInteger tokensOwed1 = positionStorage.tokensOwed1;
@@ -413,7 +414,7 @@ public class NonFungiblePositionManager extends IRC721Enumerable {
         // trigger an update of the position fees owed and fee growth snapshots if it has any liquidity
         if (positionStorage.liquidity.compareTo(ZERO) > 0) {
             IConvexusPool.burn(pool, positionStorage.tickLower, positionStorage.tickUpper, ZERO);
-            var positionKey = Positions.getKey(Context.getAddress(), positionStorage.tickLower, positionStorage.tickUpper);
+            var positionKey = PositionsDB.getKey(Context.getAddress(), positionStorage.tickLower, positionStorage.tickUpper);
             Position.Info poolPos = IConvexusPool.positions(pool, positionKey);
             BigInteger feeGrowthInside0LastX128 = poolPos.feeGrowthInside0LastX128;
             BigInteger feeGrowthInside1LastX128 = poolPos.feeGrowthInside1LastX128;

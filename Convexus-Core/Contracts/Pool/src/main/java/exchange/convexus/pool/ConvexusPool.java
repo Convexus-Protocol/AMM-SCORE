@@ -27,14 +27,13 @@ import exchange.convexus.librairies.FixedPoint128;
 import exchange.convexus.librairies.FullMath;
 import exchange.convexus.librairies.LiquidityMath;
 import exchange.convexus.librairies.Observations;
-import exchange.convexus.librairies.ObserveResult;
 import exchange.convexus.librairies.PositionLib;
-import exchange.convexus.librairies.Positions;
+import exchange.convexus.librairies.PositionsDB;
 import exchange.convexus.librairies.SqrtPriceMath;
 import exchange.convexus.librairies.TickLib;
 import exchange.convexus.librairies.TickBitmap;
 import exchange.convexus.librairies.TickMath;
-import exchange.convexus.librairies.Ticks;
+import exchange.convexus.librairies.TicksDB;
 import exchange.convexus.utils.JSONUtils;
 import exchange.convexus.utils.ReentrancyLock;
 import exchange.convexus.utils.TimeUtils;
@@ -102,13 +101,13 @@ public abstract class ConvexusPool {
     private final VarDB<BigInteger> liquidity = Context.newVarDB(NAME + "_liquidity", BigInteger.class);
 
     // Look up information about a specific tick in the pool
-    private final Ticks ticks = new Ticks();
+    private final TicksDB ticks = new TicksDB();
 
     // Returns 256 packed tick initialized boolean values. See TickBitmap for more information
     private final TickBitmap tickBitmap = new TickBitmap();
     
     // Returns the information about a position by the position's key
-    private final Positions positions = new Positions();
+    private final PositionsDB positions = new PositionsDB();
 
     // Returns data about a specific observation index
     private final Observations observations = new Observations();
@@ -502,7 +501,7 @@ public abstract class ConvexusPool {
         BigInteger liquidityDelta,
         int tick
     ) {
-        byte[] positionKey = Positions.getKey(owner, tickLower, tickUpper);
+        byte[] positionKey = PositionsDB.getKey(owner, tickLower, tickUpper);
         Position.Info position = this.positions.get(positionKey);
 
         BigInteger _feeGrowthGlobal0X128 = this.feeGrowthGlobal0X128.get();
@@ -759,7 +758,7 @@ public abstract class ConvexusPool {
         BigInteger amount1;
 
         // we don't need to checkTicks here, because invalid positions will never have non-zero tokensOwed{0,1}
-        byte[] key = Positions.getKey(caller, tickLower, tickUpper);
+        byte[] key = PositionsDB.getKey(caller, tickLower, tickUpper);
         Position.Info position = this.positions.get(key);
 
         amount0 = amount0Requested.compareTo(position.tokensOwed0) > 0 ? position.tokensOwed0 : amount0Requested;

@@ -24,12 +24,12 @@ import score.Address;
 import score.Context;
 import score.DictDB;
 
-public class Positions {
+public class PositionsDB {
   // ================================================
   // Consts
   // ================================================
   // Contract class name
-  private static final String NAME = "Positions";
+  private static final String NAME = "PositionsDB";
   
   // Returns the information about a position by the position's key
   private final DictDB<byte[], Position.Info> positions = Context.newDictDB(NAME + "_positions", Position.Info.class);
@@ -51,12 +51,12 @@ public class Positions {
       int tickLower,
       int tickUpper
   ) {
-      return Context.hash("sha3-256", 
-          BytesUtils.concat(
-              owner.toByteArray(), 
-              BytesUtils.intToBytes(tickLower), 
-              BytesUtils.intToBytes(tickUpper)
-          )
-      );
+    return Context.hash("sha3-256", 
+      BytesUtils.concat(
+        owner.toByteArray(), 
+        BytesUtils.intToBytes(tickLower), 
+        BytesUtils.intToBytes(tickUpper)
+      )
+    );
   }
 }

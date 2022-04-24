@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package exchange.convexus.librairies;
+package exchange.convexus.pool;
 
 import java.math.BigInteger;
 import java.util.Map;
@@ -22,15 +22,10 @@ import java.util.Map;
 public class ObserveResult {
   // Cumulative tick values as of each `secondsAgos` from the current block timestamp
   public BigInteger[] tickCumulatives;
-  BigInteger[] gettickCumulatives () { return this.tickCumulatives; }
-  void settickCumulatives (BigInteger[] v) { this.tickCumulatives = v; }
-
   // Cumulative seconds per liquidity-in-range value as of each `secondsAgos` from the current block
   public BigInteger[] secondsPerLiquidityCumulativeX128s;
-  BigInteger[] getsecondsPerLiquidityCumulativeX128s () { return this.secondsPerLiquidityCumulativeX128s; }
-  void setsecondsPerLiquidityCumulativeX128s (BigInteger[] v) { this.secondsPerLiquidityCumulativeX128s = v; }
 
-  ObserveResult (BigInteger[] tickCumulatives, BigInteger[] secondsPerLiquidityCumulativeX128s) {
+  public ObserveResult (BigInteger[] tickCumulatives, BigInteger[] secondsPerLiquidityCumulativeX128s) {
     this.tickCumulatives = tickCumulatives;
     this.secondsPerLiquidityCumulativeX128s = secondsPerLiquidityCumulativeX128s;
   }
@@ -39,8 +34,8 @@ public class ObserveResult {
     @SuppressWarnings("unchecked")
     Map<String,Object> map = (Map<String,Object>) call;
     return new ObserveResult (
-        (BigInteger[]) map.get("tickCumulatives"), 
-        (BigInteger[]) map.get("secondsPerLiquidityCumulativeX128s")
+      (BigInteger[]) map.get("tickCumulatives"), 
+      (BigInteger[]) map.get("secondsPerLiquidityCumulativeX128s")
     );
   }
 }
