@@ -8,21 +8,21 @@ include (
   ':Convexus-Core:Librairies',
 
   // Contracts
-  'Convexus-Core:Contracts:Factory',
-  'Convexus-Core:Contracts:Pool',
+  ':Convexus-Core:Contracts:Factory',
+  ':Convexus-Core:Contracts:Pool',
   
   // Interfaces
-  'Convexus-Core:Interfaces:Factory',
-  'Convexus-Core:Interfaces:Pool',
+  ':Convexus-Core:Interfaces:Factory',
+  ':Convexus-Core:Interfaces:Pool',
   
   // Structs
-  'Convexus-Core:Structs:Factory',
-  'Convexus-Core:Structs:Pool',
+  ':Convexus-Core:Structs:Factory',
+  ':Convexus-Core:Structs:Pool',
 
   // Tests
-  'Convexus-Core:Tests:Unit-Factory',
-  'Convexus-Core:Tests:Unit-Pool',
-  'Convexus-Core:Tests:Integration',
+  ':Convexus-Core:Tests:Unit-Factory',
+  ':Convexus-Core:Tests:Unit-Pool',
+  ':Convexus-Core:Tests:Integration',
 
   // --------------------------
   // --- Convexus Periphery ---
@@ -58,20 +58,20 @@ include (
   ':Convexus-Periphery:Structs:Governor',
 
   // Tests
-  'Convexus-Periphery:Tests:Unit:SwapRouter',
-  'Convexus-Periphery:Tests:Unit:LiquidityManagement',
-  'Convexus-Periphery:Tests:Unit:NonFungiblePositionManager',
-  'Convexus-Periphery:Tests:Unit:NonfungibleTokenPositionDescriptor',
-  'Convexus-Periphery:Tests:Unit:PoolInitializer',
-  'Convexus-Periphery:Tests:Unit:Governor',
-  'Convexus-Periphery:Tests:Unit:TickLens',
-  'Convexus-Periphery:Tests:Unit:Quoter',
-  'Convexus-Periphery:Tests:Unit:PairFlash',
-  'Convexus-Periphery:Tests:Unit:Swap',
-  'Convexus-Periphery:Tests:Unit:CXS',
-  'Convexus-Periphery:Tests:Unit:Staker',
-  'Convexus-Periphery:Tests:Unit:Clients',
-  'Convexus-Periphery:Tests:Unit:Librairies',
+  ':Convexus-Periphery:Tests:Unit:SwapRouter',
+  ':Convexus-Periphery:Tests:Unit:LiquidityManagement',
+  ':Convexus-Periphery:Tests:Unit:NonFungiblePositionManager',
+  ':Convexus-Periphery:Tests:Unit:NonfungibleTokenPositionDescriptor',
+  ':Convexus-Periphery:Tests:Unit:PoolInitializer',
+  ':Convexus-Periphery:Tests:Unit:Governor',
+  ':Convexus-Periphery:Tests:Unit:TickLens',
+  ':Convexus-Periphery:Tests:Unit:Quoter',
+  ':Convexus-Periphery:Tests:Unit:PairFlash',
+  ':Convexus-Periphery:Tests:Unit:Swap',
+  ':Convexus-Periphery:Tests:Unit:CXS',
+  ':Convexus-Periphery:Tests:Unit:Staker',
+  ':Convexus-Periphery:Tests:Unit:Clients',
+  ':Convexus-Periphery:Tests:Unit:Librairies',
 
   // -----------------------
   // --- Convexus Common ---
