@@ -40,7 +40,6 @@ import score.annotation.Optional;
 import scorex.io.Reader;
 import scorex.io.StringReader;
 
-import static exchange.convexus.librairies.BlockTimestamp._blockTimestamp;
 import static exchange.convexus.utils.IntUtils.uint128;
 
 import exchange.convexus.liquidity.AddLiquidityParams;
@@ -50,6 +49,7 @@ import exchange.convexus.pool.IConvexusPool;
 import exchange.convexus.pool.PairAmounts;
 import exchange.convexus.pool.Position;
 import exchange.convexus.positiondescriptor.INonfungibleTokenPositionDescriptor;
+import exchange.convexus.utils.TimeUtils;
 
 // @title NFT positions
 // @notice Wraps Convexus positions in the IRC non-fungible token interface
@@ -569,7 +569,8 @@ public class NonFungiblePositionManager extends IRC721Enumerable {
      * Check if transaction hasn't reached the deadline
      */
     private void checkDeadline(BigInteger deadline) {
-        Context.require(_blockTimestamp().compareTo(deadline) <= 0,
+        final BigInteger now = TimeUtils.now();
+        Context.require(now.compareTo(deadline) <= 0,
             "checkDeadline: Transaction too old");
     }
 

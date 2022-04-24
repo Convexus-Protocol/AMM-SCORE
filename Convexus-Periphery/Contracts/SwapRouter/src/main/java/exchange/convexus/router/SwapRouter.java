@@ -40,6 +40,7 @@ import exchange.convexus.utils.BytesUtils;
 import exchange.convexus.utils.IntUtils;
 import exchange.convexus.utils.JSONUtils;
 import exchange.convexus.utils.ReentrancyLock;
+import exchange.convexus.utils.TimeUtils;
 import score.Address;
 import score.ByteArrayObjectWriter;
 import score.Context;
@@ -49,8 +50,6 @@ import score.annotation.External;
 import score.annotation.Optional;
 import scorex.io.Reader;
 import scorex.io.StringReader;
-
-import static exchange.convexus.librairies.BlockTimestamp._blockTimestamp;
 
 /**
  * @title Convexus Swap Router
@@ -532,7 +531,8 @@ public class SwapRouter {
      * Check if transaction hasn't reached the deadline
      */
     private void checkDeadline(BigInteger deadline) {
-        Context.require(_blockTimestamp().compareTo(deadline) <= 0,
+        final BigInteger now = TimeUtils.now();
+        Context.require(now.compareTo(deadline) <= 0,
             "checkDeadline: Transaction too old");
     }
 

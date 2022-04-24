@@ -16,7 +16,6 @@
 
 package exchange.convexus.pools;
 
-import static exchange.convexus.librairies.BlockTimestamp._blockTimestamp;
 import static exchange.convexus.utils.IntUtils.uint256;
 import static java.math.BigInteger.ZERO;
 
@@ -53,6 +52,7 @@ import exchange.convexus.pool.SwapState;
 import exchange.convexus.pool.Tick;
 import exchange.convexus.utils.JSONUtils;
 import exchange.convexus.utils.ReentrancyLock;
+import exchange.convexus.utils.TimeUtils;
 import score.Address;
 import score.Context;
 import score.VarDB;
@@ -395,7 +395,7 @@ abstract class ConvexusPool2 {
                 secondsOutsideLower.subtract(secondsOutsideUpper)
             );
         } else if (_slot0.tick < tickUpper) {
-            BigInteger time = _blockTimestamp();
+            BigInteger time = TimeUtils.now();
             Observations.ObserveSingleResult result = observations.observeSingle(
                 time, 
                 ZERO, 
@@ -440,7 +440,7 @@ abstract class ConvexusPool2 {
     public ObserveResult observe (BigInteger[] secondsAgos) {
         Slot0 _slot0 = this.slot0.get();
         return observations.observe(
-            _blockTimestamp(), 
+            TimeUtils.now(), 
             secondsAgos, 
             _slot0.tick, 
             _slot0.observationIndex, 
@@ -492,7 +492,7 @@ abstract class ConvexusPool2 {
 
         int tick = TickMath.getTickAtSqrtRatio(sqrtPriceX96);
 
-        var result = observations.initialize(_blockTimestamp());
+        var result = observations.initialize(TimeUtils.now());
 
         this.slot0.set(new Slot0(
             sqrtPriceX96,
@@ -534,7 +534,7 @@ abstract class ConvexusPool2 {
         boolean flippedLower = false;
         boolean flippedUpper = false;
         if (!liquidityDelta.equals(ZERO)) {
-            BigInteger time = _blockTimestamp();
+            BigInteger time = TimeUtils.now();
             var result = this.observations.observeSingle(
                 time, 
                 ZERO, 
@@ -640,7 +640,7 @@ abstract class ConvexusPool2 {
                 // write an oracle entry
                 var writeResult = observations.write(
                     _slot0.observationIndex,
-                    _blockTimestamp(),
+                    TimeUtils.now(),
                     _slot0.tick,
                     liquidityBefore,
                     _slot0.observationCardinality,
@@ -892,7 +892,7 @@ abstract class ConvexusPool2 {
 
         SwapCache cache = new SwapCache(
             this.liquidity.get(),
-            _blockTimestamp(),
+            TimeUtils.now(),
             zeroForOne ? (slot0Start.feeProtocol % 16) : (slot0Start.feeProtocol >> 4),
             ZERO,
             ZERO,

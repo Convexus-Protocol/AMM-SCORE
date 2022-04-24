@@ -20,7 +20,7 @@ import static java.math.BigInteger.ONE;
 import static java.math.BigInteger.ZERO;
 
 import java.math.BigInteger;
-
+import exchange.convexus.pool.BeforeAfterObservation;
 import exchange.convexus.pool.Oracle;
 import exchange.convexus.utils.MathUtils;
 import score.Context;

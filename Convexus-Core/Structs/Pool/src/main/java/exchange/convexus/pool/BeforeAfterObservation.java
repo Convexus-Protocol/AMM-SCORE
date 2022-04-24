@@ -14,9 +14,7 @@
  * limitations under the License.
  */
 
-package exchange.convexus.librairies;
-
-import exchange.convexus.pool.Oracle;
+package exchange.convexus.pool;
 
 public class BeforeAfterObservation {
   public Oracle.Observation beforeOrAt;
