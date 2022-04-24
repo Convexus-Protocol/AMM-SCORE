@@ -22,6 +22,7 @@ dependencies {
     testImplementation project(':Convexus-Core:Contracts:Factory')
 
     // Periphery
+    testImplementation project(':Convexus-Periphery:Librairies')
     testImplementation project(':Convexus-Periphery:Structs:NonFungiblePositionManager')
 
     testImplementation project(':Convexus-Periphery:Contracts:NonFungiblePositionManager')

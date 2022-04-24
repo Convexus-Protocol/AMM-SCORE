@@ -18,6 +18,7 @@ dependencies {
     implementation project(':Convexus-Commons:ICON:unittest')
 
     /// Core ///
+    implementation project(':Convexus-Core:Librairies')
     // Interfaces
     implementation project(':Convexus-Core:Interfaces:Pool')
     implementation project(':Convexus-Core:Interfaces:Factory')
@@ -31,6 +32,7 @@ dependencies {
     implementation project(':Convexus-Core:Contracts:Factory')
     
     /// Periphery ///
+    implementation project(':Convexus-Periphery:Librairies')
     // Interfaces
     
     // Structs

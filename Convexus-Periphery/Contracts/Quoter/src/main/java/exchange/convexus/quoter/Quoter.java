@@ -24,11 +24,10 @@ import java.math.BigInteger;
 
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonObject;
-
-import exchange.convexus.librairies.CallbackValidation;
-import exchange.convexus.librairies.Path;
-import exchange.convexus.librairies.PoolAddressLib;
 import exchange.convexus.librairies.TickMath;
+import exchange.convexus.periphery.librairies.CallbackValidation;
+import exchange.convexus.periphery.librairies.Path;
+import exchange.convexus.periphery.librairies.PoolAddressLib;
 import exchange.convexus.utils.AddressUtils;
 import exchange.convexus.utils.BytesUtils;
 import exchange.convexus.utils.JSONUtils;

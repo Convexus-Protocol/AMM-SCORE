@@ -14,11 +14,13 @@
  * limitations under the License.
  */
 
-package exchange.convexus.librairies;
+package exchange.convexus.periphery.librairies;
 
 import static exchange.convexus.utils.IntUtils.uint128;
 
 import java.math.BigInteger;
+import exchange.convexus.librairies.FixedPoint96;
+import exchange.convexus.librairies.FullMath;
 
 public class LiquidityAmounts {
 
@@ -32,7 +34,7 @@ public class LiquidityAmounts {
    * @param amount1 The amount of token1 being sent in
    * @return liquidity The maximum amount of liquidity received
    */
-  public static BigInteger getLiquidityForAmounts(
+  public static BigInteger getLiquidityForAmounts (
     BigInteger sqrtRatioX96, 
     BigInteger sqrtRatioAX96,
     BigInteger sqrtRatioBX96, 

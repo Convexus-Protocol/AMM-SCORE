@@ -36,8 +36,8 @@ import org.mockito.ArgumentCaptor;
 
 import exchange.convexus.factory.ConvexusFactoryUtils;
 import exchange.convexus.librairies.TickMath;
-import exchange.convexus.librairies.PositionsDB;
 import exchange.convexus.liquidity.ConvexusLiquidityUtils;
+import exchange.convexus.pool.db.PositionsDB;
 import exchange.convexus.utils.AssertUtils;
 import exchange.convexus.utils.IntUtils;
 import static exchange.convexus.utils.TimeUtils.now;

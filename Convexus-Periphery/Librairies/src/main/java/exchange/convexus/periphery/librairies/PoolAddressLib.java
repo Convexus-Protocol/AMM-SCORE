@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package exchange.convexus.librairies;
+package exchange.convexus.periphery.librairies;
 
 import exchange.convexus.factory.IConvexusFactory;
 import exchange.convexus.pool.PoolAddress.PoolKey;

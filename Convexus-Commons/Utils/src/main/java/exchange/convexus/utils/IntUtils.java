@@ -55,4 +55,8 @@ public class IntUtils {
     }
     return n.mod(TWO_POW_96);
   }
+
+  public static int uint8(int i) {
+    return i < 0 ? i + 256 : i;
+  }
 }

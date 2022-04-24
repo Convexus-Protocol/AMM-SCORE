@@ -4,6 +4,9 @@ include (
   // ---------------------
   // --- Convexus Core ---
   // ---------------------
+  // Librairies
+  ':Convexus-Core:Librairies',
+
   // Contracts
   'Convexus-Core:Contracts:Factory',
   'Convexus-Core:Contracts:Pool',
@@ -23,6 +26,9 @@ include (
   // --------------------------
   // --- Convexus Periphery ---
   // --------------------------
+  // Librairies
+  ':Convexus-Periphery:Librairies',
+
   // Contracts
   ':Convexus-Periphery:Contracts:SwapRouter',
   ':Convexus-Periphery:Contracts:LiquidityManagement',
@@ -61,6 +67,7 @@ include (
   'Convexus-Periphery:Tests:CXS-Test',
   'Convexus-Periphery:Tests:Staker-Test',
   'Convexus-Periphery:Tests:Clients',
+  'Convexus-Periphery:Tests:Librairies',
 
   // -----------------------
   // --- Convexus Common ---

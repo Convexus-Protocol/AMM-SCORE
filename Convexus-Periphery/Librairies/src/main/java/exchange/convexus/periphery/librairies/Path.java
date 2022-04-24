@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package exchange.convexus.librairies;
+package exchange.convexus.periphery.librairies;
 
 import java.util.Arrays;
 import exchange.convexus.pool.PoolData;

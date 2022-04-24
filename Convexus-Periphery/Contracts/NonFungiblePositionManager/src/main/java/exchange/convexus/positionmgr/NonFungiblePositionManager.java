@@ -26,8 +26,6 @@ import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
 import exchange.convexus.librairies.FixedPoint128;
 import exchange.convexus.librairies.FullMath;
-import exchange.convexus.librairies.PoolAddressLib;
-import exchange.convexus.librairies.PositionsDB;
 import team.iconation.standards.token.irc721.IRC721Enumerable;
 
 import score.Address;
@@ -45,10 +43,12 @@ import static exchange.convexus.utils.IntUtils.uint128;
 import exchange.convexus.liquidity.AddLiquidityParams;
 import exchange.convexus.liquidity.AddLiquidityResult;
 import exchange.convexus.liquidity.ConvexusLiquidityManagement;
+import exchange.convexus.periphery.librairies.PoolAddressLib;
 import exchange.convexus.pool.IConvexusPool;
 import exchange.convexus.pool.PairAmounts;
 import exchange.convexus.pool.Position;
 import exchange.convexus.pool.PoolAddress.PoolKey;
+import exchange.convexus.pool.db.PositionsDB;
 import exchange.convexus.positiondescriptor.INonfungibleTokenPositionDescriptor;
 import exchange.convexus.utils.TimeUtils;
 

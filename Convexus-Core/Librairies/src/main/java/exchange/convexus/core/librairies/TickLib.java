@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package exchange.convexus.librairies;
+package exchange.convexus.core.librairies;
 
 import java.math.BigInteger;
+import exchange.convexus.librairies.TickMath;
 
 public class TickLib {
   public static BigInteger tickSpacingToMaxLiquidityPerTick (int tickSpacing) {

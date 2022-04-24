@@ -20,9 +20,6 @@ import static java.math.BigInteger.ZERO;
 
 import java.math.BigInteger;
 import exchange.convexus.interfaces.irc2.IIRC2;
-import exchange.convexus.librairies.CallbackValidation;
-import exchange.convexus.librairies.PeripheryPayments;
-import exchange.convexus.librairies.PoolAddressLib;
 import exchange.convexus.router.ExactInputSingleParams;
 import static exchange.convexus.utils.TimeUtils.now;
 import score.Address;
@@ -41,6 +38,9 @@ import com.eclipsesource.json.JsonValue;
 import exchange.convexus.liquidity.AddLiquidityParams;
 import exchange.convexus.liquidity.AddLiquidityResult;
 import exchange.convexus.liquidity.ConvexusLiquidityManagement;
+import exchange.convexus.periphery.librairies.CallbackValidation;
+import exchange.convexus.periphery.librairies.PeripheryPayments;
+import exchange.convexus.periphery.librairies.PoolAddressLib;
 import exchange.convexus.pool.IConvexusPool;
 import exchange.convexus.pool.PoolAddress.PoolKey;
 

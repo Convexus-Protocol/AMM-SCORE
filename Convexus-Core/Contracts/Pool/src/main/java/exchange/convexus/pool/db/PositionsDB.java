@@ -15,9 +15,8 @@
  */
 
 
-package exchange.convexus.librairies;
+package exchange.convexus.pool.db;
 
-import static java.math.BigInteger.ZERO;
 import exchange.convexus.pool.Position;
 import exchange.convexus.utils.BytesUtils;
 import score.Address;
@@ -30,16 +29,13 @@ public class PositionsDB {
   // ================================================
   // Contract class name
   private static final String NAME = "PositionsDB";
-  
+
   // Returns the information about a position by the position's key
   private final DictDB<byte[], Position.Info> positions = Context.newDictDB(NAME + "_positions", Position.Info.class);
-  private Position.Info emptyPosition () {
-    return new Position.Info(ZERO, ZERO, ZERO, ZERO, ZERO);
-  }
 
   public Position.Info get (byte[] key) {
     var position = this.positions.get(key);
-    return position == null ? emptyPosition() : position;
+    return position == null ? Position.Info.empty() : position;
   }
 
   public void set (byte[] key, Position.Info value) {

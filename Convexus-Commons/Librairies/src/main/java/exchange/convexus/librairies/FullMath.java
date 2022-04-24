@@ -26,8 +26,7 @@ import score.Context;
 
 public class FullMath {
 
-  public static BigInteger mulDivRoundingUp(BigInteger a, BigInteger b, BigInteger denominator) {
-
+  public static BigInteger mulDivRoundingUp (BigInteger a, BigInteger b, BigInteger denominator) {
     BigInteger result = mulDiv(a, b, denominator);
 
     if (mulmod(a, b, denominator).compareTo(ZERO) > 0) {
@@ -38,7 +37,7 @@ public class FullMath {
     return result;
   }
 
-  private static BigInteger mulmod(BigInteger x, BigInteger y, BigInteger m) {
+  private static BigInteger mulmod (BigInteger x, BigInteger y, BigInteger m) {
     return x.multiply(y).mod(m);
   }
 
@@ -50,7 +49,7 @@ public class FullMath {
    * @return result The 256-bit result
    * @dev Credit to Remco Bloemen under MIT license https://xn--2-umb.com/21/muldiv
    */
-  public static BigInteger mulDiv(BigInteger a, BigInteger b, BigInteger denominator) {
+  public static BigInteger mulDiv (BigInteger a, BigInteger b, BigInteger denominator) {
     // BigInteger can reach 512 bits
     return a.multiply(b).divide(denominator);
     /*

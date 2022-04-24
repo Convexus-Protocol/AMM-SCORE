@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package exchange.convexus.librairies;
+package exchange.convexus.core.librairies;
 
+import static exchange.convexus.utils.IntUtils.uint8;
 import static java.math.BigInteger.ONE;
 import static java.math.BigInteger.ZERO;
 
 import java.math.BigInteger;
-
 import exchange.convexus.utils.IntUtils;
 import score.Context;
 import score.DictDB;
@@ -66,10 +66,6 @@ public class TickBitmap {
     int wordPos = tick >> 8;
     int bitPos = uint8(tick % 256);
     return new PositionResult(wordPos, bitPos);
-  }
-
-  private int uint8(int i) {
-    return i < 0 ? i + 256 : i;
   }
 
   /**

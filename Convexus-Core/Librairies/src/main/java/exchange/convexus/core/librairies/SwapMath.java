@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package exchange.convexus.pool;
+package exchange.convexus.core.librairies;
 
 import static java.math.BigInteger.ZERO;
 
 import java.math.BigInteger;
 
 import exchange.convexus.librairies.FullMath;
-import exchange.convexus.librairies.SqrtPriceMath;
+import exchange.convexus.pool.ComputeSwapStepResult;
 import exchange.convexus.utils.IntUtils;
 
 public class SwapMath {
@@ -39,7 +39,7 @@ public class SwapMath {
    * @return amountOut The amount to be received, of either token0 or token1, based on the direction of the swap
    * @return feeAmount The amount of input that will be taken as a fee
    */
-  public static ComputeSwapStepResult computeSwapStep(
+  public static ComputeSwapStepResult computeSwapStep (
     BigInteger sqrtRatioCurrentX96, 
     BigInteger sqrtRatioTargetX96, 
     BigInteger liquidity,

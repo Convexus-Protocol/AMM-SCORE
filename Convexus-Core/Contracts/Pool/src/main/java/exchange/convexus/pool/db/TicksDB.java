@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package exchange.convexus.librairies;
+package exchange.convexus.pool.db;
 
 import static java.math.BigInteger.ZERO;
 
 import java.math.BigInteger;
+import exchange.convexus.core.librairies.LiquidityMath;
 import exchange.convexus.pool.Tick;
 import score.Context;
 import score.DictDB;

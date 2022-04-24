@@ -17,11 +17,11 @@
 package exchange.convexus.liquidity;
 
 import exchange.convexus.interfaces.irc2.IIRC2;
-import exchange.convexus.librairies.CallbackValidation;
-import exchange.convexus.librairies.LiquidityAmounts;
-import exchange.convexus.librairies.PeripheryPayments;
-import exchange.convexus.librairies.PoolAddressLib;
 import exchange.convexus.librairies.TickMath;
+import exchange.convexus.periphery.librairies.CallbackValidation;
+import exchange.convexus.periphery.librairies.LiquidityAmounts;
+import exchange.convexus.periphery.librairies.PeripheryPayments;
+import exchange.convexus.periphery.librairies.PoolAddressLib;
 import score.Address;
 import score.BranchDB;
 import score.ByteArrayObjectWriter;

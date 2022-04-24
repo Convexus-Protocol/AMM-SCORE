@@ -27,7 +27,7 @@ import score.annotation.External;
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonObject;
 import exchange.convexus.interfaces.irc2.IIRC2;
-import exchange.convexus.librairies.PoolAddressLib;
+import exchange.convexus.periphery.librairies.PoolAddressLib;
 
 /// @title Describes NFT token positions
 /// @notice Produces a string containing the data URI for a JSON metadata string

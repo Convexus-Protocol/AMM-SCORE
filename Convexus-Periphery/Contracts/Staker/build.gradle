@@ -14,6 +14,7 @@ dependencies {
     implementation project(':Convexus-Core:Structs:Factory')
     implementation project(':Convexus-Core:Interfaces:Pool')
 
+    implementation project(':Convexus-Periphery:Librairies')
     implementation project(':Convexus-Periphery:Structs:Staker')
     implementation project(':Convexus-Periphery:Structs:NonFungiblePositionManager')
     implementation project(':Convexus-Periphery:Interfaces:NonFungiblePositionManager')

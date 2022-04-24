@@ -29,9 +29,9 @@ import com.iconloop.score.test.Score;
 
 import exchange.convexus.factory.ConvexusFactoryMock;
 import exchange.convexus.initializer.ConvexusPoolInitializerUtils;
-import exchange.convexus.librairies.Path;
 import exchange.convexus.liquidity.ConvexusLiquidityUtils;
 import exchange.convexus.nft.NFTUtils;
+import exchange.convexus.periphery.librairies.Path;
 import exchange.convexus.positiondescriptor.NonfungibleTokenPositionDescriptor;
 import exchange.convexus.positionmgr.NonFungiblePositionManager;
 import exchange.convexus.testtokens.Baln;

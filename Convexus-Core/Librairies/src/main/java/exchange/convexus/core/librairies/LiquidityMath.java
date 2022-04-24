@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package exchange.convexus.librairies;
+package exchange.convexus.core.librairies;
 
 import static exchange.convexus.utils.IntUtils.uint128;
 

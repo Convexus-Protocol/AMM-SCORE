@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package exchange.convexus.librairies;
+package exchange.convexus.core.librairies;
 
 import java.math.BigInteger;
 import static exchange.convexus.utils.MathUtils.gt;

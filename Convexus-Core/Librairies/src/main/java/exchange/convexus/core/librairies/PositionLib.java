@@ -14,11 +14,13 @@
  * limitations under the License.
  */
 
-package exchange.convexus.librairies;
+package exchange.convexus.core.librairies;
 
 import static exchange.convexus.utils.IntUtils.uint128;
 
 import java.math.BigInteger;
+import exchange.convexus.librairies.FixedPoint128;
+import exchange.convexus.librairies.FullMath;
 import exchange.convexus.pool.Position;
 import score.Context;
 

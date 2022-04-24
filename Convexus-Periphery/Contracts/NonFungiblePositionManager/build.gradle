@@ -10,9 +10,11 @@ dependencies {
     implementation project(':Convexus-Commons:Librairies')
     implementation project(':Convexus-Commons:ICON:irc721')
 
+    implementation project(':Convexus-Core:Contracts:Pool')
     implementation project(':Convexus-Core:Structs:Pool')
     implementation project(':Convexus-Core:Interfaces:Pool')
 
+    implementation project(':Convexus-Periphery:Librairies')
     implementation project(':Convexus-Periphery:Structs:NonFungiblePositionManager')
     implementation project(':Convexus-Periphery:Interfaces:NonfungibleTokenPositionDescriptor')
     

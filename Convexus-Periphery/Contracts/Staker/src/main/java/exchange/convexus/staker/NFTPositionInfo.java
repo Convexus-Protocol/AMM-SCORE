@@ -17,8 +17,7 @@
 package exchange.convexus.staker;
 
 import java.math.BigInteger;
-
-import exchange.convexus.librairies.PoolAddressLib;
+import exchange.convexus.periphery.librairies.PoolAddressLib;
 import exchange.convexus.pool.PoolAddress.PoolKey;
 import exchange.convexus.positionmgr.INonFungiblePositionManager;
 import exchange.convexus.positionmgr.PositionInformation;

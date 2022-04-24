@@ -39,9 +39,9 @@ import org.mockito.ArgumentCaptor;
 
 import exchange.convexus.callee.ConvexusPoolCallee;
 import exchange.convexus.factory.ConvexusFactoryMock;
-import exchange.convexus.librairies.PositionsDB;
 import exchange.convexus.librairies.TickMath;
 import exchange.convexus.liquidity.ConvexusLiquidityUtils;
+import exchange.convexus.pool.db.PositionsDB;
 import exchange.convexus.reentrantcallee.ConvexusReentrantCallee;
 import exchange.convexus.swappay.ConvexusSwapPay;
 import exchange.convexus.testtokens.Sicx;
