@@ -8,6 +8,7 @@ dependencies {
     implementation project(':Convexus-Commons:Interfaces')
 
     implementation project(':Convexus-Periphery:Interfaces:Timelock')
+    implementation project(':Convexus-Periphery:Interfaces:CXS')
     implementation project(':Convexus-Periphery:Structs:Governor')
     
     implementation project(':Convexus-Periphery:Contracts:Timelock')

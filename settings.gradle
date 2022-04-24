@@ -52,6 +52,7 @@ include (
   ':Convexus-Periphery:Interfaces:NonfungibleTokenPositionDescriptor',
   ':Convexus-Periphery:Interfaces:NonFungiblePositionManager',
   ':Convexus-Periphery:Interfaces:Timelock',
+  ':Convexus-Periphery:Interfaces:CXS',
 
   // Structs
   ':Convexus-Periphery:Structs:NonFungiblePositionManager',
