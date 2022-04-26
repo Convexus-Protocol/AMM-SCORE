@@ -5,23 +5,21 @@ build
 out
 
 .vscode
+*.code-workspace
 *.class
 *.jar
-!gradle/wrapper/gradle-wrapper.jar
 
-scripts/config/keystores
-!scripts/config/keystores/localhost
+!gradle/wrapper/gradle-wrapper.jar
 
 testsvc/
 
 .project
 .classpath
 
-scripts/config/deploy
-
 *.pyc
 venv/
 
 R&D/TODO
+
 head
-*.code-workspace
+scripts/config
