@@ -1,7 +1,6 @@
 <p align="center">
   <img 
-    src="https://i.imgur.com/4RsDm76.png" 
-    width="550px"
+    src="https://i.imgur.com/qqIPMGE.png" 
     alt="Convexus logo">
 </p>
 
