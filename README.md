@@ -60,7 +60,9 @@ $ sudo apt install jq
 
 ## 1. Build the project (mostly for making sure that everything works correctly for your setup)
 
+```java
 $ ./gradlew build
+```
 
 This should run all the unittest, and run successfully with a similar output than below:
 
