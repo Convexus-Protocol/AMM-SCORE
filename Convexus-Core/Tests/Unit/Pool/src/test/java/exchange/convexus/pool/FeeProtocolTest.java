@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 ICONation
+ * Copyright 2022 Convexus Protocol
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,9 +28,8 @@ import com.iconloop.score.test.ServiceManager;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
+import exchange.convexus.core.pool.contracts.db.PositionsDB;
 import exchange.convexus.factory.ConvexusFactoryUtils;
-import exchange.convexus.pool.db.PositionsDB;
 import exchange.convexus.utils.AssertUtils;
 import exchange.convexus.utils.IntUtils;
 

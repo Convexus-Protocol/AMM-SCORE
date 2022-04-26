@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 getAddress () {
   package=$1
   endpoint=$2

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 ICONation
+ * Copyright 2022 Convexus Protocol
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,10 +38,10 @@ import com.iconloop.score.test.Score;
 import org.mockito.ArgumentCaptor;
 
 import exchange.convexus.callee.ConvexusPoolCallee;
+import exchange.convexus.core.pool.contracts.db.PositionsDB;
 import exchange.convexus.factory.ConvexusFactoryMock;
 import exchange.convexus.librairies.TickMath;
 import exchange.convexus.liquidity.ConvexusLiquidityUtils;
-import exchange.convexus.pool.db.PositionsDB;
 import exchange.convexus.reentrantcallee.ConvexusReentrantCallee;
 import exchange.convexus.swappay.ConvexusSwapPay;
 import exchange.convexus.testtokens.Sicx;

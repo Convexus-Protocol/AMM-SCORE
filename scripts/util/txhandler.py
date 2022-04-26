@@ -1,4 +1,4 @@
-# Copyright 2022 ICON Foundation
+# Copyright 2021 ICON Foundation
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -67,16 +67,18 @@ class TxHandler:
             .build()
         return self._icon_service.call(_call)
 
-    def invoke(self, wallet, to, method, params, limit=None):
-        print(f"Invoking {method}({params}) ...")
+    def invoke(self, wallet, to, method, params, limit=None, value=0):
+        icx_value = f", ICX={value/10**18}" if value != 0 else ""
+        print(f"Invoking {method}({params}{icx_value}) ...")
         transaction = CallTransactionBuilder() \
             .from_(wallet.get_address()) \
             .to(to) \
             .nid(self._nid) \
             .method(method) \
+            .value(value) \
             .params(params) \
             .build()
-        return self._send_transaction(transaction, wallet, limit)
+        return self._send_transaction(transaction, wallet, 1_000_000_000)
 
     def transfer(self, wallet, to, amount, limit=100000):
         transaction = TransactionBuilder() \
@@ -99,8 +101,13 @@ class TxHandler:
                 sleep(2)
             elif 'result' in result:
                 result = result['result']
+                if result['status'] != "0x1":
+                    print_response("Result", result)
+                    die("Error: Transaction failed")
+
                 if verbose:
                     print_response("Result", result)
+
                 return result
             else:
                 print_response("Response", result)

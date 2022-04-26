@@ -11,9 +11,11 @@ include (
   ':Convexus-Core:Contracts:Factory',
   ':Convexus-Core:Contracts:Pool',
   
+  // ScoreInterfaces
+  ':Convexus-Core:Score-Interfaces:Factory',
+  ':Convexus-Core:Score-Interfaces:Pool',
   // Interfaces
   ':Convexus-Core:Interfaces:Factory',
-  ':Convexus-Core:Interfaces:Pool',
   
   // Structs
   ':Convexus-Core:Structs:Factory',
@@ -22,7 +24,10 @@ include (
   // Tests
   ':Convexus-Core:Tests:Unit:Factory',
   ':Convexus-Core:Tests:Unit:Pool',
-  ':Convexus-Core:Tests:Integration',
+
+  ':Convexus-Core:Tests:Integration:Score',
+  ':Convexus-Core:Tests:Integration:Factory',
+  ':Convexus-Core:Tests:Integration:Pool',
 
   // --------------------------
   // --- Convexus Periphery ---
@@ -47,10 +52,10 @@ include (
   ':Convexus-Periphery:Contracts:Staker',
 
   // Interfaces
-  ':Convexus-Periphery:Interfaces:NonfungibleTokenPositionDescriptor',
-  ':Convexus-Periphery:Interfaces:NonFungiblePositionManager',
-  ':Convexus-Periphery:Interfaces:Timelock',
-  ':Convexus-Periphery:Interfaces:CXS',
+  ':Convexus-Periphery:Score-Interfaces:NonfungibleTokenPositionDescriptor',
+  ':Convexus-Periphery:Score-Interfaces:NonFungiblePositionManager',
+  ':Convexus-Periphery:Score-Interfaces:Timelock',
+  ':Convexus-Periphery:Score-Interfaces:CXS',
 
   // Structs
   ':Convexus-Periphery:Structs:NonFungiblePositionManager',
@@ -73,13 +78,17 @@ include (
   ':Convexus-Periphery:Tests:Unit:Clients',
   ':Convexus-Periphery:Tests:Unit:Librairies',
 
+  ':Convexus-Periphery:Tests:Integration:Score',
+  ':Convexus-Periphery:Tests:Integration:SwapRouter',
+
   // -----------------------
   // --- Convexus Common ---
   // -----------------------
   // Librairies & common code
   ':Convexus-Commons:Librairies',
   ':Convexus-Commons:Utils',
-  ':Convexus-Commons:Tests',
+  ':Convexus-Commons:Tests:Unit',
+  ':Convexus-Commons:Tests:Integration',
   
   // -----------------------
   // --- Tokens Common ---

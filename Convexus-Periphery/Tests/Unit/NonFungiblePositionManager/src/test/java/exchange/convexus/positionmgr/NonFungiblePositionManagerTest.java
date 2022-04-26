@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 ICONation
+ * Copyright 2022 Convexus Protocol
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,10 +24,9 @@ import java.math.BigInteger;
 import com.iconloop.score.test.Account;
 
 import org.mockito.ArgumentCaptor;
-
+import exchange.convexus.core.pool.contracts.ConvexusPool;
 import exchange.convexus.factory.ConvexusFactoryMock;
 import exchange.convexus.initializer.ConvexusPoolInitializer;
-import exchange.convexus.pool.ConvexusPool;
 import exchange.convexus.pool.PairAmounts;
 import exchange.convexus.positiondescriptor.NonfungibleTokenPositionDescriptor;
 import exchange.convexus.router.SwapRouter;

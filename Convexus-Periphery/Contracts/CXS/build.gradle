@@ -28,7 +28,7 @@ deployJar {
             uri = 'https://endpoint.convexus.netlib.re/api/v3'
             nid = 3
         }
-        local {
+        localhost {
             uri = 'http://localhost:9082/api/v3'
             nid = 3
         }

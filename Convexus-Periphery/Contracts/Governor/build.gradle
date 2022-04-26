@@ -7,8 +7,8 @@ dependencies {
     implementation project(':Convexus-Commons:Utils')
     implementation project(':Convexus-Commons:Tokens:Interfaces:irc2')
 
-    implementation project(':Convexus-Periphery:Interfaces:Timelock')
-    implementation project(':Convexus-Periphery:Interfaces:CXS')
+    implementation project(':Convexus-Periphery:Score-Interfaces:Timelock')
+    implementation project(':Convexus-Periphery:Score-Interfaces:CXS')
     implementation project(':Convexus-Periphery:Structs:Governor')
     
     implementation project(':Convexus-Periphery:Contracts:Timelock')
@@ -37,7 +37,7 @@ deployJar {
             uri = 'https://endpoint.convexus.netlib.re/api/v3'
             nid = 3
         }
-        local {
+        localhost {
             uri = 'http://localhost:9082/api/v3'
             nid = 3
         }

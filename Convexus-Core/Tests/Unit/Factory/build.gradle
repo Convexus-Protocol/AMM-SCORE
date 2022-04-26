@@ -1,20 +1,9 @@
-// version = '0.9.1'
-
-// for integration tests
-sourceSets {
-    intTest {}
-}
-configurations {
-    intTestImplementation.extendsFrom testImplementation
-    intTestRuntimeOnly.extendsFrom testRuntimeOnly
-}
-
 dependencies {
     compileOnly 'foundation.icon:javaee-api:0.9.0'
     implementation  'com.github.sink772:javaee-tokens:0.6.1'
 
     testImplementation project(':Convexus-Commons:Utils')
-    testImplementation project(':Convexus-Commons:Tests')
+    testImplementation project(':Convexus-Commons:Tests:Unit')
     testImplementation project(':Convexus-Core:Contracts:Factory')
     testImplementation project(':Test-Framework:unittest')
     
@@ -30,29 +19,3 @@ dependencies {
 test {
     useJUnitPlatform()
 }
-
-def pooljar = project(':Convexus-Core:Contracts:Pool').getTasks().getByName('optimizedJar')
-def factoryjar = project(':Convexus-Core:Contracts:Factory').getTasks().getByName('optimizedJar')
-// def irc2jar = project(':irc2-token').getTasks().getByName('optimizedJar')
-
-task integrationTest(type: Test) {
-    useJUnitPlatform()
-    description = 'Runs integration tests.'
-    group = 'verification'
-
-    testClassesDirs = sourceSets.intTest.output.classesDirs
-    classpath = sourceSets.intTest.runtimeClasspath
-    testLogging.showStandardStreams = true
-
-    // use the common config files
-    systemProperty('env.props', new File(project(':Test-Framework:testinteg').projectDir, 'conf/env.props'))
-
-    def prefix = 'score.path.'
-    systemProperty(prefix + 'Convexus-Core:Contracts:Factory', factoryjar.outputJarName)
-    systemProperty(prefix + 'Convexus-Core:Contracts:Pool', 
-        project(':Convexus-Core:Contracts:Pool').getProjectDir().toString()
-        + '/build/libs/Convexus-Core:Contracts:Pool-optimized.jar')
-    // systemProperty(prefix + 'IRC2BasicToken', irc2jar.outputJarName)
-}
-
-integrationTest.dependsOn(/*irc2jar, */factoryjar, pooljar)

@@ -54,25 +54,25 @@ class Command:
         print(f" -------------------- Deploying {args.package} ... -------------------- ")
         Command.optimizedJar(args)
         config = Config(args.endpoint, args.keystore.name, args.password)
-        deploy(config, args.package, verbose=print)
+        deploy(config, args.package)
 
     @staticmethod
     def update(args):
         print(f" -------------------- Updating {args.package} ... -------------------- ")
         Command.optimizedJar(args)
         config = Config(args.endpoint, args.keystore.name, args.password)
-        update(config, args.package, verbose=print)
+        update(config, args.package)
 
     @staticmethod
     def invoke(args):
         print(f" -------------------- Invoking {args.package} ... -------------------- ")
         config = Config(args.endpoint, args.keystore.name, args.password)
-        invoke(config, args.package, args.params, verbose=print)
+        invoke(config, args.package, args.params)
 
     @staticmethod
     def call(args):
         config = Config(args.endpoint, args.keystore.name, args.password)
-        print(call(config, args.package, args.params, verbose=print))
+        print(call(config, args.package, args.params))
 
 if __name__ == "__main__":
     Command()

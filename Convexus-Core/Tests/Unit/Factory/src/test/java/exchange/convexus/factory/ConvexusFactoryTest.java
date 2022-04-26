@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 ICONation
+ * Copyright 2022 Convexus Protocol
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 
 package exchange.convexus.factory;
 
+import exchange.convexus.core.contracts.factory.ConvexusFactory;
 import exchange.convexus.testtokens.Sicx;
 import exchange.convexus.testtokens.Usdc;
 import exchange.convexus.utils.ConvexusTest;

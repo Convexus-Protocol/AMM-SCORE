@@ -1,4 +1,4 @@
-# Copyright 2022 ICON Foundation
+# Copyright 2021 ICON Foundation
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@ def in_loop(value):
 
 
 def print_response(header, msg):
-    pass # print(f'{header}: {json.dumps(msg, indent=4)}')
+    print(f'{header}: {json.dumps(msg, indent=4)}')
 
 
 def get_icon_service(endpoint):
@@ -46,7 +46,7 @@ def get_icon_service(endpoint):
         "bicon":    ['https://bicon.net.solidwallet.io', 0x3],
         "sejong":   ['https://sejong.net.solidwallet.io', 0x53],
         "gochain":  ['http://localhost:9082', 0x3],
-        "convexus": ['https://endpoint.convexus.netlib.re', 0x3],
+        "custom":   ['https://endpoint.karmafinance.netlib.re', 0x3],
         "local":    ['http://localhost:9000', 0x3],
     }
     url, nid = endpoint_map.get(endpoint, [endpoint, 0x3])

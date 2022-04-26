@@ -1,4 +1,4 @@
-# Copyright 2022 ICONation
+# Copyright 2021 ICONation
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ def get_params(package, endpoint):
     params = json.loads(open(f"{deploy_path}/{endpoint}/params.json", "r").read())
     return params
 
-def deploy(config: Config, package: str, verbose=print_empty):
+def deploy(config: Config, package: str, verbose=False):
     owner = config.owner
     tx_handler = config.tx_handler
     
@@ -47,16 +47,17 @@ def deploy(config: Config, package: str, verbose=print_empty):
         content = gen_deploy_data_content(f"./{javaPkgPath}/build/libs/{jarName}-{build}.jar")
 
     content_type = 'application/java'
+    print(f"Deploying {javaPkg} contract ...")
     tx_hash = tx_handler.install(owner, content, content_type, params)
 
-    tx_result = tx_handler.ensure_tx_result(tx_hash, verbose != print_empty)
+    tx_result = tx_handler.ensure_tx_result(tx_hash, verbose)
     deploy_path = f"./config/deploy/{package}/"
     open(f"{deploy_path}/{config.endpoint}/deploy.json", "w+").write(json.dumps(tx_result, indent=2))
     score_address = tx_result["scoreAddress"]
-    verbose(f"{deploy_path}: {score_address}")
+    print(f"Deployed at {score_address}")
     return score_address
 
-def update(config: Config, package: str, verbose=print_empty):
+def update(config: Config, package: str, verbose=False):
     owner = config.owner
     tx_handler = config.tx_handler
 
@@ -72,11 +73,12 @@ def update(config: Config, package: str, verbose=print_empty):
         content = gen_deploy_data_content(f"./{javaPkgPath}/build/libs/{jarName}-{build}.jar")
 
     content_type = 'application/java'
+    print(f"Updating {javaPkg} contract ...")
     tx_hash = tx_handler.update(owner, address, content, content_type, params)
 
-    tx_result = tx_handler.ensure_tx_result(tx_hash, verbose != print_empty)
+    tx_result = tx_handler.ensure_tx_result(tx_hash, verbose)
     deploy_path = f"./config/deploy/{package}/"
     open(f"{deploy_path}/{config.endpoint}/deploy.json", "w+").write(json.dumps(tx_result, indent=2))
     score_address = tx_result["scoreAddress"]
-    verbose(f"{deploy_path}: {score_address}")
+    print(f"Updated at {score_address}")
     return score_address

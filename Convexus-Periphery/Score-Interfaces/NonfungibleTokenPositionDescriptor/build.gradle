@@ -1,0 +1,8 @@
+// version = '0.9.1'
+
+dependencies {
+    compileOnly 'foundation.icon:javaee-api:0.9.0'
+
+    implementation project(':Convexus-Periphery:Score-Interfaces:NonFungiblePositionManager')
+    
+}

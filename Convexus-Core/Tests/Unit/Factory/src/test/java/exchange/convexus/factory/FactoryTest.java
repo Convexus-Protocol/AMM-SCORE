@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 ICONation
+ * Copyright 2022 Convexus Protocol
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,7 +41,7 @@ public class FactoryTest extends ConvexusFactoryTest {
 
   void setPoolContract () {
     try {
-      byte[] rawBytes = Files.readAllBytes(Paths.get("../../Contracts/Pool/build/libs/Pool-optimized.jar"));
+      byte[] rawBytes = Files.readAllBytes(Paths.get("../../../Contracts/Pool/build/libs/Pool-optimized.jar"));
       factory.invoke(owner, "setPoolContract", rawBytes);
     } catch (IOException e) {
       assertEquals(e.getMessage(), "");

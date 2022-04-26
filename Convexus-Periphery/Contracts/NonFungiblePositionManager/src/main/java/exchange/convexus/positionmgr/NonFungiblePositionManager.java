@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 ICONation
+ * Copyright 2022 Convexus Protocol
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ import java.math.BigInteger;
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
+import exchange.convexus.core.pool.contracts.db.PositionsDB;
 import exchange.convexus.librairies.FixedPoint128;
 import exchange.convexus.librairies.FullMath;
 import team.iconation.standards.token.irc721.IRC721Enumerable;
@@ -48,7 +49,6 @@ import exchange.convexus.pool.IConvexusPool;
 import exchange.convexus.pool.PairAmounts;
 import exchange.convexus.pool.Position;
 import exchange.convexus.pool.PoolAddress.PoolKey;
-import exchange.convexus.pool.db.PositionsDB;
 import exchange.convexus.positiondescriptor.INonfungibleTokenPositionDescriptor;
 import exchange.convexus.utils.TimeUtils;
 

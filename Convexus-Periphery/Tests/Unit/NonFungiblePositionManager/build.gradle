@@ -10,7 +10,7 @@ dependencies {
 
     testImplementation project(':Convexus-Commons:Utils')
     testImplementation project(':Convexus-Commons:Librairies')
-    testImplementation project(':Convexus-Commons:Tests')
+    testImplementation project(':Convexus-Commons:Tests:Unit')
     testImplementation project(':Test-Framework:unittest')
     testImplementation project(':Convexus-Commons:Tokens:Contracts:irc2')
     testImplementation project(':Convexus-Commons:Tokens:Contracts:irc721')

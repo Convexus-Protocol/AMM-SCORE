@@ -9,7 +9,7 @@ dependencies {
     implementation project(':Convexus-Commons:Librairies')
     implementation project(':Convexus-Commons:Tokens:Interfaces:irc2')
 
-    implementation project(':Convexus-Core:Interfaces:Pool')
+    implementation project(':Convexus-Core:Score-Interfaces:Pool')
     implementation project(':Convexus-Core:Structs:Pool')
 
     implementation project(':Convexus-Periphery:Librairies')
@@ -39,7 +39,7 @@ deployJar {
             uri = 'https://endpoint.convexus.netlib.re/api/v3'
             nid = 3
         }
-        local {
+        localhost {
             uri = 'http://localhost:9082/api/v3'
             nid = 3
         }

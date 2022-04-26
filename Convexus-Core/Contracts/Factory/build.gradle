@@ -5,6 +5,7 @@ dependencies {
     implementation project(':Convexus-Commons:Utils')
     
     implementation project(':Convexus-Core:Structs:Factory')
+    implementation project(':Convexus-Core:Interfaces:Factory')
 }
 
 optimizedJar {
@@ -30,7 +31,7 @@ deployJar {
             uri = 'https://endpoint.convexus.netlib.re/api/v3'
             nid = 3
         }
-        local {
+        localhost {
             uri = 'http://localhost:9082/api/v3'
             nid = 3
         }

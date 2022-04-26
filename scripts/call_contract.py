@@ -1,4 +1,4 @@
-# Copyright 2022 ICON Foundation
+# Copyright 2021 ICON Foundation
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,23 +24,25 @@ def print_empty(*args):
 
 def get_call(package, endpoint, filename):
     call = json.loads(open(f"./config/calls/{package}/{endpoint}/{filename}.json", "r").read())
-    return call['method'], call['params']
+    return call['method'], \
+           call['params'] if "params" in call else {}, \
+           int(call['value'], 16) if "value" in call else 0,
 
 def invoke(config: Config, package: str, paramsfilename: str, verbose=print_empty):
     owner = config.owner
     tx_handler = config.tx_handler
 
     address = get_deploy(package, config.endpoint)
-    method, params = get_call(package, config.endpoint, paramsfilename)
+    method, params, value = get_call(package, config.endpoint, paramsfilename)
 
-    tx_hash = tx_handler.invoke(owner, address, method, params)
-    print("TxHash = ", tx_hash)
+    tx_hash = tx_handler.invoke(owner, address, method, params, value=value)
+    print("TxHash =", tx_hash)
     return tx_handler.ensure_tx_result(tx_hash)
 
 def call(config: Config, package: str, paramsfilename: str, verbose=print_empty):
     tx_handler = config.tx_handler
 
     address = get_deploy(package, config.endpoint)
-    method, params = get_call(package, config.endpoint, paramsfilename)
+    method, params, value = get_call(package, config.endpoint, paramsfilename)
 
     return tx_handler.call(address, method, params)

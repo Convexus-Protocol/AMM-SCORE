@@ -1,4 +1,4 @@
-# Copyright 2022 ICONation
+# Copyright 2021 ICONation
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@ import json
 
 def get_meta(package, endpoint):
     deploy_path = f"./config/deploy/{package}/"
-    meta = json.loads(open(f"{deploy_path}/{endpoint}/meta.json", "r").read())
+    meta = json.loads(open(f"{deploy_path}/build.json", "r").read())
     javaPkg=meta['javaPkg']
     version=meta['version'] if 'version' in meta else ''
     build=meta['build']

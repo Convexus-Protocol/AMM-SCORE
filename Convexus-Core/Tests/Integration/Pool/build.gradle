@@ -1,0 +1,58 @@
+// version = '0.9.1'
+
+// for integration tests
+sourceSets {
+    intTest {}
+}
+configurations {
+    intTestImplementation.extendsFrom testImplementation
+    intTestRuntimeOnly.extendsFrom testRuntimeOnly
+}
+
+dependencies {
+    compileOnly 'foundation.icon:javaee-api:0.9.0'
+    implementation  'com.github.sink772:javaee-tokens:0.6.1'
+
+    implementation project(':Convexus-Commons:Utils')
+    implementation project(':Convexus-Commons:Tests:Unit')
+    implementation project(':Convexus-Core:Contracts:Factory')
+    implementation project(':Test-Framework:unittest')
+    
+    implementation 'org.mockito:mockito-inline:3.11.0'
+    implementation 'org.junit.jupiter:junit-jupiter-api:5.6.0'
+    runtimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.6.0'
+    
+    implementation 'foundation.icon:icon-sdk:2.0.0'
+    implementation project(':Test-Framework:testinteg')
+
+    implementation project(':Convexus-Core:Tests:Integration:Score')
+}
+
+test {
+    useJUnitPlatform()
+}
+
+def pooljar = project(':Convexus-Core:Contracts:Pool').getTasks().getByName('optimizedJar')
+def factoryjar = project(':Convexus-Core:Contracts:Factory').getTasks().getByName('optimizedJar')
+def irc2jar = project(':Convexus-Commons:Tokens:Contracts:irc2').getTasks().getByName('optimizedJar')
+
+task integrationTest(type: Test) {
+    useTestNG()
+    useJUnitPlatform()
+    description = 'Runs integration tests.'
+    group = 'verification'
+
+    testClassesDirs = sourceSets.intTest.output.classesDirs
+    classpath = sourceSets.intTest.runtimeClasspath
+    testLogging.showStandardStreams = true
+
+    // use the common config files
+    systemProperty('env.props', new File(project(':Convexus-Commons:Tests:Integration').projectDir, 'conf/env.props'))
+
+    def prefix = 'score.path.'
+    systemProperty(prefix + 'Convexus-Core:Contracts:Factory', factoryjar.outputJarName)
+    systemProperty(prefix + 'Convexus-Core:Contracts:Pool', pooljar.outputJarName)
+    systemProperty(prefix + 'Convexus-Commons:Tokens:Contracts:irc2', irc2jar.outputJarName)
+}
+
+integrationTest.dependsOn(irc2jar, factoryjar, pooljar)

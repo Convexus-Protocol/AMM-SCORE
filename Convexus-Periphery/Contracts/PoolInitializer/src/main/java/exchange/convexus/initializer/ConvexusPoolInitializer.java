@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 ICONation
+ * Copyright 2022 Convexus Protocol
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import exchange.convexus.utils.AddressUtils;
 import static java.math.BigInteger.ZERO;
 
 import java.math.BigInteger;
-import exchange.convexus.factory.IConvexusFactory;
+import exchange.convexus.core.factory.IConvexusFactory;
 import exchange.convexus.pool.IConvexusPool;
 import exchange.convexus.pool.Slot0;
 import score.Address;
