@@ -45,6 +45,7 @@ import exchange.convexus.pool.ModifyPositionResult;
 import exchange.convexus.pool.ObserveResult;
 import exchange.convexus.pool.Oracle;
 import exchange.convexus.pool.PairAmounts;
+import exchange.convexus.pool.PoolSettings;
 import exchange.convexus.pool.Position;
 import exchange.convexus.pool.PositionStorage;
 import exchange.convexus.pool.ProtocolFees;
@@ -77,64 +78,41 @@ public abstract class ConvexusPool
     // Contract class name
     public static final String NAME = "ConvexusPool";
 
-    // Contract name
-    private final String name;
-
-    // The contract that deployed the pool
-    private final Address factory;
-
-    // The first of the two tokens of the pool, sorted by address
-    private final Address token0;
-
-    // The second of the two tokens of the pool, sorted by address
-    private final Address token1;
-
-    // The pool's fee in hundredths of a bip, i.e. 1e-6
-    private final int fee;
-
-    // The pool tick spacing
-    // @dev Ticks can only be used at multiples of this value, minimum of 1 and always positive
-    // e.g.: a tickSpacing of 3 means ticks can be initialized every 3rd tick, i.e., ..., -6, -3, 0, 3, 6, ...
-    // This value is an int to avoid casting even though it is always positive.
-    private final int tickSpacing;
-
-    // The maximum amount of position liquidity that can use any tick in the range
-    // @dev This parameter is enforced per tick to prevent liquidity from overflowing an int at any point, and
-    // also prevents out-of-range liquidity from being used to prevent adding in-range liquidity to a pool
-    // @return The max amount of liquidity per tick
-    private final BigInteger maxLiquidityPerTick;
+    // Pool settings
+    private final PoolSettings settings;
 
     // ================================================
     // DB Variables
     // ================================================
     // The 0th storage slot in the pool stores many values, and is exposed as a single method to save steps when accessed externally.
-    private final VarDB<Slot0> slot0 = Context.newVarDB(NAME + "_slot0", Slot0.class);
+    protected final VarDB<Slot0> slot0 = Context.newVarDB(NAME + "_slot0", Slot0.class);
 
     // Whether the pool is locked
-    private final ReentrancyLock poolLock = new ReentrancyLock(NAME + "_poolLock");
+    protected final ReentrancyLock poolLock = new ReentrancyLock(NAME + "_poolLock");
 
     // The fee growth as a Q128.128 fees of token0 collected per unit of liquidity for the entire life of the pool
     protected final VarDB<BigInteger> feeGrowthGlobal0X128 = Context.newVarDB(NAME + "_feeGrowthGlobal0X128", BigInteger.class);
+
     // The fee growth as a Q128.128 fees of token1 collected per unit of liquidity for the entire life of the pool
     protected final VarDB<BigInteger> feeGrowthGlobal1X128 = Context.newVarDB(NAME + "_feeGrowthGlobal1X128", BigInteger.class);
-    
+
     // The amounts of token0 and token1 that are owed to the protocol
-    private final VarDB<ProtocolFees> protocolFees = Context.newVarDB(NAME + "_protocolFees", ProtocolFees.class);
-    
+    protected final VarDB<ProtocolFees> protocolFees = Context.newVarDB(NAME + "_protocolFees", ProtocolFees.class);
+
     // The amounts of token0 and token1 that are owed to the protocol
-    private final VarDB<BigInteger> liquidity = Context.newVarDB(NAME + "_liquidity", BigInteger.class);
+    protected final VarDB<BigInteger> liquidity = Context.newVarDB(NAME + "_liquidity", BigInteger.class);
 
     // Look up information about a specific tick in the pool
-    private final Ticks ticks = new Ticks();
+    protected final Ticks ticks = new Ticks();
 
     // Returns 256 packed tick initialized boolean values. See TickBitmap for more information
-    private final TickBitmap tickBitmap = new TickBitmap();
-    
+    protected final TickBitmap tickBitmap = new TickBitmap();
+
     // Returns the information about a position by the position's key
-    private final Positions positions = new Positions();
+    protected final Positions positions = new Positions();
 
     // Returns data about a specific observation index
-    private final Observations observations = new Observations();
+    protected final Observations observations = new Observations();
 
     // ================================================
     // Event Logs
@@ -304,13 +282,16 @@ public abstract class ConvexusPool
      * See {@code ConvexusPoolFactored} constructor for the actual pool deployed on the network
      */
     protected ConvexusPool (Parameters parameters) {
-        this.factory = parameters.factory;
-        this.token0 = parameters.token0;
-        this.token1 = parameters.token1;
-        this.fee = parameters.fee;
-        this.tickSpacing = parameters.tickSpacing;
-        this.maxLiquidityPerTick = TickLib.tickSpacingToMaxLiquidityPerTick(this.tickSpacing);
-        this.name = "Convexus Pool (" + IIRC2.symbol(this.token0) + " / " + IIRC2.symbol(this.token1) + ")";
+        // Initialize settings
+        this.settings = new PoolSettings (
+            parameters.factory,
+            parameters.token0,
+            parameters.token1,
+            parameters.fee,
+            parameters.tickSpacing,
+            TickLib.tickSpacingToMaxLiquidityPerTick(parameters.tickSpacing),
+            "Convexus Pool (" + IIRC2.symbol(parameters.token0) + " / " + IIRC2.symbol(parameters.token1) + ")"
+        );
 
         // Default values
         if (this.liquidity.get() == null) {
@@ -504,12 +485,12 @@ public abstract class ConvexusPool
         if (amount0.compareTo(ZERO) > 0) {
             position.tokensOwed0 = position.tokensOwed0.subtract(amount0);
             this.positions.set(key, position);
-            pay(this.token0, recipient, amount0);
+            pay(this.settings.token0, recipient, amount0);
         }
         if (amount1.compareTo(ZERO) > 0) {
             position.tokensOwed1 = position.tokensOwed1.subtract(amount1);
             this.positions.set(key, position);
-            pay(this.token1, recipient, amount1);
+            pay(this.settings.token1, recipient, amount1);
         }
 
         this.Collect(caller, tickLower, tickUpper, recipient, amount0, amount1);
@@ -633,7 +614,7 @@ public abstract class ConvexusPool
 
             var next = tickBitmap.nextInitializedTickWithinOneWord(
                 state.tick,
-                tickSpacing,
+                this.settings.tickSpacing,
                 zeroForOne
             );
             
@@ -658,7 +639,7 @@ public abstract class ConvexusPool
                     : step.sqrtPriceNextX96,
                 state.liquidity,
                 state.amountSpecifiedRemaining,
-                fee
+                this.settings.fee
             );
 
             state.sqrtPriceX96 = swapStep.sqrtRatioNextX96;
@@ -788,7 +769,7 @@ public abstract class ConvexusPool
         // do the transfers and collect payment
         if (zeroForOne) {
             if (amount1.compareTo(ZERO) < 0) {
-                pay(token1, recipient, amount1.negate());
+                pay(this.settings.token1, recipient, amount1.negate());
             }
 
             BigInteger balance0Before = balance0();
@@ -798,7 +779,7 @@ public abstract class ConvexusPool
                 "swap: the callback didn't charge the payment (1)");
         } else {
             if (amount0.compareTo(ZERO) < 0) {
-                pay(token0, recipient, amount0.negate());
+                pay(this.settings.token0, recipient, amount0.negate());
             }
 
             BigInteger balance1Before = balance1();
@@ -843,16 +824,16 @@ public abstract class ConvexusPool
         
         final BigInteger TEN_E6 = BigInteger.valueOf(1000000);
         
-        BigInteger fee0 = FullMath.mulDivRoundingUp(amount0, BigInteger.valueOf(fee), TEN_E6);
-        BigInteger fee1 = FullMath.mulDivRoundingUp(amount1, BigInteger.valueOf(fee), TEN_E6);
+        BigInteger fee0 = FullMath.mulDivRoundingUp(amount0, BigInteger.valueOf(this.settings.fee), TEN_E6);
+        BigInteger fee1 = FullMath.mulDivRoundingUp(amount1, BigInteger.valueOf(this.settings.fee), TEN_E6);
         BigInteger balance0Before = balance0();
         BigInteger balance1Before = balance1();
 
         if (amount0.compareTo(ZERO) > 0) {
-            pay(token0, recipient, amount0);
+            pay(this.settings.token0, recipient, amount0);
         }
         if (amount1.compareTo(ZERO) > 0) {
-            pay(token1, recipient, amount1);
+            pay(this.settings.token1, recipient, amount1);
         }
 
         IConvexusPoolCallee.convexusFlashCallback(caller, fee0, fee1, data);
@@ -970,7 +951,7 @@ public abstract class ConvexusPool
             }
             _protocolFees.token0 = _protocolFees.token0.subtract(amount0);
             this.protocolFees.set(_protocolFees);
-            pay(token0, recipient, amount0);
+            pay(this.settings.token0, recipient, amount0);
         }
         if (amount1.compareTo(ZERO) > 0) {
             if (amount1.equals(_protocolFees.token1)) {
@@ -979,7 +960,7 @@ public abstract class ConvexusPool
             }
             _protocolFees.token1 = _protocolFees.token1.subtract(amount1);
             this.protocolFees.set(_protocolFees);
-            pay(token1, recipient, amount1);
+            pay(this.settings.token1, recipient, amount1);
         }
 
         this.CollectProtocol(caller, recipient, amount0, amount1);
@@ -1149,7 +1130,7 @@ public abstract class ConvexusPool
                 tickCumulative,
                 time,
                 false,
-                this.maxLiquidityPerTick
+                this.settings.maxLiquidityPerTick
             );
             
             flippedUpper = ticks.update(
@@ -1162,14 +1143,14 @@ public abstract class ConvexusPool
                 tickCumulative,
                 time,
                 true,
-                this.maxLiquidityPerTick
+                this.settings.maxLiquidityPerTick
             );
             
             if (flippedLower) {
-                tickBitmap.flipTick(tickLower, tickSpacing);
+                tickBitmap.flipTick(tickLower, this.settings.tickSpacing);
             }
             if (flippedUpper) {
-                tickBitmap.flipTick(tickUpper, tickSpacing);
+                tickBitmap.flipTick(tickUpper, this.settings.tickSpacing);
             }
         }
 
@@ -1273,14 +1254,14 @@ public abstract class ConvexusPool
      * @notice Get the pool's balance of token0
      */
     private BigInteger balance0 () {
-        return IIRC2.balanceOf(this.token0, Context.getAddress());
+        return IIRC2.balanceOf(this.settings.token0, Context.getAddress());
     }
 
     /**
      * @notice Get the pool's balance of token1
      */
     private BigInteger balance1 () {
-        return IIRC2.balanceOf(this.token1, Context.getAddress());
+        return IIRC2.balanceOf(this.settings.token1, Context.getAddress());
     }
 
     // ================================================
@@ -1296,7 +1277,7 @@ public abstract class ConvexusPool
     }
 
     private void checkCallerIsFactoryOwner() {
-        final Address factoryOwner = IConvexusFactory.owner(this.factory);
+        final Address factoryOwner = IConvexusFactory.owner(this.settings.factory);
         final Address caller = Context.getCaller();
 
         Context.require(caller.equals(factoryOwner),
@@ -1308,24 +1289,67 @@ public abstract class ConvexusPool
     // ================================================
     @External(readonly = true)
     public String name() {
-        return this.name;
+        return this.settings.name;
     }
 
     @External(readonly = true)
     public Address factory() {
-        return this.factory;
+        return this.settings.factory;
     }
 
     @External(readonly = true)
     public Address token0() {
-        return this.token0;
+        return this.settings.token0;
     }
 
     @External(readonly = true)
     public Address token1() {
-        return this.token1;
+        return this.settings.token1;
     }
 
+    /**
+     * The 0th storage slot in the pool stores many values, and is exposed as a single method to save steps when accessed externally.
+     */
+    @External(readonly = true)
+    public Slot0 slot0 () {
+        return this.slot0.get();
+    }
+
+    @External(readonly = true)
+    public ProtocolFees protocolFees () {
+        return this.protocolFees.get();
+    }
+
+    @External(readonly = true)
+    public BigInteger maxLiquidityPerTick () {
+        return this.settings.maxLiquidityPerTick;
+    }
+
+    @External(readonly = true)
+    public BigInteger liquidity () {
+        return this.liquidity.get();
+    }
+
+    @External(readonly = true)
+    public BigInteger fee () {
+        return BigInteger.valueOf(this.settings.fee);
+    }
+
+    @External(readonly = true)
+    public BigInteger tickSpacing () {
+        return BigInteger.valueOf(this.settings.tickSpacing);
+    }
+
+    @External(readonly = true)
+    public BigInteger feeGrowthGlobal0X128 () {
+        return feeGrowthGlobal0X128.get();
+    }
+
+    @External(readonly = true)
+    public BigInteger feeGrowthGlobal1X128 () {
+        return feeGrowthGlobal1X128.get();
+    }
+    
     // Implements Interfaces
     @External(readonly = true)
     public Tick.Info ticks (int tick) {
@@ -1345,48 +1369,5 @@ public abstract class ConvexusPool
     @External(readonly = true)
     public BigInteger tickBitmap (int index) {
         return this.tickBitmap.get(index);
-    }
-
-    /**
-     * The 0th storage slot in the pool stores many values, and is exposed as a single method to save steps when accessed externally.
-     */
-    @External(readonly = true)
-    public Slot0 slot0 () {
-        return this.slot0.get();
-    }
-
-    @External(readonly = true)
-    public ProtocolFees protocolFees () {
-        return this.protocolFees.get();
-    }
-
-    @External(readonly = true)
-    public BigInteger maxLiquidityPerTick () {
-        return this.maxLiquidityPerTick;
-    }
-
-    @External(readonly = true)
-    public BigInteger liquidity () {
-        return this.liquidity.get();
-    }
-
-    @External(readonly = true)
-    public BigInteger fee () {
-        return BigInteger.valueOf(this.fee);
-    }
-
-    @External(readonly = true)
-    public BigInteger tickSpacing () {
-        return BigInteger.valueOf(this.tickSpacing);
-    }
-
-    @External(readonly = true)
-    public BigInteger feeGrowthGlobal0X128 () {
-        return feeGrowthGlobal0X128.get();
-    }
-
-    @External(readonly = true)
-    public BigInteger feeGrowthGlobal1X128 () {
-        return feeGrowthGlobal1X128.get();
     }
 }
