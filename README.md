@@ -22,7 +22,9 @@ These features make Convexus a flexible and efficient automated market maker:
 
 See our introduction [Medium](https://convexus.medium.com/convexus-cbf2db4ce9e7) article for more information.
 
-# Build & Deploy Convexus
+# 🏗️ Build
+
+## Prerequisite
 
 You need to install JDK 11 or later version. Visit [OpenJDK.net](http://openjdk.java.net/) for prebuilt binaries.
 Or you can install a proper OpenJDK package from your OS vendors.
@@ -56,9 +58,7 @@ $ # Install JQ
 $ sudo apt install jq
 ```
 
-# How to Build and Deploy the project
-
-## 1. Build the project (mostly for making sure that everything works correctly for your setup)
+## Testing the setup
 
 ```java
 $ ./gradlew build
@@ -77,7 +77,7 @@ BUILD SUCCESSFUL in 2m 4s
 162 actionable tasks: 155 executed, 7 up-to-date
 ```
 
-## 2. Setup the Convexus build system
+## Setup the Convexus build system
 
 You'll need `python3` and `pip` installed on your machine beforehand.
 
@@ -92,7 +92,7 @@ $ pip install -r ./requirements.txt
 
 Everytime you want to use the Convexus build & deploy system, please do `source ./venv/bin/activate` beforehand.
 
-## 3. Deploy the Convexus Core Factory contracts
+## Deploy the Convexus Core Factory contracts
 
 ```bash
 $ # Run this in the root folder of the project
@@ -105,7 +105,7 @@ $ ./scripts/scenario/1.deploy_core_factory.sh lisbon
 [🎉] Convexus Core Pool Factory contract has been successfully setup!
 ```
 
-## 4. Deploy a Convexus Pool contract
+## Deploy a Convexus Pool contract
 
 For deploying pools, we will need to create a new configuration file, that will contain basic information about the newly deployed pool.
 
@@ -131,7 +131,7 @@ $ ./scripts/scenario/2.deploy_core_pool.sh custom-sicx-usdc
 [🎉] Pool successfully initialized!
 ```
 
-## 5. Deploy the Convexus Periphery contracts
+## Deploy the Convexus Periphery contracts
 
 The process for deploying a custom bond contract is straightforward. 
 
