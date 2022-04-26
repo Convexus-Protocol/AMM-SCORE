@@ -24,10 +24,9 @@ import java.math.BigInteger;
 import com.iconloop.score.test.Account;
 
 import org.mockito.ArgumentCaptor;
-
-import exchange.convexus.quoter.QuoteExactInputSingleParams;
-import exchange.convexus.quoter.QuoteResult;
-import exchange.convexus.quoter.Quoter;
+import exchange.convexus.periphery.quoter.QuoteExactInputSingleParams;
+import exchange.convexus.periphery.quoter.QuoteResult;
+import exchange.convexus.periphery.quoter.Quoter;
 import exchange.convexus.utils.ScoreSpy;
 
 public class QuoterClient {

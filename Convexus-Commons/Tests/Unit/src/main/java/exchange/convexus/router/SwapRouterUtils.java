@@ -22,7 +22,10 @@ import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonObject;
 import com.iconloop.score.test.Account;
 import com.iconloop.score.test.Score;
-
+import exchange.convexus.periphery.router.ExactInputParams;
+import exchange.convexus.periphery.router.ExactInputSingleParams;
+import exchange.convexus.periphery.router.ExactOutputParams;
+import exchange.convexus.periphery.router.ExactOutputSingleParams;
 import score.Address;
 
 public class SwapRouterUtils {

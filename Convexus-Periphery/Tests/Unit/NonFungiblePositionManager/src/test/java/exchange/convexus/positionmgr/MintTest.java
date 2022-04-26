@@ -29,6 +29,7 @@ import org.junit.jupiter.api.Test;
 
 import exchange.convexus.initializer.ConvexusPoolInitializerUtils;
 import exchange.convexus.liquidity.ConvexusLiquidityUtils;
+import exchange.convexus.periphery.positionmgr.MintParams;
 import exchange.convexus.pool.ConvexusPoolMock;
 import exchange.convexus.utils.AssertUtils;
 

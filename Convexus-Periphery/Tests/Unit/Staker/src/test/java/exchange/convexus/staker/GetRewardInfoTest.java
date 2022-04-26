@@ -33,6 +33,7 @@ import org.junit.jupiter.api.Test;
 
 import exchange.convexus.liquidity.ConvexusLiquidityUtils;
 import exchange.convexus.nft.NFTUtils;
+import exchange.convexus.periphery.staker.IncentiveId;
 import exchange.convexus.pool.SnapshotCumulativesInsideResult;
 import exchange.convexus.positionmgr.PositionInformation;
 import exchange.convexus.utils.MathUtils;

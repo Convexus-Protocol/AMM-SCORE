@@ -16,6 +16,7 @@
 
 package exchange.convexus.swap;
 
+import exchange.convexus.periphery.swap.Swap;
 import exchange.convexus.utils.ConvexusTest;
 import exchange.convexus.utils.ScoreSpy;
 

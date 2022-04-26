@@ -16,6 +16,7 @@
 
 package exchange.convexus.ticklens;
 
+import exchange.convexus.periphery.ticklens.TickLens;
 import exchange.convexus.utils.ConvexusTest;
 import exchange.convexus.utils.ScoreSpy;
 

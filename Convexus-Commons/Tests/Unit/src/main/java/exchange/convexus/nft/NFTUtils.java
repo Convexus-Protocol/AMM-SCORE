@@ -24,10 +24,9 @@ import java.math.BigInteger;
 import com.iconloop.score.test.Account;
 
 import org.mockito.ArgumentCaptor;
-
-import exchange.convexus.positionmgr.DecreaseLiquidityParams;
-import exchange.convexus.positionmgr.MintParams;
-import exchange.convexus.positionmgr.NonFungiblePositionManager;
+import exchange.convexus.periphery.positionmgr.DecreaseLiquidityParams;
+import exchange.convexus.periphery.positionmgr.MintParams;
+import exchange.convexus.periphery.positionmgr.NonFungiblePositionManager;
 import exchange.convexus.utils.ScoreSpy;
 import score.Address;
 

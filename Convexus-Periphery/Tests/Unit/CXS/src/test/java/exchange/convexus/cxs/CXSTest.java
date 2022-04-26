@@ -16,6 +16,7 @@
 
 package exchange.convexus.cxs;
 
+import exchange.convexus.periphery.cxs.CXS;
 import exchange.convexus.utils.ConvexusTest;
 import exchange.convexus.utils.ScoreSpy;
 

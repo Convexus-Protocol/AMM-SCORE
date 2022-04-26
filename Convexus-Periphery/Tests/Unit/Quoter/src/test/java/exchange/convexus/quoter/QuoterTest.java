@@ -17,9 +17,10 @@
 package exchange.convexus.quoter;
 
 import exchange.convexus.factory.ConvexusFactoryMock;
-import exchange.convexus.positiondescriptor.NonfungibleTokenPositionDescriptor;
-import exchange.convexus.positionmgr.NonFungiblePositionManager;
-import exchange.convexus.router.SwapRouter;
+import exchange.convexus.periphery.positiondescriptor.NonfungibleTokenPositionDescriptor;
+import exchange.convexus.periphery.positionmgr.NonFungiblePositionManager;
+import exchange.convexus.periphery.quoter.Quoter;
+import exchange.convexus.periphery.router.SwapRouter;
 import exchange.convexus.utils.ConvexusTest;
 import exchange.convexus.utils.IntUtils;
 import exchange.convexus.utils.ScoreSpy;

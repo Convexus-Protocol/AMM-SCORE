@@ -30,6 +30,7 @@ import org.junit.jupiter.api.Test;
 
 import exchange.convexus.liquidity.ConvexusLiquidityUtils;
 import exchange.convexus.nft.NFTUtils;
+import exchange.convexus.periphery.staker.IncentiveId;
 
 public class LiquidityIfOverflowTest extends ConvexusStakerTest {
   

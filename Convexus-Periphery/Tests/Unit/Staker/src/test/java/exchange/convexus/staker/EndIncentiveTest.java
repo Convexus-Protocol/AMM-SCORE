@@ -31,7 +31,7 @@ import static exchange.convexus.utils.SleepUtils.sleepTo;
 import static exchange.convexus.utils.TimeUtils.now;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
+import exchange.convexus.periphery.staker.IncentiveId;
 import exchange.convexus.utils.AssertUtils;
 import score.Address;
 

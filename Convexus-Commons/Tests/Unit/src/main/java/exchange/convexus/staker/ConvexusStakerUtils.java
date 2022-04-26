@@ -22,7 +22,7 @@ import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonObject;
 import com.iconloop.score.test.Account;
 import com.iconloop.score.test.Score;
-
+import exchange.convexus.periphery.staker.ConvexusStaker;
 import exchange.convexus.utils.ScoreSpy;
 import score.Address;
 

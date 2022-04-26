@@ -30,6 +30,7 @@ import exchange.convexus.clients.QuoterClient;
 import exchange.convexus.initializer.ConvexusPoolInitializerUtils;
 import exchange.convexus.liquidity.ConvexusLiquidityUtils;
 import exchange.convexus.nft.NFTUtils;
+import exchange.convexus.periphery.quoter.QuoteExactInputSingleParams;
 import exchange.convexus.pool.ConvexusPoolMock;
 import exchange.convexus.pool.Slot0;
 import exchange.convexus.router.SwapRouterUtils;

@@ -16,6 +16,7 @@
 
 package exchange.convexus.governor;
 
+import exchange.convexus.periphery.governor.ConvexusGovernor;
 import exchange.convexus.utils.ConvexusTest;
 import exchange.convexus.utils.ScoreSpy;
 

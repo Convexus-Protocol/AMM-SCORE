@@ -16,6 +16,7 @@
 
 package exchange.convexus.liquidity;
 
+import exchange.convexus.periphery.liquidity.ConvexusLiquidityManagement;
 import exchange.convexus.utils.ConvexusTest;
 import exchange.convexus.utils.ScoreSpy;
 
