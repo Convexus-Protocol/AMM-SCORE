@@ -13,7 +13,7 @@ class Command:
     def __init__(self) -> None:
         parser = argparse.ArgumentParser()
         parser.add_argument('-e', '--endpoint', type=str, default='gochain', help='target endpoint for connection')
-        parser.add_argument('-k', '--keystore', type=argparse.FileType('r'), default='config/keystores/sejong/operator.icx',
+        parser.add_argument('-k', '--keystore', type=argparse.FileType('r'), default='./scripts/config/keystores/sejong/operator.icx',
                             help='keystore file for creating transactions')
         parser.add_argument('-p', '--password', type=str, default='gochain', help='keystore password')
         subparsers = parser.add_subparsers(title='Available commands', dest='command')

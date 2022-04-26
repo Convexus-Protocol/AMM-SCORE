@@ -31,7 +31,7 @@ token1=$(echo ${poolConfig} | jq -r .pool.token1)
 fee=$(echo ${poolConfig} | jq -r .pool.fee)
 
 # Keystores
-operator=$(cat ./config/keystores/${network}/operator.icx | jq .address -r)
+operator=$(cat ./scripts/config/keystores/${network}/operator.icx | jq .address -r)
 
 # Tokens Packages
 token0Pkg=$(getToken0Pkg ${poolId})

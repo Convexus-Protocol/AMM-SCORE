@@ -1,8 +1,0 @@
-{
-  "method": "createPool",
-  "params": {
-    "tokenA": "cxd4657c829519242113495d75636e051e5c06bd7c",
-    "tokenB": "cx0645da6aace1edb81ca17bdf56735ca9d2a12294",
-    "fee": "0xbb8"
-  }
-}

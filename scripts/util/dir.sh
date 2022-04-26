@@ -2,7 +2,7 @@
 
 set -e
 
-CONFIG_DIR=./config
+CONFIG_DIR=./scripts/config
 DEPLOY_DIR=${CONFIG_DIR}/deploy
 CALLS_DIR=${CONFIG_DIR}/calls
 

@@ -39,7 +39,7 @@ callsDir=$(getCallsDir ${pkg} ${network})
 posmgr=$(getAddress ${pkg} ${network})
 
 # Keystores
-operator=$(cat ./config/keystores/${network}/operator.icx | jq .address -r)
+operator=$(cat ./scripts/config/keystores/${network}/operator.icx | jq .address -r)
 
 # Deposit token0
 info "Depositing token0..."

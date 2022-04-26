@@ -9,15 +9,15 @@ out
 *.jar
 !gradle/wrapper/gradle-wrapper.jar
 
-config/keystores
-!config/keystores/localhost
+scripts/config/keystores
+!scripts/config/keystores/localhost
 
 testsvc/
 
 .project
 .classpath
 
-config/deploy
+scripts/config/deploy
 
 *.pyc
 venv/

@@ -23,12 +23,12 @@ def print_empty(*args):
     pass
 
 def get_deploy(package, endpoint):
-    deploy_path = f"./config/deploy/{package}/"
+    deploy_path = f"./scripts/config/deploy/{package}/"
     deploy = json.loads(open(f"{deploy_path}/{endpoint}/deploy.json", "r").read())
     return deploy['scoreAddress']
 
 def get_params(package, endpoint):
-    deploy_path = f"./config/deploy/{package}/"
+    deploy_path = f"./scripts/config/deploy/{package}/"
     params = json.loads(open(f"{deploy_path}/{endpoint}/params.json", "r").read())
     return params
 
@@ -51,7 +51,7 @@ def deploy(config: Config, package: str, verbose=False):
     tx_hash = tx_handler.install(owner, content, content_type, params)
 
     tx_result = tx_handler.ensure_tx_result(tx_hash, verbose)
-    deploy_path = f"./config/deploy/{package}/"
+    deploy_path = f"./scripts/config/deploy/{package}/"
     open(f"{deploy_path}/{config.endpoint}/deploy.json", "w+").write(json.dumps(tx_result, indent=2))
     score_address = tx_result["scoreAddress"]
     print(f"Deployed at {score_address}")
@@ -77,7 +77,7 @@ def update(config: Config, package: str, verbose=False):
     tx_hash = tx_handler.update(owner, address, content, content_type, params)
 
     tx_result = tx_handler.ensure_tx_result(tx_hash, verbose)
-    deploy_path = f"./config/deploy/{package}/"
+    deploy_path = f"./scripts/config/deploy/{package}/"
     open(f"{deploy_path}/{config.endpoint}/deploy.json", "w+").write(json.dumps(tx_result, indent=2))
     score_address = tx_result["scoreAddress"]
     print(f"Updated at {score_address}")

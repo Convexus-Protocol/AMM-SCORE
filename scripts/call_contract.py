@@ -23,7 +23,7 @@ def print_empty(*args):
     pass
 
 def get_call(package, endpoint, filename):
-    call = json.loads(open(f"./config/calls/{package}/{endpoint}/{filename}.json", "r").read())
+    call = json.loads(open(f"./scripts/config/calls/{package}/{endpoint}/{filename}.json", "r").read())
     return call['method'], \
            call['params'] if "params" in call else {}, \
            int(call['value'], 16) if "value" in call else 0,
