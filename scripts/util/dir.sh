@@ -7,48 +7,48 @@ DEPLOY_DIR=${CONFIG_DIR}/deploy
 CALLS_DIR=${CONFIG_DIR}/calls
 
 getDeployDir () {
-  pkg=$1
-  network=$2
-  deployDir=${DEPLOY_DIR}/${pkg}/${network}
-  echo ${deployDir}
+  _pkg=$1
+  _network=$2
+  _deployDir=${DEPLOY_DIR}/${_pkg}/${_network}
+  echo ${_deployDir}
 }
 
 setupDeployDir () {
-  pkg=$1
-  network=$2
-  deployDir=$(getDeployDir ${pkg} ${network})
-  mkdir -p ${deployDir}
+  _pkg=$1
+  _network=$2
+  _deployDir=$(getDeployDir ${_pkg} ${_network})
+  mkdir -p ${_deployDir}
 }
 
 getCallsDir () {
-  pkg=$1
-  network=$2
-  callsDir=${CALLS_DIR}/${pkg}/${network}
-  echo ${callsDir}
+  _pkg=$1
+  _network=$2
+  _callsDir=${CALLS_DIR}/${_pkg}/${_network}
+  echo ${_callsDir}
 }
 
 setupCallsDir () {
-  pkg=$1
-  network=$2
-  callsDir=$(getCallsDir ${pkg} ${network})
-  mkdir -p ${callsDir}
+  _pkg=$1
+  _network=$2
+  _callsDir=$(getCallsDir ${_pkg} ${_network})
+  mkdir -p ${_callsDir}
 }
 
 getJavaDir () {
-  javaPkg=$1
-  build=$2
-  javaDir=${DEPLOY_DIR}/${pkg}
-  echo ${javaDir}
+  _pkg=$1
+  _javaDir=${DEPLOY_DIR}/${_pkg}
+  echo ${_javaDir}
 }
 
 setupJavaDir () {
-  javaPkg=$1
-  build=$2
-  javaDir=$(getJavaDir ${javaPkg} ${build})
-  mkdir -p ${javaDir}
+  _pkg=$1
+  _javaPkg=$2
+  _build=$3
+  _javaDir=$(getJavaDir ${_pkg} ${_build})
+  mkdir -p ${_javaDir}
 
   jq -n \
-    --arg javaPkg $javaPkg \
-    --arg build $build \
-  '{javaPkg: $javaPkg, build: $build}' > ${javaDir}/build.json
+    --arg javaPkg $_javaPkg \
+    --arg build $_build \
+  '{javaPkg: $javaPkg, build: $build}' > ${_javaDir}/build.json
 }

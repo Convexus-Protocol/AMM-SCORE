@@ -34,7 +34,7 @@ class TxHandler:
     def icon_service(self):
         return self._icon_service
 
-    def _send_transaction(self, transaction, wallet, limit):
+    def _send_transaction(self, transaction, wallet, limit=None):
         if limit is not None:
             signed_tx = SignedTransaction(transaction, wallet, limit)
         else:
@@ -78,7 +78,7 @@ class TxHandler:
             .value(value) \
             .params(params) \
             .build()
-        return self._send_transaction(transaction, wallet, 1_000_000_000)
+        return self._send_transaction(transaction, wallet)
 
     def transfer(self, wallet, to, amount, limit=100000):
         transaction = TransactionBuilder() \

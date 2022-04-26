@@ -8,9 +8,6 @@ source ./scripts/util/get_address.sh
 source ./scripts/util/dir.sh
 source ./scripts/util/console.sh
 
-source ./scripts/karma/pkg.sh
-
-# Network must be given as a parameter of this script
 if [ "$#" -ne "1" ] ; then
   error "Usage: $0 <network>"
   exit 1
@@ -19,19 +16,23 @@ fi
 network=$1
 
 # Start
-deployName="Core Pool Factory"
+deployName="Convexus Core Pool Factory"
 info "Deploying ${deployName}..."
 
 # Package information
-pkg=$(getFactoryStoragePkg)
-javaPkg=":Karma-Bond:Contracts:Karma-FactoryStorage"
+pkg="core/factory"
+javaPkg=":Convexus-Core:Contracts:Factory"
 build="optimized"
 
 # Setup packages
-setupJavaDir ${javaPkg} ${build}
+setupJavaDir ${pkg} ${javaPkg} ${build}
 setupDeployDir ${pkg} ${network}
 setupCallsDir ${pkg} ${network}
 deployDir=$(getDeployDir ${pkg} ${network})
+
+# Start
+info "Cleaning..."
+./gradlew "${javaPkg}:clean" > /dev/null
 
 # Deploy on ICON network
 jq -n '{}' > ${deployDir}/params.json

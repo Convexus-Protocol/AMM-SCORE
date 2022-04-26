@@ -41,14 +41,15 @@ def print_response(header, msg):
 
 def get_icon_service(endpoint):
     endpoint_map = {
-        "mainnet":  ['https://ctz.solidwallet.io', 0x1],
-        "testnet":  ['https://test-ctz.solidwallet.io', 0x2],
-        "bicon":    ['https://bicon.net.solidwallet.io', 0x3],
-        "sejong":   ['https://sejong.net.solidwallet.io', 0x53],
-        "gochain":  ['http://localhost:9082', 0x3],
-        "custom":   ['https://endpoint.karmafinance.netlib.re', 0x3],
-        "local":    ['http://localhost:9000', 0x3],
+        "mainnet":   ['https://ctz.solidwallet.io', 0x1],
+        "testnet":   ['https://test-ctz.solidwallet.io', 0x2],
+        "bicon":     ['https://bicon.net.solidwallet.io', 0x3],
+        "sejong":    ['https://sejong.net.solidwallet.io', 0x53],
+        "localhost": ['http://localhost:9082', 0x3],
+        "custom":    ['https://endpoint.convexus.netlib.re', 0x3],
     }
+    if not endpoint in endpoint_map:
+        raise Exception(f"Invalid endpoint '{endpoint}'")
     url, nid = endpoint_map.get(endpoint, [endpoint, 0x3])
     return IconService(HTTPProvider(url, 3)), nid
 

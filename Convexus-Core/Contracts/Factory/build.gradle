@@ -9,7 +9,7 @@ dependencies {
 }
 
 optimizedJar {
-    mainClassName = 'exchange.convexus.factory.ConvexusFactory'
+    mainClassName = 'exchange.convexus.core.contracts.factory.ConvexusFactory'
     // setEnableDebug(true)
     from {
         configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }

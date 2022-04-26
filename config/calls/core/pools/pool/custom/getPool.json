@@ -1,0 +1,8 @@
+{
+  "method": "getPool",
+  "params": {
+    "token0": "cxf01b7f8f5250e037c5108bd2f3946b7bad934ac8",
+    "token1": "cx05fdf38acb1214382c9532dc897d91ac833c993a",
+    "fee": "0xbb8"
+  }
+}

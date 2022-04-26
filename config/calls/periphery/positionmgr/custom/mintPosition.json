@@ -1,0 +1,18 @@
+{
+  "method": "mint",
+  "params": {
+    "params": {
+      "token0": "cxd4657c829519242113495d75636e051e5c06bd7c",
+      "token1": "cx0645da6aace1edb81ca17bdf56735ca9d2a12294",
+      "fee": "0xbb8",
+      "tickLower": "-0xd89b4",
+      "tickUpper": "0xd89b4",
+      "amount0Desired": "0x21e19e0c9bab2400000",
+      "amount1Desired": "0x21e19e0c9bab2400000",
+      "amount0Min": "0x0",
+      "amount1Min": "0x0",
+      "recipient": "hxb6b5791be0b5ef67063b3c10b840fb81514db2fd",
+      "deadline": "0x19debd01c7"
+    }
+  }
+}
