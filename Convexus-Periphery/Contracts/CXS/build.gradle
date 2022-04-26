@@ -1,18 +1,11 @@
-// version = '0.9.1'
-
 dependencies {
     compileOnly 'foundation.icon:javaee-api:0.9.0'
     implementation project(':Convexus-Commons:Utils')
 }
 
 optimizedJar {
-    mainClassName = 'exchange.convexus.factory.ConvexusFactory'
-    // setEnableDebug(true)
+    mainClassName = 'exchange.convexus.periphery.CXS'
     from {
         configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
     }
-}
-
-test {
-    useJUnitPlatform()
 }

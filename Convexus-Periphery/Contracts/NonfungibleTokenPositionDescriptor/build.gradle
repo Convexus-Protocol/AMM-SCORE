@@ -1,5 +1,3 @@
-// version = '0.9.1'
-
 dependencies {
     compileOnly 'foundation.icon:javaee-api:0.9.0'
     implementation 'foundation.icon:javaee-scorex:0.5.2'
@@ -18,13 +16,8 @@ dependencies {
 }
 
 optimizedJar {
-    mainClassName = 'exchange.convexus.positiondescriptor.NonfungibleTokenPositionDescriptor'
-    // setEnableDebug(true)
+    mainClassName = 'exchange.convexus.periphery.positiondescriptor.NonfungibleTokenPositionDescriptor'
     from {
         configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
     }
-}
-
-test {
-    useJUnitPlatform()
 }

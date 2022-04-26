@@ -1,5 +1,3 @@
-// version = '0.9.1'
-
 dependencies {
     compileOnly 'foundation.icon:javaee-api:0.9.0'
     
@@ -11,8 +9,7 @@ dependencies {
 }
 
 optimizedJar {
-    mainClassName = 'exchange.convexus.factory.ConvexusFactory'
-    // setEnableDebug(true)
+    mainClassName = 'exchange.convexus.periphery.ticklens.TickLens'
     from {
         configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
     }
