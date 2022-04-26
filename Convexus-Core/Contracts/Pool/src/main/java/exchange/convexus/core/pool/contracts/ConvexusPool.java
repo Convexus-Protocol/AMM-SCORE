@@ -21,6 +21,7 @@ import static java.math.BigInteger.ZERO;
 
 import java.math.BigInteger;
 import exchange.convexus.core.factory.IConvexusFactory;
+import exchange.convexus.core.interfaces.poolcallee.IConvexusPoolCallee;
 import exchange.convexus.core.librairies.LiquidityMath;
 import exchange.convexus.core.librairies.PositionLib;
 import exchange.convexus.core.librairies.SqrtPriceMath;
@@ -35,7 +36,6 @@ import exchange.convexus.interfaces.irc2.IIRC2;
 import exchange.convexus.librairies.FixedPoint128;
 import exchange.convexus.librairies.FullMath;
 import exchange.convexus.librairies.TickMath;
-import exchange.convexus.pool.IConvexusPoolCallee;
 import exchange.convexus.pool.ModifyPositionParams;
 import exchange.convexus.pool.ModifyPositionResult;
 import exchange.convexus.pool.ObserveResult;

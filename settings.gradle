@@ -14,8 +14,9 @@ include (
   // ScoreInterfaces
   ':Convexus-Core:Score-Interfaces:Factory',
   ':Convexus-Core:Score-Interfaces:Pool',
+  ':Convexus-Core:Score-Interfaces:ConvexusPoolCallee',
   // Interfaces
-  ':Convexus-Core:Interfaces:Factory',
+  ':Convexus-Core:Interfaces:ConvexusPoolDeployer',
   
   // Structs
   ':Convexus-Core:Structs:Factory',

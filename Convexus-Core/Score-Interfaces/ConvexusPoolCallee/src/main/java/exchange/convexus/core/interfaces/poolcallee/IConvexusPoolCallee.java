@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package exchange.convexus.pool;
+package exchange.convexus.core.interfaces.poolcallee;
 
 import java.math.BigInteger;
 import score.Address;

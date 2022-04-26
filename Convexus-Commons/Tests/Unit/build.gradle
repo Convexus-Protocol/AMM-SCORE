@@ -22,8 +22,9 @@ dependencies {
     // ScoreInterfaces
     implementation project(':Convexus-Core:Score-Interfaces:Pool')
     implementation project(':Convexus-Core:Score-Interfaces:Factory')
+    implementation project(':Convexus-Core:Score-Interfaces:ConvexusPoolCallee')
     // Interfaces
-    implementation project(':Convexus-Core:Interfaces:Factory')
+    implementation project(':Convexus-Core:Interfaces:ConvexusPoolDeployer')
 
     // Structs
     implementation project(':Convexus-Core:Structs:Pool')
