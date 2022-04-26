@@ -92,7 +92,7 @@ $ pip install -r ./requirements.txt
 
 Everytime you want to use the Convexus build & deploy system, please do `source ./venv/bin/activate` beforehand.
 
-## 3. Deploy the Convexus Core contracts
+## 3. Deploy the Convexus Core Factory contracts
 
 ```bash
 $ # Run this in the root folder of the project
@@ -105,7 +105,7 @@ $ ./scripts/scenario/1.deploy_core_factory.sh lisbon
 [🎉] Convexus Core Pool Factory contract has been successfully setup!
 ```
 
-## 4. Deploy the Convexus Custom Treasury contract
+## 4. Deploy a Convexus Pool contract
 
 For deploying pools, we will need to create a new configuration file, that will contain basic information about the newly deployed pool.
 
