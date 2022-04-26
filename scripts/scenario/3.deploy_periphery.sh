@@ -31,3 +31,5 @@ ${setupDir}/3.2.deploy_nft_position_descriptor.sh ${network}
 # Deploy NFTPosition Manager
 info "Deploying the NFT Position Manager..."
 ${setupDir}/3.3.deploy_nft_position_manager.sh ${network}
+
+success "All Periphery Contracts have been deployed successfully!"
