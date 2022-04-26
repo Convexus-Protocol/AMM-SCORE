@@ -18,30 +18,6 @@ optimizedJar {
     }
 }
 
-deployJar {
-    keystore = rootProject.hasProperty('keystoreName') ? "$keystoreName" 
-        : 'Z:/Work/ICON/Convexus/Convexus/config/keystores/sejong/operator.icx'
-    password = rootProject.hasProperty('keystorePass') ? "$keystorePass"
-        : 'gochain'
-
-    endpoints {
-        sejong {
-            uri = 'https://sejong.net.solidwallet.io/api/v3'
-            nid = 83
-        }
-        convexus {
-            uri = 'https://endpoint.convexus.netlib.re/api/v3'
-            nid = 3
-        }
-        localhost {
-            uri = 'http://localhost:9082/api/v3'
-            nid = 3
-        }
-    }
-    parameters {
-    }
-}
-
 test {
     useJUnitPlatform()
 }
