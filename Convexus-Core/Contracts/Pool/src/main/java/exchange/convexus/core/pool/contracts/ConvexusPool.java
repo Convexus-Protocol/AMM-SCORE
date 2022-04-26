@@ -87,9 +87,6 @@ public abstract class ConvexusPool
     // The 0th storage slot in the pool stores many values, and is exposed as a single method to save steps when accessed externally.
     protected final VarDB<Slot0> slot0 = Context.newVarDB(NAME + "_slot0", Slot0.class);
 
-    // Whether the pool is locked
-    protected final ReentrancyLock poolLock = new ReentrancyLock(NAME + "_poolLock");
-
     // The fee growth as a Q128.128 fees of token0 collected per unit of liquidity for the entire life of the pool
     protected final VarDB<BigInteger> feeGrowthGlobal0X128 = Context.newVarDB(NAME + "_feeGrowthGlobal0X128", BigInteger.class);
 
@@ -102,17 +99,24 @@ public abstract class ConvexusPool
     // The amounts of token0 and token1 that are owed to the protocol
     protected final VarDB<BigInteger> liquidity = Context.newVarDB(NAME + "_liquidity", BigInteger.class);
 
-    // Look up information about a specific tick in the pool
-    protected final Ticks ticks = new Ticks();
+    // Whether the pool is locked
+    protected final ReentrancyLock poolLock = new ReentrancyLock(NAME + "_poolLock");
 
-    // Returns 256 packed tick initialized boolean values. See TickBitmap for more information
-    protected final TickBitmap tickBitmap = new TickBitmap();
+    // Implements IObservations
+    // Returns data about a specific observation index
+    protected final Observations observations = new Observations();
 
+    // Implements IPositions
     // Returns the information about a position by the position's key
     protected final Positions positions = new Positions();
 
-    // Returns data about a specific observation index
-    protected final Observations observations = new Observations();
+    // Implements ITickBitmap
+    // Returns 256 packed tick initialized boolean values. See TickBitmap for more information
+    protected final TickBitmap tickBitmap = new TickBitmap();
+
+    // Implements ITicks
+    // Look up information about a specific tick in the pool
+    protected final Ticks ticks = new Ticks();
 
     // ================================================
     // Event Logs

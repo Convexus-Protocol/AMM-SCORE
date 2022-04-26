@@ -45,9 +45,6 @@ public class ConvexusFactory implements IConvexusPoolDeployer {
     // Contract name
     private final String name;
 
-    // Implements IConvexusPoolDeployer
-    private final ConvexusPoolDeployer poolDeployer;
-
     // ================================================
     // DB Variables
     // ================================================
@@ -56,6 +53,9 @@ public class ConvexusFactory implements IConvexusPoolDeployer {
     protected final BranchDB<Address, BranchDB<Address, DictDB<Integer, Address>>> getPool = Context.newBranchDB(NAME + "_getPool", Address.class);
     protected final VarDB<byte[]> poolContract = Context.newVarDB(NAME + "_poolContract", byte[].class);
     protected final ArrayDB<Address> pools = Context.newArrayDB(NAME + "_pools", Address.class);
+
+    // Implements IConvexusPoolDeployer
+    private final ConvexusPoolDeployer poolDeployer;
 
     // ================================================
     // Event Logs
@@ -316,7 +316,6 @@ public class ConvexusFactory implements IConvexusPoolDeployer {
     }
 
     // --- Implement IConvexusPoolDeployer ---
-    @Override
     @External(readonly = true)
     public Parameters parameters() {
         return this.poolDeployer.parameters();
