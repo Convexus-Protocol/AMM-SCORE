@@ -10,6 +10,11 @@ dependencies {
     implementation project(':Convexus-Core:Score-Interfaces:Pool')
     implementation project(':Convexus-Core:Score-Interfaces:Factory')
     implementation project(':Convexus-Core:Score-Interfaces:ConvexusPoolCallee')
+
+    implementation project(':Convexus-Core:Interfaces:Observations')
+    implementation project(':Convexus-Core:Interfaces:Positions')
+    implementation project(':Convexus-Core:Interfaces:Ticks')
+    implementation project(':Convexus-Core:Interfaces:TickBitmap')
     
     implementation project(':Convexus-Core:Structs:Pool')
     implementation project(':Convexus-Core:Structs:Factory')

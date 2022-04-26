@@ -24,7 +24,7 @@ import java.math.BigInteger;
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
-import exchange.convexus.core.pool.contracts.db.PositionsDB;
+import exchange.convexus.core.pool.contracts.models.Positions;
 import exchange.convexus.librairies.FixedPoint128;
 import exchange.convexus.librairies.FullMath;
 import team.iconation.standards.token.irc721.IRC721Enumerable;
@@ -235,7 +235,7 @@ public class NonFungiblePositionManager extends IRC721Enumerable {
         this._nextId.set(tokenId.add(ONE));
         this._mint(params.recipient, tokenId);
 
-        byte[] positionKey = PositionsDB.getKey(Context.getAddress(), params.tickLower, params.tickUpper);
+        byte[] positionKey = Positions.getKey(Context.getAddress(), params.tickLower, params.tickUpper);
         Position.Info poolPos = IConvexusPool.positions(pool, positionKey);
         
         // idempotent set
@@ -302,7 +302,7 @@ public class NonFungiblePositionManager extends IRC721Enumerable {
         BigInteger amount1 = result.amount1;
         Address pool = result.pool;
 
-        byte[] positionKey = PositionsDB.getKey(Context.getAddress(), positionStorage.tickLower, positionStorage.tickUpper);
+        byte[] positionKey = Positions.getKey(Context.getAddress(), positionStorage.tickLower, positionStorage.tickUpper);
 
         // this is now updated to the current transaction
         Position.Info poolPos = IConvexusPool.positions(pool, positionKey);
@@ -361,7 +361,7 @@ public class NonFungiblePositionManager extends IRC721Enumerable {
         Context.require(amount0.compareTo(params.amount0Min) >= 0 && amount1.compareTo(params.amount1Min) >= 0,
             "decreaseLiquidity: Price slippage check");
 
-        byte[] positionKey = PositionsDB.getKey(Context.getAddress(), positionStorage.tickLower, positionStorage.tickUpper);
+        byte[] positionKey = Positions.getKey(Context.getAddress(), positionStorage.tickLower, positionStorage.tickUpper);
         // this is now updated to the current transaction
         Position.Info poolPos = IConvexusPool.positions(pool, positionKey);
 
@@ -415,7 +415,7 @@ public class NonFungiblePositionManager extends IRC721Enumerable {
         // trigger an update of the position fees owed and fee growth snapshots if it has any liquidity
         if (positionStorage.liquidity.compareTo(ZERO) > 0) {
             IConvexusPool.burn(pool, positionStorage.tickLower, positionStorage.tickUpper, ZERO);
-            var positionKey = PositionsDB.getKey(Context.getAddress(), positionStorage.tickLower, positionStorage.tickUpper);
+            var positionKey = Positions.getKey(Context.getAddress(), positionStorage.tickLower, positionStorage.tickUpper);
             Position.Info poolPos = IConvexusPool.positions(pool, positionKey);
             BigInteger feeGrowthInside0LastX128 = poolPos.feeGrowthInside0LastX128;
             BigInteger feeGrowthInside1LastX128 = poolPos.feeGrowthInside1LastX128;

@@ -16,6 +16,7 @@
 
 package exchange.convexus.core.contracts.factory;
 
+import exchange.convexus.core.contracts.factory.models.ConvexusPoolDeployer;
 import exchange.convexus.core.interfaces.pooldeployer.IConvexusPoolDeployer;
 import exchange.convexus.factory.Parameters;
 import exchange.convexus.utils.AddressUtils;

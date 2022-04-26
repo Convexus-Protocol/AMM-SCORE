@@ -33,7 +33,7 @@ import com.iconloop.score.test.ServiceManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-import exchange.convexus.core.pool.contracts.db.PositionsDB;
+import exchange.convexus.core.pool.contracts.models.Positions;
 import exchange.convexus.factory.ConvexusFactoryUtils;
 import exchange.convexus.librairies.TickMath;
 import exchange.convexus.liquidity.ConvexusLiquidityUtils;
@@ -661,7 +661,7 @@ public class MintInitializedTest extends ConvexusPoolTest {
     ConvexusLiquidityUtils.deposit(alice, callee.getAddress(), usdc.score, new BigInteger("1"));
     callee.invoke(alice, "mint", pool.getAddress(), alice.getAddress(), minTick + tickSpacing, maxTick - tickSpacing, ONE);
 
-    var position = Position.Info.fromMap(pool.call("positions", PositionsDB.getKey(alice.getAddress(), minTick + tickSpacing, maxTick - tickSpacing)));
+    var position = Position.Info.fromMap(pool.call("positions", Positions.getKey(alice.getAddress(), minTick + tickSpacing, maxTick - tickSpacing)));
     assertEquals(ONE, position.liquidity);
     assertEquals(new BigInteger("102084710076281216349243831104605583"), position.feeGrowthInside0LastX128);
     assertEquals(new BigInteger("10208471007628121634924383110460558"), position.feeGrowthInside1LastX128);
@@ -669,7 +669,7 @@ public class MintInitializedTest extends ConvexusPoolTest {
     assertEquals(ZERO, position.tokensOwed1);
     
     pool.invoke(alice, "burn", minTick + tickSpacing, maxTick - tickSpacing, ONE);
-    position = Position.Info.fromMap(pool.call("positions", PositionsDB.getKey(alice.getAddress(), minTick + tickSpacing, maxTick - tickSpacing)));
+    position = Position.Info.fromMap(pool.call("positions", Positions.getKey(alice.getAddress(), minTick + tickSpacing, maxTick - tickSpacing)));
     assertEquals(ZERO, position.liquidity);
     assertEquals(new BigInteger("102084710076281216349243831104605583"), position.feeGrowthInside0LastX128);
     assertEquals(new BigInteger("10208471007628121634924383110460558"), position.feeGrowthInside1LastX128);

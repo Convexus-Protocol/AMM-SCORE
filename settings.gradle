@@ -17,6 +17,10 @@ include (
   ':Convexus-Core:Score-Interfaces:ConvexusPoolCallee',
   // Interfaces
   ':Convexus-Core:Interfaces:ConvexusPoolDeployer',
+  ':Convexus-Core:Interfaces:Observations',
+  ':Convexus-Core:Interfaces:Positions',
+  ':Convexus-Core:Interfaces:TickBitmap',
+  ':Convexus-Core:Interfaces:Ticks',
   
   // Structs
   ':Convexus-Core:Structs:Factory',

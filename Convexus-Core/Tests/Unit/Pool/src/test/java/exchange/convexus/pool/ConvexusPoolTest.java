@@ -38,7 +38,7 @@ import com.iconloop.score.test.Score;
 import org.mockito.ArgumentCaptor;
 
 import exchange.convexus.callee.ConvexusPoolCallee;
-import exchange.convexus.core.pool.contracts.db.PositionsDB;
+import exchange.convexus.core.pool.contracts.models.Positions;
 import exchange.convexus.factory.ConvexusFactoryMock;
 import exchange.convexus.librairies.TickMath;
 import exchange.convexus.liquidity.ConvexusLiquidityUtils;
@@ -269,7 +269,7 @@ public class ConvexusPoolTest extends ConvexusTest {
   }
   
   protected Position.Info positions (Account account, int minTick, int maxTick) {
-    return Position.Info.fromMap(pool.call("positions", PositionsDB.getKey(account.getAddress(), minTick, maxTick)));
+    return Position.Info.fromMap(pool.call("positions", Positions.getKey(account.getAddress(), minTick, maxTick)));
   }
 
   protected void setFeeGrowthGlobal0X128(BigInteger _feeGrowthGlobal0X128) {

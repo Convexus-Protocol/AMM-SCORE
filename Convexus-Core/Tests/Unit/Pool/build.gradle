@@ -17,6 +17,12 @@ dependencies {
 
     testImplementation project(':Convexus-Core:Contracts:Pool')
     testImplementation project(':Convexus-Core:Contracts:Factory')
+    
+    testImplementation project(':Convexus-Core:Interfaces:Positions')
+    testImplementation project(':Convexus-Core:Interfaces:Observations')
+    testImplementation project(':Convexus-Core:Interfaces:ConvexusPoolDeployer')
+    testImplementation project(':Convexus-Core:Interfaces:Ticks')
+    testImplementation project(':Convexus-Core:Interfaces:TickBitmap')
 }
 
 test {

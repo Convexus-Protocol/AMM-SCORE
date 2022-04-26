@@ -27,10 +27,10 @@ import exchange.convexus.core.librairies.PositionLib;
 import exchange.convexus.core.librairies.SqrtPriceMath;
 import exchange.convexus.core.librairies.SwapMath;
 import exchange.convexus.core.librairies.TickLib;
-import exchange.convexus.core.pool.contracts.db.ObservationsDB;
-import exchange.convexus.core.pool.contracts.db.PositionsDB;
-import exchange.convexus.core.pool.contracts.db.TickBitmapDB;
-import exchange.convexus.core.pool.contracts.db.TicksDB;
+import exchange.convexus.core.pool.contracts.models.Observations;
+import exchange.convexus.core.pool.contracts.models.Positions;
+import exchange.convexus.core.pool.contracts.models.TickBitmap;
+import exchange.convexus.core.pool.contracts.models.Ticks;
 import exchange.convexus.factory.Parameters;
 import exchange.convexus.interfaces.irc2.IIRC2;
 import exchange.convexus.librairies.FixedPoint128;
@@ -123,16 +123,16 @@ abstract class ConvexusPool1 {
     private final VarDB<BigInteger> liquidity = Context.newVarDB(NAME + "_liquidity", BigInteger.class);
 
     // Look up information about a specific tick in the pool
-    private final TicksDB ticks = new TicksDB();
+    private final Ticks ticks = new Ticks();
 
     // Returns 256 packed tick initialized boolean values. See TickBitmap for more information
-    private final TickBitmapDB tickBitmap = new TickBitmapDB();
+    private final TickBitmap tickBitmap = new TickBitmap();
     
     // Returns the information about a position by the position's key
-    private final PositionsDB positions = new PositionsDB();
+    private final Positions positions = new Positions();
 
     // Returns data about a specific observation index
-    private final ObservationsDB observations = new ObservationsDB();
+    private final Observations observations = new Observations();
 
     // ================================================
     // Event Logs
@@ -396,7 +396,7 @@ abstract class ConvexusPool1 {
             );
         } else if (_slot0.tick < tickUpper) {
             BigInteger time = TimeUtils.now();
-            ObservationsDB.ObserveSingleResult result = observations.observeSingle(
+            Observations.ObserveSingleResult result = observations.observeSingle(
                 time, 
                 ZERO, 
                 _slot0.tick, 
@@ -523,7 +523,7 @@ abstract class ConvexusPool1 {
         BigInteger liquidityDelta,
         int tick
     ) {
-        byte[] positionKey = PositionsDB.getKey(owner, tickLower, tickUpper);
+        byte[] positionKey = Positions.getKey(owner, tickLower, tickUpper);
         Position.Info position = this.positions.get(positionKey);
 
         BigInteger _feeGrowthGlobal0X128 = this.feeGrowthGlobal0X128.get();
@@ -780,7 +780,7 @@ abstract class ConvexusPool1 {
         BigInteger amount1;
 
         // we don't need to checkTicks here, because invalid positions will never have non-zero tokensOwed{0,1}
-        byte[] key = PositionsDB.getKey(caller, tickLower, tickUpper);
+        byte[] key = Positions.getKey(caller, tickLower, tickUpper);
         Position.Info position = this.positions.get(key);
 
         amount0 = amount0Requested.compareTo(position.tokensOwed0) > 0 ? position.tokensOwed0 : amount0Requested;

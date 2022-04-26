@@ -30,7 +30,7 @@ import com.iconloop.score.test.ServiceManager;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import exchange.convexus.core.pool.contracts.db.PositionsDB;
+import exchange.convexus.core.pool.contracts.models.Positions;
 import exchange.convexus.factory.ConvexusFactoryUtils;
 import exchange.convexus.liquidity.ConvexusLiquidityUtils;
 
@@ -88,7 +88,7 @@ public class BurnTest extends ConvexusPoolTest {
       swapExact1For0(TEN.pow(18), alice);
 
       pool.invoke(bob, "burn", minTick, maxTick, TEN.pow(18));
-      var position = Position.Info.fromMap(pool.call("positions", PositionsDB.getKey(bob.getAddress(), minTick, maxTick)));
+      var position = Position.Info.fromMap(pool.call("positions", Positions.getKey(bob.getAddress(), minTick, maxTick)));
       assertEquals(ZERO, position.liquidity);
       assertNotEquals(ZERO, position.tokensOwed0);
       assertNotEquals(ZERO, position.tokensOwed1);
