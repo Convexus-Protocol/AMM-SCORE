@@ -1,1 +1,3 @@
+cls
+
 gradlew generateMergedReport
