@@ -36,6 +36,7 @@ import exchange.convexus.pool.PoolData;
 import exchange.convexus.interfaces.irc2.IIRC2ICX;
 import exchange.convexus.utils.AddressUtils;
 import exchange.convexus.utils.BytesUtils;
+import exchange.convexus.utils.ICX;
 import exchange.convexus.utils.IntUtils;
 import exchange.convexus.utils.ReentrancyLock;
 import exchange.convexus.utils.TimeUtils;
@@ -46,6 +47,7 @@ import score.ObjectReader;
 import score.VarDB;
 import score.annotation.External;
 import score.annotation.Optional;
+import score.annotation.Payable;
 import scorex.io.Reader;
 import scorex.io.StringReader;
 
@@ -460,6 +462,38 @@ public class SwapRouter {
         return amountIn;
     }
 
+    @External
+    @Payable
+    public void exactInputSingleIcx (ExactInputSingleParams params) {
+        exactInputSingle(Context.getCaller(), ICX.getAddress(), Context.getValue(), params);
+    }
+
+    @External
+    @Payable
+    public void exactOutputSingleIcx (ExactOutputSingleParams params) {
+        exactOutputSingle(Context.getCaller(), ICX.getAddress(), Context.getValue(), params);
+    }
+
+    @External
+    @Payable
+    public void exactInputIcx (ExactInputParams params) {
+        exactInput(Context.getCaller(), ICX.getAddress(), Context.getValue(), params);
+    }
+
+    @External
+    @Payable
+    public void exactOutputIcx (ExactOutputParams params) {
+        exactOutput(Context.getCaller(), ICX.getAddress(), Context.getValue(), params);
+    }
+
+    @External
+    @Payable
+    public void payIcx () {
+        // "payIcx" is coming from the Pool
+        // Accept the incoming ICX transfer
+        this.liquidityMgr.deposit(Context.getCaller(), ICX.getAddress(), Context.getValue());
+    }
+  
     @External
     public void tokenFallback (Address _from, BigInteger _value, @Optional byte[] _data) throws Exception {
         Reader reader = new StringReader(new String(_data));

@@ -406,7 +406,7 @@ public class MintInitializedTest extends ConvexusPoolTest {
 
   // Including current price
   @Test
-  void testTransfersCurtrentPriceOfBothTokens () {
+  void testTransfersCurrentPriceOfBothTokens () {
 
     ConvexusLiquidityUtils.deposit(alice, callee.getAddress(), sicx.score, new BigInteger("317"));
     ConvexusLiquidityUtils.deposit(alice, callee.getAddress(), usdc.score, new BigInteger("32"));

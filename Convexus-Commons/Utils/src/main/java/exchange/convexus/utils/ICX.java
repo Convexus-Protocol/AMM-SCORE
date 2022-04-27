@@ -22,7 +22,7 @@ import score.Address;
 import score.Context;
 
 public class ICX {
-  private static final Address TOKEN_ADDRESS = Address.fromString("cx1111111111111111111111111111111111111111");
+  private static final Address TOKEN_ADDRESS = Address.fromString("cx0000000000000000000000000000000000000001");
   private static final int DECIMALS = 18;
   private static final String SYMBOL = "ICX";
 
@@ -39,7 +39,12 @@ public class ICX {
     String method,
     Object... params
   ) {
-    Context.call(value, targetAddress, method, params);
+    if (targetAddress.isContract()) {
+      Context.call(value, targetAddress, method, params);
+    } else {
+      Context.println("Warning: method '" + method + "' called on EOA");
+      Context.transfer(targetAddress, value);
+    }
   }
 
   public static Address getAddress () {

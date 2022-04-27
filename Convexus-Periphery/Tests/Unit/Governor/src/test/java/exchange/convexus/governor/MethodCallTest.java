@@ -82,7 +82,7 @@ public class MethodCallTest extends ConvexusGovernorTest {
   @Test
   void testInvokePayable () {
     MethodParam param = new MethodParam("BigInteger", BigInteger.ONE);
-    sm.transfer(owner, caller.getAddress(), BigInteger.ONE);
+    sm.transferIcx(owner, caller.getAddress(), BigInteger.ONE);
     invoke(owner, BigInteger.ONE, "methodPayable", new MethodParam[] {param});
   }
 

@@ -36,6 +36,7 @@ import score.VarDB;
 import score.annotation.EventLog;
 import score.annotation.External;
 import score.annotation.Optional;
+import score.annotation.Payable;
 import scorex.io.Reader;
 import scorex.io.StringReader;
 
@@ -51,6 +52,7 @@ import exchange.convexus.pool.PoolAddress.PoolKey;
 import exchange.convexus.positiondescriptor.INonfungibleTokenPositionDescriptor;
 import exchange.convexus.positionmgr.NFTPosition;
 import exchange.convexus.positionmgr.PositionInformation;
+import exchange.convexus.utils.ICX;
 import exchange.convexus.utils.TimeUtils;
 
 // @title NFT positions
@@ -516,6 +518,15 @@ public class NonFungiblePositionManager extends IRC721Enumerable {
         this.liquidityMgr.withdraw(token);
     }
 
+    /**
+     * @notice Add ICX funds to the liquidity manager
+     */
+    @External
+    @Payable
+    public void depositIcx () {
+        this.liquidityMgr.deposit(Context.getCaller(), ICX.getAddress(), Context.getValue());
+    }
+  
     @External
     public void tokenFallback (Address _from, BigInteger _value, @Optional byte[] _data) throws Exception {
         Reader reader = new StringReader(new String(_data));
@@ -527,7 +538,7 @@ public class NonFungiblePositionManager extends IRC721Enumerable {
         switch (method)
         {
             /**
-             * @notice Add funds to the liquidity manager
+             * @notice Add IRC2 funds to the liquidity manager
              */
             case "deposit": {
                 this.liquidityMgr.deposit(_from, token, _value);

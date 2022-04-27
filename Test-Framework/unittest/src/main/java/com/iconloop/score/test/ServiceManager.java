@@ -17,7 +17,7 @@
 package com.iconloop.score.test;
 
 import score.Address;
-
+import score.Context;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigInteger;
@@ -103,6 +103,7 @@ public class ServiceManager {
                     superclass = superclass.getSuperclass();
                 }
             }
+
             throw new IllegalStateException(caller.getName() + " not found");
         }
         return score;

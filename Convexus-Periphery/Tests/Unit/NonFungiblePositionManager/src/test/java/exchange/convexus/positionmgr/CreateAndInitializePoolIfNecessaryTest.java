@@ -40,10 +40,4 @@ public class CreateAndInitializePoolIfNecessaryTest extends NonFungiblePositionM
   void testCreateAndInitializePoolIfNecessary () {
     ConvexusPoolInitializerUtils.createAndInitializePoolIfNecessary(ConvexusPoolMock.class, alice, factory, sicx.getAddress(), usdc.getAddress(), FEE_AMOUNTS[MEDIUM], encodePriceSqrt(ONE, ONE), tickSpacing);
   }
-
-  @Test
-  void testIsPayable () {
-    // Periphery::NonfungiblePositionManager.spec.js line 101
-    // TODO
-  }
 }

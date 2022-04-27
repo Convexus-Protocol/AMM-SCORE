@@ -25,6 +25,7 @@ import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
 import exchange.convexus.interfaces.irc2.IIRC2ICX;
 import exchange.convexus.pool.IConvexusPool;
+import exchange.convexus.utils.ICX;
 import score.Address;
 import score.BranchDB;
 import score.ByteArrayObjectWriter;
@@ -33,6 +34,7 @@ import score.DictDB;
 import score.ObjectReader;
 import score.annotation.External;
 import score.annotation.Optional;
+import score.annotation.Payable;
 import scorex.io.Reader;
 import scorex.io.StringReader;
 
@@ -121,6 +123,12 @@ public class ConvexusSwapPay {
       IIRC2ICX.transfer(token, caller, amount, "withdraw");
       depositedUser.set(token, ZERO);
     }
+  }
+
+  @External
+  @Payable
+  public void depositIcx () {
+    deposit(Context.getCaller(), ICX.getAddress(), Context.getValue());
   }
 
   @External

@@ -17,9 +17,9 @@
 package exchange.convexus.pool;
 
 import exchange.convexus.utils.ConvexusTest;
+import exchange.convexus.utils.ICX;
 import exchange.convexus.utils.IntUtils;
 import score.Address;
-
 import static java.math.BigInteger.ONE;
 import static java.math.BigInteger.TWO;
 import static java.math.BigInteger.ZERO;
@@ -77,6 +77,13 @@ public class ConvexusPoolTest extends ConvexusTest {
     underpay = deploy_swap_pay();
   }
 
+  void setup_pool_icx (Address factory, int fee, int tickSpacing) throws Exception {
+    pool = deploy_mock_pool(ICX.getAddress(), usdc.getAddress(), factory, fee, tickSpacing);
+    callee = deploy_callee();
+    reentrantCallee = deploy_reentrant_callee();
+    underpay = deploy_swap_pay();
+  }
+
   void setup_factory () throws Exception {
     factory = deploy_factory();
   }
@@ -117,6 +124,18 @@ public class ConvexusPoolTest extends ConvexusTest {
     );
   }
 
+  protected void callSwapIcx (
+    Account from, 
+    String method, 
+    Address pool, 
+    ScoreSpy<?> callee, 
+    BigInteger value, 
+    Address recipient, 
+    BigInteger sqrtPriceLimitX96
+  ) {
+    callee.invoke(from, value, method + "Icx", pool, recipient, sqrtPriceLimitX96);
+  }
+
   protected void swap (
     Account from,
     Score inputToken,
@@ -155,6 +174,34 @@ public class ConvexusPoolTest extends ConvexusTest {
     );
   }
   
+
+  protected void swapIcx (
+    Account from,
+    BigInteger amountIn,
+    BigInteger amountOut,
+    BigInteger sqrtPriceLimitX96
+  ) {
+    boolean exactInput = amountOut.equals(ZERO);
+
+    String method = exactInput
+          ? "swapExact0For1"
+          : "swap0ForExact1";
+      
+    if (sqrtPriceLimitX96 == null) {
+      sqrtPriceLimitX96 = TickMath.MIN_SQRT_RATIO.add(ONE);
+    }
+
+    callSwapIcx (
+      from,
+      method,
+      pool.getAddress(), 
+      callee, 
+      exactInput ? amountIn : amountOut, 
+      from.getAddress(), 
+      sqrtPriceLimitX96
+    );
+  }
+  
   protected void swapExact0For1 (BigInteger amount, Account caller, BigInteger sqrtPriceLimitX96) {
     swap(caller, sicx.score, amount, ZERO, sqrtPriceLimitX96);
   }
@@ -167,6 +214,20 @@ public class ConvexusPoolTest extends ConvexusTest {
   }
   protected void swap0ForExact1 (BigInteger amount, Account caller) {
     swap(caller, sicx.score, ZERO, amount, null);
+  }
+
+  protected void swapExact0For1Icx (BigInteger amount, Account caller, BigInteger sqrtPriceLimitX96) {
+    swapIcx(caller, amount, ZERO, sqrtPriceLimitX96);
+  }
+  protected void swapExact0For1Icx (BigInteger amount, Account caller) {
+    swapIcx(caller, amount, ZERO, null);
+  }
+
+  protected void swap0ForExact1Icx (BigInteger amount, Account caller, BigInteger sqrtPriceLimitX96) {
+    swapIcx(caller, ZERO, amount, sqrtPriceLimitX96);
+  }
+  protected void swap0ForExact1Icx (BigInteger amount, Account caller) {
+    swapIcx(caller, ZERO, amount, null);
   }
 
   protected void swapExact1For0 (BigInteger amount, Account caller, BigInteger sqrtPriceLimitX96) {

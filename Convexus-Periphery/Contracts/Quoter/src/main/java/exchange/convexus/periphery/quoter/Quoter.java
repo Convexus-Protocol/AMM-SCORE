@@ -42,6 +42,7 @@ import score.VarDB;
 import score.annotation.EventLog;
 import score.annotation.External;
 import score.annotation.Optional;
+import score.annotation.Payable;
 
 /**
  * @title Provides quotes for swaps
@@ -451,6 +452,12 @@ public class Quoter {
                 return new QuoteMultiResult(amountOut, sqrtPriceX96AfterList, initializedTicksCrossedList);
             }
         }
+    }
+
+    @External
+    @Payable
+    public void payIcx () {
+        // Accept the incoming ICX transfer
     }
 
     @External

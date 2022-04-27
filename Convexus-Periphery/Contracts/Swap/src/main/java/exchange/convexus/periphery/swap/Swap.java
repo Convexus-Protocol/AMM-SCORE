@@ -25,9 +25,11 @@ import score.Address;
 import score.Context;
 import score.annotation.External;
 import score.annotation.Optional;
+import score.annotation.Payable;
 import scorex.io.Reader;
 import scorex.io.StringReader;
 import exchange.convexus.utils.BytesUtils;
+import exchange.convexus.utils.ICX;
 import exchange.convexus.utils.ReentrancyLock;
 import exchange.convexus.utils.StringUtils;
 import static exchange.convexus.utils.TimeUtils.now;
@@ -240,7 +242,38 @@ public class Swap {
 
         reentreancy.lock(false);
     }
+    
+    @External
+    @Payable
+    public void swapExactInputSingleIcx () {
+        swapExactInputSingle(Context.getCaller(), ICX.getAddress(), Context.getValue());
+    }
 
+    @External
+    @Payable
+    public void swapExactInputMultihopIcx () {
+        swapExactInputMultihop(Context.getCaller(), ICX.getAddress(), Context.getValue());
+    }
+
+    @External
+    @Payable
+    public void swapExactOutputSingleIcx (BigInteger amountOut) {
+        swapExactOutputSingle(Context.getCaller(), ICX.getAddress(), amountOut, Context.getValue());
+    }
+
+    @External
+    @Payable
+    public void swapExactOutputMultihopIcx (BigInteger amountOut) {
+        swapExactOutputMultihop(Context.getCaller(), ICX.getAddress(), amountOut, Context.getValue());
+    }
+
+    @External
+    @Payable
+    public void depositIcx () {
+        // Accept the incoming ICX transfer
+        this.liquidityMgr.deposit(Context.getCaller(), ICX.getAddress(), Context.getValue());
+    }
+  
     @External
     public void tokenFallback (Address _from, BigInteger _value, @Optional byte[] _data) throws Exception {
         Reader reader = new StringReader(new String(_data));
@@ -250,7 +283,7 @@ public class Swap {
         Address token = Context.getCaller();
 
         // Ensure we received `tokenIn` as input
-        Context.require(token.equals(tokenIn));
+        Context.require(token.equals(this.tokenIn));
 
         switch (method)
         {

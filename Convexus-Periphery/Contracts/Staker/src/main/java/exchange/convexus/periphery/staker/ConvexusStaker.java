@@ -39,6 +39,7 @@ import exchange.convexus.staker.IncentiveKey;
 import exchange.convexus.staker.RewardAmount;
 import exchange.convexus.staker.Stake;
 import exchange.convexus.staker.StakesResult;
+import exchange.convexus.utils.ICX;
 import exchange.convexus.utils.StringUtils;
 import static exchange.convexus.utils.TimeUtils.now;
 import score.Address;
@@ -49,6 +50,7 @@ import score.ObjectReader;
 import score.annotation.EventLog;
 import score.annotation.External;
 import score.annotation.Optional;
+import score.annotation.Payable;
 import scorex.io.Reader;
 import scorex.io.StringReader;
 import team.iconation.standards.token.irc721.IRC721Receiver;
@@ -501,6 +503,20 @@ public class ConvexusStaker implements IRC721Receiver {
         }
 
         this.TokenStaked(tokenId, incentiveId, liquidity);
+    }
+
+    @External
+    @Payable
+    public void createIncentiveIcx (Address pool, BigInteger startTime, BigInteger endTime, Address refundee) {
+        IncentiveKey key = new IncentiveKey(
+            ICX.getAddress(), // the reward token is the one sent
+            pool,
+            startTime,
+            endTime,
+            refundee
+          );
+        BigInteger reward = Context.getValue();
+        createIncentive(key, reward);
     }
 
     @External

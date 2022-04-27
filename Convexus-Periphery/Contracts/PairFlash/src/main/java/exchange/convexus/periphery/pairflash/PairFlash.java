@@ -27,6 +27,7 @@ import score.Context;
 import score.ObjectReader;
 import score.annotation.External;
 import score.annotation.Optional;
+import score.annotation.Payable;
 import scorex.io.Reader;
 import scorex.io.StringReader;
 
@@ -42,6 +43,7 @@ import exchange.convexus.periphery.liquidity.ConvexusLiquidityManagement;
 import exchange.convexus.periphery.router.ExactInputSingleParams;
 import exchange.convexus.pool.IConvexusPool;
 import exchange.convexus.pool.PoolAddress.PoolKey;
+import exchange.convexus.utils.ICX;
 
 /**
  * @title Flash contract implementation
@@ -228,6 +230,21 @@ public class PairFlash {
     @External
     public void withdraw (Address token) {
         this.liquidityMgr.withdraw(token);
+    }
+
+    /**
+     * @notice Accept the incoming ICX transfer
+     */
+    @External
+    @Payable
+    public void depositIcx () {
+        this.liquidityMgr.deposit(Context.getCaller(), ICX.getAddress(), Context.getValue());
+    }
+
+    @External
+    @Payable
+    public void payIcx () {
+        this.liquidityMgr.deposit(Context.getCaller(), ICX.getAddress(), Context.getValue());
     }
 
     @External

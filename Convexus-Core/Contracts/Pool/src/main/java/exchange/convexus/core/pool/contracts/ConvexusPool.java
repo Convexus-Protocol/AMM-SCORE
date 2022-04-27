@@ -63,6 +63,7 @@ import score.VarDB;
 import score.annotation.EventLog;
 import score.annotation.External;
 import score.annotation.Optional;
+import score.annotation.Payable;
 
 /**
  * ConvexusPool is an abstract class, the concrete class that should be deployed on production is ConvexusPoolFactored.
@@ -970,6 +971,13 @@ public abstract class ConvexusPool
         
         this.poolLock.lock(false);
         return new PairAmounts(amount0, amount1);
+    }
+
+    @External
+    @Payable
+    public void payIcx () {
+        Context.require(Context.getCaller().isContract(), 
+            "tokenFallback: Pool shouldn't need to receive ICX from EOA");
     }
 
     @External

@@ -25,6 +25,7 @@ import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
 import exchange.convexus.interfaces.irc2.IIRC2ICX;
 import exchange.convexus.pool.IConvexusPool;
+import exchange.convexus.utils.ICX;
 import exchange.convexus.utils.IntUtils;
 import exchange.convexus.utils.StringUtils;
 import score.Address;
@@ -36,6 +37,7 @@ import score.ObjectReader;
 import score.annotation.EventLog;
 import score.annotation.External;
 import score.annotation.Optional;
+import score.annotation.Payable;
 import scorex.io.Reader;
 import scorex.io.StringReader;
 
@@ -120,6 +122,8 @@ public class ConvexusPoolCallee {
     depositedUser.set(token, oldBalance.subtract(owed));
 
     // Actually transfer the tokens
+    Context.println("Paying " + owed + " ICX to " + destination);
+    Context.println("ICX Balance = " + Context.getBalance(Context.getAddress()));
     IIRC2ICX.transfer(token, destination, owed, "pay");
   }
 
@@ -133,6 +137,13 @@ public class ConvexusPoolCallee {
     var depositedUser = this.deposited.at(caller);
     BigInteger oldBalance = depositedUser.getOrDefault(tokenIn, ZERO);
     depositedUser.set(tokenIn, oldBalance.add(amountIn));
+    Context.println("depositedUser(" + caller + ")(" + tokenIn + ") = " + depositedUser.get(tokenIn));
+  }
+
+  @External
+  @Payable
+  public void depositIcx () {
+    deposit(Context.getCaller(), ICX.getAddress(), Context.getValue());
   }
 
   @External
@@ -149,6 +160,54 @@ public class ConvexusPoolCallee {
   }
 
   @External
+  @Payable
+  public void swapExact0For1Icx (Address pool, Address recipient, BigInteger sqrtPriceLimitX96) {
+    final BigInteger amount = Context.getValue();
+    final Address caller = Context.getCaller();
+    doSwapFor(caller, ICX.getAddress(), amount, "swapExact0For1", pool, recipient, sqrtPriceLimitX96);
+  }
+
+  @External
+  @Payable
+  public void swap1ForExact0Icx (Address pool, Address recipient, BigInteger sqrtPriceLimitX96) {
+    final BigInteger amount = Context.getValue();
+    final Address caller = Context.getCaller();
+    doSwapFor(caller, ICX.getAddress(), amount, "swap1ForExact0", pool, recipient, sqrtPriceLimitX96);
+  }
+
+  @External
+  @Payable
+  public void swap0ForExact1Icx (Address pool, Address recipient, BigInteger sqrtPriceLimitX96) {
+    final BigInteger amount = Context.getValue();
+    final Address caller = Context.getCaller();
+    doSwapFor(caller, ICX.getAddress(), amount, "swap0ForExact1", pool, recipient, sqrtPriceLimitX96);
+  }
+
+  @External
+  @Payable
+  public void swapExact1For0Icx (Address pool, Address recipient, BigInteger sqrtPriceLimitX96) {
+    final BigInteger amount = Context.getValue();
+    final Address caller = Context.getCaller();
+    doSwapFor(caller, ICX.getAddress(), amount, "swapExact1For0", pool, recipient, sqrtPriceLimitX96);
+  }
+
+  @External
+  @Payable
+  public void swapToLowerSqrtPriceIcx (Address pool, Address recipient, BigInteger sqrtPriceX96) {
+    final BigInteger amount = Context.getValue();
+    final Address caller = Context.getCaller();
+    doSwapSqrtPrice(caller, ICX.getAddress(), amount, "swapToLowerSqrtPrice", pool, recipient, sqrtPriceX96);
+  }
+
+  @External
+  @Payable
+  public void swapToHigherSqrtPriceIcx (Address pool, Address recipient, BigInteger sqrtPriceX96) {
+    final BigInteger amount = Context.getValue();
+    final Address caller = Context.getCaller();
+    doSwapSqrtPrice(caller, ICX.getAddress(), amount, "swapToHigherSqrtPrice", pool, recipient, sqrtPriceX96);
+  }
+
+  @External
   public void tokenFallback (Address _from, BigInteger _value, @Optional byte[] _data) throws Exception {
     Reader reader = new StringReader(new String(_data));
     JsonValue input = Json.parse(reader);
@@ -160,50 +219,56 @@ public class ConvexusPoolCallee {
     {
       case "deposit": {
         deposit(_from, token, _value);
-        break;
-      }
+      } break;
 
       case "swapExact0For1":
       case "swap1ForExact0":
       case "swap0ForExact1":
       case "swapExact1For0":
       {
-        deposit(_from, token, _value);
-        
         JsonObject params = root.get("params").asObject();
         Address pool = Address.fromString(params.get("pool").asString());
         Address recipient = Address.fromString(params.get("recipient").asString());
         BigInteger amount = _value;
         BigInteger sqrtPriceLimitX96 = StringUtils.toBigInt(params.get("sqrtPriceLimitX96").asString());
 
-        switch (method) {
-          case "swapExact0For1": swapExact0For1(pool, amount, recipient, sqrtPriceLimitX96, _from.toByteArray()); break;
-          case "swap1ForExact0": swap1ForExact0(pool, amount, recipient, sqrtPriceLimitX96, _from.toByteArray()); break;
-          case "swap0ForExact1": swap0ForExact1(pool, amount, recipient, sqrtPriceLimitX96, _from.toByteArray()); break; 
-          case "swapExact1For0": swapExact1For0(pool, amount, recipient, sqrtPriceLimitX96, _from.toByteArray()); break;
-        }
-        break;
-      }
+        doSwapFor(_from, token, amount, method, pool, recipient, sqrtPriceLimitX96);
+      } break;
 
       case "swapToLowerSqrtPrice":
       case "swapToHigherSqrtPrice":
       {
-        deposit(_from, token, _value);
-        
         JsonObject params = root.get("params").asObject();
         Address pool = Address.fromString(params.get("pool").asString());
         Address recipient = Address.fromString(params.get("recipient").asString());
+        BigInteger amount = _value;
         BigInteger sqrtPriceX96 = StringUtils.toBigInt(params.get("sqrtPriceX96").asString());
 
-        switch (method) {
-          case "swapToLowerSqrtPrice":  swapToLowerSqrtPrice (pool, sqrtPriceX96, recipient, _from.toByteArray()); break;
-          case "swapToHigherSqrtPrice": swapToHigherSqrtPrice(pool, sqrtPriceX96, recipient, _from.toByteArray()); break;
-        }
-        break;
-      }
+        doSwapSqrtPrice(_from, token, amount, method, pool, recipient, sqrtPriceX96);
+      } break;
 
       default:
         Context.revert("tokenFallback: Unimplemented tokenFallback action");
+    }
+  }
+
+  private void doSwapSqrtPrice (Address caller, Address token, BigInteger amount, String method, Address pool, Address recipient, BigInteger sqrtPriceX96) {
+    deposit(caller, token, amount);
+    switch (method) {
+      case "swapToLowerSqrtPrice":  swapToLowerSqrtPrice (pool, sqrtPriceX96, recipient, caller.toByteArray()); break;
+      case "swapToHigherSqrtPrice": swapToHigherSqrtPrice(pool, sqrtPriceX96, recipient, caller.toByteArray()); break;
+      default: Context.revert("Invalid doSwapSqrtPrice method");
+    }
+  }
+
+  private void doSwapFor (Address caller, Address token, BigInteger amount, String method, Address pool, Address recipient, BigInteger sqrtPriceLimitX96) {
+    deposit(caller, token, amount);
+    switch (method) {
+      case "swapExact0For1": swapExact0For1(pool, amount, recipient, sqrtPriceLimitX96, caller.toByteArray()); break;
+      case "swap1ForExact0": swap1ForExact0(pool, amount, recipient, sqrtPriceLimitX96, caller.toByteArray()); break;
+      case "swap0ForExact1": swap0ForExact1(pool, amount, recipient, sqrtPriceLimitX96, caller.toByteArray()); break; 
+      case "swapExact1For0": swapExact1For0(pool, amount, recipient, sqrtPriceLimitX96, caller.toByteArray()); break;
+      default: Context.revert("Invalid doSwapFor method");
     }
   }
 
