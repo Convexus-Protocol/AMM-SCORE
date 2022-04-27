@@ -42,6 +42,7 @@ import exchange.convexus.utils.AddressUtils;
 import exchange.convexus.utils.ArrayUtils;
 import exchange.convexus.utils.AssertUtils;
 import exchange.convexus.utils.ConvexusTest;
+import exchange.convexus.utils.ICX;
 import exchange.convexus.utils.IntUtils;
 import exchange.convexus.utils.ScoreSpy;
 import exchange.convexus.utils.TimeUtils;
@@ -71,10 +72,12 @@ public class SwapRouterTest extends ConvexusTest {
     baln = deploy_baln();
     
     // Transfer some funds to Alice
+    alice.addBalance("ICX", IntUtils.MAX_UINT256);
     sicx.invoke(owner, "mintTo", alice.getAddress(), IntUtils.MAX_UINT256);
     usdc.invoke(owner, "mintTo", alice.getAddress(), IntUtils.MAX_UINT256);
     baln.invoke(owner, "mintTo", alice.getAddress(), IntUtils.MAX_UINT256);
     // Transfer some funds to trader
+    trader.addBalance("ICX", BigInteger.valueOf(10));
     sicx.invoke(owner, "mintTo", trader.getAddress(), BigInteger.valueOf(10));
     usdc.invoke(owner, "mintTo", trader.getAddress(), BigInteger.valueOf(10));
     baln.invoke(owner, "mintTo", trader.getAddress(), BigInteger.valueOf(10));
@@ -111,6 +114,36 @@ public class SwapRouterTest extends ConvexusTest {
       nft, 
       alice, 
       token0.getAddress(), token1.getAddress(), 
+      fee, 
+      tickLower, tickUpper, 
+      BigInteger.valueOf(1000000), 
+      BigInteger.valueOf(1000000), 
+      ZERO, BigInteger.ZERO, 
+      alice.getAddress(), 
+      TimeUtils.now().add(ONE)
+    );
+  }
+
+  void createIcxPool (Class<?> poolClass, Score token1) throws Exception {
+    
+    if (AddressUtils.compareTo(ICX.getAddress(), token1.getAddress()) > 0) {
+      throw new Exception("Invalid token0 / token1 order");
+    }
+
+    int fee = FEE_AMOUNTS[MEDIUM];
+    int tickSpacing = TICK_SPACINGS[MEDIUM];
+    int tickLower = getMinTick(tickSpacing);
+    int tickUpper = getMaxTick(tickSpacing);
+    
+    ConvexusPoolInitializerUtils.createAndInitializePoolIfNecessary(poolClass, alice, factory, ICX.getAddress(), token1.getAddress(), fee, encodePriceSqrt(1, 1), tickSpacing);
+    
+    ConvexusLiquidityUtils.depositIcx(alice, nft, BigInteger.valueOf(1000000));
+    ConvexusLiquidityUtils.deposit(alice, nft.getAddress(), token1, BigInteger.valueOf(1000000));
+
+    NFTUtils.mint(
+      nft, 
+      alice, 
+      ICX.getAddress(), token1.getAddress(), 
       fee, 
       tickLower, tickUpper, 
       BigInteger.valueOf(1000000), 
@@ -167,6 +200,85 @@ public class SwapRouterTest extends ConvexusTest {
     exactInputSingle (tokenIn, tokenOut, BigInteger.valueOf(3), ONE);
   }
 
+  void exactInputSingleToIcx (Score tokenIn) {
+    exactInputSingleToIcx (tokenIn, BigInteger.valueOf(3), ONE);
+  }
+
+  void exactInputSingleIcx (Score tokenOut) {
+    exactInputSingleIcx (tokenOut, BigInteger.valueOf(3), ONE);
+  }
+
+  void exactInputSingleIcx (Score tokenOut, BigInteger amountIn, BigInteger amountOutMinimum) {
+    // ensure that the swap fails if the limit is any tighter
+    AssertUtils.assertThrowsMessage(AssertionError.class, () ->
+      SwapRouterUtils.exactInputSingleIcx(
+        trader, 
+        router.score, 
+        amountIn,
+        tokenOut.getAddress(),
+        FEE_AMOUNTS[MEDIUM],
+        trader.getAddress(),
+        TimeUtils.now().add(ONE),
+        amountOutMinimum.add(ONE),
+        AddressUtils.compareTo(ICX.getAddress(), tokenOut.getAddress()) < 0 
+        ? new BigInteger("4295128740")
+        : new BigInteger("1461446703485210103287273052203988822378723970341")
+      ),
+      "exactInputSingle: Too little received"
+    );
+
+    SwapRouterUtils.exactInputSingleIcx(
+      trader, 
+      router.score,
+      amountIn,
+      tokenOut.getAddress(),
+      FEE_AMOUNTS[MEDIUM],
+      trader.getAddress(),
+      TimeUtils.now().add(ONE),
+      amountOutMinimum,
+      AddressUtils.compareTo(ICX.getAddress(), tokenOut.getAddress()) < 0 
+      ? new BigInteger("4295128740")
+      : new BigInteger("1461446703485210103287273052203988822378723970341")
+    );
+  }
+
+  void exactInputSingleToIcx (Score tokenIn, BigInteger amountIn, BigInteger amountOutMinimum) {
+    
+    // ensure that the swap fails if the limit is any tighter
+    AssertUtils.assertThrowsMessage(AssertionError.class, () ->
+      SwapRouterUtils.exactInputSingle(
+        trader, 
+        tokenIn, 
+        router.getAddress(), 
+        amountIn,
+        ICX.getAddress(),
+        FEE_AMOUNTS[MEDIUM],
+        trader.getAddress(),
+        TimeUtils.now().add(ONE),
+        amountOutMinimum.add(ONE),
+        AddressUtils.compareTo(tokenIn.getAddress(), ICX.getAddress()) < 0 
+        ? new BigInteger("4295128740")
+        : new BigInteger("1461446703485210103287273052203988822378723970341")
+      ),
+      "exactInputSingle: Too little received"
+    );
+
+    SwapRouterUtils.exactInputSingle(
+      trader, 
+      tokenIn, 
+      router.getAddress(), 
+      amountIn,
+      ICX.getAddress(),
+      FEE_AMOUNTS[MEDIUM],
+      trader.getAddress(),
+      TimeUtils.now().add(ONE),
+      amountOutMinimum,
+      AddressUtils.compareTo(tokenIn.getAddress(), ICX.getAddress()) < 0 
+      ? new BigInteger("4295128740")
+      : new BigInteger("1461446703485210103287273052203988822378723970341")
+    );
+  }
+  
   void exactInputSingle (Score tokenIn, Score tokenOut, BigInteger amountIn, BigInteger amountOutMinimum) {
     // ensure that the swap fails if the limit is any tighter
     AssertUtils.assertThrowsMessage(AssertionError.class, () ->
@@ -202,7 +314,6 @@ public class SwapRouterTest extends ConvexusTest {
       : new BigInteger("1461446703485210103287273052203988822378723970341")
     );
   }
-
   
   void exactOutputSingle (Score tokenIn, Score tokenOut) {
     exactOutputSingle (tokenIn, tokenOut, ONE, BigInteger.valueOf(3));
@@ -298,6 +409,14 @@ public class SwapRouterTest extends ConvexusTest {
   BigInteger[] getBalances (Address who) {
     return new BigInteger[] {
       (BigInteger) sicx.call("balanceOf", who),
+      (BigInteger) usdc.call("balanceOf", who),
+      (BigInteger) baln.call("balanceOf", who)
+    };
+  }
+
+  BigInteger[] getBalancesIcx (Address who) {
+    return new BigInteger[] {
+      (BigInteger) Account.getAccount(who).getBalance(),
       (BigInteger) usdc.call("balanceOf", who),
       (BigInteger) baln.call("balanceOf", who)
     };

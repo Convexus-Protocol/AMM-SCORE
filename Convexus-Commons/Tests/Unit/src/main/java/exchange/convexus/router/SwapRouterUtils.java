@@ -77,6 +77,22 @@ public class SwapRouterUtils {
     );
   }
 
+  public static void exactInputSingleIcx (
+    Account from, Score router, BigInteger _value, 
+    Address tokenOut, int fee, Address recipient, BigInteger deadline, BigInteger amountOutMinimum, BigInteger sqrtPriceLimitX96) {
+
+    var params = new ExactInputSingleParams(
+      tokenOut,
+      fee,
+      recipient,
+      deadline,
+      amountOutMinimum,
+      sqrtPriceLimitX96
+    );
+
+    router.invoke(from, _value, "exactInputSingleIcx", params);
+  }
+
   public static void exactOutput(
     Account from, 
     Score tokenIn, 

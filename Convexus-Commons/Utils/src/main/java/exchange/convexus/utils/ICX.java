@@ -42,7 +42,6 @@ public class ICX {
     if (targetAddress.isContract()) {
       Context.call(value, targetAddress, method, params);
     } else {
-      Context.println("Warning: method '" + method + "' called on EOA");
       Context.transfer(targetAddress, value);
     }
   }

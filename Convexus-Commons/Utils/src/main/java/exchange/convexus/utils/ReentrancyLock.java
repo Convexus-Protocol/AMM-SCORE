@@ -35,15 +35,11 @@ public class ReentrancyLock {
      * @param state reentrancy protection state
      */
     public void lock (boolean state) {
+        // Check current lock state
         boolean lock_state = this.locked.getOrDefault(false);
-        if (state) {
-            Context.require(!lock_state, 
-                "ReentrancyLock: wrong lock state: " + lock_state);
-            this.locked.set(true);
-        } else {
-            Context.require(lock_state, 
-                "ReentrancyLock: wrong lock state: " + lock_state);
-            this.locked.set(false);
-        }
+        Context.require(state != lock_state, "ReentrancyLock: wrong lock state: " + lock_state);
+
+        // OK
+        this.locked.set(state);
     }
 }

@@ -58,6 +58,7 @@ import score.VarDB;
 import score.annotation.EventLog;
 import score.annotation.External;
 import score.annotation.Optional;
+import score.annotation.Payable;
 
 public class Pool3 extends ConvexusPool3 {
     public Pool3(Address token0, Address token1, Address factory, int fee, int tickSpacing) {
@@ -72,7 +73,7 @@ abstract class ConvexusPool3 {
     // ================================================
     
     // Contract class name
-    public static final String NAME = "ConvexusPool";
+    public static final String NAME = "ConvexusPool3";
 
     // Contract name
     private final String name;
@@ -1274,6 +1275,13 @@ abstract class ConvexusPool3 {
         
         this.poolLock.lock(false);
         return new PairAmounts(amount0, amount1);
+    }
+
+    @External
+    @Payable
+    public void payIcx () {
+        Context.require(Context.getCaller().isContract(), 
+            "tokenFallback: Pool shouldn't need to receive ICX from EOA");
     }
 
     @External
