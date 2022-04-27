@@ -101,6 +101,7 @@ include (
   ':Convexus-Commons:Tokens:Contracts:irc2',
   ':Convexus-Commons:Tokens:Contracts:irc721',
   ':Convexus-Commons:Tokens:Interfaces:irc2',
+  ':Convexus-Commons:Tokens:Interfaces:irc2icx',
   ':Convexus-Commons:Tokens:Interfaces:irc721',
 
   // -----------------------

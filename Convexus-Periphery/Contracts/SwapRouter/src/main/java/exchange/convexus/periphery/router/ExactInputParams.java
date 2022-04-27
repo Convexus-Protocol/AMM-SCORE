@@ -20,10 +20,11 @@ import java.math.BigInteger;
 
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonObject;
+import exchange.convexus.interfaces.irc2.Parameterizable;
 import exchange.convexus.utils.StringUtils;
 import score.Address;
 
-public class ExactInputParams {
+public class ExactInputParams implements Parameterizable {
     // The `path` is a sequence of [`tokenAddress`, `fee`, `tokenAddress`], encoded in *reverse order*, which are the variables needed to compute each pool contract address in our sequence of swaps. The multihop swap router code will automatically find the correct pool with these variables, and execute the swap needed within each pool in our sequence.
     public byte[] path;
     // The destination address of the outbound asset
@@ -60,5 +61,15 @@ public class ExactInputParams {
             .add("recipient", this.recipient.toString())
             .add("deadline", this.deadline.toString())
             .add("amountOutMinimum", this.amountOutMinimum.toString());
+    }
+
+    @Override
+    public Object[] toRaw() {
+      return new Object[] {
+        this.path,
+        this.recipient,
+        this.deadline,
+        this.amountOutMinimum
+      };
     }
 }

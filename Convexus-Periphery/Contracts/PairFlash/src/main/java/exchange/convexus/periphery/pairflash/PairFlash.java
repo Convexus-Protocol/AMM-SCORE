@@ -19,7 +19,7 @@ package exchange.convexus.periphery.pairflash;
 import static java.math.BigInteger.ZERO;
 
 import java.math.BigInteger;
-import exchange.convexus.interfaces.irc2.IIRC2;
+import exchange.convexus.interfaces.irc2.IIRC2ICX;
 import static exchange.convexus.utils.TimeUtils.now;
 import score.Address;
 import score.ByteArrayObjectWriter;
@@ -87,7 +87,7 @@ public class PairFlash {
     private BigInteger routerExactInputSingle (Address tokenIn, BigInteger amountIn, Address tokenOut, BigInteger amountOutMinimum, int poolFee) {
         final Address thisAddress = Context.getAddress();
 
-        BigInteger amountBefore = IIRC2.balanceOf(tokenOut, thisAddress);
+        BigInteger amountBefore = IIRC2ICX.balanceOf(tokenOut, thisAddress);
 
         var params = new ExactInputSingleParams(
             tokenOut, 
@@ -99,14 +99,10 @@ public class PairFlash {
         );
 
         // Forward tokenIn to the router and call the "exactInputSingle" method
-        JsonObject data = Json.object()
-            .add("method", "exactInputSingle")
-            .add("params", params.toJson());
-
         // The call to `exactInputSingle` executes the swap.
-        IIRC2.transfer(tokenIn, this.swapRouter, amountIn, data.toString().getBytes());
+        IIRC2ICX.transfer(tokenIn, this.swapRouter, amountIn, "exactInputSingle", params);
 
-        BigInteger amountAfter = IIRC2.balanceOf(tokenOut, thisAddress);
+        BigInteger amountAfter = IIRC2ICX.balanceOf(tokenOut, thisAddress);
         BigInteger amountOut = amountAfter.subtract(amountBefore);
 
         return amountOut;

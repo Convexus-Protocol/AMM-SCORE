@@ -20,11 +20,11 @@ import java.math.BigInteger;
 
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonObject;
-
+import exchange.convexus.interfaces.irc2.Parameterizable;
 import exchange.convexus.utils.StringUtils;
 import score.Address;
 
-public class ExactInputSingleParams {
+public class ExactInputSingleParams implements Parameterizable {
     // The contract address of the outbound token
     public Address tokenOut;
     // The fee tier of the pool, used to determine the correct pool contract in which to execute the swap
@@ -73,5 +73,17 @@ public class ExactInputSingleParams {
             .add("deadline", deadline.toString())
             .add("amountOutMinimum", amountOutMinimum.toString())
             .add("sqrtPriceLimitX96", sqrtPriceLimitX96.toString());
+    }
+
+    @Override
+    public Object[] toRaw() {
+        return new Object[] {
+            this.tokenOut,
+            this.fee,
+            this.recipient,
+            this.deadline,
+            this.amountOutMinimum,
+            this.sqrtPriceLimitX96,
+        };
     }
 }

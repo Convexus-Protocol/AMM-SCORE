@@ -27,7 +27,7 @@ import java.math.BigInteger;
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
-import exchange.convexus.interfaces.irc2.IIRC2;
+import exchange.convexus.interfaces.irc2.IIRC2ICX;
 import exchange.convexus.interfaces.irc721.IIRC721;
 import exchange.convexus.pool.IConvexusPool;
 import exchange.convexus.pool.SnapshotCumulativesInsideResult;
@@ -39,7 +39,6 @@ import exchange.convexus.staker.IncentiveKey;
 import exchange.convexus.staker.RewardAmount;
 import exchange.convexus.staker.Stake;
 import exchange.convexus.staker.StakesResult;
-import exchange.convexus.utils.JSONUtils;
 import exchange.convexus.utils.StringUtils;
 import static exchange.convexus.utils.TimeUtils.now;
 import score.Address;
@@ -229,7 +228,7 @@ public class ConvexusStaker implements IRC721Receiver {
         incentiveStorage.totalRewardUnclaimed = ZERO;
         this.incentives.set(incentiveId, incentiveStorage);
 
-        IIRC2.transfer(key.rewardToken, key.refundee, refund, JSONUtils.method("refund"));
+        IIRC2ICX.transfer(key.rewardToken, key.refundee, refund, "refund");
 
         // @dev we never clear totalSecondsClaimedX128
 
@@ -411,7 +410,7 @@ public class ConvexusStaker implements IRC721Receiver {
 
         var rewardTokenDict = rewards.at(rewardToken);
         rewardTokenDict.set(caller, rewardTokenDict.get(caller).subtract(reward));
-        IIRC2.transfer(rewardToken, to, reward, JSONUtils.method("claimReward"));
+        IIRC2ICX.transfer(rewardToken, to, reward, "claimReward");
 
         this.RewardClaimed(to, reward);
         return reward;

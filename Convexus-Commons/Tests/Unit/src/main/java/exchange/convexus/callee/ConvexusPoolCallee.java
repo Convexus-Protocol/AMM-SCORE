@@ -23,10 +23,9 @@ import java.math.BigInteger;
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
-import exchange.convexus.interfaces.irc2.IIRC2;
+import exchange.convexus.interfaces.irc2.IIRC2ICX;
 import exchange.convexus.pool.IConvexusPool;
 import exchange.convexus.utils.IntUtils;
-import exchange.convexus.utils.JSONUtils;
 import exchange.convexus.utils.StringUtils;
 import score.Address;
 import score.BranchDB;
@@ -121,7 +120,7 @@ public class ConvexusPoolCallee {
     depositedUser.set(token, oldBalance.subtract(owed));
 
     // Actually transfer the tokens
-    IIRC2.transfer(token, destination, owed, JSONUtils.method("pay"));
+    IIRC2ICX.transfer(token, destination, owed, "pay");
   }
 
   // @External - this method is external through tokenFallback
@@ -144,7 +143,7 @@ public class ConvexusPoolCallee {
     BigInteger amount = depositedUser.getOrDefault(caller, ZERO);
 
     if (amount.compareTo(ZERO) > 0) {
-      IIRC2.transfer(token, caller, amount, JSONUtils.method("withdraw"));
+      IIRC2ICX.transfer(token, caller, amount, "withdraw");
       depositedUser.set(token, ZERO);
     }
   }
@@ -243,12 +242,12 @@ public class ConvexusPoolCallee {
 
     if (pay0.compareTo(ZERO) > 0) {
       Address token0 = IConvexusPool.token0(caller);
-      Context.println("[Callee][flashcallback] Paying " + pay0 + " " + IIRC2.symbol(token0) + " to the pool");
+      Context.println("[Callee][flashcallback] Paying " + pay0 + " " + IIRC2ICX.symbol(token0) + " to the pool");
       pay(sender, token0, caller, pay0);
     }
     if (pay1.compareTo(ZERO) > 0) {
       Address token1 = IConvexusPool.token1(caller);
-      Context.println("[Callee][flashcallback] Paying " + pay1 + " " + IIRC2.symbol(token1) + " to the pool");
+      Context.println("[Callee][flashcallback] Paying " + pay1 + " " + IIRC2ICX.symbol(token1) + " to the pool");
       pay(sender, token1, caller, pay1);
     }
   }
@@ -288,7 +287,7 @@ public class ConvexusPoolCallee {
   private void checkEnoughDeposited (Address address, Address token, BigInteger amount) {
     var depositedUser = this.deposited.at(address);
     BigInteger userBalance = depositedUser.getOrDefault(token, ZERO);
-    Context.println("[Callee][checkEnoughDeposited][" + IIRC2.symbol(token) + "][" + address + "] " + userBalance + " / " + amount);
+    Context.println("[Callee][checkEnoughDeposited][" + IIRC2ICX.symbol(token) + "][" + address + "] " + userBalance + " / " + amount);
     Context.require(userBalance.compareTo(amount) >= 0,
         // "checkEnoughDeposited: user didn't deposit enough funds - " + userBalance + "/" + amount);
         "checkEnoughDeposited: user didn't deposit enough funds");

@@ -19,7 +19,7 @@ package com.iconloop.score.test;
 import java.math.BigInteger;
 
 public class TestBase {
-    protected static final BigInteger ICX = BigInteger.TEN.pow(18);
+    protected static final BigInteger TO_ICX = BigInteger.TEN.pow(18);
 
     private static ServiceManager sInstance;
 

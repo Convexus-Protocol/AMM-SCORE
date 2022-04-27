@@ -26,7 +26,7 @@ import score.annotation.External;
 
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonObject;
-import exchange.convexus.interfaces.irc2.IIRC2;
+import exchange.convexus.interfaces.irc2.IIRC2ICX;
 import exchange.convexus.periphery.librairies.PoolAddressLib;
 
 /// @title Describes NFT token positions
@@ -60,10 +60,10 @@ public class NonfungibleTokenPositionDescriptor {
       .add("tokenId", tokenId.toString(10))
       .add("quoteTokenAddress", quoteTokenAddress.toString())
       .add("baseTokenAddress", baseTokenAddress.toString())
-      .add("quoteTokenSymbol", IIRC2.symbol(quoteTokenAddress))
-      .add("baseTokenSymbol", IIRC2.symbol(baseTokenAddress))
-      .add("quoteTokenDecimals", Integer.toString(IIRC2.decimals(quoteTokenAddress)))
-      .add("baseTokenDecimals", Integer.toString(IIRC2.decimals(baseTokenAddress)))
+      .add("quoteTokenSymbol", IIRC2ICX.symbol(quoteTokenAddress))
+      .add("baseTokenSymbol", IIRC2ICX.symbol(baseTokenAddress))
+      .add("quoteTokenDecimals", Integer.toString(IIRC2ICX.decimals(quoteTokenAddress)))
+      .add("baseTokenDecimals", Integer.toString(IIRC2ICX.decimals(baseTokenAddress)))
       .add("flipRatio", _flipRatio.toString())
       .add("tickLower", Integer.toString(position.tickLower))
       .add("tickUpper", Integer.toString(position.tickUpper))

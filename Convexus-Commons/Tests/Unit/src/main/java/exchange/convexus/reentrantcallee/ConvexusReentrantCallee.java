@@ -25,10 +25,9 @@ import java.math.BigInteger;
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
-import exchange.convexus.interfaces.irc2.IIRC2;
+import exchange.convexus.interfaces.irc2.IIRC2ICX;
 import exchange.convexus.librairies.TickMath;
 import exchange.convexus.pool.IConvexusPool;
-import exchange.convexus.utils.JSONUtils;
 import score.Address;
 import score.BranchDB;
 import score.Context;
@@ -129,7 +128,7 @@ public class ConvexusReentrantCallee {
     BigInteger amount = depositedUser.getOrDefault(caller, ZERO);
 
     if (amount.compareTo(ZERO) > 0) {
-      IIRC2.transfer(token, caller, amount, JSONUtils.method("withdraw"));
+      IIRC2ICX.transfer(token, caller, amount, "withdraw");
       depositedUser.set(token, ZERO);
     }
   }

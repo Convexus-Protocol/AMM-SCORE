@@ -22,7 +22,6 @@ import score.Address;
 
 public class AddressUtils {
     public static final Address ZERO_ADDRESS = new Address(new byte[Address.LENGTH]);
-    public static final Address ICX_ADDRESS = Address.fromString("cx1111111111111111111111111111111111111111");
 
     public static int compareTo (Address a, Address b) {
         return new BigInteger(a.toByteArray()).compareTo(new BigInteger(b.toByteArray()));

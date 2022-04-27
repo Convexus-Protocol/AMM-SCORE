@@ -16,7 +16,7 @@
 
 package exchange.convexus.periphery.liquidity;
 
-import exchange.convexus.interfaces.irc2.IIRC2;
+import exchange.convexus.interfaces.irc2.IIRC2ICX;
 import exchange.convexus.librairies.TickMath;
 import exchange.convexus.periphery.librairies.CallbackValidation;
 import exchange.convexus.periphery.librairies.LiquidityAmounts;
@@ -32,7 +32,6 @@ import exchange.convexus.pool.IConvexusPool;
 import exchange.convexus.pool.MintCallbackData;
 import exchange.convexus.pool.PairAmounts;
 import exchange.convexus.pool.PoolAddress.PoolKey;
-import exchange.convexus.utils.JSONUtils;
 import static java.math.BigInteger.ZERO;
 
 import java.math.BigInteger;
@@ -171,7 +170,7 @@ public class ConvexusLiquidityManagement {
         var depositedUser = this.deposited.at(caller);
         BigInteger oldBalance = depositedUser.getOrDefault(tokenIn, ZERO);
         depositedUser.set(tokenIn, oldBalance.add(amountIn));
-        // Context.println("LM: deposit(" + caller + ")(" + IIRC2.symbol(tokenIn) + ") = " + this.deposited.at(caller).get(tokenIn));
+        // Context.println("LM: deposit(" + caller + ")(" + IIRC2ICX.symbol(tokenIn) + ") = " + this.deposited.at(caller).get(tokenIn));
     }
 
     /**
@@ -184,7 +183,7 @@ public class ConvexusLiquidityManagement {
         BigInteger amount = depositedUser.getOrDefault(token, ZERO);
 
         if (amount.compareTo(ZERO) > 0) {
-            IIRC2.transfer(token, caller, amount, JSONUtils.method("withdraw"));
+            IIRC2ICX.transfer(token, caller, amount, "withdraw");
             depositedUser.set(token, ZERO);
         }
     }
@@ -195,7 +194,7 @@ public class ConvexusLiquidityManagement {
     private void checkEnoughDeposited (Address address, Address token, BigInteger amount) {
         var depositedUser = this.deposited.at(address);
         BigInteger userBalance = depositedUser.getOrDefault(token, ZERO);
-        // Context.println("[Callee][checkEnoughDeposited][" + IIRC2.symbol(token) + "] " + userBalance + " / " + amount);
+        // Context.println("[Callee][checkEnoughDeposited][" + IIRC2ICX.symbol(token) + "] " + userBalance + " / " + amount);
         Context.require(userBalance.compareTo(amount) >= 0,
             "checkEnoughDeposited: user didn't deposit enough funds");
     }

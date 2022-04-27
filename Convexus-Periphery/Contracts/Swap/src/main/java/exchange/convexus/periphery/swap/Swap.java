@@ -28,12 +28,11 @@ import score.annotation.Optional;
 import scorex.io.Reader;
 import scorex.io.StringReader;
 import exchange.convexus.utils.BytesUtils;
-import exchange.convexus.utils.JSONUtils;
 import exchange.convexus.utils.ReentrancyLock;
 import exchange.convexus.utils.StringUtils;
 import static exchange.convexus.utils.TimeUtils.now;
 
-import exchange.convexus.interfaces.irc2.IIRC2;
+import exchange.convexus.interfaces.irc2.IIRC2ICX;
 import exchange.convexus.periphery.liquidity.AddLiquidityParams;
 import exchange.convexus.periphery.liquidity.AddLiquidityResult;
 import exchange.convexus.periphery.liquidity.ConvexusLiquidityManagement;
@@ -90,7 +89,7 @@ public class Swap {
         Address _tokenOut,
         Address _tokenInOut
     ) {
-        this.name = "Convexus " + IIRC2.symbol(_tokenIn) + "-" + IIRC2.symbol(_tokenInOut) + "-" + IIRC2.symbol(_tokenOut) + " Swap";
+        this.name = "Convexus " + IIRC2ICX.symbol(_tokenIn) + "-" + IIRC2ICX.symbol(_tokenInOut) + "-" + IIRC2ICX.symbol(_tokenOut) + " Swap";
         this.swapRouter = _swapRouter;
         this.tokenIn = _tokenIn;
         this.tokenOut = _tokenOut;
@@ -123,7 +122,7 @@ public class Swap {
 
         // The call to `exactInputSingle` executes the swap.
         // Forward tokenIn to the router and call the "exactInputSingle" method
-        IIRC2.transfer(tokenIn, this.swapRouter, amountIn, JSONUtils.method("exactInputSingle", params.toJson()));
+        IIRC2ICX.transfer(tokenIn, this.swapRouter, amountIn, "exactInputSingle", params);
 
         reentreancy.lock(false);
     }
@@ -156,12 +155,12 @@ public class Swap {
 
         // Executes the swap returning the token exceess not needed to spend to receive the desired amountOut.
         // Forward `tokenIn` to the router and call the "exactOutputSingle" method
-        IIRC2.transfer(tokenIn, this.swapRouter, amountInMaximum, JSONUtils.method("exactOutputSingle", params.toJson()));
+        IIRC2ICX.transfer(tokenIn, this.swapRouter, amountInMaximum, "exactOutputSingle", params);
 
-        BigInteger excess = IIRC2.balanceOf(tokenIn, Context.getAddress());
+        BigInteger excess = IIRC2ICX.balanceOf(tokenIn, Context.getAddress());
         // send back the tokens excess to the caller if there's any
         if (excess.compareTo(ZERO) > 0) {
-            IIRC2.transfer(tokenIn, caller, excess, JSONUtils.method("excess"));
+            IIRC2ICX.transfer(tokenIn, caller, excess, "excess");
         }
 
         reentreancy.lock(false);
@@ -189,7 +188,7 @@ public class Swap {
 
         // Executes the swap.
         // Forward tokenIn to the router and call the "exactInput" method
-        IIRC2.transfer(tokenIn, this.swapRouter, amountIn, JSONUtils.method("exactInput", params.toJson()));
+        IIRC2ICX.transfer(tokenIn, this.swapRouter, amountIn, "exactInput", params);
 
         reentreancy.lock(false);
     }
@@ -231,12 +230,12 @@ public class Swap {
         
         // Executes the swap returning the token exceess not needed to spend to receive the desired amountOut.
         // Forward `tokenIn` to the router and call the "exactOutput" method
-        IIRC2.transfer(tokenIn, this.swapRouter, amountInMaximum, JSONUtils.method("exactOutput", params.toJson()));
+        IIRC2ICX.transfer(tokenIn, this.swapRouter, amountInMaximum, "exactOutput", params);
 
-        BigInteger excess = IIRC2.balanceOf(tokenIn, Context.getAddress());
+        BigInteger excess = IIRC2ICX.balanceOf(tokenIn, Context.getAddress());
         // send back the tokens excess to the caller if there's any
         if (excess.compareTo(ZERO) > 0) {
-            IIRC2.transfer(tokenIn, caller, excess, JSONUtils.method("excess"));
+            IIRC2ICX.transfer(tokenIn, caller, excess, "excess");
         }
 
         reentreancy.lock(false);

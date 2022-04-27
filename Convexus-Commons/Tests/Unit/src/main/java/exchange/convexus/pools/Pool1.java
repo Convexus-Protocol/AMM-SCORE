@@ -32,7 +32,7 @@ import exchange.convexus.core.pool.contracts.models.Positions;
 import exchange.convexus.core.pool.contracts.models.TickBitmap;
 import exchange.convexus.core.pool.contracts.models.Ticks;
 import exchange.convexus.factory.Parameters;
-import exchange.convexus.interfaces.irc2.IIRC2;
+import exchange.convexus.interfaces.irc2.IIRC2ICX;
 import exchange.convexus.librairies.FixedPoint128;
 import exchange.convexus.librairies.FullMath;
 import exchange.convexus.librairies.TickMath;
@@ -50,7 +50,6 @@ import exchange.convexus.pool.StepComputations;
 import exchange.convexus.pool.SwapCache;
 import exchange.convexus.pool.SwapState;
 import exchange.convexus.pool.Tick;
-import exchange.convexus.utils.JSONUtils;
 import exchange.convexus.utils.ReentrancyLock;
 import exchange.convexus.utils.TimeUtils;
 import score.Address;
@@ -308,7 +307,7 @@ abstract class ConvexusPool1 {
         this.fee = parameters.fee;
         this.tickSpacing = parameters.tickSpacing;
         this.maxLiquidityPerTick = TickLib.tickSpacingToMaxLiquidityPerTick(this.tickSpacing);
-        this.name = "Convexus Pool (" + IIRC2.symbol(this.token0) + " / " + IIRC2.symbol(this.token1) + ")";
+        this.name = "Convexus Pool (" + IIRC2ICX.symbol(this.token0) + " / " + IIRC2ICX.symbol(this.token1) + ")";
 
         // Default values
         if (this.liquidity.get() == null) {
@@ -343,14 +342,14 @@ abstract class ConvexusPool1 {
      * @notice Get the pool's balance of token0
      */
     private BigInteger balance0 () {
-        return IIRC2.balanceOf(this.token0, Context.getAddress());
+        return IIRC2ICX.balanceOf(this.token0, Context.getAddress());
     }
 
     /**
      * @notice Get the pool's balance of token1
      */
     private BigInteger balance1 () {
-        return IIRC2.balanceOf(this.token1, Context.getAddress());
+        return IIRC2ICX.balanceOf(this.token1, Context.getAddress());
     }
 
     /**
@@ -804,7 +803,7 @@ abstract class ConvexusPool1 {
     }
 
     private void pay (Address token, Address recipient, BigInteger amount) {
-        IIRC2.transfer(token, recipient, amount, JSONUtils.method("pay"));
+        IIRC2ICX.transfer(token, recipient, amount, "pay");
     }
 
     /**

@@ -17,8 +17,7 @@
 package exchange.convexus.periphery.librairies;
 
 import java.math.BigInteger;
-import exchange.convexus.interfaces.irc2.IIRC2;
-import exchange.convexus.utils.JSONUtils;
+import exchange.convexus.interfaces.irc2.IIRC2ICX;
 import score.Address;
 
 public class PeripheryPayments {
@@ -33,7 +32,6 @@ public class PeripheryPayments {
     Address recipient,
     BigInteger value
   ) {
-    // TODO: ICX payment
-    IIRC2.transfer(token, recipient, value, JSONUtils.method("pay"));
+    IIRC2ICX.transfer(token, recipient, value, "pay");
   }
 }

@@ -20,10 +20,11 @@ import java.math.BigInteger;
 
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonObject;
+import exchange.convexus.interfaces.irc2.Parameterizable;
 import exchange.convexus.utils.StringUtils;
 import score.Address;
 
-public class ExactOutputParams {
+public class ExactOutputParams implements Parameterizable {
     public byte[] path;
     public Address recipient;
     public BigInteger deadline;
@@ -56,5 +57,15 @@ public class ExactOutputParams {
             .add("recipient", this.recipient.toString())
             .add("deadline", this.deadline.toString())
             .add("amountOut", this.amountOut.toString());
+    }
+
+    @Override
+    public Object[] toRaw() {
+      return new Object[] {
+        this.path,
+        this.recipient,
+        this.deadline,
+        this.amountOut
+      };
     }
 }

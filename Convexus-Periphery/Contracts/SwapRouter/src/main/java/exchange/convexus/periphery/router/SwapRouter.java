@@ -33,11 +33,10 @@ import exchange.convexus.periphery.liquidity.ConvexusLiquidityManagement;
 import exchange.convexus.pool.IConvexusPool;
 import exchange.convexus.pool.PairAmounts;
 import exchange.convexus.pool.PoolData;
-import exchange.convexus.interfaces.irc2.IIRC2;
+import exchange.convexus.interfaces.irc2.IIRC2ICX;
 import exchange.convexus.utils.AddressUtils;
 import exchange.convexus.utils.BytesUtils;
 import exchange.convexus.utils.IntUtils;
-import exchange.convexus.utils.JSONUtils;
 import exchange.convexus.utils.ReentrancyLock;
 import exchange.convexus.utils.TimeUtils;
 import score.Address;
@@ -247,7 +246,7 @@ public class SwapRouter {
         // send back the tokens excess to the caller if there's any
         BigInteger excess = amountInMaximum.subtract(amountIn);
         if (excess.compareTo(ZERO) > 0) {
-            IIRC2.transfer(tokenIn, caller, excess, JSONUtils.method("excess"));
+            IIRC2ICX.transfer(tokenIn, caller, excess, "excess");
         }
 
         reentreancy.lock(false);

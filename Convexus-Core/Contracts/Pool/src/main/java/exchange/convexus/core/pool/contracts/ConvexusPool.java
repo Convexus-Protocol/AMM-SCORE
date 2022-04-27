@@ -36,7 +36,7 @@ import exchange.convexus.core.pool.contracts.models.Positions;
 import exchange.convexus.core.pool.contracts.models.TickBitmap;
 import exchange.convexus.core.pool.contracts.models.Ticks;
 import exchange.convexus.factory.Parameters;
-import exchange.convexus.interfaces.irc2.IIRC2;
+import exchange.convexus.interfaces.irc2.IIRC2ICX;
 import exchange.convexus.librairies.FixedPoint128;
 import exchange.convexus.librairies.FullMath;
 import exchange.convexus.librairies.TickMath;
@@ -55,7 +55,6 @@ import exchange.convexus.pool.StepComputations;
 import exchange.convexus.pool.SwapCache;
 import exchange.convexus.pool.SwapState;
 import exchange.convexus.pool.Tick;
-import exchange.convexus.utils.JSONUtils;
 import exchange.convexus.utils.ReentrancyLock;
 import exchange.convexus.utils.TimeUtils;
 import score.Address;
@@ -294,7 +293,7 @@ public abstract class ConvexusPool
             parameters.fee,
             parameters.tickSpacing,
             TickLib.tickSpacingToMaxLiquidityPerTick(parameters.tickSpacing),
-            "Convexus Pool (" + IIRC2.symbol(parameters.token0) + " / " + IIRC2.symbol(parameters.token1) + ")"
+            "Convexus Pool (" + IIRC2ICX.symbol(parameters.token0) + " / " + IIRC2ICX.symbol(parameters.token1) + ")"
         );
 
         // Default values
@@ -1083,7 +1082,7 @@ public abstract class ConvexusPool
     // Private methods
     // ================================================
     private void pay (Address token, Address recipient, BigInteger amount) {
-        IIRC2.transfer(token, recipient, amount, JSONUtils.method("pay"));
+        IIRC2ICX.transfer(token, recipient, amount, "pay");
     }
 
     /**
@@ -1258,14 +1257,14 @@ public abstract class ConvexusPool
      * @notice Get the pool's balance of token0
      */
     private BigInteger balance0 () {
-        return IIRC2.balanceOf(this.settings.token0, Context.getAddress());
+        return IIRC2ICX.balanceOf(this.settings.token0, Context.getAddress());
     }
 
     /**
      * @notice Get the pool's balance of token1
      */
     private BigInteger balance1 () {
-        return IIRC2.balanceOf(this.settings.token1, Context.getAddress());
+        return IIRC2ICX.balanceOf(this.settings.token1, Context.getAddress());
     }
 
     // ================================================
