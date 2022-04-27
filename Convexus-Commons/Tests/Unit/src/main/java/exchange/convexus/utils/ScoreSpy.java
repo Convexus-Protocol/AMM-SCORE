@@ -16,6 +16,7 @@
 
 package exchange.convexus.utils;
 
+import java.math.BigInteger;
 import com.iconloop.score.test.Account;
 import com.iconloop.score.test.Score;
 
@@ -36,6 +37,10 @@ public class ScoreSpy<T> {
 
   public void invoke(Account from, String method, Object... params) {
     this.score.invoke(from, method, params);
+  }
+
+  public void invoke(Account from, BigInteger value, String method, Object... params) {
+    this.score.invoke(from, value, method, params);
   }
 
   public Address getAddress () {

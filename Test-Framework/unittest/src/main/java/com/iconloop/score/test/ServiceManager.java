@@ -125,13 +125,11 @@ public class ServiceManager {
         Score from = getScoreFromClass(caller);
         if ("fallback".equals(method) || "".equals(method)) {
             getBlock().increase();
-            transferIcx(from.getAccount(), targetAddress, value);
             if (targetAddress.isContract()) {
                 call(from.getAccount(), value, targetAddress, "fallback");
             }
             return null;
         } else {
-            transferIcx(from.getAccount(), targetAddress, value);
             return call(from.getAccount(), value, targetAddress, method, params);
         }
     }
