@@ -35,6 +35,7 @@ public class ServiceManager {
     private final Map<Address, Score> addressScoreMap = new HashMap<>();
     private final Map<String, Object> storageMap = new HashMap<>();
     private final Map<Long, Map<String, Object>> frameMemoryStorage = new HashMap<>();
+    private final Map<Long, Frame> frames = new HashMap<>();
     private final Map<Long, List<Long>> frameTree = new HashMap<>();
     private final Map<String, Class<?>> storageClassMap = new HashMap<>();
     private int nextCount = 1;
@@ -127,10 +128,20 @@ public class ServiceManager {
             getBlock().increase();
             if (targetAddress.isContract()) {
                 call(from.getAccount(), value, targetAddress, "fallback");
+            } else {
+                this.pushFrame(from.getAccount(), Account.getAccount(targetAddress), false, null, value);
+                this.popFrame();
             }
             return null;
         } else {
             return call(from.getAccount(), value, targetAddress, method, params);
+        }
+    }
+
+    public void transferIcx(Account from, Account to, BigInteger value) {
+        if (value.compareTo(BigInteger.ZERO) > 0) {
+            from.subtractBalance("ICX", value);
+            to.addBalance("ICX", value);
         }
     }
 
@@ -175,17 +186,31 @@ public class ServiceManager {
     }
 
     public void revertFrame (long frameId) {
+        revertFrame(frameId, 0);
+    }
+
+    public void revertFrame (long frameId, int depth) {
+        Frame frame = getFrame(frameId);
+        if (frame == null) return;
+
         var curFrameMemory = frameMemoryStorage.get(frameId);
 
         // revert child frames
         var childFrames = frameTree.get(frameId);
         if (childFrames != null) {
             for (var childFrame : childFrames) {
-                revertFrame(childFrame);
+                revertFrame(childFrame, ++depth);
             }
         }
+        frameTree.put(frameId, new ArrayList<>());
 
         // revert current frame
+        // Give back the ICX to the origin
+        if (frame.value.compareTo(BigInteger.ZERO) > 0) {
+            frame.from.addBalance("ICX", frame.value);
+            frame.to.subtractBalance("ICX", frame.value);
+        }
+
         // Check if nothing have been written in the current frame
         if (curFrameMemory != null) {
             for (var items : curFrameMemory.entrySet()) {
@@ -193,6 +218,12 @@ public class ServiceManager {
                 writeStorage(items.getKey(), items.getValue(), storageClassMap.get(items.getKey()));
             }
         }
+        
+        this.frames.put(frame.id, null);
+    }
+
+    private Frame getFrame(long frameId) {
+        return this.frames.get(frameId);
     }
 
     public Object getStorage(String key) {
@@ -290,14 +321,18 @@ public class ServiceManager {
 
     public void pushFrame(Account from, Account to, boolean readonly, String method, BigInteger value) {
         frameId++; // Generate new frame ID for current frame
+        
+        this.transferIcx(from, to, value);
 
-        contexts.push(new Frame(from, to, readonly, method, value, frameId, frameParentId));
+        var frame = new Frame(from, to, readonly, method, value, frameId, frameParentId);
+        contexts.push(frame);
+        this.frames.put(frameId, frame);
         var childsId = frameTree.get(frameParentId);
         if (childsId == null) {
             childsId = new ArrayList<>();
             frameTree.put(frameParentId, childsId);
         }
-        childsId.add(frameId);
+        childsId.add(frame.id);
 
         frameParentId = frameId;
     }

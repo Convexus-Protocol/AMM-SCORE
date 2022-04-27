@@ -26,7 +26,6 @@ import java.math.BigInteger;
 import java.util.EmptyStackException;
 import java.util.HashMap;
 import java.util.Map;
-import com.iconloop.score.test.ServiceManager.Frame;
 
 public class Score extends TestBase {
     private static final ServiceManager sm = getServiceManager();
@@ -175,7 +174,6 @@ public class Score extends TestBase {
             }
         }
         try {
-            addIcxToDestination(value);
             Class<?> clazz = instance.getClass();
             var m = clazz.getMethod(method, paramClasses);
             var result = m.invoke(instance, params);
@@ -184,29 +182,14 @@ public class Score extends TestBase {
             Context.println("========================================");
             e.printStackTrace();
             sm.revertFrame(sm.getCurrentFrame().getId());
-            revertIcxFromDestination(sm.getCurrentFrame());
             throw new RuntimeException(e.getMessage());
         } catch (InvocationTargetException e) {
             Context.println("========================================");
             e.printStackTrace();
             sm.revertFrame(sm.getCurrentFrame().getId());
-            revertIcxFromDestination(sm.getCurrentFrame());
             throw new AssertionError(e.getTargetException().getMessage());
         } finally {
             sm.popFrame();
-        }
-    }
-
-    private void revertIcxFromDestination(Frame currentFrame) {
-        BigInteger value = currentFrame.value;
-        if (value.compareTo(BigInteger.ZERO) > 0) {
-            this.getAccount().subtractBalance("ICX", value);
-        }
-    }
-
-    private void addIcxToDestination(BigInteger value) {
-        if (value.compareTo(BigInteger.ZERO) > 0) {
-            this.getAccount().addBalance("ICX", value);
         }
     }
 }
