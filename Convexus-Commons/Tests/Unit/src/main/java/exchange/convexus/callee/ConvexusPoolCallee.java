@@ -122,8 +122,6 @@ public class ConvexusPoolCallee {
     depositedUser.set(token, oldBalance.subtract(owed));
 
     // Actually transfer the tokens
-    Context.println("Paying " + owed + " ICX to " + destination);
-    Context.println("ICX Balance = " + Context.getBalance(Context.getAddress()));
     IIRC2ICX.transfer(token, destination, owed, "pay");
   }
 
