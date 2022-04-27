@@ -33,6 +33,7 @@ import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigInteger;
 import java.util.Map;
+import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -69,7 +70,7 @@ public final class Context extends TestBase {
     }
 
     public static byte[] getTransactionHash() {
-        return null;
+        return Context.hash("sha3-256", BigInteger.valueOf(getBlockTimestamp()).toByteArray());
     }
 
     public static int getTransactionIndex() {
@@ -81,7 +82,7 @@ public final class Context extends TestBase {
     }
 
     public static BigInteger getTransactionNonce() {
-        return BigInteger.ZERO;
+        return new BigInteger(256, new Random());
     }
 
     public static Address getAddress() {

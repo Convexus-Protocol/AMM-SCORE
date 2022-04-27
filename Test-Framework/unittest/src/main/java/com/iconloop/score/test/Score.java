@@ -68,6 +68,11 @@ public class Score extends TestBase {
         call(from, false, BigInteger.ZERO, method, params);
     }
 
+    public void invoke(Account from, BigInteger value, String method, Object... params) {
+        sm.getBlock().increase();
+        call(from, false, value, method, params);
+    }
+
     private Object getReturnValue (Object returnValue) throws IllegalAccessException {
         // Nothing returned
         if (returnValue == null) {
