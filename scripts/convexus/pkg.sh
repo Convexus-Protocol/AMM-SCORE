@@ -25,6 +25,16 @@ getNonFungiblePositionManagerPkg() {
   echo "periphery/positionmgr"
 }
 
+# ReadOnlyPool
+getReadOnlyPool() {
+  echo "periphery/readonlypool"
+}
+
+# Quoter
+getQuoter() {
+  echo "periphery/quoter"
+}
+
 # NonfungibleTokenPositionDescriptor
 getNonfungibleTokenPositionDescriptorPkg() {
   echo "periphery/positiondescriptor"

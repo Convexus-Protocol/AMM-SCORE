@@ -57,6 +57,7 @@ public class ConvexusPoolReadOnly
    * @return amount0 The delta of the balance of token0 of the pool, exact when negative, minimum when positive
    * @return amount1 The delta of the balance of token1 of the pool, exact when negative, minimum when positive
    */
+  @External(readonly = true)
   public PairAmounts swap (
     Address pool,
     Address recipient,

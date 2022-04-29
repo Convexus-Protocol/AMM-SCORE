@@ -29,6 +29,8 @@ public class ExactOutputParams implements IRC2ICXParam {
     public Address recipient;
     public BigInteger deadline;
     public BigInteger amountOut;
+
+    public ExactOutputParams () {}
     
     public ExactOutputParams (
       byte[] path,

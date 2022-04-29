@@ -88,4 +88,6 @@ public class Slot0 {
         this.observationCardinalityNext = observationCardinalityNext;
         this.feeProtocol = feeProtocol;
     }
+
+    public Slot0 () {}
 }

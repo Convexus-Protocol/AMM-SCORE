@@ -45,4 +45,6 @@ public class QuoteExactOutputSingleParams {
         this.fee = fee;
         this.sqrtPriceLimitX96 = sqrtPriceLimitX96;
     }
+
+    public QuoteExactOutputSingleParams () {}
 }

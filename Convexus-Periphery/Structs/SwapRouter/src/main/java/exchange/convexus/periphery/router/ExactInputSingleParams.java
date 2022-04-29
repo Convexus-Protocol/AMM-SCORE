@@ -38,6 +38,8 @@ public class ExactInputSingleParams implements IRC2ICXParam {
     // The Q64.96 sqrt price limit
     public BigInteger sqrtPriceLimitX96;
 
+    public ExactInputSingleParams () {}
+
     public ExactInputSingleParams (
         Address tokenOut,
         int fee,

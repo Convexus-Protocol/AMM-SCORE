@@ -15,7 +15,7 @@ dependencies {
 }
 
 optimizedJar {
-    mainClassName = 'exchange.convexus.periphery.quoter.Quoter'
+    mainClassName = 'exchange.convexus.periphery.poolreadonly.ConvexusPoolReadOnly'
     from {
         configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
     }

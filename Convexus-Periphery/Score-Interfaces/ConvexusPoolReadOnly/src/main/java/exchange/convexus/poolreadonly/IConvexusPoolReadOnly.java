@@ -8,7 +8,7 @@ import score.Context;
 public class IConvexusPoolReadOnly {
 
   public static PairAmounts swap (
-    Address readonlyPool,
+    Address readOnlyPool,
     Address pool,
     Address recipient,
     boolean zeroForOne,
@@ -16,6 +16,6 @@ public class IConvexusPoolReadOnly {
     BigInteger sqrtPriceLimitX96,
     byte[] data
   ) {
-    return PairAmounts.fromMap(Context.call(readonlyPool, "swap", pool, recipient, zeroForOne, amountSpecified, sqrtPriceLimitX96, data));
+    return PairAmounts.fromMap(Context.call(readOnlyPool, "swap", pool, recipient, zeroForOne, amountSpecified, sqrtPriceLimitX96, data));
   }
 }

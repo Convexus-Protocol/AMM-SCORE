@@ -1,6 +1,7 @@
 #!/bin/bash
 
 . ./scripts/util/get_address.sh
+. ./scripts/convexus/pkg.sh
 
 if [ $# -eq 0 ]; then
   echo "Usage: $0 [endpoint]"
@@ -19,6 +20,7 @@ echo "USDC Token          : "$(getAddress "core/pools/custom-sicx-usdc/token1" $
 echo "Swap Router         : "$(getAddress "periphery/swaprouter" ${endpoint})
 echo "Position Descriptor : "$(getAddress "periphery/positiondescriptor" ${endpoint})
 echo "Position Manager    : "$(getAddress "periphery/positionmgr" ${endpoint})
+echo "Pool ReadOnly       : "$(getAddress $(getReadOnlyPool) ${endpoint})
 
 echo "=========================================================="
 

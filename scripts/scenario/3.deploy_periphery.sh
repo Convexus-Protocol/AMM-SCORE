@@ -32,4 +32,12 @@ ${setupDir}/3.2.deploy_nft_position_descriptor.sh ${network}
 info "Deploying the NFT Position Manager..."
 ${setupDir}/3.3.deploy_nft_position_manager.sh ${network}
 
+# Deploy Readonly Pool
+info "Deploying the ReadOnly Pool..."
+${setupDir}/3.4.deploy_readonly_pool.sh ${network}
+
+# Deploy Quoter
+info "Deploying the Quoter..."
+${setupDir}/3.5.deploy_quoter.sh ${network}
+
 success "All Periphery Contracts have been deployed successfully!"

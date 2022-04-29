@@ -34,6 +34,7 @@ import exchange.convexus.utils.StringUtils;
 import exchange.convexus.pool.IConvexusPool;
 import exchange.convexus.pool.PoolData;
 import exchange.convexus.pool.Slot0;
+import exchange.convexus.poolreadonly.IConvexusPoolReadOnly;
 import score.Address;
 import score.Context;
 import score.UserRevertedException;
@@ -53,7 +54,7 @@ public class Quoter {
     // Contract name
     private final String name;
     private final Address factory;
-    private final Address readonlyPool;
+    private final Address readOnlyPool;
 
     // ================================================
     // Methods
@@ -62,12 +63,12 @@ public class Quoter {
      *  Contract constructor
      */
     public Quoter (
-        Address _factory,
-        Address readonlyPool
+        Address factory,
+        Address readOnlyPool
     ) {
         this.name = "Convexus Quoter";
-        this.factory = _factory;
-        this.readonlyPool = readonlyPool;
+        this.factory = factory;
+        this.readOnlyPool = readOnlyPool;
     }
 
     /**
@@ -266,7 +267,7 @@ public class Quoter {
         Address pool = getPool(params.tokenIn, params.tokenOut, params.fee);
 
         try {
-            IConvexusPoolReadOnly.swap(this.readonlyPool,
+            IConvexusPoolReadOnly.swap(this.readOnlyPool,
                 pool, 
                 Context.getAddress(), // ZERO_ADDRESS might cause issues with some tokens
                 zeroForOne, 
@@ -348,7 +349,7 @@ public class Quoter {
         Address pool = getPool(params.tokenIn, params.tokenOut, params.fee);
 
         try {
-            IConvexusPoolReadOnly.swap(this.readonlyPool,
+            IConvexusPoolReadOnly.swap(this.readOnlyPool,
                 pool, 
                 Context.getAddress(), // ZERO_ADDRESS might cause issues with some tokens
                 zeroForOne,

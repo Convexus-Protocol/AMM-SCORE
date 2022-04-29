@@ -17,9 +17,9 @@
 package exchange.convexus.quoter;
 
 import exchange.convexus.mocks.factory.ConvexusFactoryMock;
+import exchange.convexus.periphery.poolreadonly.ConvexusPoolReadOnly;
 import exchange.convexus.periphery.positiondescriptor.NonfungibleTokenPositionDescriptor;
 import exchange.convexus.periphery.positionmgr.NonFungiblePositionManager;
-import exchange.convexus.periphery.quoter.ConvexusPoolReadOnly;
 import exchange.convexus.periphery.quoter.Quoter;
 import exchange.convexus.periphery.router.SwapRouter;
 import exchange.convexus.test.ConvexusTest;

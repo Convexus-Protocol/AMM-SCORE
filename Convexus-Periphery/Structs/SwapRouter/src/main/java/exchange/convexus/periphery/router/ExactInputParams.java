@@ -33,6 +33,8 @@ public class ExactInputParams implements IRC2ICXParam {
     public BigInteger deadline;
     // The maximum amount of token0 willing to be swapped for the specified amountOut of token1
     public BigInteger amountOutMinimum;
+
+    public ExactInputParams () {}
     
     public ExactInputParams (
       byte[] path,

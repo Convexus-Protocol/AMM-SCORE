@@ -37,6 +37,8 @@ public class ExactOutputSingleParams implements IRC2ICXParam {
   public BigInteger amountOut;
   // The Q64.96 sqrt price limit
   public BigInteger sqrtPriceLimitX96;
+
+  public ExactOutputSingleParams () {}
   
   public ExactOutputSingleParams (
     Address tokenOut, 
