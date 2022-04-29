@@ -1,13 +1,13 @@
 package exchange.convexus.poolreadonly;
 
 import java.math.BigInteger;
-import exchange.convexus.pool.PairAmounts;
+import exchange.convexus.periphery.poolreadonly.SwapResult;
 import score.Address;
 import score.Context;
 
 public class IConvexusPoolReadOnly {
 
-  public static PairAmounts swap (
+  public static SwapResult swap (
     Address readOnlyPool,
     Address pool,
     Address recipient,
@@ -16,6 +16,6 @@ public class IConvexusPoolReadOnly {
     BigInteger sqrtPriceLimitX96,
     byte[] data
   ) {
-    return PairAmounts.fromMap(Context.call(readOnlyPool, "swap", pool, recipient, zeroForOne, amountSpecified, sqrtPriceLimitX96, data));
+    return SwapResult.fromMap(Context.call(readOnlyPool, "swap", pool, recipient, zeroForOne, amountSpecified, sqrtPriceLimitX96, data));
   }
 }

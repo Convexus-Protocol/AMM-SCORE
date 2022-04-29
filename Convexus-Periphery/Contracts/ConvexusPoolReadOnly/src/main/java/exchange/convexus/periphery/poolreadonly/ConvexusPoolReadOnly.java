@@ -19,14 +19,13 @@ package exchange.convexus.periphery.poolreadonly;
 import static java.math.BigInteger.ZERO;
 
 import java.math.BigInteger;
-import exchange.convexus.core.interfaces.poolcallee.IConvexusPoolCallee;
+import exchange.convexus.core.interfaces.poolcallee.IConvexusPoolCalleeReadOnly;
 import exchange.convexus.core.librairies.LiquidityMath;
 import exchange.convexus.core.librairies.SwapMath;
 import exchange.convexus.librairies.FixedPoint128;
 import exchange.convexus.librairies.FullMath;
 import exchange.convexus.librairies.TickMath;
 import exchange.convexus.pool.IConvexusPool;
-import exchange.convexus.pool.PairAmounts;
 import exchange.convexus.pool.Slot0;
 import exchange.convexus.pool.StepComputations;
 import exchange.convexus.pool.SwapCache;
@@ -58,7 +57,7 @@ public class ConvexusPoolReadOnly
    * @return amount1 The delta of the balance of token1 of the pool, exact when negative, minimum when positive
    */
   @External(readonly = true)
-  public PairAmounts swap (
+  public SwapResult swap (
     Address pool,
     Address recipient,
     boolean zeroForOne,
@@ -240,12 +239,10 @@ public class ConvexusPoolReadOnly
 
     // do the transfers and collect payment
     if (zeroForOne) {
-      IConvexusPoolCallee.convexusSwapCallbackReadonly(caller, amount0, amount1, data, _slot0);
+      return IConvexusPoolCalleeReadOnly.convexusSwapCallbackReadonly(caller, amount0, amount1, data, _slot0.sqrtPriceX96, _slot0.tick);
     } else {
-      IConvexusPoolCallee.convexusSwapCallbackReadonly(caller, amount0, amount1, data, _slot0);
+      return IConvexusPoolCalleeReadOnly.convexusSwapCallbackReadonly(caller, amount0, amount1, data, _slot0.sqrtPriceX96, _slot0.tick);
     }
-
-    return new PairAmounts(amount0, amount1);
   }
 
   // ================================================

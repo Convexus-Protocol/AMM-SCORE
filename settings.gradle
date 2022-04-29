@@ -15,6 +15,7 @@ include (
   ':Convexus-Core:Score-Interfaces:Factory',
   ':Convexus-Core:Score-Interfaces:Pool',
   ':Convexus-Core:Score-Interfaces:ConvexusPoolCallee',
+  ':Convexus-Core:Score-Interfaces:ConvexusPoolCalleeReadOnly',
   // Interfaces
   ':Convexus-Core:Interfaces:ConvexusPoolDeployer',
   ':Convexus-Core:Interfaces:Observations',
@@ -76,6 +77,7 @@ include (
   ':Convexus-Periphery:Score-Interfaces:NonFungiblePositionManager',
   ':Convexus-Periphery:Score-Interfaces:Timelock',
   ':Convexus-Periphery:Score-Interfaces:CXS',
+  ':Convexus-Periphery:Score-Interfaces:ConvexusPoolCalleeReadOnly',
 
   // Structs
   ':Convexus-Periphery:Structs:CXS',
@@ -84,6 +86,7 @@ include (
   ':Convexus-Periphery:Structs:Governor',
   ':Convexus-Periphery:Structs:SwapRouter',
   ':Convexus-Periphery:Structs:PairFlash',
+  ':Convexus-Periphery:Structs:ConvexusPoolReadOnly',
 
   // Unit tests
   ':Convexus-Periphery:Tests:Unit:SwapRouter',

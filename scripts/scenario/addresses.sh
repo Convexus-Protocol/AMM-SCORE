@@ -21,6 +21,7 @@ echo "Swap Router         : "$(getAddress "periphery/swaprouter" ${endpoint})
 echo "Position Descriptor : "$(getAddress "periphery/positiondescriptor" ${endpoint})
 echo "Position Manager    : "$(getAddress "periphery/positionmgr" ${endpoint})
 echo "Pool ReadOnly       : "$(getAddress $(getReadOnlyPool) ${endpoint})
+echo "Quoter              : "$(getAddress $(getQuoter) ${endpoint})
 
 echo "=========================================================="
 

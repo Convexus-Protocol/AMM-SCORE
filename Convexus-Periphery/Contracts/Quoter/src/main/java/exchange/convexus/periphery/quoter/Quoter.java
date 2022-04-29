@@ -22,22 +22,17 @@ import static java.math.BigInteger.ZERO;
 
 import java.math.BigInteger;
 
-import com.eclipsesource.json.Json;
-import com.eclipsesource.json.JsonObject;
 import exchange.convexus.librairies.TickMath;
 import exchange.convexus.periphery.librairies.Path;
 import exchange.convexus.periphery.librairies.PoolAddressLib;
+import exchange.convexus.periphery.poolreadonly.SwapResult;
 import exchange.convexus.utils.AddressUtils;
 import exchange.convexus.utils.BytesUtils;
-import exchange.convexus.utils.JSONUtils;
-import exchange.convexus.utils.StringUtils;
 import exchange.convexus.pool.IConvexusPool;
 import exchange.convexus.pool.PoolData;
-import exchange.convexus.pool.Slot0;
 import exchange.convexus.poolreadonly.IConvexusPoolReadOnly;
 import score.Address;
 import score.Context;
-import score.UserRevertedException;
 import score.annotation.External;
 
 /**
@@ -83,11 +78,12 @@ public class Quoter {
     }
 
     @External(readonly = true)
-    public void convexusSwapCallbackReadonly (
+    public SwapResult convexusSwapCallbackReadonly (
         BigInteger amount0Delta,
         BigInteger amount1Delta,
         byte[] path,
-        Slot0 slot0
+        BigInteger sqrtPriceX96,
+        int tick
     ) {
         Context.require(
             amount0Delta.compareTo(ZERO) > 0 
@@ -111,53 +107,24 @@ public class Quoter {
             amountReceived = amount0Delta.negate();
         }
 
-        BigInteger sqrtPriceX96After = slot0.sqrtPriceX96;
-        int tickAfter = slot0.tick;
-
-        JsonObject reason = Json.object()
-            .add("sqrtPriceX96After", sqrtPriceX96After.toString())
-            .add("tickAfter", BigInteger.valueOf(tickAfter).toString());
-
-        if (isExactInput) {
-            reason.add("amountOut", amountReceived.toString());
-        } else {
-            reason.add("amountOut", amountToPay.toString());
-        }
-
-        // Revert at the end no matter what, so the quoter can catch the reason
-        Context.revert(reason.toString());
+        BigInteger sqrtPriceX96After = sqrtPriceX96;
+        int tickAfter = tick;
+        BigInteger amountOut = isExactInput ? amountReceived : amountToPay;
+        Context.println("amountOut=" + amountOut);
+        Context.println("sqrtPriceX96After=" + sqrtPriceX96After);
+        Context.println("tickAfter=" + tickAfter);
+        return new SwapResult(amountOut, sqrtPriceX96After, tickAfter);
     }
 
-    /**
-     * @dev Parses a revert reason that should contain the numeric quote
-     */
-    private RevertReason parseRevertReason (String reason) {
-        final String prefix = "Reverted(0): ";
-
-        // A manual reverted reason should start with the prefix as expected
-        Context.require(reason.startsWith(prefix), reason);
-
-        // Remove the prefixed error message from Context.revert()
-        reason = reason.substring(prefix.length());
-
-        JsonObject json = JSONUtils.parse(reason);
-        BigInteger amountReceived = StringUtils.toBigInt(json.get("amountOut").asString());
-        BigInteger sqrtPriceX96After = StringUtils.toBigInt(json.get("sqrtPriceX96After").asString());
-        int tickAfter = StringUtils.toBigInt(json.get("tickAfter").asString()).intValue();
-        return new RevertReason(amountReceived, sqrtPriceX96After, tickAfter);
-    }
-
-    private QuoteResult handleRevert (
-        String reason,
+    private QuoteResult handleResult (
+        SwapResult swapResult,
         Address pool
     ) {
         var slot0 = IConvexusPool.slot0(pool);
         int tickBefore = slot0.tick;
-        var result = parseRevertReason(reason);
-
-        int initializedTicksCrossed = countInitializedTicksCrossed(pool, tickBefore, result.tickAfter);
+        int initializedTicksCrossed = countInitializedTicksCrossed(pool, tickBefore, swapResult.tickAfter);
         
-        return new QuoteResult(result.amount, result.sqrtPriceX96After, initializedTicksCrossed);
+        return new QuoteResult(swapResult.amount, swapResult.sqrtPriceX96After, initializedTicksCrossed);
     }
 
     private BigInteger tickBitmap (Address pool, int pos) {
@@ -266,8 +233,7 @@ public class Quoter {
         boolean zeroForOne = AddressUtils.compareTo(params.tokenIn, params.tokenOut) < 0;
         Address pool = getPool(params.tokenIn, params.tokenOut, params.fee);
 
-        try {
-            IConvexusPoolReadOnly.swap(this.readOnlyPool,
+        var result = IConvexusPoolReadOnly.swap(this.readOnlyPool,
                 pool, 
                 Context.getAddress(), // ZERO_ADDRESS might cause issues with some tokens
                 zeroForOne, 
@@ -277,11 +243,8 @@ public class Quoter {
                     : params.sqrtPriceLimitX96,
                 Path.encodePath(new PoolData(params.tokenIn, params.tokenOut, params.fee))
             );
-        } catch (UserRevertedException | AssertionError exception) {
-            return handleRevert(exception.getMessage(), pool);
-        }
-
-        return null;
+        
+        return handleResult(result, pool);
     }
 
     /// @notice Returns the amount out received for a given exact input swap without executing the swap
@@ -348,25 +311,21 @@ public class Quoter {
         boolean zeroForOne = AddressUtils.compareTo(params.tokenIn, params.tokenOut) < 0;
         Address pool = getPool(params.tokenIn, params.tokenOut, params.fee);
 
-        try {
-            IConvexusPoolReadOnly.swap(this.readOnlyPool,
-                pool, 
-                Context.getAddress(), // ZERO_ADDRESS might cause issues with some tokens
-                zeroForOne,
-                params.amount.negate(),
-                params.sqrtPriceLimitX96.equals(ZERO)
-                    ? (zeroForOne ? TickMath.MIN_SQRT_RATIO.add(ONE) : TickMath.MAX_SQRT_RATIO.subtract(ONE))
-                    : params.sqrtPriceLimitX96,
-                BytesUtils.concat(
-                    params.tokenOut.toByteArray(), 
-                    BytesUtils.intToBytes(params.fee), 
-                    params.tokenIn.toByteArray())
-            );
-        } catch (UserRevertedException exception) {
-            return handleRevert(exception.getMessage(), pool);
-        }
+        var result = IConvexusPoolReadOnly.swap(this.readOnlyPool,
+            pool, 
+            Context.getAddress(), // ZERO_ADDRESS might cause issues with some tokens
+            zeroForOne,
+            params.amount.negate(),
+            params.sqrtPriceLimitX96.equals(ZERO)
+                ? (zeroForOne ? TickMath.MIN_SQRT_RATIO.add(ONE) : TickMath.MAX_SQRT_RATIO.subtract(ONE))
+                : params.sqrtPriceLimitX96,
+            BytesUtils.concat(
+                params.tokenOut.toByteArray(), 
+                BytesUtils.intToBytes(params.fee), 
+                params.tokenIn.toByteArray())
+        );
 
-        return null;
+        return handleResult(result, pool);
     }
 
     /**
