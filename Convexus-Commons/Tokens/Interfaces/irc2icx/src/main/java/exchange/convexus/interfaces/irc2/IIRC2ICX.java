@@ -39,7 +39,7 @@ public class IIRC2ICX {
     }
   }
 
-  public static void transfer (Address token, Address destination, BigInteger value, String method, Parameterizable params) {
+  public static void transfer (Address token, Address destination, BigInteger value, String method, IRC2ICXParam params) {
     if (ICX.isICX(token)) {
       ICX.transfer(destination, value, method + "Icx", params.toRaw());
     } else {

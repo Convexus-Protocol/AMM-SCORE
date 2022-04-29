@@ -20,11 +20,11 @@ import java.math.BigInteger;
 
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonObject;
-import exchange.convexus.interfaces.irc2.Parameterizable;
+import exchange.convexus.interfaces.irc2.IRC2ICXParam;
 import exchange.convexus.utils.StringUtils;
 import score.Address;
 
-public class ExactOutputParams implements Parameterizable {
+public class ExactOutputParams implements IRC2ICXParam {
     public byte[] path;
     public Address recipient;
     public BigInteger deadline;

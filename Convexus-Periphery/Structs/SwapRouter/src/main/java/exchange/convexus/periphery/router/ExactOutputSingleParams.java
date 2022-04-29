@@ -20,11 +20,11 @@ import java.math.BigInteger;
 
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonObject;
-import exchange.convexus.interfaces.irc2.Parameterizable;
+import exchange.convexus.interfaces.irc2.IRC2ICXParam;
 import exchange.convexus.utils.StringUtils;
 import score.Address;
 
-public class ExactOutputSingleParams implements Parameterizable {
+public class ExactOutputSingleParams implements IRC2ICXParam {
   // The contract address of the outbound token
   public Address tokenOut;
   // The fee tier of the pool, used to determine the correct pool contract in which to execute 
