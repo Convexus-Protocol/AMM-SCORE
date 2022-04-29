@@ -17,18 +17,21 @@ dependencies {
     implementation project(':Convexus-Commons:Tests:Unit:Utils')
     implementation project(':Convexus-Commons:Tests:Unit:ConvexusFactory')
     implementation project(':Convexus-Commons:Tests:Unit:ConvexusLiquidity')
-    implementation project(':Convexus-Commons:Tests:Unit:ConvexusPool')
-    implementation project(':Convexus-Commons:Tests:Unit:ConvexusPoolCallee')
     implementation project(':Convexus-Commons:Tests:Unit:ConvexusPoolInitializer')
-    implementation project(':Convexus-Commons:Tests:Unit:ConvexusReentrantCallee')
-    implementation project(':Convexus-Commons:Tests:Unit:ConvexusSwapPay')
     implementation project(':Convexus-Commons:Tests:Unit:NFTPosition')
     implementation project(':Convexus-Commons:Tests:Unit:Staker')
     implementation project(':Convexus-Commons:Tests:Unit:SwapRouter')
-    implementation project(':Convexus-Commons:Tests:Unit:Tokens')
+    implementation project(':Convexus-Commons:Tests:Contracts:Tokens')
     
     /// Core ///
     implementation project(':Convexus-Core:Contracts:Pool')
+    implementation project(':Convexus-Core:Tests:Mocks:Pool')
+    implementation project(':Convexus-Core:Tests:Mocks:Factory')
+    // Test Contracts
+    implementation project(':Convexus-Core:Tests:Contracts:Pool')
+    implementation project(':Convexus-Core:Tests:Contracts:ConvexusPoolCallee')
+    implementation project(':Convexus-Core:Tests:Contracts:ConvexusReentrantCallee')
+    implementation project(':Convexus-Core:Tests:Contracts:ConvexusSwapPay')
     
     /// Periphery
     implementation project(':Convexus-Periphery:Contracts:SwapRouter')

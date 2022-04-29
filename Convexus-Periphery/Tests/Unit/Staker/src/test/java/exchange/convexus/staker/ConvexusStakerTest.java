@@ -25,16 +25,13 @@ import static java.math.BigInteger.ZERO;
 import java.math.BigInteger;
 
 import com.iconloop.score.test.Account;
-
-import exchange.convexus.test.factory.ConvexusFactoryMock;
+import exchange.convexus.mocks.factory.ConvexusFactoryMock;
 import exchange.convexus.test.factory.ConvexusFactoryUtils;
 import exchange.convexus.test.liquidity.ConvexusLiquidityUtils;
 import exchange.convexus.test.nft.NFTUtils;
 import exchange.convexus.periphery.positiondescriptor.NonfungibleTokenPositionDescriptor;
 import exchange.convexus.periphery.positionmgr.NonFungiblePositionManager;
 import exchange.convexus.periphery.staker.ConvexusStaker;
-import exchange.convexus.test.pool.Pool1;
-import exchange.convexus.test.pool.Pool2;
 import exchange.convexus.test.staker.ConvexusStakerUtils;
 import exchange.convexus.positionmgr.DecreaseLiquidityParams;
 import exchange.convexus.positionmgr.PositionInformation;
@@ -43,6 +40,8 @@ import exchange.convexus.test.tokens.Sicx;
 import exchange.convexus.test.tokens.Usdc;
 import exchange.convexus.test.tokens.Baln;
 import exchange.convexus.test.ConvexusTest;
+import exchange.convexus.test.contracts.pool.Pool1;
+import exchange.convexus.test.contracts.pool.Pool2;
 import exchange.convexus.utils.IntUtils;
 import exchange.convexus.utils.ScoreSpy;
 import static exchange.convexus.utils.TimeUtils.now;

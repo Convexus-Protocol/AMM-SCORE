@@ -31,7 +31,7 @@ import exchange.convexus.test.ConvexusTest;
 import exchange.convexus.test.liquidity.ConvexusLiquidityUtils;
 import exchange.convexus.test.nft.NFTUtils;
 import exchange.convexus.periphery.quoter.QuoteExactInputSingleParams;
-import exchange.convexus.test.pool.ConvexusPoolMock;
+import exchange.convexus.mocks.pool.ConvexusPoolMock;
 import exchange.convexus.pool.Slot0;
 import exchange.convexus.test.swaprouter.SwapRouterUtils;
 import exchange.convexus.utils.ScoreSpy;

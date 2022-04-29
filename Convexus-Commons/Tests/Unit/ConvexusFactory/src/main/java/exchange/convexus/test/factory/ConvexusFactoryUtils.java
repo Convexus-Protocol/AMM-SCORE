@@ -25,6 +25,7 @@ import static org.mockito.Mockito.verify;
 import com.iconloop.score.test.Account;
 import score.Address;
 import exchange.convexus.core.contracts.factory.ConvexusFactory;
+import exchange.convexus.mocks.factory.ConvexusFactoryMock;
 import exchange.convexus.test.factory.ConvexusFactoryUtils;
 
 public class ConvexusFactoryUtils {

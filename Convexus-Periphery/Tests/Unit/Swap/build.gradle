@@ -10,6 +10,8 @@ dependencies {
     testImplementation project(':Convexus-Commons:Tests:Unit:Utils')
     testImplementation project(':Convexus-Commons:Tests:Unit:ConvexusTest')
 
+    testImplementation project(':Convexus-Core:Tests:Mocks:Factory')
+    
     testImplementation project(':Convexus-Periphery:Contracts:Swap')
 }
 

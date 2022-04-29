@@ -26,10 +26,19 @@ include (
   ':Convexus-Core:Structs:Factory',
   ':Convexus-Core:Structs:Pool',
 
-  // Tests
+  // Unit tests
   ':Convexus-Core:Tests:Unit:Factory',
   ':Convexus-Core:Tests:Unit:Pool',
+  // Mocks
+  ':Convexus-Core:Tests:Mocks:Pool',
+  ':Convexus-Core:Tests:Mocks:Factory',
+  // Test Contracts
+  ':Convexus-Core:Tests:Contracts:Pool',
+  ':Convexus-Core:Tests:Contracts:ConvexusPoolCallee',
+  ':Convexus-Core:Tests:Contracts:ConvexusReentrantCallee',
+  ':Convexus-Core:Tests:Contracts:ConvexusSwapPay',
 
+  // Integration tests
   ':Convexus-Core:Tests:Integration:Score',
   ':Convexus-Core:Tests:Integration:Factory',
   ':Convexus-Core:Tests:Integration:Pool',
@@ -70,7 +79,7 @@ include (
   ':Convexus-Periphery:Structs:SwapRouter',
   ':Convexus-Periphery:Structs:PairFlash',
 
-  // Tests
+  // Unit tests
   ':Convexus-Periphery:Tests:Unit:SwapRouter',
   ':Convexus-Periphery:Tests:Unit:LiquidityManagement',
   ':Convexus-Periphery:Tests:Unit:NonFungiblePositionManager',
@@ -85,7 +94,8 @@ include (
   ':Convexus-Periphery:Tests:Unit:Staker',
   ':Convexus-Periphery:Tests:Unit:Clients',
   ':Convexus-Periphery:Tests:Unit:Librairies',
-
+  // Test Contracts
+  // Integration tests
   ':Convexus-Periphery:Tests:Integration:Score',
   ':Convexus-Periphery:Tests:Integration:SwapRouter',
 
@@ -98,19 +108,16 @@ include (
   // Units
   ':Convexus-Commons:Tests:Unit:ConvexusTest',
   ':Convexus-Commons:Tests:Unit:ConvexusFactory',
-  ':Convexus-Commons:Tests:Unit:ConvexusPool',
   ':Convexus-Commons:Tests:Unit:ConvexusPoolInitializer',
-  ':Convexus-Commons:Tests:Unit:ConvexusSwapPay',
   ':Convexus-Commons:Tests:Unit:Staker',
-  ':Convexus-Commons:Tests:Unit:Tokens',
   ':Convexus-Commons:Tests:Unit:ConvexusLiquidity',
-  ':Convexus-Commons:Tests:Unit:ConvexusPoolCallee',
-  ':Convexus-Commons:Tests:Unit:ConvexusReentrantCallee',
   ':Convexus-Commons:Tests:Unit:NFTPosition',
   ':Convexus-Commons:Tests:Unit:SwapRouter',
   ':Convexus-Commons:Tests:Unit:Utils',
   // Integration
   ':Convexus-Commons:Tests:Integration',
+  // Test contracts
+  ':Convexus-Commons:Tests:Contracts:Tokens',
   
   // -----------------------
   // --- Tokens Common ---

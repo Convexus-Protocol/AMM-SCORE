@@ -9,5 +9,6 @@ dependencies {
     implementation project(':Convexus-Commons:Tests:Unit:Utils')
     /// Core ///
     implementation project(':Convexus-Core:Contracts:Factory')
+    implementation project(':Convexus-Core:Tests:Mocks:Factory')
     implementation project(':Convexus-Core:Interfaces:ConvexusPoolDeployer')
 }

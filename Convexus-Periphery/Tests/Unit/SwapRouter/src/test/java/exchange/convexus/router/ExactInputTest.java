@@ -24,9 +24,8 @@ import com.iconloop.score.test.ServiceManager;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import exchange.convexus.test.pool.Pool1;
-import exchange.convexus.test.pool.Pool2;
+import exchange.convexus.test.contracts.pool.Pool1;
+import exchange.convexus.test.contracts.pool.Pool2;
 import score.Address;
 
 public class ExactInputTest extends SwapRouterTest {

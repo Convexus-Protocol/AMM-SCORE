@@ -1,0 +1,18 @@
+dependencies {
+    compileOnly 'foundation.icon:javaee-api:0.9.0'
+    implementation 'org.mockito:mockito-inline:3.11.0'
+
+    implementation project(':Test-Framework:unittest')
+    
+    /// Commons ///
+    implementation project(':Convexus-Commons:Utils')
+    implementation project(':Convexus-Commons:Tests:Unit:Utils')
+    /// Core ///
+    implementation project(':Convexus-Core:Structs:Factory')
+    implementation project(':Convexus-Core:Contracts:Pool')
+    implementation project(':Convexus-Core:Interfaces:ConvexusPoolDeployer')
+    implementation project(':Convexus-Core:Interfaces:Observations')
+    implementation project(':Convexus-Core:Interfaces:Positions')
+    implementation project(':Convexus-Core:Interfaces:TickBitmap')
+    implementation project(':Convexus-Core:Interfaces:Ticks')
+}

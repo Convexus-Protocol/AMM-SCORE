@@ -16,7 +16,7 @@
 
 package exchange.convexus.initializer;
 
-import exchange.convexus.test.factory.ConvexusFactoryMock;
+import exchange.convexus.mocks.factory.ConvexusFactoryMock;
 import exchange.convexus.periphery.initializer.ConvexusPoolInitializer;
 import exchange.convexus.test.ConvexusTest;
 import exchange.convexus.utils.ScoreSpy;

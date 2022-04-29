@@ -24,9 +24,8 @@ import com.iconloop.score.test.ServiceManager;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import exchange.convexus.test.pool.Pool1;
-import exchange.convexus.test.pool.Pool2;
+import exchange.convexus.test.contracts.pool.Pool1;
+import exchange.convexus.test.contracts.pool.Pool2;
 import exchange.convexus.utils.ICX;
 import score.Address;
 
@@ -48,14 +47,14 @@ public class ExactInputSingleIcxTest extends SwapRouterTest {
     Address pool = (Address) factory.call("getPool", ICX.getAddress(), usdc.getAddress(), FEE_AMOUNTS[MEDIUM]);
 
     // get balances before
-    var poolBefore = getBalancesIcx(pool);
-    var traderBefore = getBalancesIcx(trader.getAddress());
+    BigInteger[] poolBefore = getBalancesIcx(pool);
+    BigInteger[] traderBefore = getBalancesIcx(trader.getAddress());
 
     exactInputSingleIcx(usdc.score);
 
     // get balances after
-    var poolAfter = getBalancesIcx(pool);
-    var traderAfter = getBalancesIcx(trader.getAddress());
+    BigInteger[] poolAfter = getBalancesIcx(pool);
+    BigInteger[] traderAfter = getBalancesIcx(trader.getAddress());
 
     assertEquals(traderAfter[0], traderBefore[0].subtract(BigInteger.valueOf(3)));
     assertEquals(traderAfter[1], traderBefore[1].add(BigInteger.valueOf(1)));
@@ -68,14 +67,14 @@ public class ExactInputSingleIcxTest extends SwapRouterTest {
     Address pool = (Address) factory.call("getPool", usdc.getAddress(), ICX.getAddress(), FEE_AMOUNTS[MEDIUM]);
 
     // get balances before
-    var poolBefore = getBalancesIcx(pool);
-    var traderBefore = getBalancesIcx(trader.getAddress());
+    BigInteger[] poolBefore = getBalancesIcx(pool);
+    BigInteger[] traderBefore = getBalancesIcx(trader.getAddress());
     
     exactInputSingleToIcx(usdc.score);
 
     // get balances after
-    var poolAfter = getBalancesIcx(pool);
-    var traderAfter = getBalancesIcx(trader.getAddress());
+    BigInteger[] poolAfter = getBalancesIcx(pool);
+    BigInteger[] traderAfter = getBalancesIcx(trader.getAddress());
 
     assertEquals(traderAfter[0], traderBefore[0].add(BigInteger.valueOf(1)));
     assertEquals(traderAfter[1], traderBefore[1].subtract(BigInteger.valueOf(3)));

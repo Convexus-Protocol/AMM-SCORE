@@ -13,6 +13,8 @@ dependencies {
     
     testImplementation project(':Convexus-Core:Contracts:Factory')
 
+    testImplementation project(':Convexus-Core:Tests:Mocks:Factory')
+    
     testImplementation project(':Convexus-Periphery:Contracts:PoolInitializer')
 
     

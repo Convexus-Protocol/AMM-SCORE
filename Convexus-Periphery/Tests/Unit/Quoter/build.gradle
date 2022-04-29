@@ -10,15 +10,18 @@ dependencies {
     testImplementation project(':Convexus-Commons:Utils')
     testImplementation project(':Convexus-Commons:Tests:Unit:Utils')
     testImplementation project(':Convexus-Commons:Tests:Unit:ConvexusTest')
-    testImplementation project(':Convexus-Commons:Tests:Unit:ConvexusPool')
+    testImplementation project(':Convexus-Core:Tests:Contracts:Pool')
     testImplementation project(':Convexus-Commons:Tests:Unit:ConvexusFactory')
     testImplementation project(':Convexus-Commons:Tests:Unit:SwapRouter')
-    testImplementation project(':Convexus-Commons:Tests:Unit:Tokens')
+    testImplementation project(':Convexus-Commons:Tests:Contracts:Tokens')
     testImplementation project(':Convexus-Commons:Tests:Unit:ConvexusLiquidity')
     testImplementation project(':Convexus-Commons:Tests:Unit:NFTPosition')
 
     testImplementation project(':Convexus-Core:Structs:Pool')
     testImplementation project(':Convexus-Core:Structs:Factory')
+    
+    testImplementation project(':Convexus-Core:Tests:Mocks:Pool')
+    testImplementation project(':Convexus-Core:Tests:Mocks:Factory')
     
     testImplementation project(':Convexus-Periphery:Contracts:Quoter')
     testImplementation project(':Convexus-Periphery:Contracts:SwapRouter')

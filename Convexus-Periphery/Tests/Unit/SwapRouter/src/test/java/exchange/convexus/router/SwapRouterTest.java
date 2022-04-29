@@ -27,7 +27,7 @@ import java.util.List;
 import com.iconloop.score.test.Account;
 import com.iconloop.score.test.Score;
 
-import exchange.convexus.test.factory.ConvexusFactoryMock;
+import exchange.convexus.mocks.factory.ConvexusFactoryMock;
 import exchange.convexus.test.liquidity.ConvexusLiquidityUtils;
 import exchange.convexus.test.nft.NFTUtils;
 import exchange.convexus.test.swaprouter.SwapRouterUtils;

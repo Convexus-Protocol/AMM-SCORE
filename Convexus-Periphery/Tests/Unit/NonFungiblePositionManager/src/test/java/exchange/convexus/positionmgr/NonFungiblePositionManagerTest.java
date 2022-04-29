@@ -25,13 +25,13 @@ import com.iconloop.score.test.Account;
 
 import org.mockito.ArgumentCaptor;
 import exchange.convexus.core.pool.contracts.ConvexusPool;
+import exchange.convexus.mocks.factory.ConvexusFactoryMock;
 import exchange.convexus.periphery.initializer.ConvexusPoolInitializer;
 import exchange.convexus.periphery.positiondescriptor.NonfungibleTokenPositionDescriptor;
 import exchange.convexus.periphery.positionmgr.NonFungiblePositionManager;
 import exchange.convexus.periphery.router.SwapRouter;
 import exchange.convexus.pool.PairAmounts;
 import exchange.convexus.test.ConvexusTest;
-import exchange.convexus.test.factory.ConvexusFactoryMock;
 import exchange.convexus.test.tokens.Sicx;
 import exchange.convexus.test.tokens.Usdc;
 import exchange.convexus.utils.IntUtils;

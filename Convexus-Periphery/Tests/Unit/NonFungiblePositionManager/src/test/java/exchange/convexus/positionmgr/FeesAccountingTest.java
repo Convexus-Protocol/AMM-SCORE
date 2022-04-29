@@ -35,7 +35,7 @@ import org.junit.jupiter.api.Test;
 import exchange.convexus.test.ConvexusTest;
 import exchange.convexus.test.liquidity.ConvexusLiquidityUtils;
 import exchange.convexus.periphery.librairies.Path;
-import exchange.convexus.test.pool.ConvexusPoolMock;
+import exchange.convexus.mocks.pool.ConvexusPoolMock;
 import exchange.convexus.pool.PoolData;
 import exchange.convexus.test.swaprouter.SwapRouterUtils;
 import static exchange.convexus.utils.TimeUtils.now;

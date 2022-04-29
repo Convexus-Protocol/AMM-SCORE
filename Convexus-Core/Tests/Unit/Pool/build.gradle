@@ -17,6 +17,9 @@ dependencies {
 
     testImplementation project(':Convexus-Core:Contracts:Pool')
     testImplementation project(':Convexus-Core:Contracts:Factory')
+
+    testImplementation project(':Convexus-Core:Tests:Mocks:Pool')
+    testImplementation project(':Convexus-Core:Tests:Mocks:Factory')
     
     testImplementation project(':Convexus-Core:Interfaces:Positions')
     testImplementation project(':Convexus-Core:Interfaces:Observations')
@@ -24,17 +27,17 @@ dependencies {
     testImplementation project(':Convexus-Core:Interfaces:Ticks')
     testImplementation project(':Convexus-Core:Interfaces:TickBitmap')
 
+    testImplementation project(':Convexus-Core:Tests:Contracts:Pool')
+    testImplementation project(':Convexus-Core:Tests:Contracts:ConvexusReentrantCallee')
+    testImplementation project(':Convexus-Core:Tests:Contracts:ConvexusPoolCallee')
+    testImplementation project(':Convexus-Core:Tests:Contracts:ConvexusSwapPay')
+    
     // Unit tests
     testImplementation project(':Convexus-Commons:Tests:Unit:ConvexusFactory')
-    testImplementation project(':Convexus-Commons:Tests:Unit:ConvexusPoolCallee')
     testImplementation project(':Convexus-Commons:Tests:Unit:ConvexusPoolInitializer')
     testImplementation project(':Convexus-Commons:Tests:Unit:ConvexusTest')
     testImplementation project(':Convexus-Commons:Tests:Unit:ConvexusLiquidity')
-    testImplementation project(':Convexus-Commons:Tests:Unit:ConvexusPool')
-    testImplementation project(':Convexus-Commons:Tests:Unit:ConvexusReentrantCallee')
-    testImplementation project(':Convexus-Commons:Tests:Unit:ConvexusSwapPay')
-    testImplementation project(':Convexus-Commons:Tests:Unit:Tokens')
-    
+    testImplementation project(':Convexus-Commons:Tests:Contracts:Tokens')
 }
 
 test {

@@ -28,7 +28,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import exchange.convexus.test.ConvexusTest;
 import exchange.convexus.test.liquidity.ConvexusLiquidityUtils;
-import exchange.convexus.test.pool.ConvexusPoolMock;
+import exchange.convexus.mocks.pool.ConvexusPoolMock;
 import exchange.convexus.utils.AssertUtils;
 import exchange.convexus.utils.ICX;
 import static exchange.convexus.test.nft.NFTUtils.mint;

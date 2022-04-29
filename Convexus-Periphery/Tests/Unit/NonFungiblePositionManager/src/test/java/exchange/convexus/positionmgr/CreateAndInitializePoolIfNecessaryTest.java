@@ -23,7 +23,7 @@ import com.iconloop.score.test.ServiceManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import exchange.convexus.test.ConvexusTest;
-import exchange.convexus.test.pool.ConvexusPoolMock;
+import exchange.convexus.mocks.pool.ConvexusPoolMock;
 
 public class CreateAndInitializePoolIfNecessaryTest extends NonFungiblePositionManagerTest {
 
