@@ -63,6 +63,7 @@ include (
   ':Convexus-Periphery:Score-Interfaces:CXS',
 
   // Structs
+  ':Convexus-Periphery:Structs:CXS',
   ':Convexus-Periphery:Structs:NonFungiblePositionManager',
   ':Convexus-Periphery:Structs:Staker',
   ':Convexus-Periphery:Structs:Governor',
