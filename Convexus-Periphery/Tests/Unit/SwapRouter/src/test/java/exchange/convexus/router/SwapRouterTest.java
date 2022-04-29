@@ -27,21 +27,21 @@ import java.util.List;
 import com.iconloop.score.test.Account;
 import com.iconloop.score.test.Score;
 
-import exchange.convexus.factory.ConvexusFactoryMock;
-import exchange.convexus.initializer.ConvexusPoolInitializerUtils;
-import exchange.convexus.liquidity.ConvexusLiquidityUtils;
-import exchange.convexus.nft.NFTUtils;
+import exchange.convexus.test.factory.ConvexusFactoryMock;
+import exchange.convexus.test.liquidity.ConvexusLiquidityUtils;
+import exchange.convexus.test.nft.NFTUtils;
+import exchange.convexus.test.swaprouter.SwapRouterUtils;
 import exchange.convexus.periphery.librairies.Path;
 import exchange.convexus.periphery.positiondescriptor.NonfungibleTokenPositionDescriptor;
 import exchange.convexus.periphery.positionmgr.NonFungiblePositionManager;
 import exchange.convexus.periphery.router.SwapRouter;
-import exchange.convexus.testtokens.Baln;
-import exchange.convexus.testtokens.Sicx;
-import exchange.convexus.testtokens.Usdc;
+import exchange.convexus.test.tokens.Baln;
+import exchange.convexus.test.tokens.Sicx;
+import exchange.convexus.test.tokens.Usdc;
 import exchange.convexus.utils.AddressUtils;
 import exchange.convexus.utils.ArrayUtils;
 import exchange.convexus.utils.AssertUtils;
-import exchange.convexus.utils.ConvexusTest;
+import exchange.convexus.test.ConvexusTest;
 import exchange.convexus.utils.ICX;
 import exchange.convexus.utils.IntUtils;
 import exchange.convexus.utils.ScoreSpy;
@@ -105,7 +105,7 @@ public class SwapRouterTest extends ConvexusTest {
     int tickLower = getMinTick(tickSpacing);
     int tickUpper = getMaxTick(tickSpacing);
     
-    ConvexusPoolInitializerUtils.createAndInitializePoolIfNecessary(poolClass, alice, factory, token0.getAddress(), token1.getAddress(), fee, encodePriceSqrt(1, 1), tickSpacing);
+    ConvexusTest.createAndInitializePoolIfNecessary(poolClass, alice, factory, token0.getAddress(), token1.getAddress(), fee, encodePriceSqrt(1, 1), tickSpacing);
     
     ConvexusLiquidityUtils.deposit(alice, nft.getAddress(), token0, BigInteger.valueOf(1000000));
     ConvexusLiquidityUtils.deposit(alice, nft.getAddress(), token1, BigInteger.valueOf(1000000));
@@ -135,7 +135,7 @@ public class SwapRouterTest extends ConvexusTest {
     int tickLower = getMinTick(tickSpacing);
     int tickUpper = getMaxTick(tickSpacing);
     
-    ConvexusPoolInitializerUtils.createAndInitializePoolIfNecessary(poolClass, alice, factory, ICX.getAddress(), token1.getAddress(), fee, encodePriceSqrt(1, 1), tickSpacing);
+    ConvexusTest.createAndInitializePoolIfNecessary(poolClass, alice, factory, ICX.getAddress(), token1.getAddress(), fee, encodePriceSqrt(1, 1), tickSpacing);
     
     ConvexusLiquidityUtils.depositIcx(alice, nft, BigInteger.valueOf(1000000));
     ConvexusLiquidityUtils.deposit(alice, nft.getAddress(), token1, BigInteger.valueOf(1000000));

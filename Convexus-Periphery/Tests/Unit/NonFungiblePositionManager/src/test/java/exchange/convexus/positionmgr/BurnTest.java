@@ -17,8 +17,8 @@
 package exchange.convexus.positionmgr;
 
 import static java.math.BigInteger.ZERO;
-import static exchange.convexus.nft.NFTUtils.decreaseLiquidity;
-import static exchange.convexus.nft.NFTUtils.mint;
+import static exchange.convexus.test.nft.NFTUtils.decreaseLiquidity;
+import static exchange.convexus.test.nft.NFTUtils.mint;
 import static exchange.convexus.utils.TimeUtils.now;
 import static java.math.BigInteger.ONE;
 
@@ -28,10 +28,9 @@ import com.iconloop.score.test.ServiceManager;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import exchange.convexus.initializer.ConvexusPoolInitializerUtils;
-import exchange.convexus.liquidity.ConvexusLiquidityUtils;
-import exchange.convexus.pool.ConvexusPoolMock;
+import exchange.convexus.test.ConvexusTest;
+import exchange.convexus.test.liquidity.ConvexusLiquidityUtils;
+import exchange.convexus.test.pool.ConvexusPoolMock;
 import exchange.convexus.utils.AssertUtils;
 import exchange.convexus.utils.IntUtils;
 
@@ -47,7 +46,7 @@ public class BurnTest extends NonFungiblePositionManagerTest {
     setup_initializer();
 
     // create a position
-    ConvexusPoolInitializerUtils.createAndInitializePoolIfNecessary(ConvexusPoolMock.class, alice, factory, sicx.getAddress(), usdc.getAddress(), FEE_AMOUNTS[MEDIUM], encodePriceSqrt(ONE, ONE), tickSpacing);
+    ConvexusTest.createAndInitializePoolIfNecessary(ConvexusPoolMock.class, alice, factory, sicx.getAddress(), usdc.getAddress(), FEE_AMOUNTS[MEDIUM], encodePriceSqrt(ONE, ONE), tickSpacing);
 
     final BigInteger hundred = BigInteger.valueOf(100);
     ConvexusLiquidityUtils.deposit(alice, nft.getAddress(), sicx.score, hundred);

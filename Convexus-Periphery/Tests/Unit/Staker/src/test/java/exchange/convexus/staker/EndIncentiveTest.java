@@ -34,6 +34,7 @@ import org.junit.jupiter.api.Test;
 import exchange.convexus.periphery.staker.IncentiveId;
 import exchange.convexus.utils.AssertUtils;
 import score.Address;
+import exchange.convexus.test.staker.ConvexusStakerUtils;
 
 public class EndIncentiveTest extends ConvexusStakerTest {
 

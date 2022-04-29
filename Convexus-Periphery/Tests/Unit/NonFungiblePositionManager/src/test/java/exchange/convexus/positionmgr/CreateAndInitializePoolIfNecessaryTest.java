@@ -22,9 +22,8 @@ import com.iconloop.score.test.ServiceManager;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import exchange.convexus.initializer.ConvexusPoolInitializerUtils;
-import exchange.convexus.pool.ConvexusPoolMock;
+import exchange.convexus.test.ConvexusTest;
+import exchange.convexus.test.pool.ConvexusPoolMock;
 
 public class CreateAndInitializePoolIfNecessaryTest extends NonFungiblePositionManagerTest {
 
@@ -38,6 +37,6 @@ public class CreateAndInitializePoolIfNecessaryTest extends NonFungiblePositionM
 
   @Test
   void testCreateAndInitializePoolIfNecessary () {
-    ConvexusPoolInitializerUtils.createAndInitializePoolIfNecessary(ConvexusPoolMock.class, alice, factory, sicx.getAddress(), usdc.getAddress(), FEE_AMOUNTS[MEDIUM], encodePriceSqrt(ONE, ONE), tickSpacing);
+    ConvexusTest.createAndInitializePoolIfNecessary(ConvexusPoolMock.class, alice, factory, sicx.getAddress(), usdc.getAddress(), FEE_AMOUNTS[MEDIUM], encodePriceSqrt(ONE, ONE), tickSpacing);
   }
 }

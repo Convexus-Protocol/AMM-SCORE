@@ -1,0 +1,10 @@
+dependencies {
+    compileOnly 'foundation.icon:javaee-api:0.9.0'
+    implementation 'org.mockito:mockito-inline:3.11.0'
+
+    /// Commons ///
+    implementation project(':Convexus-Commons:Utils')
+    implementation project(':Convexus-Commons:Tests:Unit:Utils')
+    /// Core ///
+    implementation project(':Convexus-Core:Contracts:Factory')
+}

@@ -66,6 +66,8 @@ include (
   ':Convexus-Periphery:Structs:NonFungiblePositionManager',
   ':Convexus-Periphery:Structs:Staker',
   ':Convexus-Periphery:Structs:Governor',
+  ':Convexus-Periphery:Structs:SwapRouter',
+  ':Convexus-Periphery:Structs:PairFlash',
 
   // Tests
   ':Convexus-Periphery:Tests:Unit:SwapRouter',
@@ -92,7 +94,21 @@ include (
   // Librairies & common code
   ':Convexus-Commons:Librairies',
   ':Convexus-Commons:Utils',
-  ':Convexus-Commons:Tests:Unit',
+  // Units
+  ':Convexus-Commons:Tests:Unit:ConvexusTest',
+  ':Convexus-Commons:Tests:Unit:ConvexusFactory',
+  ':Convexus-Commons:Tests:Unit:ConvexusPool',
+  ':Convexus-Commons:Tests:Unit:ConvexusPoolInitializer',
+  ':Convexus-Commons:Tests:Unit:ConvexusSwapPay',
+  ':Convexus-Commons:Tests:Unit:Staker',
+  ':Convexus-Commons:Tests:Unit:Tokens',
+  ':Convexus-Commons:Tests:Unit:ConvexusLiquidity',
+  ':Convexus-Commons:Tests:Unit:ConvexusPoolCallee',
+  ':Convexus-Commons:Tests:Unit:ConvexusReentrantCallee',
+  ':Convexus-Commons:Tests:Unit:NFTPosition',
+  ':Convexus-Commons:Tests:Unit:SwapRouter',
+  ':Convexus-Commons:Tests:Unit:Utils',
+  // Integration
   ':Convexus-Commons:Tests:Integration',
   
   // -----------------------

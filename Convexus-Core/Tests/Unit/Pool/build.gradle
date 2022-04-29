@@ -8,7 +8,7 @@ dependencies {
 
     testImplementation project(':Convexus-Commons:Utils')
     testImplementation project(':Convexus-Commons:Librairies')
-    testImplementation project(':Convexus-Commons:Tests:Unit')
+    testImplementation project(':Convexus-Commons:Tests:Unit:Utils')
     testImplementation project(':Test-Framework:unittest')
     
     testImplementation project(':Convexus-Core:Librairies')
@@ -23,6 +23,13 @@ dependencies {
     testImplementation project(':Convexus-Core:Interfaces:ConvexusPoolDeployer')
     testImplementation project(':Convexus-Core:Interfaces:Ticks')
     testImplementation project(':Convexus-Core:Interfaces:TickBitmap')
+
+    // Unit tests
+    testImplementation project(':Convexus-Commons:Tests:Unit:ConvexusFactory')
+    testImplementation project(':Convexus-Commons:Tests:Unit:ConvexusPoolCallee')
+    testImplementation project(':Convexus-Commons:Tests:Unit:ConvexusPoolInitializer')
+    testImplementation project(':Convexus-Commons:Tests:Unit:ConvexusTest')
+    
 }
 
 test {

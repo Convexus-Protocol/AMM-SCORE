@@ -12,7 +12,7 @@ dependencies {
     implementation  'com.github.sink772:javaee-tokens:0.6.1'
 
     implementation project(':Convexus-Commons:Utils')
-    implementation project(':Convexus-Commons:Tests:Unit')
+    implementation project(':Convexus-Commons:Tests:Unit:Utils')
     implementation project(':Convexus-Core:Contracts:Factory')
     implementation project(':Test-Framework:unittest')
     

@@ -27,9 +27,9 @@ import com.iconloop.score.test.Account;
 
 import org.mockito.ArgumentCaptor;
 
-import exchange.convexus.factory.ConvexusFactoryMock;
-import exchange.convexus.factory.ConvexusFactoryUtils;
-import exchange.convexus.liquidity.ConvexusLiquidityUtils;
+import exchange.convexus.test.factory.ConvexusFactoryMock;
+import exchange.convexus.test.factory.ConvexusFactoryUtils;
+import exchange.convexus.test.liquidity.ConvexusLiquidityUtils;
 import exchange.convexus.periphery.pairflash.FlashParams;
 import exchange.convexus.periphery.pairflash.PairFlash;
 import exchange.convexus.periphery.positiondescriptor.NonfungibleTokenPositionDescriptor;
@@ -38,16 +38,16 @@ import exchange.convexus.periphery.quoter.QuoteExactInputSingleParams;
 import exchange.convexus.periphery.quoter.QuoteResult;
 import exchange.convexus.periphery.quoter.Quoter;
 import exchange.convexus.periphery.router.SwapRouter;
-import exchange.convexus.pools.Pool1;
-import exchange.convexus.pools.Pool2;
-import exchange.convexus.pools.Pool3;
-import exchange.convexus.testtokens.Sicx;
-import exchange.convexus.testtokens.Usdc;
-import exchange.convexus.utils.ConvexusTest;
+import exchange.convexus.test.pool.Pool1;
+import exchange.convexus.test.pool.Pool2;
+import exchange.convexus.test.pool.Pool3;
+import exchange.convexus.test.tokens.Sicx;
+import exchange.convexus.test.tokens.Usdc;
+import exchange.convexus.test.ConvexusTest;
 import exchange.convexus.utils.IntUtils;
 import exchange.convexus.utils.ScoreSpy;
 
-import static exchange.convexus.nft.NFTUtils.mint;
+import static exchange.convexus.test.nft.NFTUtils.mint;
 import static exchange.convexus.utils.TimeUtils.now;
 import score.Address;
 

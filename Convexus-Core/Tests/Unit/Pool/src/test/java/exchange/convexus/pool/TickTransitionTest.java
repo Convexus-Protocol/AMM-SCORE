@@ -31,8 +31,8 @@ import com.iconloop.score.test.ServiceManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import exchange.convexus.core.librairies.SwapMath;
-import exchange.convexus.factory.ConvexusFactoryUtils;
 import exchange.convexus.librairies.TickMath;
+import exchange.convexus.test.factory.ConvexusFactoryUtils;
 
 public class TickTransitionTest extends ConvexusPoolTest {
 

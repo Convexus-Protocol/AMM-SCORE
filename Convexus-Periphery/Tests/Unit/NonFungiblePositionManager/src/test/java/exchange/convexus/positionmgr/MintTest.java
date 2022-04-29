@@ -26,14 +26,12 @@ import com.iconloop.score.test.ServiceManager;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import exchange.convexus.initializer.ConvexusPoolInitializerUtils;
-import exchange.convexus.liquidity.ConvexusLiquidityUtils;
-import exchange.convexus.periphery.positionmgr.MintParams;
-import exchange.convexus.pool.ConvexusPoolMock;
+import exchange.convexus.test.ConvexusTest;
+import exchange.convexus.test.liquidity.ConvexusLiquidityUtils;
+import exchange.convexus.test.pool.ConvexusPoolMock;
 import exchange.convexus.utils.AssertUtils;
 
-import static exchange.convexus.nft.NFTUtils.mint;
+import static exchange.convexus.test.nft.NFTUtils.mint;
 import static exchange.convexus.utils.TimeUtils.now;
 
 public class MintTest extends NonFungiblePositionManagerTest {
@@ -90,7 +88,7 @@ public class MintTest extends NonFungiblePositionManagerTest {
 
   @Test
   void failsIfCannotTransfer () {
-    ConvexusPoolInitializerUtils.createAndInitializePoolIfNecessary(ConvexusPoolMock.class, alice, factory, sicx.getAddress(), usdc.getAddress(), FEE_AMOUNTS[MEDIUM], encodePriceSqrt(ONE, ONE), tickSpacing);
+    ConvexusTest.createAndInitializePoolIfNecessary(ConvexusPoolMock.class, alice, factory, sicx.getAddress(), usdc.getAddress(), FEE_AMOUNTS[MEDIUM], encodePriceSqrt(ONE, ONE), tickSpacing);
     
     AssertUtils.assertThrowsMessage(AssertionError.class, () -> 
       mint (
@@ -113,7 +111,7 @@ public class MintTest extends NonFungiblePositionManagerTest {
 
   @Test
   void createsAToken () {
-    ConvexusPoolInitializerUtils.createAndInitializePoolIfNecessary(ConvexusPoolMock.class, alice, factory, sicx.getAddress(), usdc.getAddress(), FEE_AMOUNTS[MEDIUM], encodePriceSqrt(ONE, ONE), tickSpacing);
+    ConvexusTest.createAndInitializePoolIfNecessary(ConvexusPoolMock.class, alice, factory, sicx.getAddress(), usdc.getAddress(), FEE_AMOUNTS[MEDIUM], encodePriceSqrt(ONE, ONE), tickSpacing);
 
     final BigInteger fifteen = BigInteger.valueOf(15);
     

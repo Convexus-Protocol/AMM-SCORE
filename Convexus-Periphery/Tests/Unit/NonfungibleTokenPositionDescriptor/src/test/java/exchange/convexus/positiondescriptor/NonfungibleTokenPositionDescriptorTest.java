@@ -16,7 +16,7 @@
 
 package exchange.convexus.positiondescriptor;
 
-import exchange.convexus.utils.ConvexusTest;
+import exchange.convexus.test.ConvexusTest;
 
 public class NonfungibleTokenPositionDescriptorTest extends ConvexusTest {
 

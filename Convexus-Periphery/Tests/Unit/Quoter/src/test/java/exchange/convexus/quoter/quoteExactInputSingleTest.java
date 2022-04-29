@@ -27,13 +27,13 @@ import com.iconloop.score.test.ServiceManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import exchange.convexus.clients.QuoterClient;
-import exchange.convexus.initializer.ConvexusPoolInitializerUtils;
-import exchange.convexus.liquidity.ConvexusLiquidityUtils;
-import exchange.convexus.nft.NFTUtils;
+import exchange.convexus.test.ConvexusTest;
+import exchange.convexus.test.liquidity.ConvexusLiquidityUtils;
+import exchange.convexus.test.nft.NFTUtils;
 import exchange.convexus.periphery.quoter.QuoteExactInputSingleParams;
-import exchange.convexus.pool.ConvexusPoolMock;
+import exchange.convexus.test.pool.ConvexusPoolMock;
 import exchange.convexus.pool.Slot0;
-import exchange.convexus.router.SwapRouterUtils;
+import exchange.convexus.test.swaprouter.SwapRouterUtils;
 import exchange.convexus.utils.ScoreSpy;
 import exchange.convexus.utils.TimeUtils;
 import score.Address;
@@ -53,7 +53,7 @@ public class quoteExactInputSingleTest extends QuoterTest {
     setup_nft();
     setup_router();
     
-    pool = (ScoreSpy<ConvexusPoolMock>) ConvexusPoolInitializerUtils.createAndInitializePoolIfNecessary(ConvexusPoolMock.class, alice, factory, sicx.getAddress(), usdc.getAddress(), FEE_AMOUNTS[MEDIUM], encodePriceSqrt(ONE, ONE), tickSpacing);
+    pool = (ScoreSpy<ConvexusPoolMock>) ConvexusTest.createAndInitializePoolIfNecessary(ConvexusPoolMock.class, alice, factory, sicx.getAddress(), usdc.getAddress(), FEE_AMOUNTS[MEDIUM], encodePriceSqrt(ONE, ONE), tickSpacing);
 
     // Mint a position
     final BigInteger thousand = EXA.multiply(BigInteger.valueOf(1000));

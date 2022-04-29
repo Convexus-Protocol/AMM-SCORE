@@ -23,6 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
+import exchange.convexus.test.staker.ConvexusStakerUtils;
 
 import java.math.BigInteger;
 
@@ -35,8 +36,8 @@ import static exchange.convexus.utils.TimeUtils.now;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import exchange.convexus.liquidity.ConvexusLiquidityUtils;
-import exchange.convexus.nft.NFTUtils;
+import exchange.convexus.test.liquidity.ConvexusLiquidityUtils;
+import exchange.convexus.test.nft.NFTUtils;
 import exchange.convexus.periphery.staker.IncentiveId;
 import exchange.convexus.utils.AssertUtils;
 import exchange.convexus.utils.SleepUtils;

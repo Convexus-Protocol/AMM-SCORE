@@ -27,6 +27,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static exchange.convexus.utils.TimeUtils.now;
+import exchange.convexus.test.staker.ConvexusStakerUtils;
 
 public class StakeEntireTime extends ConvexusStakerTest {
 

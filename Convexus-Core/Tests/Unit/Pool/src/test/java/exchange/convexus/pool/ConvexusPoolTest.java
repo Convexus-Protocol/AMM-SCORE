@@ -16,7 +16,6 @@
 
 package exchange.convexus.pool;
 
-import exchange.convexus.utils.ConvexusTest;
 import exchange.convexus.utils.ICX;
 import exchange.convexus.utils.IntUtils;
 import score.Address;
@@ -36,17 +35,18 @@ import com.iconloop.score.test.Account;
 import com.iconloop.score.test.Score;
 
 import org.mockito.ArgumentCaptor;
-
-import exchange.convexus.callee.ConvexusPoolCallee;
 import exchange.convexus.core.pool.contracts.models.Positions;
-import exchange.convexus.factory.ConvexusFactoryMock;
 import exchange.convexus.librairies.TickMath;
-import exchange.convexus.liquidity.ConvexusLiquidityUtils;
-import exchange.convexus.reentrantcallee.ConvexusReentrantCallee;
-import exchange.convexus.swappay.ConvexusSwapPay;
-import exchange.convexus.testtokens.Sicx;
-import exchange.convexus.testtokens.Usdc;
+import exchange.convexus.test.callee.ConvexusPoolCallee;
+import exchange.convexus.test.factory.ConvexusFactoryMock;
+import exchange.convexus.test.liquidity.ConvexusLiquidityUtils;
+import exchange.convexus.test.pool.ConvexusPoolMock;
+import exchange.convexus.test.reentrantcallee.ConvexusReentrantCallee;
+import exchange.convexus.test.swappay.ConvexusSwapPay;
+import exchange.convexus.test.tokens.Sicx;
+import exchange.convexus.test.tokens.Usdc;
 import exchange.convexus.utils.ScoreSpy;
+import exchange.convexus.test.ConvexusTest;
 
 public class ConvexusPoolTest extends ConvexusTest {
 

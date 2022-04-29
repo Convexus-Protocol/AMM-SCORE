@@ -10,6 +10,7 @@ dependencies {
     implementation project(':Convexus-Core:Score-Interfaces:Pool')
     implementation project(':Convexus-Core:Structs:Pool')
 
+    implementation project(':Convexus-Periphery:Structs:SwapRouter')
     implementation project(':Convexus-Periphery:Librairies')
     implementation project(':Convexus-Periphery:Contracts:LiquidityManagement')
 }

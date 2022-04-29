@@ -31,8 +31,8 @@ import com.iconloop.score.test.ServiceManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import exchange.convexus.core.pool.contracts.models.Positions;
-import exchange.convexus.factory.ConvexusFactoryUtils;
-import exchange.convexus.liquidity.ConvexusLiquidityUtils;
+import exchange.convexus.test.factory.ConvexusFactoryUtils;
+import exchange.convexus.test.liquidity.ConvexusLiquidityUtils;
 
 public class BurnTest extends ConvexusPoolTest {
 

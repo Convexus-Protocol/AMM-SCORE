@@ -17,9 +17,9 @@
 package exchange.convexus.factory;
 
 import exchange.convexus.core.contracts.factory.ConvexusFactory;
-import exchange.convexus.testtokens.Sicx;
-import exchange.convexus.testtokens.Usdc;
-import exchange.convexus.utils.ConvexusTest;
+import exchange.convexus.test.ConvexusTest;
+import exchange.convexus.test.tokens.Sicx;
+import exchange.convexus.test.tokens.Usdc;
 import exchange.convexus.utils.IntUtils;
 import exchange.convexus.utils.ScoreSpy;
 

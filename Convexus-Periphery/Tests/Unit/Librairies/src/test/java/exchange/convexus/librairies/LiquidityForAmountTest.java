@@ -25,7 +25,7 @@ import com.iconloop.score.test.ServiceManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import exchange.convexus.periphery.librairies.LiquidityAmounts;
-import exchange.convexus.utils.ConvexusTest;
+import exchange.convexus.test.ConvexusTest;
 
 public class LiquidityForAmountTest extends ConvexusTest {
   

@@ -32,9 +32,8 @@ import com.iconloop.score.test.ServiceManager;
 
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
-
-import exchange.convexus.factory.ConvexusFactoryUtils;
 import exchange.convexus.librairies.TickMath;
+import exchange.convexus.test.factory.ConvexusFactoryUtils;
 import exchange.convexus.utils.AssertUtils;
 import exchange.convexus.utils.IntUtils;
 

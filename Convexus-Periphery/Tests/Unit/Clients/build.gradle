@@ -13,7 +13,7 @@ dependencies {
     implementation project(':Test-Framework:unittest')
 
     implementation project(':Convexus-Commons:Tokens:Contracts:irc2')
-    implementation project(':Convexus-Commons:Tests:Unit')
+    implementation project(':Convexus-Commons:Tests:Unit:Utils')
     implementation project(':Convexus-Commons:Utils')
 
     implementation project(':Convexus-Periphery:Contracts:Quoter')

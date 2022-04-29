@@ -35,7 +35,8 @@ import static exchange.convexus.utils.TimeUtils.now;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import exchange.convexus.liquidity.ConvexusLiquidityUtils;
+import exchange.convexus.test.liquidity.ConvexusLiquidityUtils;
+import exchange.convexus.test.staker.ConvexusStakerUtils;
 import score.Address;
 
 public class ClaimRewardTest extends ConvexusStakerTest {

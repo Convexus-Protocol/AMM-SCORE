@@ -23,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
-import static exchange.convexus.nft.NFTUtils.mint;
+import static exchange.convexus.test.nft.NFTUtils.mint;
 import static exchange.convexus.utils.IntUtils.MAX_UINT128;
 
 import java.math.BigInteger;
@@ -32,13 +32,12 @@ import com.iconloop.score.test.ServiceManager;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import exchange.convexus.initializer.ConvexusPoolInitializerUtils;
-import exchange.convexus.liquidity.ConvexusLiquidityUtils;
+import exchange.convexus.test.ConvexusTest;
+import exchange.convexus.test.liquidity.ConvexusLiquidityUtils;
 import exchange.convexus.periphery.librairies.Path;
-import exchange.convexus.pool.ConvexusPoolMock;
+import exchange.convexus.test.pool.ConvexusPoolMock;
 import exchange.convexus.pool.PoolData;
-import exchange.convexus.router.SwapRouterUtils;
+import exchange.convexus.test.swaprouter.SwapRouterUtils;
 import static exchange.convexus.utils.TimeUtils.now;
 import score.Address;
 
@@ -55,7 +54,7 @@ public class FeesAccountingTest extends NonFungiblePositionManagerTest {
     setup_initializer();
 
     // create a position
-    ConvexusPoolInitializerUtils.createAndInitializePoolIfNecessary(ConvexusPoolMock.class, alice, factory, sicx.getAddress(), usdc.getAddress(), FEE_AMOUNTS[MEDIUM], encodePriceSqrt(ONE, ONE), tickSpacing);
+    ConvexusTest.createAndInitializePoolIfNecessary(ConvexusPoolMock.class, alice, factory, sicx.getAddress(), usdc.getAddress(), FEE_AMOUNTS[MEDIUM], encodePriceSqrt(ONE, ONE), tickSpacing);
 
     // nft 1 earns 25% of fees
     final BigInteger nft1Value = BigInteger.valueOf(100);
