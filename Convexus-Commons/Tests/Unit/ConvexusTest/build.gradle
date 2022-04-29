@@ -15,12 +15,8 @@ dependencies {
     implementation project(':Convexus-Commons:Tokens:Interfaces:irc2icx')
     // Unit
     implementation project(':Convexus-Commons:Tests:Unit:Utils')
-    implementation project(':Convexus-Commons:Tests:Unit:ConvexusFactory')
-    implementation project(':Convexus-Commons:Tests:Unit:ConvexusLiquidity')
-    implementation project(':Convexus-Commons:Tests:Unit:ConvexusPoolInitializer')
-    implementation project(':Convexus-Commons:Tests:Unit:NFTPosition')
-    implementation project(':Convexus-Commons:Tests:Unit:Staker')
-    implementation project(':Convexus-Commons:Tests:Unit:SwapRouter')
+    implementation project(':Convexus-Periphery:Tests:Utils:NFTPosition')
+    implementation project(':Convexus-Periphery:Tests:Utils:Staker')
     implementation project(':Convexus-Commons:Tests:Contracts:Tokens')
     
     /// Core ///
@@ -32,6 +28,10 @@ dependencies {
     implementation project(':Convexus-Core:Tests:Contracts:ConvexusPoolCallee')
     implementation project(':Convexus-Core:Tests:Contracts:ConvexusReentrantCallee')
     implementation project(':Convexus-Core:Tests:Contracts:ConvexusSwapPay')
+    // Test Utils
+    implementation project(':Convexus-Core:Tests:Utils:Factory')
+    implementation project(':Convexus-Core:Tests:Utils:ConvexusLiquidity')
+    implementation project(':Convexus-Core:Tests:Utils:ConvexusPoolInitializer')
     
     /// Periphery
     implementation project(':Convexus-Periphery:Contracts:SwapRouter')
@@ -46,4 +46,6 @@ dependencies {
     implementation project(':Convexus-Periphery:Contracts:PairFlash')
     implementation project(':Convexus-Periphery:Contracts:Swap')
     implementation project(':Convexus-Periphery:Contracts:Staker')
+    // Test Utils
+    implementation project(':Convexus-Periphery:Tests:Utils:SwapRouter')
 }

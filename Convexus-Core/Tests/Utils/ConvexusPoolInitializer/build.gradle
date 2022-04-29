@@ -15,7 +15,7 @@ dependencies {
     implementation project(':Convexus-Commons:Tokens:Interfaces:irc2icx')
     // Unit
     implementation project(':Convexus-Commons:Tests:Unit:Utils')
-    implementation project(':Convexus-Commons:Tests:Unit:ConvexusFactory')
+    implementation project(':Convexus-Core:Tests:Utils:Factory')
     
     /// Core ///
     implementation project(':Convexus-Core:Librairies')

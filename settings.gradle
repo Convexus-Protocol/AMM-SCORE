@@ -37,6 +37,10 @@ include (
   ':Convexus-Core:Tests:Contracts:ConvexusPoolCallee',
   ':Convexus-Core:Tests:Contracts:ConvexusReentrantCallee',
   ':Convexus-Core:Tests:Contracts:ConvexusSwapPay',
+  // Test utils
+  ':Convexus-Core:Tests:Utils:Factory',
+  ':Convexus-Core:Tests:Utils:ConvexusLiquidity',
+  ':Convexus-Core:Tests:Utils:ConvexusPoolInitializer',
 
   // Integration tests
   ':Convexus-Core:Tests:Integration:Score',
@@ -98,6 +102,10 @@ include (
   // Integration tests
   ':Convexus-Periphery:Tests:Integration:Score',
   ':Convexus-Periphery:Tests:Integration:SwapRouter',
+  // Test utils
+  ':Convexus-Periphery:Tests:Utils:SwapRouter',
+  ':Convexus-Periphery:Tests:Utils:Staker',
+  ':Convexus-Periphery:Tests:Utils:NFTPosition',
 
   // -----------------------
   // --- Convexus Common ---
@@ -107,12 +115,6 @@ include (
   ':Convexus-Commons:Utils',
   // Units
   ':Convexus-Commons:Tests:Unit:ConvexusTest',
-  ':Convexus-Commons:Tests:Unit:ConvexusFactory',
-  ':Convexus-Commons:Tests:Unit:ConvexusPoolInitializer',
-  ':Convexus-Commons:Tests:Unit:Staker',
-  ':Convexus-Commons:Tests:Unit:ConvexusLiquidity',
-  ':Convexus-Commons:Tests:Unit:NFTPosition',
-  ':Convexus-Commons:Tests:Unit:SwapRouter',
   ':Convexus-Commons:Tests:Unit:Utils',
   // Integration
   ':Convexus-Commons:Tests:Integration',

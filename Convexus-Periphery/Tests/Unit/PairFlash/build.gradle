@@ -10,10 +10,10 @@ dependencies {
     testImplementation project(':Convexus-Commons:Tests:Unit:Utils')
     testImplementation project(':Convexus-Commons:Tests:Unit:ConvexusTest')
     testImplementation project(':Convexus-Core:Tests:Contracts:Pool')
-    testImplementation project(':Convexus-Commons:Tests:Unit:ConvexusFactory')
+    testImplementation project(':Convexus-Core:Tests:Utils:Factory')
     testImplementation project(':Convexus-Commons:Tests:Contracts:Tokens')
-    testImplementation project(':Convexus-Commons:Tests:Unit:NFTPosition')
-    testImplementation project(':Convexus-Commons:Tests:Unit:ConvexusLiquidity')
+    testImplementation project(':Convexus-Periphery:Tests:Utils:NFTPosition')
+    testImplementation project(':Convexus-Core:Tests:Utils:ConvexusLiquidity')
 
     testImplementation project(':Convexus-Core:Contracts:Factory')
 

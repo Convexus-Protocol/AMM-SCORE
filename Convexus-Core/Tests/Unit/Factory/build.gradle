@@ -13,7 +13,7 @@ dependencies {
     testImplementation project(':Convexus-Commons:Tests:Unit:ConvexusTest')
     testImplementation project(':Convexus-Commons:Tests:Unit:Utils')
     testImplementation project(':Convexus-Commons:Tests:Contracts:Tokens')
-    testImplementation project(':Convexus-Commons:Tests:Unit:ConvexusFactory')
+    testImplementation project(':Convexus-Core:Tests:Utils:Factory')
     
     testImplementation project(':Convexus-Commons:Utils')
     testImplementation project(':Convexus-Core:Contracts:Factory')
