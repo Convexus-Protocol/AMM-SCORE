@@ -16,14 +16,6 @@
 
 package exchange.convexus.clients;
 
-import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.verify;
-
-import java.math.BigInteger;
-
-import com.iconloop.score.test.Account;
-
-import org.mockito.ArgumentCaptor;
 import exchange.convexus.periphery.quoter.QuoteExactInputSingleParams;
 import exchange.convexus.periphery.quoter.QuoteResult;
 import exchange.convexus.periphery.quoter.Quoter;
@@ -33,17 +25,8 @@ public class QuoterClient {
 
   public static QuoteResult quoteExactInputSingle (
     ScoreSpy<Quoter> client,
-    Account from,
     QuoteExactInputSingleParams params
   ) {
-    reset(client.spy);
-    client.invoke(from, "quoteExactInputSingle", params);
-
-    // Get QuoteResult event
-    ArgumentCaptor<BigInteger> amount = ArgumentCaptor.forClass(BigInteger.class);
-    ArgumentCaptor<BigInteger> sqrtPriceX96After = ArgumentCaptor.forClass(BigInteger.class);
-    ArgumentCaptor<Integer> initializedTicksCrossed = ArgumentCaptor.forClass(Integer.class);
-    verify(client.spy).QuoteResult(amount.capture(), sqrtPriceX96After.capture(), initializedTicksCrossed.capture());
-    return new QuoteResult(amount.getValue(), sqrtPriceX96After.getValue(), initializedTicksCrossed.getValue());
+    return QuoteResult.fromMap(client.call("quoteExactInputSingle", params));
   }
 }

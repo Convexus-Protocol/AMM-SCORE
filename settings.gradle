@@ -64,12 +64,14 @@ include (
   ':Convexus-Periphery:Contracts:TreasuryVester',
   ':Convexus-Periphery:Contracts:TickLens',
   ':Convexus-Periphery:Contracts:Quoter',
+  ':Convexus-Periphery:Contracts:ConvexusPoolReadOnly',
   ':Convexus-Periphery:Contracts:PairFlash',
   ':Convexus-Periphery:Contracts:Swap',
   ':Convexus-Periphery:Contracts:CXS',
   ':Convexus-Periphery:Contracts:Staker',
 
   // Interfaces
+  ':Convexus-Periphery:Score-Interfaces:ConvexusPoolReadOnly',
   ':Convexus-Periphery:Score-Interfaces:NonfungibleTokenPositionDescriptor',
   ':Convexus-Periphery:Score-Interfaces:NonFungiblePositionManager',
   ':Convexus-Periphery:Score-Interfaces:Timelock',

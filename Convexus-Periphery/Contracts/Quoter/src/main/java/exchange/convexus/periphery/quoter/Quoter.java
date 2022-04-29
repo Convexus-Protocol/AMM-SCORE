@@ -25,7 +25,6 @@ import java.math.BigInteger;
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonObject;
 import exchange.convexus.librairies.TickMath;
-import exchange.convexus.periphery.librairies.CallbackValidation;
 import exchange.convexus.periphery.librairies.Path;
 import exchange.convexus.periphery.librairies.PoolAddressLib;
 import exchange.convexus.utils.AddressUtils;
@@ -38,11 +37,7 @@ import exchange.convexus.pool.Slot0;
 import score.Address;
 import score.Context;
 import score.UserRevertedException;
-import score.VarDB;
-import score.annotation.EventLog;
 import score.annotation.External;
-import score.annotation.Optional;
-import score.annotation.Payable;
 
 /**
  * @title Provides quotes for swaps
@@ -55,25 +50,10 @@ public class Quoter {
     // ================================================
     // Consts
     // ================================================
-    
-    // Contract class name
-    private static final String NAME = "Quoter";
-
     // Contract name
     private final String name;
     private final Address factory;
-
-    // ================================================
-    // DB Variables
-    // ================================================
-    /// @dev Transient storage variable used to check a safety condition in exact output swaps.
-    private final VarDB<BigInteger> amountOutCached = Context.newVarDB(NAME + "_amountOutCached", BigInteger.class);
-
-    // ================================================
-    // Event Logs
-    // ================================================
-    @EventLog
-    public void QuoteResult(BigInteger amount, BigInteger sqrtPriceX96After, int initializedTicksCrossed) {}
+    private final Address readonlyPool;
 
     // ================================================
     // Methods
@@ -81,11 +61,13 @@ public class Quoter {
     /**
      *  Contract constructor
      */
-    public Quoter(
-        Address _factory
+    public Quoter (
+        Address _factory,
+        Address readonlyPool
     ) {
         this.name = "Convexus Quoter";
         this.factory = _factory;
+        this.readonlyPool = readonlyPool;
     }
 
     /**
@@ -99,11 +81,12 @@ public class Quoter {
         return PoolAddressLib.getPool(factory, PoolAddressLib.getPoolKey(tokenA, tokenB, fee));
     }
 
-    @External
-    public void convexusSwapCallback (
+    @External(readonly = true)
+    public void convexusSwapCallbackReadonly (
         BigInteger amount0Delta,
         BigInteger amount1Delta,
-        byte[] path
+        byte[] path,
+        Slot0 slot0
     ) {
         Context.require(
             amount0Delta.compareTo(ZERO) > 0 
@@ -113,9 +96,6 @@ public class Quoter {
         PoolData decoded = Path.decodeFirstPool(path);
         Address tokenIn = decoded.tokenA;
         Address tokenOut = decoded.tokenB;
-        int fee = decoded.fee;
-
-        CallbackValidation.verifyCallback(this.factory, tokenIn, tokenOut, fee);
 
         boolean isExactInput;
         BigInteger amountToPay;
@@ -130,9 +110,6 @@ public class Quoter {
             amountReceived = amount0Delta.negate();
         }
 
-        Address pool = getPool(tokenIn, tokenOut, fee);
-
-        Slot0 slot0 = IConvexusPool.slot0(pool);
         BigInteger sqrtPriceX96After = slot0.sqrtPriceX96;
         int tickAfter = slot0.tick;
 
@@ -143,12 +120,6 @@ public class Quoter {
         if (isExactInput) {
             reason.add("amountOut", amountReceived.toString());
         } else {
-            BigInteger amountOutCached = this.amountOutCached.get();
-            if (!amountOutCached.equals(ZERO)) {
-                Context.require(amountReceived.equals(amountOutCached),
-                    "convexusSwapCallback: amountReceived == amountOutCached");
-            }
-
             reason.add("amountOut", amountToPay.toString());
         }
 
@@ -185,7 +156,6 @@ public class Quoter {
 
         int initializedTicksCrossed = countInitializedTicksCrossed(pool, tickBefore, result.tickAfter);
         
-        this.QuoteResult(result.amount, result.sqrtPriceX96After, initializedTicksCrossed);
         return new QuoteResult(result.amount, result.sqrtPriceX96After, initializedTicksCrossed);
     }
 
@@ -290,13 +260,14 @@ public class Quoter {
      * @return initializedTicksCrossed The number of initialized ticks that the swap crossed
      * @return gasEstimate The estimate of the gas that the swap consumes
      */
-    @External
+    @External(readonly = true)
     public QuoteResult quoteExactInputSingle (QuoteExactInputSingleParams params) {
         boolean zeroForOne = AddressUtils.compareTo(params.tokenIn, params.tokenOut) < 0;
         Address pool = getPool(params.tokenIn, params.tokenOut, params.fee);
 
         try {
-            IConvexusPool.swap(pool, 
+            IConvexusPoolReadOnly.swap(this.readonlyPool,
+                pool, 
                 Context.getAddress(), // ZERO_ADDRESS might cause issues with some tokens
                 zeroForOne, 
                 params.amountIn,
@@ -319,7 +290,7 @@ public class Quoter {
     /// @return sqrtPriceX96AfterList List of the sqrt price after the swap for each pool in the path
     /// @return initializedTicksCrossedList List of the initialized ticks that the swap crossed for each pool in the path
     /// @return gasEstimate The estimate of the gas that the swap consumes
-    @External
+    @External(readonly = true)
     public QuoteMultiResult quoteExactInput (byte[] path, BigInteger amountIn) {
 
         int numPools = Path.numPools(path);
@@ -371,18 +342,14 @@ public class Quoter {
      * @return initializedTicksCrossed The number of initialized ticks that the swap crossed
      * @return gasEstimate The estimate of the gas that the swap consumes
      */
-    @External
+    @External(readonly = true)
     public QuoteResult quoteExactOutputSingle (QuoteExactOutputSingleParams params) {
         boolean zeroForOne = AddressUtils.compareTo(params.tokenIn, params.tokenOut) < 0;
         Address pool = getPool(params.tokenIn, params.tokenOut, params.fee);
-        
-        // if no price limit has been specified, cache the output amount for comparison in the swap callback
-        if (params.sqrtPriceLimitX96.equals(ZERO)) {
-            amountOutCached.set(params.amount);
-        }
 
         try {
-            IConvexusPool.swap(pool, 
+            IConvexusPoolReadOnly.swap(this.readonlyPool,
+                pool, 
                 Context.getAddress(), // ZERO_ADDRESS might cause issues with some tokens
                 zeroForOne,
                 params.amount.negate(),
@@ -395,9 +362,6 @@ public class Quoter {
                     params.tokenIn.toByteArray())
             );
         } catch (UserRevertedException exception) {
-            if (params.sqrtPriceLimitX96.equals(ZERO)) {
-                amountOutCached.set(null); // clear cache
-            }
             return handleRevert(exception.getMessage(), pool);
         }
 
@@ -410,7 +374,7 @@ public class Quoter {
      * @param amountOut The amount of the last token to receive
      * @return amountIn The amount of first token required to be paid
      */
-    @External
+    @External(readonly = true)
     public QuoteMultiResult quoteExactOutput (byte[] path, BigInteger amountOut) {
         
         int numPools = Path.numPools(path);
@@ -451,30 +415,6 @@ public class Quoter {
             } else {
                 return new QuoteMultiResult(amountOut, sqrtPriceX96AfterList, initializedTicksCrossedList);
             }
-        }
-    }
-
-    @External
-    @Payable
-    public void payIcx () {
-        // Accept the incoming ICX transfer
-    }
-
-    @External
-    public void tokenFallback (Address _from, BigInteger _value, @Optional byte[] _data) throws Exception {
-        JsonObject root = JSONUtils.parse(_data);
-        String method = root.get("method").asString();
-        // Address token = Context.getCaller();
-
-        switch (method)
-        {
-            case "pay": {
-                // Accept the incoming token transfer
-                break;
-            }
-
-            default:
-                Context.revert("tokenFallback: Unimplemented tokenFallback action");
         }
     }
 

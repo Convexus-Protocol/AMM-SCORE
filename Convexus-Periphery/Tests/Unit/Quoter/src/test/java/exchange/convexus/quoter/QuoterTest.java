@@ -19,6 +19,7 @@ package exchange.convexus.quoter;
 import exchange.convexus.mocks.factory.ConvexusFactoryMock;
 import exchange.convexus.periphery.positiondescriptor.NonfungibleTokenPositionDescriptor;
 import exchange.convexus.periphery.positionmgr.NonFungiblePositionManager;
+import exchange.convexus.periphery.quoter.ConvexusPoolReadOnly;
 import exchange.convexus.periphery.quoter.Quoter;
 import exchange.convexus.periphery.router.SwapRouter;
 import exchange.convexus.test.ConvexusTest;
@@ -30,6 +31,7 @@ import exchange.convexus.test.tokens.Usdc;
 public class QuoterTest extends ConvexusTest {
 
   ScoreSpy<ConvexusFactoryMock> factory;
+  ScoreSpy<ConvexusPoolReadOnly> poolReadonly;
   ScoreSpy<Quoter> quoter;
   ScoreSpy<Sicx> sicx;
   ScoreSpy<Usdc> usdc;
@@ -67,6 +69,7 @@ public class QuoterTest extends ConvexusTest {
 
   void setup_quoter () throws Exception {
     factory = deploy_factory();
-    quoter = deploy_quoter(factory.getAddress());
+    poolReadonly = deploy_pool_readonly();
+    quoter = deploy_quoter(factory.getAddress(), poolReadonly.getAddress());
   }
 }

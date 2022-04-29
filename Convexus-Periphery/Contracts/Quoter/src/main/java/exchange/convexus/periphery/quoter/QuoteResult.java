@@ -17,6 +17,7 @@
 package exchange.convexus.periphery.quoter;
 
 import java.math.BigInteger;
+import java.util.Map;
 
 public class QuoteResult {
     public BigInteger amountOut;
@@ -31,5 +32,15 @@ public class QuoteResult {
         this.amountOut = amountOut;
         this.sqrtPriceX96After = sqrtPriceX96After;
         this.initializedTicksCrossed = initializedTicksCrossed;
+    }
+
+    public static QuoteResult fromMap(Object call) {
+        @SuppressWarnings("unchecked")
+        Map<String, Object> map = (Map<String, Object>) call;
+        return new QuoteResult (
+            (BigInteger) map.get("amountOut"),
+            (BigInteger) map.get("sqrtPriceX96After"),
+            ((BigInteger) map.get("initializedTicksCrossed")).intValue()
+        );
     }
 }

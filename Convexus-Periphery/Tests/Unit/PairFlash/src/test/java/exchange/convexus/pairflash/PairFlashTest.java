@@ -18,14 +18,10 @@ package exchange.convexus.pairflash;
 
 import static java.math.BigInteger.ONE;
 import static java.math.BigInteger.ZERO;
-import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.verify;
 
 import java.math.BigInteger;
 
 import com.iconloop.score.test.Account;
-
-import org.mockito.ArgumentCaptor;
 
 import exchange.convexus.test.factory.ConvexusFactoryUtils;
 import exchange.convexus.test.liquidity.ConvexusLiquidityUtils;
@@ -34,6 +30,7 @@ import exchange.convexus.periphery.pairflash.FlashParams;
 import exchange.convexus.periphery.pairflash.PairFlash;
 import exchange.convexus.periphery.positiondescriptor.NonfungibleTokenPositionDescriptor;
 import exchange.convexus.periphery.positionmgr.NonFungiblePositionManager;
+import exchange.convexus.periphery.quoter.ConvexusPoolReadOnly;
 import exchange.convexus.periphery.quoter.QuoteExactInputSingleParams;
 import exchange.convexus.periphery.quoter.QuoteResult;
 import exchange.convexus.periphery.quoter.Quoter;
@@ -55,6 +52,7 @@ public class PairFlashTest extends ConvexusTest {
 
   ScoreSpy<PairFlash> flash;
   ScoreSpy<ConvexusFactoryMock> factory;
+  ScoreSpy<ConvexusPoolReadOnly> poolReadonly;
   ScoreSpy<SwapRouter> router;
   ScoreSpy<Sicx> sicx;
   ScoreSpy<Usdc> usdc;
@@ -90,7 +88,8 @@ public class PairFlashTest extends ConvexusTest {
   
   void setup_pairflash () throws Exception {
     factory = deploy_factory();
-    quoter = deploy_quoter(factory.getAddress());
+    poolReadonly = deploy_pool_readonly();
+    quoter = deploy_quoter(factory.getAddress(), poolReadonly.getAddress());
     router = deploy_router(factory.getAddress());
     flash = deploy_flash(router.getAddress(), factory.getAddress());
   }
@@ -142,15 +141,7 @@ public class PairFlashTest extends ConvexusTest {
     int fee,
     BigInteger sqrtPriceLimitX96
   ) {
-    reset(quoter.spy);
-    quoter.invoke(alice, "quoteExactInputSingle", new QuoteExactInputSingleParams(tokenIn, tokenOut, amountIn, fee, sqrtPriceLimitX96));
-
-    ArgumentCaptor<BigInteger> amount = ArgumentCaptor.forClass(BigInteger.class);
-    ArgumentCaptor<BigInteger> sqrtPriceX96After = ArgumentCaptor.forClass(BigInteger.class);
-    ArgumentCaptor<Integer> initializedTicksCrossed = ArgumentCaptor.forClass(Integer.class);
-    verify(quoter.spy).QuoteResult(amount.capture(), sqrtPriceX96After.capture(), initializedTicksCrossed.capture());
-
-    return new QuoteResult(amount.getValue(), sqrtPriceX96After.getValue(), initializedTicksCrossed.getValue());
+    return QuoteResult.fromMap(quoter.call("quoteExactInputSingle", new QuoteExactInputSingleParams(tokenIn, tokenOut, amountIn, fee, sqrtPriceLimitX96)));
   }
 
   protected void initFlash (

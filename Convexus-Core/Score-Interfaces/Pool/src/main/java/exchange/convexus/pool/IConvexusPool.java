@@ -18,6 +18,7 @@ package exchange.convexus.pool;
 
 import java.math.BigInteger;
 import exchange.convexus.factory.Parameters;
+import exchange.convexus.pool.Oracle.Observation;
 import score.Address;
 import score.Context;
 
@@ -57,6 +58,19 @@ public class IConvexusPool {
   ) {
     return PairAmounts.fromMap (
       Context.call(pool, "swap", recipient, zeroForOne, amountSpecified, sqrtPriceLimitX96, data)
+    );
+  }
+
+  public static PairAmounts swapReadOnly (
+    Address pool,
+    Address recipient,
+    boolean zeroForOne,
+    BigInteger amountSpecified,
+    BigInteger sqrtPriceLimitX96,
+    byte[] data
+  ) {
+    return PairAmounts.fromMap (
+      Context.call(pool, "swapReadOnly", recipient, zeroForOne, amountSpecified, sqrtPriceLimitX96, data)
     );
   }
 
@@ -143,5 +157,25 @@ public class IConvexusPool {
     return Tick.Info.fromMap(
       Context.call(pool, "ticks", populatedTick)
     );
+  }
+
+  public static BigInteger liquidity (Address pool) {
+    return (BigInteger) Context.call(pool, "liquidity");
+  }
+
+  public static BigInteger feeGrowthGlobal0X128 (Address pool) {
+    return (BigInteger) Context.call(pool, "feeGrowthGlobal0X128");
+  }
+
+  public static BigInteger feeGrowthGlobal1X128 (Address pool) {
+    return (BigInteger) Context.call(pool, "feeGrowthGlobal1X128");
+  }
+
+  public static PoolSettings settings (Address pool) {
+    return PoolSettings.fromMap(Context.call(pool, "settings"));
+  }
+
+  public static Observation observations (Address pool, int index) {
+    return Observation.fromMap(Context.call(pool, "observations", index));
   }
 }

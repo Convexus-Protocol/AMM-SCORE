@@ -96,7 +96,7 @@ public class quoteExactInputSingleTest extends QuoterTest {
     Slot0 slot0 = Slot0.fromMap(pool.call("slot0"));
     assertEquals(new BigInteger("1000000000000000000000000", 16), slot0.sqrtPriceX96);
 
-    var quote = QuoterClient.quoteExactInputSingle(quoter, alice, params);
+    var quote = QuoterClient.quoteExactInputSingle(quoter, params);
     assertEquals(0, quote.initializedTicksCrossed);
     assertEquals(new BigInteger("996"), quote.amountOut);
     assertEquals(new BigInteger("ffffffffffffffed9bccf536", 16), quote.sqrtPriceX96After);

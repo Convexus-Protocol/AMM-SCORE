@@ -29,6 +29,7 @@ import exchange.convexus.periphery.liquidity.ConvexusLiquidityManagement;
 import exchange.convexus.periphery.pairflash.PairFlash;
 import exchange.convexus.periphery.positiondescriptor.NonfungibleTokenPositionDescriptor;
 import exchange.convexus.periphery.positionmgr.NonFungiblePositionManager;
+import exchange.convexus.periphery.quoter.ConvexusPoolReadOnly;
 import exchange.convexus.periphery.quoter.Quoter;
 import exchange.convexus.periphery.router.SwapRouter;
 import exchange.convexus.periphery.staker.ConvexusStaker;
@@ -114,6 +115,14 @@ public class ConvexusTest extends TestBase {
         return new ScoreSpy<ConvexusFactoryMock>(score, spy);
     }
     
+    public ScoreSpy<ConvexusPoolReadOnly> deploy_pool_readonly () throws Exception {
+        Score score = sm.deploy(owner, ConvexusPoolReadOnly.class);
+
+        var spy = (ConvexusPoolReadOnly) spy(score.getInstance());
+        score.setInstance(spy);
+        return new ScoreSpy<ConvexusPoolReadOnly>(score, spy);
+    }
+    
     public ScoreSpy<SwapRouter> deploy_router (Address factory) throws Exception {
         Score score = sm.deploy(owner, SwapRouter.class, factory);
 
@@ -178,8 +187,8 @@ public class ConvexusTest extends TestBase {
         return new ScoreSpy<TickLens>(score, spy);
     }
     
-    public ScoreSpy<Quoter> deploy_quoter (Address factory) throws Exception {
-        Score score = sm.deploy(owner, Quoter.class, factory);
+    public ScoreSpy<Quoter> deploy_quoter (Address factory, Address readonlyPool) throws Exception {
+        Score score = sm.deploy(owner, Quoter.class, factory, readonlyPool);
 
         var spy = (Quoter) spy(score.getInstance());
         score.setInstance(spy);

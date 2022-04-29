@@ -17,6 +17,7 @@
 package exchange.convexus.core.interfaces.poolcallee;
 
 import java.math.BigInteger;
+import exchange.convexus.pool.Slot0;
 import score.Address;
 import score.Context;
 
@@ -39,6 +40,16 @@ public class IConvexusPoolCallee {
     byte[] data
   ) {
     Context.call(callee, "convexusSwapCallback", amount0Delta, amount1Delta, data);
+  }
+
+  public static void convexusSwapCallbackReadonly (
+    Address callee,
+    BigInteger amount0Delta,
+    BigInteger amount1Delta,
+    byte[] data,
+    Slot0 slot0
+  ) {
+    Context.call(callee, "convexusSwapCallbackReadonly", amount0Delta, amount1Delta, data, slot0);
   }
 
   public static void convexusFlashCallback (

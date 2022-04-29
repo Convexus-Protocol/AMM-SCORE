@@ -20,6 +20,21 @@ import static exchange.convexus.utils.IntUtils.uint256;
 import static java.math.BigInteger.ZERO;
 
 import java.math.BigInteger;
+import exchange.convexus.core.factory.IConvexusFactory;
+import exchange.convexus.core.interfaces.observations.IObservations;
+import exchange.convexus.core.interfaces.poolcallee.IConvexusPoolCallee;
+import exchange.convexus.core.interfaces.positions.IPositions;
+import exchange.convexus.core.interfaces.tickbitmap.ITickBitmap;
+import exchange.convexus.core.interfaces.ticks.ITicks;
+import exchange.convexus.core.librairies.LiquidityMath;
+import exchange.convexus.core.librairies.PositionLib;
+import exchange.convexus.core.librairies.SqrtPriceMath;
+import exchange.convexus.core.librairies.SwapMath;
+import exchange.convexus.core.librairies.TickLib;
+import exchange.convexus.core.pool.contracts.models.Observations;
+import exchange.convexus.core.pool.contracts.models.Positions;
+import exchange.convexus.core.pool.contracts.models.TickBitmap;
+import exchange.convexus.core.pool.contracts.models.Ticks;
 import exchange.convexus.factory.Parameters;
 import exchange.convexus.interfaces.irc2.IIRC2ICX;
 import exchange.convexus.librairies.FixedPoint128;
@@ -30,6 +45,7 @@ import exchange.convexus.pool.ModifyPositionResult;
 import exchange.convexus.pool.ObserveResult;
 import exchange.convexus.pool.Oracle;
 import exchange.convexus.pool.PairAmounts;
+import exchange.convexus.pool.PoolSettings;
 import exchange.convexus.pool.Position;
 import exchange.convexus.pool.PositionStorage;
 import exchange.convexus.pool.ProtocolFees;
@@ -39,17 +55,6 @@ import exchange.convexus.pool.StepComputations;
 import exchange.convexus.pool.SwapCache;
 import exchange.convexus.pool.SwapState;
 import exchange.convexus.pool.Tick;
-import exchange.convexus.core.factory.IConvexusFactory;
-import exchange.convexus.core.interfaces.poolcallee.IConvexusPoolCallee;
-import exchange.convexus.core.librairies.LiquidityMath;
-import exchange.convexus.core.librairies.PositionLib;
-import exchange.convexus.core.librairies.SqrtPriceMath;
-import exchange.convexus.core.librairies.SwapMath;
-import exchange.convexus.core.librairies.TickLib;
-import exchange.convexus.core.pool.contracts.models.Observations;
-import exchange.convexus.core.pool.contracts.models.Positions;
-import exchange.convexus.core.pool.contracts.models.TickBitmap;
-import exchange.convexus.core.pool.contracts.models.Ticks;
 import exchange.convexus.utils.ReentrancyLock;
 import exchange.convexus.utils.TimeUtils;
 import score.Address;
@@ -66,73 +71,58 @@ public class Pool2 extends ConvexusPool2 {
     }
 }
 
-abstract class ConvexusPool2 {
-
+/**
+ * ConvexusPool is an abstract class, the concrete class that should be deployed on production is ConvexusPoolFactored.
+ * This class is abstract for testing purposes as it helps deploying a ConvexusPool without the ConvexusFactory.
+ */
+abstract class ConvexusPool2 
+    implements IObservations, IPositions, ITickBitmap, ITicks
+{
     // ================================================
     // Consts
     // ================================================
-    
     // Contract class name
-    public static final String NAME = "ConvexusPool2";
+    public static final String NAME = "ConvexusPool";
 
-    // Contract name
-    private final String name;
-
-    // The contract that deployed the pool
-    private final Address factory;
-
-    // The first of the two tokens of the pool, sorted by address
-    private final Address token0;
-
-    // The second of the two tokens of the pool, sorted by address
-    private final Address token1;
-
-    // The pool's fee in hundredths of a bip, i.e. 1e-6
-    private final int fee;
-
-    // The pool tick spacing
-    // @dev Ticks can only be used at multiples of this value, minimum of 1 and always positive
-    // e.g.: a tickSpacing of 3 means ticks can be initialized every 3rd tick, i.e., ..., -6, -3, 0, 3, 6, ...
-    // This value is an int to avoid casting even though it is always positive.
-    private final int tickSpacing;
-
-    // The maximum amount of position liquidity that can use any tick in the range
-    // @dev This parameter is enforced per tick to prevent liquidity from overflowing an int at any point, and
-    // also prevents out-of-range liquidity from being used to prevent adding in-range liquidity to a pool
-    // @return The max amount of liquidity per tick
-    private final BigInteger maxLiquidityPerTick;
+    // Pool settings
+    private final PoolSettings settings;
 
     // ================================================
     // DB Variables
     // ================================================
     // The 0th storage slot in the pool stores many values, and is exposed as a single method to save steps when accessed externally.
-    private final VarDB<Slot0> slot0 = Context.newVarDB(NAME + "_slot0", Slot0.class);
-
-    // Whether the pool is locked
-    private final ReentrancyLock poolLock = new ReentrancyLock(NAME + "_poolLock");
+    protected final VarDB<Slot0> slot0 = Context.newVarDB(NAME + "_slot0", Slot0.class);
 
     // The fee growth as a Q128.128 fees of token0 collected per unit of liquidity for the entire life of the pool
     protected final VarDB<BigInteger> feeGrowthGlobal0X128 = Context.newVarDB(NAME + "_feeGrowthGlobal0X128", BigInteger.class);
+
     // The fee growth as a Q128.128 fees of token1 collected per unit of liquidity for the entire life of the pool
     protected final VarDB<BigInteger> feeGrowthGlobal1X128 = Context.newVarDB(NAME + "_feeGrowthGlobal1X128", BigInteger.class);
-    
+
     // The amounts of token0 and token1 that are owed to the protocol
-    private final VarDB<ProtocolFees> protocolFees = Context.newVarDB(NAME + "_protocolFees", ProtocolFees.class);
-    
+    protected final VarDB<ProtocolFees> protocolFees = Context.newVarDB(NAME + "_protocolFees", ProtocolFees.class);
+
     // The amounts of token0 and token1 that are owed to the protocol
-    private final VarDB<BigInteger> liquidity = Context.newVarDB(NAME + "_liquidity", BigInteger.class);
+    protected final VarDB<BigInteger> liquidity = Context.newVarDB(NAME + "_liquidity", BigInteger.class);
 
-    // Look up information about a specific tick in the pool
-    private final Ticks ticks = new Ticks();
+    // Whether the pool is locked
+    protected final ReentrancyLock poolLock = new ReentrancyLock(NAME + "_poolLock");
 
-    // Returns 256 packed tick initialized boolean values. See TickBitmap for more information
-    private final TickBitmap tickBitmap = new TickBitmap();
-    
-    // Returns the information about a position by the position's key
-    private final Positions positions = new Positions();
-
+    // Implements IObservations
     // Returns data about a specific observation index
-    private final Observations observations = new Observations();
+    protected final Observations observations = new Observations();
+
+    // Implements IPositions
+    // Returns the information about a position by the position's key
+    protected final Positions positions = new Positions();
+
+    // Implements ITickBitmap
+    // Returns 256 packed tick initialized boolean values. See TickBitmap for more information
+    protected final TickBitmap tickBitmap = new TickBitmap();
+
+    // Implements ITicks
+    // Look up information about a specific tick in the pool
+    protected final Ticks ticks = new Ticks();
 
     // ================================================
     // Event Logs
@@ -145,7 +135,7 @@ abstract class ConvexusPool2 {
      * @param observationCardinalityNextNew The updated value of the next observation cardinality
      */
     @EventLog
-    protected void IncreaseObservationCardinalityNext (
+    public void IncreaseObservationCardinalityNext (
         int observationCardinalityNextOld,
         int observationCardinalityNextNew
     ) {}
@@ -157,7 +147,7 @@ abstract class ConvexusPool2 {
      * @param tick The initial tick of the pool, i.e. log base 1.0001 of the starting price of the pool
      */
     @EventLog
-    protected void Initialized (
+    public void Initialized (
         BigInteger sqrtPriceX96,
         int tick
     ) {}
@@ -173,7 +163,7 @@ abstract class ConvexusPool2 {
      * @param amount1 How much token1 was required for the minted liquidity
      */
     @EventLog(indexed = 3)
-    protected void Mint (
+    public void Mint (
         Address recipient, 
         int tickLower, 
         int tickUpper, 
@@ -193,7 +183,7 @@ abstract class ConvexusPool2 {
      * @param amount1 The amount of token1 fees collected
      */
     @EventLog(indexed = 3)
-    protected void Collect (
+    public void Collect (
         Address caller, 
         int tickLower, 
         int tickUpper, 
@@ -213,7 +203,7 @@ abstract class ConvexusPool2 {
      * @param amount1 The amount of token1 withdrawn
      */
     @EventLog(indexed = 3)
-    protected void Burn (
+    public void Burn (
         Address caller, 
         int tickLower, 
         int tickUpper, 
@@ -233,7 +223,7 @@ abstract class ConvexusPool2 {
      * @param tick The log base 1.0001 of price of the pool after the swap
      */
     @EventLog(indexed = 2)
-    protected void Swap (
+    public void Swap (
         Address sender,
         Address recipient,
         BigInteger amount0,
@@ -253,7 +243,7 @@ abstract class ConvexusPool2 {
      * @param paid1 The amount of token1 paid for the flash, which can exceed the amount1 plus the fee
      */
     @EventLog(indexed = 2)
-    protected void Flash (
+    public void Flash (
         Address sender,
         Address recipient,
         BigInteger amount0,
@@ -270,7 +260,7 @@ abstract class ConvexusPool2 {
      * @param feeProtocol1New The updated value of the token1 protocol fee
      */    
     @EventLog
-    protected void SetFeeProtocol (
+    public void SetFeeProtocol (
         int feeProtocol0Old, 
         int feeProtocol1Old, 
         int feeProtocol0New, 
@@ -285,7 +275,7 @@ abstract class ConvexusPool2 {
      * @param amount0 The amount of token1 protocol fees that is withdrawn
      */
     @EventLog(indexed = 2)
-    protected void CollectProtocol (
+    public void CollectProtocol (
         Address sender, 
         Address recipient, 
         BigInteger amount0, 
@@ -302,13 +292,16 @@ abstract class ConvexusPool2 {
      * See {@code ConvexusPoolFactored} constructor for the actual pool deployed on the network
      */
     protected ConvexusPool2 (Parameters parameters) {
-        this.factory = parameters.factory;
-        this.token0 = parameters.token0;
-        this.token1 = parameters.token1;
-        this.fee = parameters.fee;
-        this.tickSpacing = parameters.tickSpacing;
-        this.maxLiquidityPerTick = TickLib.tickSpacingToMaxLiquidityPerTick(this.tickSpacing);
-        this.name = "Convexus Pool (" + IIRC2ICX.symbol(this.token0) + " / " + IIRC2ICX.symbol(this.token1) + ")";
+        // Initialize settings
+        this.settings = new PoolSettings (
+            parameters.factory,
+            parameters.token0,
+            parameters.token1,
+            parameters.fee,
+            parameters.tickSpacing,
+            TickLib.tickSpacingToMaxLiquidityPerTick(parameters.tickSpacing),
+            "Convexus Pool (" + IIRC2ICX.symbol(parameters.token0) + " / " + IIRC2ICX.symbol(parameters.token1) + ")"
+        );
 
         // Default values
         if (this.liquidity.get() == null) {
@@ -328,125 +321,6 @@ abstract class ConvexusPool2 {
         if (this.poolLock.get() == null) {
             this.poolLock.lock(true);
         }
-    }
-
-    private void checkTicks (int tickLower, int tickUpper) {
-        Context.require(tickLower < tickUpper, 
-            "checkTicks: tickLower must be lower than tickUpper");
-        Context.require(tickLower >= TickMath.MIN_TICK, 
-            "checkTicks: tickLower lower than expected");
-        Context.require(tickUpper <= TickMath.MAX_TICK, 
-            "checkTicks: tickUpper greater than expected");
-    }
-
-    /**
-     * @notice Get the pool's balance of token0
-     */
-    private BigInteger balance0 () {
-        return IIRC2ICX.balanceOf(this.token0, Context.getAddress());
-    }
-
-    /**
-     * @notice Get the pool's balance of token1
-     */
-    private BigInteger balance1 () {
-        return IIRC2ICX.balanceOf(this.token1, Context.getAddress());
-    }
-
-    /**
-     * @notice Returns a snapshot of the tick cumulative, seconds per liquidity and seconds inside a tick range
-     * 
-     * Access: Everyone
-     * 
-     * @dev Snapshots must only be compared to other snapshots, taken over a period for which a position existed.
-     * I.e., snapshots cannot be compared if a position is not held for the entire period between when the first
-     * snapshot is taken and the second snapshot is taken.
-     * @param tickLower The lower tick of the range
-     * @param tickUpper The upper tick of the range
-     * @return tickCumulativeInside The snapshot of the tick accumulator for the range
-     * @return secondsPerLiquidityInsideX128 The snapshot of seconds per liquidity for the range
-     * @return secondsInside The snapshot of seconds per liquidity for the range
-     */
-    @External(readonly = true)
-    public SnapshotCumulativesInsideResult snapshotCumulativesInside (int tickLower, int tickUpper) {
-        checkTicks(tickLower, tickUpper);
-
-        Tick.Info lower = ticks.get(tickLower);
-        Tick.Info upper = ticks.get(tickUpper);
-
-        BigInteger tickCumulativeLower = lower.tickCumulativeOutside;
-        BigInteger tickCumulativeUpper = upper.tickCumulativeOutside;
-        BigInteger secondsPerLiquidityOutsideLowerX128 = lower.secondsPerLiquidityOutsideX128;
-        BigInteger secondsPerLiquidityOutsideUpperX128 = upper.secondsPerLiquidityOutsideX128;
-        BigInteger secondsOutsideLower = lower.secondsOutside;
-        BigInteger secondsOutsideUpper = upper.secondsOutside;
-
-        Context.require(lower.initialized, 
-            "snapshotCumulativesInside: lower not initialized");
-        Context.require(upper.initialized, 
-            "snapshotCumulativesInside: upper not initialized");
-
-        Slot0 _slot0 = this.slot0.get();
-
-        if (_slot0.tick < tickLower) {
-            return new SnapshotCumulativesInsideResult(
-                tickCumulativeLower.subtract(tickCumulativeUpper),
-                secondsPerLiquidityOutsideLowerX128.subtract(secondsPerLiquidityOutsideUpperX128),
-                secondsOutsideLower.subtract(secondsOutsideUpper)
-            );
-        } else if (_slot0.tick < tickUpper) {
-            BigInteger time = TimeUtils.now();
-            Observations.ObserveSingleResult result = observations.observeSingle(
-                time, 
-                ZERO, 
-                _slot0.tick, 
-                _slot0.observationIndex, 
-                this.liquidity.get(), 
-                _slot0.observationCardinality
-            );
-            BigInteger tickCumulative = result.tickCumulative;
-            BigInteger secondsPerLiquidityCumulativeX128 = result.secondsPerLiquidityCumulativeX128;
-
-            return new SnapshotCumulativesInsideResult(
-                tickCumulative.subtract(tickCumulativeLower).subtract(tickCumulativeUpper),
-                secondsPerLiquidityCumulativeX128.subtract(secondsPerLiquidityOutsideLowerX128).subtract(secondsPerLiquidityOutsideUpperX128),
-                time.subtract(secondsOutsideLower).subtract(secondsOutsideUpper)
-            );
-        } else {
-            return new SnapshotCumulativesInsideResult (
-                tickCumulativeUpper.subtract(tickCumulativeLower),
-                secondsPerLiquidityOutsideUpperX128.subtract(secondsPerLiquidityOutsideLowerX128),
-                secondsOutsideUpper.subtract(secondsOutsideLower)
-            );
-        }
-    }
-
-    /**
-     * @notice Returns the cumulative tick and liquidity as of each timestamp `secondsAgo` from the current block timestamp
-     * 
-     * Access: Everyone
-     * 
-     * @dev To get a time weighted average tick or liquidity-in-range, you must call this with two values, one representing
-     * the beginning of the period and another for the end of the period. E.g., to get the last hour time-weighted average tick,
-     * you must call it with secondsAgos = [3600, 0].
-     * @dev The time weighted average tick represents the geometric time weighted average price of the pool, in
-     * log base sqrt(1.0001) of token1 / token0. The TickMath library can be used to go from a tick value to a ratio.
-     * @param secondsAgos From how long ago each cumulative tick and liquidity value should be returned
-     * @return tickCumulatives Cumulative tick values as of each `secondsAgos` from the current block timestamp
-     * @return secondsPerLiquidityCumulativeX128s Cumulative seconds per liquidity-in-range value as of each `secondsAgos` from the current block
-     * timestamp
-     */
-    @External(readonly = true)
-    public ObserveResult observe (BigInteger[] secondsAgos) {
-        Slot0 _slot0 = this.slot0.get();
-        return observations.observe(
-            TimeUtils.now(), 
-            secondsAgos, 
-            _slot0.tick, 
-            _slot0.observationIndex, 
-            this.liquidity.get(), 
-            _slot0.observationCardinality
-        );
     }
 
     /**
@@ -507,174 +381,6 @@ abstract class ConvexusPool2 {
         this.poolLock.lock(false);
 
         this.Initialized(sqrtPriceX96, tick);
-    }
-
-    /**
-     * @dev Gets and updates a position with the given liquidity delta
-     * @param owner the owner of the position
-     * @param tickLower the lower tick of the position's tick range
-     * @param tickUpper the upper tick of the position's tick range
-     * @param tick the current tick, passed to avoid sloads
-     */
-    private PositionStorage _updatePosition (
-        Address owner,
-        int tickLower,
-        int tickUpper,
-        BigInteger liquidityDelta,
-        int tick
-    ) {
-        byte[] positionKey = Positions.getKey(owner, tickLower, tickUpper);
-        Position.Info position = this.positions.get(positionKey);
-
-        BigInteger _feeGrowthGlobal0X128 = this.feeGrowthGlobal0X128.get();
-        BigInteger _feeGrowthGlobal1X128 = this.feeGrowthGlobal1X128.get();
-        Slot0 _slot0 = this.slot0.get();
-
-        // if we need to update the ticks, do it
-        boolean flippedLower = false;
-        boolean flippedUpper = false;
-        if (!liquidityDelta.equals(ZERO)) {
-            BigInteger time = TimeUtils.now();
-            var result = this.observations.observeSingle(
-                time, 
-                ZERO, 
-                _slot0.tick, 
-                _slot0.observationIndex, 
-                this.liquidity.get(), 
-                _slot0.observationCardinality
-            );
-
-            BigInteger tickCumulative = result.tickCumulative;
-            BigInteger secondsPerLiquidityCumulativeX128 = result.secondsPerLiquidityCumulativeX128;
-
-            flippedLower = ticks.update(
-                tickLower,
-                tick,
-                liquidityDelta,
-                _feeGrowthGlobal0X128,
-                _feeGrowthGlobal1X128,
-                secondsPerLiquidityCumulativeX128,
-                tickCumulative,
-                time,
-                false,
-                this.maxLiquidityPerTick
-            );
-            
-            flippedUpper = ticks.update(
-                tickUpper,
-                tick,
-                liquidityDelta,
-                _feeGrowthGlobal0X128,
-                _feeGrowthGlobal1X128,
-                secondsPerLiquidityCumulativeX128,
-                tickCumulative,
-                time,
-                true,
-                this.maxLiquidityPerTick
-            );
-            
-            if (flippedLower) {
-                tickBitmap.flipTick(tickLower, tickSpacing);
-            }
-            if (flippedUpper) {
-                tickBitmap.flipTick(tickUpper, tickSpacing);
-            }
-        }
-
-        var result = this.ticks.getFeeGrowthInside(tickLower, tickUpper, tick, _feeGrowthGlobal0X128, _feeGrowthGlobal1X128);
-        BigInteger feeGrowthInside0X128 = result.feeGrowthInside0X128;
-        BigInteger feeGrowthInside1X128 = result.feeGrowthInside1X128;
-
-        PositionLib.update(position, liquidityDelta, feeGrowthInside0X128, feeGrowthInside1X128);
-
-        // clear any tick data that is no longer needed
-        if (liquidityDelta.compareTo(ZERO) < 0) {
-            if (flippedLower) {
-                this.ticks.clear(tickLower);
-            }
-            if (flippedUpper) {
-                this.ticks.clear(tickUpper);
-            }
-        }
-
-        this.positions.set(positionKey, position);
-        return new PositionStorage(position, positionKey);
-    }
-
-    /**
-     * @dev Effect some changes to a position
-     * @param params the position details and the change to the position's liquidity to effect
-     * @return position a storage pointer referencing the position with the given owner and tick range
-     * @return amount0 the amount of token0 owed to the pool, negative if the pool should pay the recipient
-     * @return amount1 the amount of token1 owed to the pool, negative if the pool should pay the recipient
-     */
-    private ModifyPositionResult _modifyPosition (ModifyPositionParams params) {
-        checkTicks(params.tickLower, params.tickUpper);
-
-        Slot0 _slot0 = this.slot0.get();
-
-        var positionStorage = _updatePosition(
-            params.owner,
-            params.tickLower,
-            params.tickUpper,
-            params.liquidityDelta,
-            _slot0.tick
-        );
-
-        BigInteger amount0 = ZERO;
-        BigInteger amount1 = ZERO;
-
-        if (!params.liquidityDelta.equals(ZERO)) {
-            if (_slot0.tick < params.tickLower) {
-                // current tick is below the passed range; liquidity can only become in range by crossing from left to
-                // right, when we'll need _more_ token0 (it's becoming more valuable) so user must provide it
-                amount0 = SqrtPriceMath.getAmount0Delta(
-                    TickMath.getSqrtRatioAtTick(params.tickLower),
-                    TickMath.getSqrtRatioAtTick(params.tickUpper),
-                    params.liquidityDelta
-                );
-            } else if (_slot0.tick < params.tickUpper) {
-                // current tick is inside the passed range
-                BigInteger liquidityBefore = this.liquidity.get();
-
-                // write an oracle entry
-                var writeResult = observations.write(
-                    _slot0.observationIndex,
-                    TimeUtils.now(),
-                    _slot0.tick,
-                    liquidityBefore,
-                    _slot0.observationCardinality,
-                    _slot0.observationCardinalityNext
-                );
-
-                _slot0.observationIndex = writeResult.indexUpdated;
-                _slot0.observationCardinality = writeResult.cardinalityUpdated;
-                this.slot0.set(_slot0);
-
-                amount0 = SqrtPriceMath.getAmount0Delta(
-                    _slot0.sqrtPriceX96,
-                    TickMath.getSqrtRatioAtTick(params.tickUpper),
-                    params.liquidityDelta
-                );
-                amount1 = SqrtPriceMath.getAmount1Delta(
-                    TickMath.getSqrtRatioAtTick(params.tickLower),
-                    _slot0.sqrtPriceX96,
-                    params.liquidityDelta
-                );
-
-                this.liquidity.set(LiquidityMath.addDelta(liquidityBefore, params.liquidityDelta));
-            } else {
-                // current tick is above the passed range; liquidity can only become in range by crossing from right to
-                // left, when we'll need _more_ token1 (it's becoming more valuable) so user must provide it
-                amount1 = SqrtPriceMath.getAmount1Delta(
-                    TickMath.getSqrtRatioAtTick(params.tickLower),
-                    TickMath.getSqrtRatioAtTick(params.tickUpper),
-                    params.liquidityDelta
-                );
-            }
-        }
-
-        return new ModifyPositionResult(positionStorage, amount0, amount1);
     }
 
     /**
@@ -789,22 +495,18 @@ abstract class ConvexusPool2 {
         if (amount0.compareTo(ZERO) > 0) {
             position.tokensOwed0 = position.tokensOwed0.subtract(amount0);
             this.positions.set(key, position);
-            pay(this.token0, recipient, amount0);
+            pay(this.settings.token0, recipient, amount0);
         }
         if (amount1.compareTo(ZERO) > 0) {
             position.tokensOwed1 = position.tokensOwed1.subtract(amount1);
             this.positions.set(key, position);
-            pay(this.token1, recipient, amount1);
+            pay(this.settings.token1, recipient, amount1);
         }
 
         this.Collect(caller, tickLower, tickUpper, recipient, amount0, amount1);
 
         this.poolLock.lock(false);
         return new PairAmounts(amount0, amount1);
-    }
-
-    private void pay (Address token, Address recipient, BigInteger amount) {
-        IIRC2ICX.transfer(token, recipient, amount, "pay");
     }
 
     /**
@@ -922,7 +624,7 @@ abstract class ConvexusPool2 {
 
             var next = tickBitmap.nextInitializedTickWithinOneWord(
                 state.tick,
-                tickSpacing,
+                this.settings.tickSpacing,
                 zeroForOne
             );
             
@@ -947,7 +649,7 @@ abstract class ConvexusPool2 {
                     : step.sqrtPriceNextX96,
                 state.liquidity,
                 state.amountSpecifiedRemaining,
-                fee
+                this.settings.fee
             );
 
             state.sqrtPriceX96 = swapStep.sqrtRatioNextX96;
@@ -1077,7 +779,7 @@ abstract class ConvexusPool2 {
         // do the transfers and collect payment
         if (zeroForOne) {
             if (amount1.compareTo(ZERO) < 0) {
-                pay(token1, recipient, amount1.negate());
+                pay(this.settings.token1, recipient, amount1.negate());
             }
 
             BigInteger balance0Before = balance0();
@@ -1087,7 +789,7 @@ abstract class ConvexusPool2 {
                 "swap: the callback didn't charge the payment (1)");
         } else {
             if (amount0.compareTo(ZERO) < 0) {
-                pay(token0, recipient, amount0.negate());
+                pay(this.settings.token0, recipient, amount0.negate());
             }
 
             BigInteger balance1Before = balance1();
@@ -1099,6 +801,205 @@ abstract class ConvexusPool2 {
 
         this.Swap(caller, recipient, amount0, amount1, state.sqrtPriceX96, state.liquidity, state.tick);
         this.poolLock.lock(false);
+
+        return new PairAmounts(amount0, amount1);
+    }
+
+    /**
+     * @notice Simulate a swap token0 for token1, or token1 for token0, as a readonly method
+     * 
+     * Access: Everyone
+     * 
+     * @dev The caller of this method receives a callback in the form of `convexusSwapCallbackReadonly`
+     * @param recipient The address to receive the output of the swap
+     * @param zeroForOne The direction of the swap, true for token0 to token1, false for token1 to token0
+     * @param amountSpecified The amount of the swap, which implicitly configures the swap as exact input (positive), or exact output (negative)
+     * @param sqrtPriceLimitX96 The Q64.96 sqrt price limit. If zero for one, the price cannot be less than this value after the swap. If one for zero, the price cannot be greater than this value after the swap.
+     * @param data Any data to be passed through to the callback
+     * @return amount0 The delta of the balance of token0 of the pool, exact when negative, minimum when positive
+     * @return amount1 The delta of the balance of token1 of the pool, exact when negative, minimum when positive
+     */
+    @External(readonly = true)
+    public PairAmounts swapReadOnly (
+        Address recipient,
+        boolean zeroForOne,
+        BigInteger amountSpecified,
+        BigInteger sqrtPriceLimitX96,
+        byte[] data
+    ) {
+        final Address caller = Context.getCaller();
+
+        Context.require(!amountSpecified.equals(ZERO),
+            "swapReadOnly: amountSpecified must be different from zero");
+        
+        Slot0 slot0Start = this.slot0.get();
+
+        Context.require (
+            zeroForOne
+                ? sqrtPriceLimitX96.compareTo(slot0Start.sqrtPriceX96) < 0 && sqrtPriceLimitX96.compareTo(TickMath.MIN_SQRT_RATIO) > 0
+                : sqrtPriceLimitX96.compareTo(slot0Start.sqrtPriceX96) > 0 && sqrtPriceLimitX96.compareTo(TickMath.MAX_SQRT_RATIO) < 0,
+            "swapReadOnly: Wrong sqrtPriceLimitX96"
+        );
+
+        SwapCache cache = new SwapCache(
+            this.liquidity.get(),
+            TimeUtils.now(),
+            zeroForOne ? (slot0Start.feeProtocol % 16) : (slot0Start.feeProtocol >> 4),
+            ZERO,
+            ZERO,
+            false
+        );
+
+        boolean exactInput = amountSpecified.compareTo(ZERO) > 0;
+
+        SwapState state = new SwapState(
+            amountSpecified,
+            ZERO,
+            slot0Start.sqrtPriceX96,
+            slot0Start.tick,
+            zeroForOne ? feeGrowthGlobal0X128.get() : feeGrowthGlobal1X128.get(),
+            ZERO,
+            cache.liquidityStart
+        );
+        
+        // continue swapping as long as we haven't used the entire input/output and haven't reached the price limit
+        while (
+            !state.amountSpecifiedRemaining.equals(ZERO) 
+         && !state.sqrtPriceX96.equals(sqrtPriceLimitX96)
+        ) {
+
+            StepComputations step = new StepComputations();
+            step.sqrtPriceStartX96 = state.sqrtPriceX96;
+
+            var next = tickBitmap.nextInitializedTickWithinOneWord(
+                state.tick,
+                this.settings.tickSpacing,
+                zeroForOne
+            );
+            
+            step.tickNext = next.tickNext;
+            step.initialized = next.initialized;
+            
+            // ensure that we do not overshoot the min/max tick, as the tick bitmap is not aware of these bounds
+            if (step.tickNext < TickMath.MIN_TICK) {
+                step.tickNext = TickMath.MIN_TICK;
+            } else if (step.tickNext > TickMath.MAX_TICK) {
+                step.tickNext = TickMath.MAX_TICK;
+            }
+
+            // get the price for the next tick
+            step.sqrtPriceNextX96 = TickMath.getSqrtRatioAtTick(step.tickNext);
+
+            // compute values to swap to the target tick, price limit, or point where input/output amount is exhausted
+            var swapStep = SwapMath.computeSwapStep(
+                state.sqrtPriceX96,
+                (zeroForOne ? step.sqrtPriceNextX96.compareTo(sqrtPriceLimitX96) < 0 : step.sqrtPriceNextX96.compareTo(sqrtPriceLimitX96) > 0)
+                    ? sqrtPriceLimitX96
+                    : step.sqrtPriceNextX96,
+                state.liquidity,
+                state.amountSpecifiedRemaining,
+                this.settings.fee
+            );
+
+            state.sqrtPriceX96 = swapStep.sqrtRatioNextX96;
+            step.amountIn = swapStep.amountIn;
+            step.amountOut = swapStep.amountOut;
+            step.feeAmount = swapStep.feeAmount;
+
+            if (exactInput) {
+                state.amountSpecifiedRemaining = state.amountSpecifiedRemaining.subtract(step.amountIn.add(step.feeAmount));
+                state.amountCalculated = state.amountCalculated.subtract(step.amountOut);
+            } else {
+                state.amountSpecifiedRemaining = state.amountSpecifiedRemaining.add(step.amountOut);
+                state.amountCalculated = state.amountCalculated.add((step.amountIn.add(step.feeAmount)));
+            }
+            
+            // if the protocol fee is on, calculate how much is owed, decrement feeAmount, and increment protocolFee
+            if (cache.feeProtocol > 0) {
+                BigInteger delta = step.feeAmount.divide(BigInteger.valueOf(cache.feeProtocol));
+                step.feeAmount = step.feeAmount.subtract(delta);
+                state.protocolFee = state.protocolFee.add(delta);
+            }
+
+            // update global fee tracker
+            if (state.liquidity.compareTo(ZERO) > 0) {
+                state.feeGrowthGlobalX128 = state.feeGrowthGlobalX128.add(FullMath.mulDiv(step.feeAmount, FixedPoint128.Q128, state.liquidity));
+            }
+            
+            // shift tick if we reached the next price
+            if (state.sqrtPriceX96.equals(step.sqrtPriceNextX96)) {
+                // if the tick is initialized, run the tick transition
+                if (step.initialized) {
+                    // check for the placeholder value, which we replace with the actual value the first time the swap
+                    // crosses an initialized tick
+                    if (!cache.computedLatestObservation) {
+                        var result = observations.observeSingle(
+                            cache.blockTimestamp,
+                            ZERO,
+                            slot0Start.tick,
+                            slot0Start.observationIndex,
+                            cache.liquidityStart,
+                            slot0Start.observationCardinality
+                        );
+                        cache.tickCumulative = result.tickCumulative;
+                        cache.secondsPerLiquidityCumulativeX128 = result.secondsPerLiquidityCumulativeX128;
+                        cache.computedLatestObservation = true;
+                    }
+                    BigInteger liquidityNet = ticks.get(step.tickNext).liquidityNet;
+                    
+                    // if we're moving leftward, we interpret liquidityNet as the opposite sign
+                    // safe because liquidityNet cannot be type(int128).min
+                    if (zeroForOne) liquidityNet = liquidityNet.negate();
+
+                    state.liquidity = LiquidityMath.addDelta(state.liquidity, liquidityNet);
+                }
+
+                state.tick = zeroForOne ? step.tickNext - 1 : step.tickNext;
+            } else if (state.sqrtPriceX96 != step.sqrtPriceStartX96) {
+                // recompute unless we're on a lower tick boundary (i.e. already transitioned ticks), and haven't moved
+                state.tick = TickMath.getTickAtSqrtRatio(state.sqrtPriceX96);
+            }
+        }
+
+        // update tick and write an oracle entry if the tick change
+        Slot0 slot0 = this.slot0.get();
+        if (state.tick != slot0Start.tick) {
+            int index = slot0Start.observationIndex;
+            int cardinality = slot0Start.observationCardinality;
+            int cardinalityNext = slot0Start.observationCardinalityNext;
+            int cardinalityUpdated = cardinality;
+            // if the conditions are right, we can bump the cardinality
+            if (cardinalityNext > cardinality && index == (cardinality - 1)) {
+                cardinalityUpdated = cardinalityNext;
+            }
+            int indexUpdated = (index + 1) % cardinalityUpdated;
+
+            slot0.sqrtPriceX96 = state.sqrtPriceX96;
+            slot0.tick = state.tick;
+            slot0.observationIndex = indexUpdated;
+            slot0.observationCardinality = cardinalityUpdated;
+        } else {
+            // otherwise just update the price
+            slot0.sqrtPriceX96 = state.sqrtPriceX96;
+        }
+
+        BigInteger amount0;
+        BigInteger amount1;
+
+        if (zeroForOne == exactInput) {
+            amount0 = amountSpecified.subtract(state.amountSpecifiedRemaining);
+            amount1 = state.amountCalculated;
+        } else {
+            amount0 = state.amountCalculated;
+            amount1 = amountSpecified.subtract(state.amountSpecifiedRemaining);
+        }
+
+        // do the transfers and collect payment
+        if (zeroForOne) {
+            IConvexusPoolCallee.convexusSwapCallbackReadonly(caller, amount0, amount1, data, slot0);
+        } else {
+            IConvexusPoolCallee.convexusSwapCallbackReadonly(caller, amount0, amount1, data, slot0);
+        }
 
         return new PairAmounts(amount0, amount1);
     }
@@ -1132,16 +1033,16 @@ abstract class ConvexusPool2 {
         
         final BigInteger TEN_E6 = BigInteger.valueOf(1000000);
         
-        BigInteger fee0 = FullMath.mulDivRoundingUp(amount0, BigInteger.valueOf(fee), TEN_E6);
-        BigInteger fee1 = FullMath.mulDivRoundingUp(amount1, BigInteger.valueOf(fee), TEN_E6);
+        BigInteger fee0 = FullMath.mulDivRoundingUp(amount0, BigInteger.valueOf(this.settings.fee), TEN_E6);
+        BigInteger fee1 = FullMath.mulDivRoundingUp(amount1, BigInteger.valueOf(this.settings.fee), TEN_E6);
         BigInteger balance0Before = balance0();
         BigInteger balance1Before = balance1();
 
         if (amount0.compareTo(ZERO) > 0) {
-            pay(token0, recipient, amount0);
+            pay(this.settings.token0, recipient, amount0);
         }
         if (amount1.compareTo(ZERO) > 0) {
-            pay(token1, recipient, amount1);
+            pay(this.settings.token1, recipient, amount1);
         }
 
         IConvexusPoolCallee.convexusFlashCallback(caller, fee0, fee1, data);
@@ -1259,7 +1160,7 @@ abstract class ConvexusPool2 {
             }
             _protocolFees.token0 = _protocolFees.token0.subtract(amount0);
             this.protocolFees.set(_protocolFees);
-            pay(token0, recipient, amount0);
+            pay(this.settings.token0, recipient, amount0);
         }
         if (amount1.compareTo(ZERO) > 0) {
             if (amount1.equals(_protocolFees.token1)) {
@@ -1268,7 +1169,7 @@ abstract class ConvexusPool2 {
             }
             _protocolFees.token1 = _protocolFees.token1.subtract(amount1);
             this.protocolFees.set(_protocolFees);
-            pay(token1, recipient, amount1);
+            pay(this.settings.token1, recipient, amount1);
         }
 
         this.CollectProtocol(caller, recipient, amount0, amount1);
@@ -1291,10 +1192,308 @@ abstract class ConvexusPool2 {
     }
 
     // ================================================
+    // ReadOnly methods
+    // ================================================
+    /**
+     * @notice Returns a snapshot of the tick cumulative, seconds per liquidity and seconds inside a tick range
+     * 
+     * Access: Everyone
+     * 
+     * @dev Snapshots must only be compared to other snapshots, taken over a period for which a position existed.
+     * I.e., snapshots cannot be compared if a position is not held for the entire period between when the first
+     * snapshot is taken and the second snapshot is taken.
+     * @param tickLower The lower tick of the range
+     * @param tickUpper The upper tick of the range
+     * @return tickCumulativeInside The snapshot of the tick accumulator for the range
+     * @return secondsPerLiquidityInsideX128 The snapshot of seconds per liquidity for the range
+     * @return secondsInside The snapshot of seconds per liquidity for the range
+     */
+    @External(readonly = true)
+    public SnapshotCumulativesInsideResult snapshotCumulativesInside (int tickLower, int tickUpper) {
+        checkTicks(tickLower, tickUpper);
+
+        Tick.Info lower = ticks.get(tickLower);
+        Tick.Info upper = ticks.get(tickUpper);
+
+        BigInteger tickCumulativeLower = lower.tickCumulativeOutside;
+        BigInteger tickCumulativeUpper = upper.tickCumulativeOutside;
+        BigInteger secondsPerLiquidityOutsideLowerX128 = lower.secondsPerLiquidityOutsideX128;
+        BigInteger secondsPerLiquidityOutsideUpperX128 = upper.secondsPerLiquidityOutsideX128;
+        BigInteger secondsOutsideLower = lower.secondsOutside;
+        BigInteger secondsOutsideUpper = upper.secondsOutside;
+
+        Context.require(lower.initialized, 
+            "snapshotCumulativesInside: lower not initialized");
+        Context.require(upper.initialized, 
+            "snapshotCumulativesInside: upper not initialized");
+
+        Slot0 _slot0 = this.slot0.get();
+
+        if (_slot0.tick < tickLower) {
+            return new SnapshotCumulativesInsideResult(
+                tickCumulativeLower.subtract(tickCumulativeUpper),
+                secondsPerLiquidityOutsideLowerX128.subtract(secondsPerLiquidityOutsideUpperX128),
+                secondsOutsideLower.subtract(secondsOutsideUpper)
+            );
+        } else if (_slot0.tick < tickUpper) {
+            BigInteger time = TimeUtils.now();
+            Observations.ObserveSingleResult result = observations.observeSingle(
+                time, 
+                ZERO, 
+                _slot0.tick, 
+                _slot0.observationIndex, 
+                this.liquidity.get(), 
+                _slot0.observationCardinality
+            );
+            BigInteger tickCumulative = result.tickCumulative;
+            BigInteger secondsPerLiquidityCumulativeX128 = result.secondsPerLiquidityCumulativeX128;
+
+            return new SnapshotCumulativesInsideResult(
+                tickCumulative.subtract(tickCumulativeLower).subtract(tickCumulativeUpper),
+                secondsPerLiquidityCumulativeX128.subtract(secondsPerLiquidityOutsideLowerX128).subtract(secondsPerLiquidityOutsideUpperX128),
+                time.subtract(secondsOutsideLower).subtract(secondsOutsideUpper)
+            );
+        } else {
+            return new SnapshotCumulativesInsideResult (
+                tickCumulativeUpper.subtract(tickCumulativeLower),
+                secondsPerLiquidityOutsideUpperX128.subtract(secondsPerLiquidityOutsideLowerX128),
+                secondsOutsideUpper.subtract(secondsOutsideLower)
+            );
+        }
+    }
+
+    /**
+     * @notice Returns the cumulative tick and liquidity as of each timestamp `secondsAgo` from the current block timestamp
+     * 
+     * Access: Everyone
+     * 
+     * @dev To get a time weighted average tick or liquidity-in-range, you must call this with two values, one representing
+     * the beginning of the period and another for the end of the period. E.g., to get the last hour time-weighted average tick,
+     * you must call it with secondsAgos = [3600, 0].
+     * @dev The time weighted average tick represents the geometric time weighted average price of the pool, in
+     * log base sqrt(1.0001) of token1 / token0. The TickMath library can be used to go from a tick value to a ratio.
+     * @param secondsAgos From how long ago each cumulative tick and liquidity value should be returned
+     * @return tickCumulatives Cumulative tick values as of each `secondsAgos` from the current block timestamp
+     * @return secondsPerLiquidityCumulativeX128s Cumulative seconds per liquidity-in-range value as of each `secondsAgos` from the current block
+     * timestamp
+     */
+    @External(readonly = true)
+    public ObserveResult observe (BigInteger[] secondsAgos) {
+        Slot0 _slot0 = this.slot0.get();
+        return observations.observe(
+            TimeUtils.now(), 
+            secondsAgos, 
+            _slot0.tick, 
+            _slot0.observationIndex, 
+            this.liquidity.get(), 
+            _slot0.observationCardinality
+        );
+    }
+
+
+    // ================================================
+    // Private methods
+    // ================================================
+    private void pay (Address token, Address recipient, BigInteger amount) {
+        IIRC2ICX.transfer(token, recipient, amount, "pay");
+    }
+
+    /**
+     * @dev Gets and updates a position with the given liquidity delta
+     * @param owner the owner of the position
+     * @param tickLower the lower tick of the position's tick range
+     * @param tickUpper the upper tick of the position's tick range
+     * @param tick the current tick, passed to avoid sloads
+     */
+    private PositionStorage _updatePosition (
+        Address owner,
+        int tickLower,
+        int tickUpper,
+        BigInteger liquidityDelta,
+        int tick
+    ) {
+        byte[] positionKey = Positions.getKey(owner, tickLower, tickUpper);
+        Position.Info position = this.positions.get(positionKey);
+
+        BigInteger _feeGrowthGlobal0X128 = this.feeGrowthGlobal0X128.get();
+        BigInteger _feeGrowthGlobal1X128 = this.feeGrowthGlobal1X128.get();
+        Slot0 _slot0 = this.slot0.get();
+
+        // if we need to update the ticks, do it
+        boolean flippedLower = false;
+        boolean flippedUpper = false;
+        if (!liquidityDelta.equals(ZERO)) {
+            BigInteger time = TimeUtils.now();
+            var result = this.observations.observeSingle(
+                time, 
+                ZERO, 
+                _slot0.tick, 
+                _slot0.observationIndex, 
+                this.liquidity.get(), 
+                _slot0.observationCardinality
+            );
+
+            BigInteger tickCumulative = result.tickCumulative;
+            BigInteger secondsPerLiquidityCumulativeX128 = result.secondsPerLiquidityCumulativeX128;
+
+            flippedLower = ticks.update(
+                tickLower,
+                tick,
+                liquidityDelta,
+                _feeGrowthGlobal0X128,
+                _feeGrowthGlobal1X128,
+                secondsPerLiquidityCumulativeX128,
+                tickCumulative,
+                time,
+                false,
+                this.settings.maxLiquidityPerTick
+            );
+            
+            flippedUpper = ticks.update(
+                tickUpper,
+                tick,
+                liquidityDelta,
+                _feeGrowthGlobal0X128,
+                _feeGrowthGlobal1X128,
+                secondsPerLiquidityCumulativeX128,
+                tickCumulative,
+                time,
+                true,
+                this.settings.maxLiquidityPerTick
+            );
+            
+            if (flippedLower) {
+                tickBitmap.flipTick(tickLower, this.settings.tickSpacing);
+            }
+            if (flippedUpper) {
+                tickBitmap.flipTick(tickUpper, this.settings.tickSpacing);
+            }
+        }
+
+        var result = this.ticks.getFeeGrowthInside(tickLower, tickUpper, tick, _feeGrowthGlobal0X128, _feeGrowthGlobal1X128);
+        BigInteger feeGrowthInside0X128 = result.feeGrowthInside0X128;
+        BigInteger feeGrowthInside1X128 = result.feeGrowthInside1X128;
+
+        PositionLib.update(position, liquidityDelta, feeGrowthInside0X128, feeGrowthInside1X128);
+
+        // clear any tick data that is no longer needed
+        if (liquidityDelta.compareTo(ZERO) < 0) {
+            if (flippedLower) {
+                this.ticks.clear(tickLower);
+            }
+            if (flippedUpper) {
+                this.ticks.clear(tickUpper);
+            }
+        }
+
+        this.positions.set(positionKey, position);
+        return new PositionStorage(position, positionKey);
+    }
+
+    /**
+     * @dev Effect some changes to a position
+     * @param params the position details and the change to the position's liquidity to effect
+     * @return position a storage pointer referencing the position with the given owner and tick range
+     * @return amount0 the amount of token0 owed to the pool, negative if the pool should pay the recipient
+     * @return amount1 the amount of token1 owed to the pool, negative if the pool should pay the recipient
+     */
+    private ModifyPositionResult _modifyPosition (ModifyPositionParams params) {
+        checkTicks(params.tickLower, params.tickUpper);
+
+        Slot0 _slot0 = this.slot0.get();
+
+        var positionStorage = _updatePosition(
+            params.owner,
+            params.tickLower,
+            params.tickUpper,
+            params.liquidityDelta,
+            _slot0.tick
+        );
+
+        BigInteger amount0 = ZERO;
+        BigInteger amount1 = ZERO;
+
+        if (!params.liquidityDelta.equals(ZERO)) {
+            if (_slot0.tick < params.tickLower) {
+                // current tick is below the passed range; liquidity can only become in range by crossing from left to
+                // right, when we'll need _more_ token0 (it's becoming more valuable) so user must provide it
+                amount0 = SqrtPriceMath.getAmount0Delta(
+                    TickMath.getSqrtRatioAtTick(params.tickLower),
+                    TickMath.getSqrtRatioAtTick(params.tickUpper),
+                    params.liquidityDelta
+                );
+            } else if (_slot0.tick < params.tickUpper) {
+                // current tick is inside the passed range
+                BigInteger liquidityBefore = this.liquidity.get();
+
+                // write an oracle entry
+                var writeResult = observations.write(
+                    _slot0.observationIndex,
+                    TimeUtils.now(),
+                    _slot0.tick,
+                    liquidityBefore,
+                    _slot0.observationCardinality,
+                    _slot0.observationCardinalityNext
+                );
+
+                _slot0.observationIndex = writeResult.indexUpdated;
+                _slot0.observationCardinality = writeResult.cardinalityUpdated;
+                this.slot0.set(_slot0);
+
+                amount0 = SqrtPriceMath.getAmount0Delta(
+                    _slot0.sqrtPriceX96,
+                    TickMath.getSqrtRatioAtTick(params.tickUpper),
+                    params.liquidityDelta
+                );
+                amount1 = SqrtPriceMath.getAmount1Delta(
+                    TickMath.getSqrtRatioAtTick(params.tickLower),
+                    _slot0.sqrtPriceX96,
+                    params.liquidityDelta
+                );
+
+                this.liquidity.set(LiquidityMath.addDelta(liquidityBefore, params.liquidityDelta));
+            } else {
+                // current tick is above the passed range; liquidity can only become in range by crossing from right to
+                // left, when we'll need _more_ token1 (it's becoming more valuable) so user must provide it
+                amount1 = SqrtPriceMath.getAmount1Delta(
+                    TickMath.getSqrtRatioAtTick(params.tickLower),
+                    TickMath.getSqrtRatioAtTick(params.tickUpper),
+                    params.liquidityDelta
+                );
+            }
+        }
+
+        return new ModifyPositionResult(positionStorage, amount0, amount1);
+    }
+
+    /**
+     * @notice Get the pool's balance of token0
+     */
+    private BigInteger balance0 () {
+        return IIRC2ICX.balanceOf(this.settings.token0, Context.getAddress());
+    }
+
+    /**
+     * @notice Get the pool's balance of token1
+     */
+    private BigInteger balance1 () {
+        return IIRC2ICX.balanceOf(this.settings.token1, Context.getAddress());
+    }
+
+    // ================================================
     // Checks
     // ================================================
+    private void checkTicks (int tickLower, int tickUpper) {
+        Context.require(tickLower < tickUpper, 
+            "checkTicks: tickLower must be lower than tickUpper");
+        Context.require(tickLower >= TickMath.MIN_TICK, 
+            "checkTicks: tickLower lower than expected");
+        Context.require(tickUpper <= TickMath.MAX_TICK, 
+            "checkTicks: tickUpper greater than expected");
+    }
+
     private void checkCallerIsFactoryOwner() {
-        final Address factoryOwner = IConvexusFactory.owner(this.factory);
+        final Address factoryOwner = IConvexusFactory.owner(this.settings.factory);
         final Address caller = Context.getCaller();
 
         Context.require(caller.equals(factoryOwner),
@@ -1306,37 +1505,27 @@ abstract class ConvexusPool2 {
     // ================================================
     @External(readonly = true)
     public String name() {
-        return this.name;
+        return this.settings.name;
     }
 
     @External(readonly = true)
     public Address factory() {
-        return this.factory;
+        return this.settings.factory;
     }
 
     @External(readonly = true)
     public Address token0() {
-        return this.token0;
+        return this.settings.token0;
     }
 
     @External(readonly = true)
     public Address token1() {
-        return this.token1;
+        return this.settings.token1;
     }
 
     @External(readonly = true)
-    public Tick.Info ticks (int tick) {
-        return this.ticks.get(tick);
-    }
-
-    @External(readonly = true)
-    public Position.Info positions (byte[] key) {
-        return this.positions.get(key);
-    }
-
-    @External(readonly = true)
-    public Oracle.Observation observations (int index) {
-        return this.observations.get(index);
+    public PoolSettings settings() {
+        return this.settings;
     }
 
     /**
@@ -1353,13 +1542,8 @@ abstract class ConvexusPool2 {
     }
 
     @External(readonly = true)
-    public BigInteger tickBitmap (int index) {
-        return this.tickBitmap.get(index);
-    }
-
-    @External(readonly = true)
     public BigInteger maxLiquidityPerTick () {
-        return this.maxLiquidityPerTick;
+        return this.settings.maxLiquidityPerTick;
     }
 
     @External(readonly = true)
@@ -1369,12 +1553,12 @@ abstract class ConvexusPool2 {
 
     @External(readonly = true)
     public BigInteger fee () {
-        return BigInteger.valueOf(this.fee);
+        return BigInteger.valueOf(this.settings.fee);
     }
 
     @External(readonly = true)
     public BigInteger tickSpacing () {
-        return BigInteger.valueOf(this.tickSpacing);
+        return BigInteger.valueOf(this.settings.tickSpacing);
     }
 
     @External(readonly = true)
@@ -1385,5 +1569,26 @@ abstract class ConvexusPool2 {
     @External(readonly = true)
     public BigInteger feeGrowthGlobal1X128 () {
         return feeGrowthGlobal1X128.get();
+    }
+    
+    // Implements Interfaces
+    @External(readonly = true)
+    public Tick.Info ticks (int tick) {
+        return this.ticks.get(tick);
+    }
+
+    @External(readonly = true)
+    public Position.Info positions (byte[] key) {
+        return this.positions.get(key);
+    }
+
+    @External(readonly = true)
+    public Oracle.Observation observations (int index) {
+        return this.observations.get(index);
+    }
+
+    @External(readonly = true)
+    public BigInteger tickBitmap (int index) {
+        return this.tickBitmap.get(index);
     }
 }

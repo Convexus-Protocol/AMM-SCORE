@@ -7,7 +7,9 @@ dependencies {
     implementation project(':Convexus-Commons:Librairies')
     
     implementation project(':Convexus-Core:Structs:Pool')
+    implementation project(':Convexus-Core:Librairies')
     implementation project(':Convexus-Core:Score-Interfaces:Pool')
+    implementation project(':Convexus-Core:Score-Interfaces:ConvexusPoolCallee')
 
     implementation project(':Convexus-Periphery:Librairies')
 }

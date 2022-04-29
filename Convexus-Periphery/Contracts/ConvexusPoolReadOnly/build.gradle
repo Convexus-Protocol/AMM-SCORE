@@ -1,0 +1,26 @@
+dependencies {
+    compileOnly 'foundation.icon:javaee-api:0.9.0'
+    implementation 'foundation.icon:javaee-scorex:0.5.2'
+    implementation 'com.github.sink772:minimal-json:0.9.6'
+
+    implementation project(':Convexus-Commons:Utils')
+    implementation project(':Convexus-Commons:Librairies')
+    
+    implementation project(':Convexus-Core:Structs:Pool')
+    implementation project(':Convexus-Core:Librairies')
+    implementation project(':Convexus-Core:Score-Interfaces:Pool')
+    implementation project(':Convexus-Core:Score-Interfaces:ConvexusPoolCallee')
+
+    implementation project(':Convexus-Periphery:Librairies')
+}
+
+optimizedJar {
+    mainClassName = 'exchange.convexus.periphery.quoter.Quoter'
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}
+
+test {
+    useJUnitPlatform()
+}

@@ -37,7 +37,7 @@ deployDir=$(getDeployDir ${pkg} ${network})
 callsDir=$(getCallsDir ${pkg} ${network})
 
 # Pool Package information
-poolPkg=$(getPoolPkg)
+poolPkg=$(getPoolPkg ${poolId})
 setupDeployDir ${poolPkg} ${network}
 setupCallsDir ${poolPkg} ${network}
 poolDeployDir=$(getDeployDir ${poolPkg} ${network})
