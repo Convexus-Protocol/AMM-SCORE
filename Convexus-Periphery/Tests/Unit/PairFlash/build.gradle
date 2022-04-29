@@ -13,6 +13,7 @@ dependencies {
     testImplementation project(':Convexus-Commons:Tests:Unit:ConvexusFactory')
     testImplementation project(':Convexus-Commons:Tests:Unit:Tokens')
     testImplementation project(':Convexus-Commons:Tests:Unit:NFTPosition')
+    testImplementation project(':Convexus-Commons:Tests:Unit:ConvexusLiquidity')
 
     testImplementation project(':Convexus-Core:Contracts:Factory')
 
@@ -21,6 +22,8 @@ dependencies {
     testImplementation project(':Convexus-Periphery:Contracts:NonfungibleTokenPositionDescriptor')
     testImplementation project(':Convexus-Periphery:Contracts:NonFungiblePositionManager')
     testImplementation project(':Convexus-Periphery:Contracts:SwapRouter')
+
+    testImplementation project(':Convexus-Periphery:Structs:PairFlash')
 }
 
 test {

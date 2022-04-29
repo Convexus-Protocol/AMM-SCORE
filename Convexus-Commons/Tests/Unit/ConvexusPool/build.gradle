@@ -7,6 +7,8 @@ dependencies {
     implementation 'org.junit.jupiter:junit-jupiter-api:5.6.0'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.6.0'
     
+    implementation project(':Test-Framework:unittest')
+    
     /// Commons ///
     implementation project(':Convexus-Commons:Utils')
     implementation project(':Convexus-Commons:Librairies')
@@ -14,8 +16,18 @@ dependencies {
     
     /// Core ///
     implementation project(':Convexus-Core:Librairies')
-    // Pool
+    // Contracts
     implementation project(':Convexus-Core:Contracts:Pool')
+    // Interfaces
+    implementation project(':Convexus-Core:Interfaces:Observations')
+    implementation project(':Convexus-Core:Interfaces:Positions')
+    implementation project(':Convexus-Core:Interfaces:TickBitmap')
+    implementation project(':Convexus-Core:Interfaces:Ticks')
     // ScoreInterfaces
     implementation project(':Convexus-Core:Score-Interfaces:Pool')
+    implementation project(':Convexus-Core:Score-Interfaces:Factory')
+    implementation project(':Convexus-Core:Score-Interfaces:ConvexusPoolCallee')
+    // Structs
+    implementation project(':Convexus-Core:Structs:Pool')
+    implementation project(':Convexus-Core:Structs:Factory')
 }

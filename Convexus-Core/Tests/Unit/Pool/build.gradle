@@ -29,6 +29,11 @@ dependencies {
     testImplementation project(':Convexus-Commons:Tests:Unit:ConvexusPoolCallee')
     testImplementation project(':Convexus-Commons:Tests:Unit:ConvexusPoolInitializer')
     testImplementation project(':Convexus-Commons:Tests:Unit:ConvexusTest')
+    testImplementation project(':Convexus-Commons:Tests:Unit:ConvexusLiquidity')
+    testImplementation project(':Convexus-Commons:Tests:Unit:ConvexusPool')
+    testImplementation project(':Convexus-Commons:Tests:Unit:ConvexusReentrantCallee')
+    testImplementation project(':Convexus-Commons:Tests:Unit:ConvexusSwapPay')
+    testImplementation project(':Convexus-Commons:Tests:Unit:Tokens')
     
 }
 

@@ -7,6 +7,8 @@ dependencies {
     implementation 'org.junit.jupiter:junit-jupiter-api:5.6.0'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.6.0'
     
+    implementation project(':Test-Framework:unittest')
+    
     /// Commons ///
     implementation project(':Convexus-Commons:Utils')
     implementation project(':Convexus-Commons:Librairies')

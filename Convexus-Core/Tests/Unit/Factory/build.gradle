@@ -12,6 +12,8 @@ dependencies {
     testImplementation project(':Test-Framework:unittest')
     testImplementation project(':Convexus-Commons:Tests:Unit:ConvexusTest')
     testImplementation project(':Convexus-Commons:Tests:Unit:Utils')
+    testImplementation project(':Convexus-Commons:Tests:Unit:Tokens')
+    testImplementation project(':Convexus-Commons:Tests:Unit:ConvexusFactory')
     
     testImplementation project(':Convexus-Commons:Utils')
     testImplementation project(':Convexus-Core:Contracts:Factory')

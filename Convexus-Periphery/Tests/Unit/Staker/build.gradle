@@ -11,6 +11,11 @@ dependencies {
     testImplementation project(':Convexus-Commons:Tests:Unit:Utils')
     testImplementation project(':Convexus-Commons:Tests:Unit:ConvexusTest')
     testImplementation project(':Convexus-Commons:Tests:Unit:ConvexusLiquidity')
+    testImplementation project(':Convexus-Commons:Tests:Unit:Staker')
+    testImplementation project(':Convexus-Commons:Tests:Unit:ConvexusPool')
+    testImplementation project(':Convexus-Commons:Tests:Unit:ConvexusFactory')
+    testImplementation project(':Convexus-Commons:Tests:Unit:NFTPosition')
+    testImplementation project(':Convexus-Commons:Tests:Unit:Tokens')
 
     // Core
     testImplementation project(':Convexus-Core:Structs:Pool')
