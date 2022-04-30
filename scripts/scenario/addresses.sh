@@ -33,4 +33,6 @@ echo "  \"$(getAddress "core/pools/custom-sicx-usdc/token1" ${endpoint})\": \"US
 echo "  \"$(getAddress "periphery/swaprouter" ${endpoint})\": \"Swap Router\","
 echo "  \"$(getAddress "periphery/positiondescriptor" ${endpoint})\": \"Position Descriptor\","
 echo "  \"$(getAddress "periphery/positionmgr" ${endpoint})\": \"Position Manager\","
+echo "  \"$(getAddress $(getReadOnlyPool) ${endpoint})\": \"Pool ReadOnly\","
+echo "  \"$(getAddress $(getQuoter) ${endpoint})\": \"Quoter\","
 echo "}"
