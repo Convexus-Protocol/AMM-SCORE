@@ -14,6 +14,7 @@ dependencies {
     implementation project(':Convexus-Periphery:Librairies')
     implementation project(':Convexus-Periphery:Score-Interfaces:ConvexusPoolReadOnly')
     implementation project(':Convexus-Periphery:Structs:ConvexusPoolReadOnly')
+    implementation project(':Convexus-Periphery:Structs:Quoter')
 }
 
 optimizedJar {

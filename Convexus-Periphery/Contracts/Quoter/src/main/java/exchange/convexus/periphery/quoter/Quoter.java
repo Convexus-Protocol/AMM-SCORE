@@ -250,10 +250,12 @@ public class Quoter {
     /// @return amountOut The amount of the last token that would be received
     /// @return sqrtPriceX96AfterList List of the sqrt price after the swap for each pool in the path
     /// @return initializedTicksCrossedList List of the initialized ticks that the swap crossed for each pool in the path
-    /// @return gasEstimate The estimate of the gas that the swap consumes
     @External(readonly = true)
-    public QuoteMultiResult quoteExactInput (byte[] path, BigInteger amountIn) {
-
+    public QuoteMultiResult quoteExactInput (
+        QuoteExactInputParams params
+    ) {
+        byte[] path = params.path;
+        BigInteger amountIn = params.amountIn;
         int numPools = Path.numPools(path);
         BigInteger[] sqrtPriceX96AfterList = new BigInteger[numPools];
         int[] initializedTicksCrossedList = new int[numPools];
@@ -332,8 +334,11 @@ public class Quoter {
      * @return amountIn The amount of first token required to be paid
      */
     @External(readonly = true)
-    public QuoteMultiResult quoteExactOutput (byte[] path, BigInteger amountOut) {
-        
+    public QuoteMultiResult quoteExactOutput (
+        QuoteExactOutputParams params
+    ) {
+        byte[] path = params.path;
+        BigInteger amountOut = params.amountOut;
         int numPools = Path.numPools(path);
         BigInteger[] sqrtPriceX96AfterList = new BigInteger[numPools];
         int[] initializedTicksCrossedList = new int[numPools];

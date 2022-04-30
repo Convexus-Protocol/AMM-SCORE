@@ -22,7 +22,7 @@ import score.Address;
 import score.Context;
 
 public class ICX {
-  private static final Address TOKEN_ADDRESS = Address.fromString("cx0000000000000000000000000000000000000001");
+  private static final Address ADDRESS = Address.fromString("cx0000000000000000000000000000000000000001");
   private static final int DECIMALS = 18;
   private static final String SYMBOL = "ICX";
 
@@ -47,11 +47,11 @@ public class ICX {
   }
 
   public static Address getAddress () {
-    return ICX.TOKEN_ADDRESS;
+    return ICX.ADDRESS;
   }
 
   public static boolean isICX (Address token) {
-    return token.equals(TOKEN_ADDRESS);
+    return token.equals(ADDRESS);
   }
   
   public static String symbol () {

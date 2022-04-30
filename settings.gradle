@@ -87,6 +87,7 @@ include (
   ':Convexus-Periphery:Structs:SwapRouter',
   ':Convexus-Periphery:Structs:PairFlash',
   ':Convexus-Periphery:Structs:ConvexusPoolReadOnly',
+  ':Convexus-Periphery:Structs:Quoter',
 
   // Unit tests
   ':Convexus-Periphery:Tests:Unit:SwapRouter',
