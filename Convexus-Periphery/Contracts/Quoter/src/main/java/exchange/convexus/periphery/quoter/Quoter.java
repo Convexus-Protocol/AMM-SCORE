@@ -110,9 +110,6 @@ public class Quoter {
         BigInteger sqrtPriceX96After = sqrtPriceX96;
         int tickAfter = tick;
         BigInteger amountOut = isExactInput ? amountReceived : amountToPay;
-        Context.println("amountOut=" + amountOut);
-        Context.println("sqrtPriceX96After=" + sqrtPriceX96After);
-        Context.println("tickAfter=" + tickAfter);
         return new SwapResult(amountOut, sqrtPriceX96After, tickAfter);
     }
 
