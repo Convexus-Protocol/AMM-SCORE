@@ -21,10 +21,12 @@ import static java.math.BigInteger.ONE;
 import static java.math.BigInteger.TEN;
 import static java.math.BigInteger.TWO;
 import static java.math.BigInteger.ZERO;
-
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.verify;
 import java.math.BigInteger;
 
 import com.iconloop.score.test.Account;
+import org.mockito.ArgumentCaptor;
 import exchange.convexus.mocks.factory.ConvexusFactoryMock;
 import exchange.convexus.test.factory.ConvexusFactoryUtils;
 import exchange.convexus.test.liquidity.ConvexusLiquidityUtils;
@@ -32,7 +34,9 @@ import exchange.convexus.test.nft.NFTUtils;
 import exchange.convexus.periphery.positiondescriptor.NonfungibleTokenPositionDescriptor;
 import exchange.convexus.periphery.positionmgr.NonFungiblePositionManager;
 import exchange.convexus.periphery.staker.ConvexusStaker;
+import exchange.convexus.pool.PairAmounts;
 import exchange.convexus.test.staker.ConvexusStakerUtils;
+import exchange.convexus.positionmgr.CollectParams;
 import exchange.convexus.positionmgr.DecreaseLiquidityParams;
 import exchange.convexus.positionmgr.PositionInformation;
 import exchange.convexus.test.tokens.RewardToken;
@@ -44,6 +48,7 @@ import exchange.convexus.test.contracts.pool.Pool1;
 import exchange.convexus.test.contracts.pool.Pool2;
 import exchange.convexus.utils.IntUtils;
 import exchange.convexus.utils.ScoreSpy;
+import exchange.convexus.utils.TimeUtils;
 import static exchange.convexus.utils.TimeUtils.now;
 import score.Address;
 
@@ -132,7 +137,32 @@ public class ConvexusStakerTest extends ConvexusTest {
   }
 
   // --- Helpers ---
-  protected BigInteger mintDepositStake (Account lp, Address[] tokensToStake, BigInteger[] amountsToStake, int[] ticksToStake, BigInteger startTime, BigInteger endTime, Address poolAddress, Address refundee) {
+  protected PairAmounts collect (
+    Account from,
+    BigInteger tokenId,
+    Address recipient,
+    BigInteger amount0Max,
+    BigInteger amount1Max
+  ) {
+    reset(nft.spy);
+    nft.invoke(from, "collect", new CollectParams(
+      tokenId,
+      recipient,
+      amount0Max,
+      amount1Max
+    ));
+    
+    // Get Collect event
+    ArgumentCaptor<BigInteger> _tokenId = ArgumentCaptor.forClass(BigInteger.class);
+    ArgumentCaptor<Address> _recipient = ArgumentCaptor.forClass(Address.class);
+    ArgumentCaptor<BigInteger> _amount0Collect = ArgumentCaptor.forClass(BigInteger.class);
+    ArgumentCaptor<BigInteger> _amount1Collect = ArgumentCaptor.forClass(BigInteger.class);
+    verify(nft.spy).Collect(_tokenId.capture(), _recipient.capture(), _amount0Collect.capture(), _amount1Collect.capture());
+
+    return new PairAmounts(_amount0Collect.getValue(), _amount1Collect.getValue());
+  }
+  
+  protected BigInteger mintDepositStakeFlow (Account lp, Address[] tokensToStake, BigInteger[] amountsToStake, int[] ticksToStake, BigInteger startTime, BigInteger endTime, Address poolAddress, Address refundee) {
     ConvexusLiquidityUtils.deposit(lp, nft.getAddress(), sicx.score, amountsToStake[0]);
     ConvexusLiquidityUtils.deposit(lp, nft.getAddress(), usdc.score, amountsToStake[1]);
 
@@ -162,7 +192,35 @@ public class ConvexusStakerTest extends ConvexusTest {
     return tokenId;
   }
 
-  protected void unstakeCollectBurnFlow (
+  protected BigInteger endIncentiveFlow (
+    Account incentiveCreator,
+    ScoreSpy<RewardToken> rewardToken,
+    Address pool,
+    BigInteger startTime,
+    BigInteger endTime,
+    Address refundee
+  ) {
+    reset(rewardToken.spy);
+    staker.invoke(incentiveCreator, "endIncentive", new IncentiveKey(
+        rewardToken.getAddress(), 
+        pool, 
+        startTime, 
+        endTime,
+        refundee
+      )
+    );
+
+    // Get Transfer event
+    ArgumentCaptor<Address> _from = ArgumentCaptor.forClass(Address.class);
+    ArgumentCaptor<Address> _to = ArgumentCaptor.forClass(Address.class);
+    ArgumentCaptor<BigInteger> _value = ArgumentCaptor.forClass(BigInteger.class);
+    ArgumentCaptor<byte[]> _data = ArgumentCaptor.forClass(byte[].class);
+    verify(rewardToken.spy).Transfer(_from.capture(), _to.capture(), _value.capture(), _data.capture());
+
+    return _value.getValue();
+  }
+
+  protected BigInteger[] unstakeCollectBurnFlow (
     Account lp, 
     Address rewardToken,
     Address pool,
@@ -170,15 +228,34 @@ public class ConvexusStakerTest extends ConvexusTest {
     BigInteger endTime,
     BigInteger tokenId
   ) {
-    unstakeToken(lp, new IncentiveKey(rwtk.getAddress(), pool, startTime, endTime, alice.getAddress()), tokenId);
-    // final BigInteger unstakedAt = TimeUtils.nowSeconds();
+    unstakeToken(lp, new IncentiveKey(rwtk.getAddress(), pool, startTime, endTime, incentiveCreator.getAddress()), tokenId);
+    final BigInteger unstakedAt = TimeUtils.now();
 
     staker.invoke(lp, "claimReward", rwtk.getAddress(), lp.getAddress(), BigInteger.ZERO);
 
+    staker.invoke(lp, "withdrawToken", tokenId, lp.getAddress(), "".getBytes());
+
     var position = PositionInformation.fromMap(nft.call("positions", tokenId));
 
+    // Remove the entire liquidity
     final BigInteger THOUSAND = BigInteger.valueOf(1000);
     nft.invoke(lp, "decreaseLiquidity", new DecreaseLiquidityParams(tokenId, position.liquidity, ZERO, ZERO, now().add(THOUSAND)));
+
+    // Get tokens owed by the NFT contract after decreasing liquidity
+    position = PositionInformation.fromMap(nft.call("positions", tokenId));
+    BigInteger tokensOwed0 = position.tokensOwed0;
+    BigInteger tokensOwed1 = position.tokensOwed1;
+
+    // Collect them
+    collect(lp, tokenId, lp.getAddress(), tokensOwed0, tokensOwed1);
+
+    // Burn the position as there's no liquidity left
+    nft.invoke(lp, "burn", tokenId);
+
+    return new BigInteger[] {
+      (BigInteger) sm.getScoreFromAddress(rewardToken).call("balanceOf", lp.getAddress()),
+      unstakedAt
+    };
   }
 
   protected void unstakeToken(Account from, IncentiveKey incentiveKey, BigInteger tokenId) {

@@ -120,7 +120,7 @@ public class EndIncentiveTest extends ConvexusStakerTest {
     BigInteger amountDesired = EXA.multiply(TEN);
 
     // stake a token
-    mintDepositStake(
+    mintDepositStakeFlow(
       lpUser0, 
       new Address[] {sicx.getAddress(), usdc.getAddress()},
       new BigInteger[] {amountDesired, amountDesired}, 

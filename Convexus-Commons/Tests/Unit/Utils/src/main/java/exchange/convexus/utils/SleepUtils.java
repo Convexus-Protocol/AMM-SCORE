@@ -35,7 +35,7 @@ public class SleepUtils extends TestBase {
     sleep(seconds.longValue());
   }
 
-  public static void sleepTo (BigInteger timestampSeconds) {
-    sleep(timestampSeconds.subtract(now()).longValue());
+  public static void sleepTo (BigInteger timestamp) {
+    sleep(timestamp.subtract(now()).divide(TimeUtils.ONE_SECOND).longValue() + 1);
   }
 }

@@ -64,7 +64,7 @@ public class ClaimRewardTest extends ConvexusStakerTest {
     ConvexusLiquidityUtils.deposit(lpUser0, nft.getAddress(), sicx.score, amountDesired);
     ConvexusLiquidityUtils.deposit(lpUser0, nft.getAddress(), usdc.score, amountDesired);
 
-    tokenId = mintDepositStake(
+    tokenId = mintDepositStakeFlow(
       lpUser0, 
       new Address[] {sicx.getAddress(), usdc.getAddress()},
       new BigInteger[] {amountDesired, amountDesired}, 
