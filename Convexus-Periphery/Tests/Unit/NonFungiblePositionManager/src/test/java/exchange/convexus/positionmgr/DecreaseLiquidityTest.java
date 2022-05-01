@@ -162,11 +162,6 @@ public class DecreaseLiquidityTest extends NonFungiblePositionManagerTest {
   }
 
   @Test
-  void testIsPayable () {
-    // TODO
-  }
-  
-  @Test
   void testAccountsForTokensOwed () {
     
     decreaseLiquidity (

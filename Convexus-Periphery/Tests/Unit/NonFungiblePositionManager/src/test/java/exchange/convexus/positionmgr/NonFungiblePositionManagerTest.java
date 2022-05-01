@@ -62,9 +62,11 @@ public class NonFungiblePositionManagerTest extends ConvexusTest {
     usdc = deploy_usdc();
     
     // Transfer some funds to Alice
+    alice.addBalance("ICX", IntUtils.MAX_UINT128);
     sicx.invoke(owner, "mintTo", alice.getAddress(), IntUtils.MAX_UINT256);
     usdc.invoke(owner, "mintTo", alice.getAddress(), IntUtils.MAX_UINT256);
     // Transfer some funds to Bob
+    bob.addBalance("ICX", IntUtils.MAX_UINT128);
     sicx.invoke(owner, "mintTo", bob.getAddress(), IntUtils.MAX_UINT256);
     usdc.invoke(owner, "mintTo", bob.getAddress(), IntUtils.MAX_UINT256);
   }

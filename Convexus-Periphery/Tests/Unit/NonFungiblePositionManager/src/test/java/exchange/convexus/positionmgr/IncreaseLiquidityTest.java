@@ -89,9 +89,4 @@ public class IncreaseLiquidityTest extends NonFungiblePositionManagerTest {
     var position = PositionInformation.fromMap(nft.call("positions", tokenId));
     assertEquals(thousand.add(hundred), position.liquidity);
   }
-
-  @Test
-  void testCanBePaidWithIcx () {
-    // TODO
-  }
 }
