@@ -137,7 +137,7 @@ public class StakeHalfway extends ConvexusStakerTest {
     // lpUser0 unstakes at the halfway mark
     SleepUtils.sleepTo(startTime.add(duration.divide(TWO)));
     
-    BigInteger[] unstakes0 = unstakeCollectBurnFlow(lpUser0, rwtk.getAddress(), pool1.getAddress(), startTime, endTime, tokensId[0]);
+    // BigInteger[] unstakes0 = unstakeCollectBurnFlow(lpUser0, rwtk.getAddress(), pool1.getAddress(), startTime, endTime, tokensId[0]);
 
     // lpUser0 then restakes at the 3/4 mark
     SleepUtils.sleepTo(startTime.add(duration.multiply(THREE).divide(FOUR)));
