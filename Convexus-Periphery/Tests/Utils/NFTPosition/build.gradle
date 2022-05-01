@@ -19,6 +19,9 @@ dependencies {
     // Tests
     implementation project(':Convexus-Commons:Tests:Unit:Utils')
     
+    /// Core ///
+    implementation project(':Convexus-Core:Interfaces:Callback')
+
     /// Periphery ///
     // Contracts
     implementation project(':Convexus-Periphery:Contracts:NonFungiblePositionManager')

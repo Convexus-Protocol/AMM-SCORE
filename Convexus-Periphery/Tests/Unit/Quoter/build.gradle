@@ -29,6 +29,8 @@ dependencies {
     testImplementation project(':Convexus-Periphery:Contracts:NonfungibleTokenPositionDescriptor')
     testImplementation project(':Convexus-Periphery:Contracts:ConvexusPoolReadOnly')
 
+    testImplementation project(':Convexus-Periphery:Structs:Quoter')
+
     testImplementation project(':Convexus-Periphery:Tests:Unit:Clients')
 }
 

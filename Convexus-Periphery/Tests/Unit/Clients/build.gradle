@@ -16,5 +16,7 @@ dependencies {
     implementation project(':Convexus-Commons:Tests:Unit:Utils')
     implementation project(':Convexus-Commons:Utils')
 
+    implementation project(':Convexus-Periphery:Structs:Quoter')
+
     implementation project(':Convexus-Periphery:Contracts:Quoter')
 }

@@ -31,6 +31,8 @@ dependencies {
     testImplementation project(':Convexus-Core:Contracts:Pool')
     testImplementation project(':Convexus-Core:Contracts:Factory')
 
+    testImplementation project(':Convexus-Core:Interfaces:Callback')
+
     // Periphery
     testImplementation project(':Convexus-Periphery:Librairies')
     testImplementation project(':Convexus-Periphery:Structs:NonFungiblePositionManager')

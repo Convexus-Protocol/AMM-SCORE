@@ -32,6 +32,8 @@ dependencies {
     testImplementation project(':Convexus-Core:Tests:Contracts:ConvexusPoolCallee')
     testImplementation project(':Convexus-Core:Tests:Contracts:ConvexusSwapPay')
     
+    testImplementation project(':Convexus-Core:Interfaces:Callback')
+
     // Unit tests
     testImplementation project(':Convexus-Core:Tests:Utils:Factory')
     testImplementation project(':Convexus-Core:Tests:Utils:ConvexusPoolInitializer')
