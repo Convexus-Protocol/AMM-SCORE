@@ -363,7 +363,7 @@ public abstract class ConvexusPool
 
     int tick = TickMath.getTickAtSqrtRatio(sqrtPriceX96);
 
-    var result = observations.initialize(TimeUtils.now());
+    var result = this.observations.initialize(TimeUtils.now());
 
     this.slot0.set(new Slot0(
       sqrtPriceX96,
@@ -695,8 +695,8 @@ public abstract class ConvexusPool
           }
           BigInteger liquidityNet = ticks.cross(
             step.tickNext,
-            (zeroForOne ? state.feeGrowthGlobalX128 : feeGrowthGlobal0X128.get()),
-            (zeroForOne ? feeGrowthGlobal1X128.get() : state.feeGrowthGlobalX128),
+            (zeroForOne ? state.feeGrowthGlobalX128 : this.feeGrowthGlobal0X128.get()),
+            (zeroForOne ? this.feeGrowthGlobal1X128.get() : state.feeGrowthGlobalX128),
             cache.secondsPerLiquidityCumulativeX128,
             cache.tickCumulative,
             cache.blockTimestamp
@@ -868,7 +868,7 @@ public abstract class ConvexusPool
         _protocolFees.token0 = _protocolFees.token0.add(fees0);
         protocolFees.set(_protocolFees);
       }
-      feeGrowthGlobal0X128.set(uint256(feeGrowthGlobal0X128.get().add(FullMath.mulDiv(paid0.subtract(fees0), FixedPoint128.Q128, _liquidity))));
+      this.feeGrowthGlobal0X128.set(uint256(this.feeGrowthGlobal0X128.get().add(FullMath.mulDiv(paid0.subtract(fees0), FixedPoint128.Q128, _liquidity))));
     }
     if (paid1.compareTo(ZERO) > 0) {
       int feeProtocol1 = _slot0.feeProtocol >> 4;
@@ -878,7 +878,7 @@ public abstract class ConvexusPool
         _protocolFees.token1 = _protocolFees.token1.add(fees1);
         protocolFees.set(_protocolFees);
       }
-      feeGrowthGlobal1X128.set(uint256(feeGrowthGlobal1X128.get().add(FullMath.mulDiv(paid1.subtract(fees1), FixedPoint128.Q128, _liquidity))));
+      this.feeGrowthGlobal1X128.set(uint256(this.feeGrowthGlobal1X128.get().add(FullMath.mulDiv(paid1.subtract(fees1), FixedPoint128.Q128, _liquidity))));
     }
 
     this.Flash(caller, recipient, amount0, amount1, paid0, paid1);
@@ -1010,8 +1010,8 @@ public abstract class ConvexusPool
   public SnapshotCumulativesInsideResult snapshotCumulativesInside (int tickLower, int tickUpper) {
     checkTicks(tickLower, tickUpper);
 
-    Tick.Info lower = ticks.get(tickLower);
-    Tick.Info upper = ticks.get(tickUpper);
+    Tick.Info lower = this.ticks.get(tickLower);
+    Tick.Info upper = this.ticks.get(tickUpper);
 
     BigInteger tickCumulativeLower = lower.tickCumulativeOutside;
     BigInteger tickCumulativeUpper = upper.tickCumulativeOutside;
@@ -1035,7 +1035,7 @@ public abstract class ConvexusPool
       );
     } else if (_slot0.tick < tickUpper) {
       BigInteger time = TimeUtils.now();
-      Observations.ObserveSingleResult result = observations.observeSingle(
+      Observations.ObserveSingleResult result = this.observations.observeSingle(
         time, 
         ZERO, 
         _slot0.tick, 
@@ -1087,7 +1087,6 @@ public abstract class ConvexusPool
       _slot0.observationCardinality
     );
   }
-
 
   // ================================================
   // Private methods
@@ -1161,10 +1160,10 @@ public abstract class ConvexusPool
       );
       
       if (flippedLower) {
-        tickBitmap.flipTick(tickLower, this.settings.tickSpacing);
+        this.tickBitmap.flipTick(tickLower, this.settings.tickSpacing);
       }
       if (flippedUpper) {
-        tickBitmap.flipTick(tickUpper, this.settings.tickSpacing);
+        this.tickBitmap.flipTick(tickUpper, this.settings.tickSpacing);
       }
     }
 
@@ -1225,7 +1224,7 @@ public abstract class ConvexusPool
         BigInteger liquidityBefore = this.liquidity.get();
 
         // write an oracle entry
-        var writeResult = observations.write(
+        var writeResult = this.observations.write(
           _slot0.observationIndex,
           TimeUtils.now(),
           _slot0.tick,
