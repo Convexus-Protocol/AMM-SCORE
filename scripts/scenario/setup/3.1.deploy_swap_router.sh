@@ -38,17 +38,17 @@ info "Cleaning..."
 
 # Deploy on ICON network
 factoryPkg=$(getFactoryPkg)
-_factory=$(getAddress ${factoryPkg} ${network})
+factory=$(getAddress ${factoryPkg} ${network})
 
 filter=$(cat <<EOF
 {
-  _factory: \$_factory
+  factory: \$factory
 }
 EOF
 )
 
 jq -n \
-  --arg _factory $_factory \
+  --arg factory $factory \
   "${filter}" > ${deployDir}/params.json
 
 ./run.py -e ${network} deploy ${pkg}

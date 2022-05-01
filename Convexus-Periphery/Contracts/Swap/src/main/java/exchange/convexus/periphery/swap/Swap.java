@@ -85,19 +85,19 @@ public class Swap {
      *  Contract constructor
      */
     public Swap (
-        Address _swapRouter,
-        Address _factory,
-        Address _tokenIn,
-        Address _tokenOut,
-        Address _tokenInOut
+        Address swapRouter,
+        Address factory,
+        Address tokenIn,
+        Address tokenOut,
+        Address tokenInOut
     ) {
-        this.name = "Convexus " + IIRC2ICX.symbol(_tokenIn) + "-" + IIRC2ICX.symbol(_tokenInOut) + "-" + IIRC2ICX.symbol(_tokenOut) + " Swap";
-        this.swapRouter = _swapRouter;
-        this.tokenIn = _tokenIn;
-        this.tokenOut = _tokenOut;
-        this.tokenInOut = _tokenInOut;
+        this.name = "Convexus " + IIRC2ICX.symbol(tokenIn) + "-" + IIRC2ICX.symbol(tokenInOut) + "-" + IIRC2ICX.symbol(tokenOut) + " Swap";
+        this.swapRouter = swapRouter;
+        this.tokenIn = tokenIn;
+        this.tokenOut = tokenOut;
+        this.tokenInOut = tokenInOut;
         
-        this.liquidityMgr = new ConvexusLiquidityManagement(_factory);
+        this.liquidityMgr = new ConvexusLiquidityManagement(factory);
     }
 
     /**
@@ -145,7 +145,7 @@ public class Swap {
         reentreancy.lock(true);
 
         // Approve the router to spend the specifed `amountInMaximum` of DAI.
-        // In production, you should choose the maximum amount to spend based on oracles or other data sources to acheive a better swap.
+        // In production, you should choose the maximum amount to spend based on oracles or other data sources to achieve a better swap.
         ExactOutputSingleParams params = new ExactOutputSingleParams(
             this.tokenOut,
             poolFee,

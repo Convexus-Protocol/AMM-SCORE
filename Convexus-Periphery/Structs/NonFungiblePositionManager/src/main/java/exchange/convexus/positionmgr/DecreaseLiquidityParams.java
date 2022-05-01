@@ -19,10 +19,15 @@ package exchange.convexus.positionmgr;
 import java.math.BigInteger;
 
 public class DecreaseLiquidityParams {
+  // The ID of the token for which liquidity is being decreased
   public BigInteger tokenId;
+  // The amount by which liquidity will be decreased
   public BigInteger liquidity;
+  // The minimum amount of token0 that should be accounted for the burned liquidity
   public BigInteger amount0Min;
+  // The minimum amount of token1 that should be accounted for the burned liquidity
   public BigInteger amount1Min;
+  // The time by which the transaction must be included to effect the change
   public BigInteger deadline;
   
   public DecreaseLiquidityParams () {}

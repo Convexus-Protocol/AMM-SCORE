@@ -30,7 +30,7 @@ import exchange.convexus.test.ConvexusTest;
 import exchange.convexus.test.liquidity.ConvexusLiquidityUtils;
 import exchange.convexus.mocks.pool.ConvexusPoolMock;
 import exchange.convexus.utils.AssertUtils;
-
+import exchange.convexus.utils.ScoreSpy;
 import static exchange.convexus.test.nft.NFTUtils.decreaseLiquidity;
 import static exchange.convexus.test.nft.NFTUtils.mint;
 import static exchange.convexus.utils.TimeUtils.now;
@@ -38,6 +38,7 @@ import static exchange.convexus.utils.TimeUtils.now;
 public class DecreaseLiquidityTest extends NonFungiblePositionManagerTest {
 
   final BigInteger tokenId = ONE;
+  ScoreSpy<?> pool;
 
   @BeforeEach
   void setup() throws Exception {
@@ -47,7 +48,7 @@ public class DecreaseLiquidityTest extends NonFungiblePositionManagerTest {
     setup_initializer();
 
     // create a position
-    ConvexusTest.createAndInitializePoolIfNecessary(ConvexusPoolMock.class, alice, factory, sicx.getAddress(), usdc.getAddress(), FEE_AMOUNTS[MEDIUM], encodePriceSqrt(ONE, ONE), tickSpacing);
+    pool = ConvexusTest.createAndInitializePoolIfNecessary(ConvexusPoolMock.class, alice, factory, sicx.getAddress(), usdc.getAddress(), FEE_AMOUNTS[MEDIUM], encodePriceSqrt(ONE, ONE), tickSpacing);
 
     final BigInteger hundred = BigInteger.valueOf(100);
     ConvexusLiquidityUtils.deposit(alice, nft.getAddress(), sicx.score, hundred);
@@ -104,6 +105,17 @@ public class DecreaseLiquidityTest extends NonFungiblePositionManagerTest {
 
   @Test
   void testDecreasesPositionLiquidity () {
+
+    BigInteger balance0Before = (BigInteger) sicx.call("balanceOf", alice.getAddress());
+    BigInteger poolBalance0Before = (BigInteger) sicx.call("balanceOf", pool.getAddress());
+    BigInteger depositedSicx = (BigInteger) nft.call("deposited", alice.getAddress(), sicx.getAddress());
+    BigInteger depositedUsdc = (BigInteger) nft.call("deposited", alice.getAddress(), usdc.getAddress());
+
+    score.Context.println("balance0Before = " + balance0Before);
+    score.Context.println("depositedSicx = " + depositedSicx);
+    score.Context.println("depositedUsdc = " + depositedUsdc);
+    score.Context.println("poolBalance0Before = " + poolBalance0Before);
+
     decreaseLiquidity (
       nft,
       alice,
@@ -116,6 +128,16 @@ public class DecreaseLiquidityTest extends NonFungiblePositionManagerTest {
 
     var position = PositionInformation.fromMap(nft.call("positions", tokenId));
     assertEquals(BigInteger.valueOf(75), position.liquidity);
+    
+    BigInteger balance0After = (BigInteger) sicx.call("balanceOf", alice.getAddress());
+    BigInteger poolBalance0After = (BigInteger) sicx.call("balanceOf", pool.getAddress());
+
+    BigInteger depositedAfterSicx = (BigInteger) nft.call("deposited", alice.getAddress(), sicx.getAddress());
+    BigInteger depositedAfterUsdc = (BigInteger) nft.call("deposited", alice.getAddress(), usdc.getAddress());
+    score.Context.println("balance0After  = " + balance0After);
+    score.Context.println("depositedAfterSicx = " + depositedAfterSicx);
+    score.Context.println("depositedAfterUsdc = " + depositedAfterUsdc);
+    score.Context.println("poolBalance0After = " + poolBalance0After);
   }
 
   @Test
@@ -174,7 +196,7 @@ public class DecreaseLiquidityTest extends NonFungiblePositionManagerTest {
   }
 
   @Test
-  void testCannotDecreaseForMOreThanTheLiquidityOfTheNftPosition () {
+  void testCannotDecreaseForMoreThanTheLiquidityOfTheNftPosition () {
 
     ConvexusLiquidityUtils.deposit(alice, nft.getAddress(), sicx.score, BigInteger.valueOf(200));
     ConvexusLiquidityUtils.deposit(alice, nft.getAddress(), usdc.score, BigInteger.valueOf(200));

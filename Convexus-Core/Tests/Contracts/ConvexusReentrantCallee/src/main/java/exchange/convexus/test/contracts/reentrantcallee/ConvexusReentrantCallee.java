@@ -25,6 +25,7 @@ import java.math.BigInteger;
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
+import exchange.convexus.core.interfaces.callback.IConvexusSwapCallback;
 import exchange.convexus.interfaces.irc2.IIRC2ICX;
 import exchange.convexus.librairies.TickMath;
 import exchange.convexus.pool.IConvexusPool;
@@ -37,8 +38,9 @@ import score.annotation.Optional;
 import scorex.io.Reader;
 import scorex.io.StringReader;
 
-public class ConvexusReentrantCallee {
-
+public class ConvexusReentrantCallee 
+  implements IConvexusSwapCallback
+{
   // ================================================
   // Consts
   // ================================================

@@ -19,11 +19,17 @@ package exchange.convexus.positionmgr;
 import java.math.BigInteger;
 
 public class IncreaseLiquidityParams {
+    // The ID of the token for which liquidity is being increased
     public BigInteger tokenId;
+    // The desired amount of token0 to be spent
     public BigInteger amount0Desired;
+    // The desired amount of token1 to be spent
     public BigInteger amount1Desired;
+    // The minimum amount of token0 to spend, which serves as a slippage check
     public BigInteger amount0Min;
+    // The minimum amount of token1 to spend, which serves as a slippage check
     public BigInteger amount1Min;
+    // The time by which the transaction must be included to effect the change
     public BigInteger deadline;
 
     public IncreaseLiquidityParams () {}

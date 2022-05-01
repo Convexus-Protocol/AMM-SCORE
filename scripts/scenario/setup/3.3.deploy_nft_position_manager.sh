@@ -39,20 +39,20 @@ info "Cleaning..."
 # Deploy on ICON network
 factoryPkg=$(getFactoryPkg)
 descriptorPkg=$(getNonfungibleTokenPositionDescriptorPkg)
-_factory=$(getAddress ${factoryPkg} ${network})
-_tokenDescriptor=$(getAddress ${descriptorPkg} ${network})
+factory=$(getAddress ${factoryPkg} ${network})
+tokenDescriptor=$(getAddress ${descriptorPkg} ${network})
 
 filter=$(cat <<EOF
 {
-  _factory: \$_factory,
-  _tokenDescriptor: \$_tokenDescriptor
+  factory: \$factory,
+  tokenDescriptor: \$tokenDescriptor
 }
 EOF
 )
 
 jq -n \
-  --arg _factory $_factory \
-  --arg _tokenDescriptor $_tokenDescriptor \
+  --arg factory $factory \
+  --arg tokenDescriptor $tokenDescriptor \
   "${filter}" > ${deployDir}/params.json
 
 ./run.py -e ${network} deploy ${pkg}

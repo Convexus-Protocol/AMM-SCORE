@@ -23,6 +23,7 @@ import java.math.BigInteger;
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
+import exchange.convexus.core.interfaces.callback.IConvexusSwapCallback;
 import exchange.convexus.interfaces.irc2.IIRC2ICX;
 import exchange.convexus.pool.IConvexusPool;
 import exchange.convexus.utils.ICX;
@@ -38,8 +39,9 @@ import score.annotation.Payable;
 import scorex.io.Reader;
 import scorex.io.StringReader;
 
-public class ConvexusSwapPay {
-
+public class ConvexusSwapPay 
+  implements IConvexusSwapCallback
+{
   // ================================================
   // Consts
   // ================================================

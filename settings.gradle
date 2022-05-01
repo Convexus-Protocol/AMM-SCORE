@@ -17,6 +17,7 @@ include (
   ':Convexus-Core:Score-Interfaces:ConvexusPoolCallee',
   ':Convexus-Core:Score-Interfaces:ConvexusPoolCalleeReadOnly',
   // Interfaces
+  ':Convexus-Core:Interfaces:Callback',
   ':Convexus-Core:Interfaces:ConvexusPoolDeployer',
   ':Convexus-Core:Interfaces:Observations',
   ':Convexus-Core:Interfaces:Positions',

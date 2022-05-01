@@ -16,6 +16,8 @@ dependencies {
     
     /// Core ///
     implementation project(':Convexus-Core:Librairies')
+    // Callbacks
+    implementation project(':Convexus-Core:Interfaces:Callback')
     // Structs
     implementation project(':Convexus-Core:Structs:Pool')
     // ScoreInterfaces

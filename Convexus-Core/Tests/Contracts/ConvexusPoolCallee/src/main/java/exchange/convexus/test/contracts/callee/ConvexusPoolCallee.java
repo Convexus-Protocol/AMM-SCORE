@@ -23,6 +23,9 @@ import java.math.BigInteger;
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
+import exchange.convexus.core.interfaces.callback.IConvexusFlashCallback;
+import exchange.convexus.core.interfaces.callback.IConvexusMintCallback;
+import exchange.convexus.core.interfaces.callback.IConvexusSwapCallback;
 import exchange.convexus.interfaces.irc2.IIRC2ICX;
 import exchange.convexus.pool.IConvexusPool;
 import exchange.convexus.utils.ICX;
@@ -41,7 +44,11 @@ import score.annotation.Payable;
 import scorex.io.Reader;
 import scorex.io.StringReader;
 
-public class ConvexusPoolCallee {
+public class ConvexusPoolCallee 
+  implements IConvexusSwapCallback,
+             IConvexusMintCallback,
+             IConvexusFlashCallback
+{
   // ================================================
   // Consts
   // ================================================
@@ -287,6 +294,13 @@ public class ConvexusPoolCallee {
   @EventLog
   public void FlashCallback(BigInteger fee0, BigInteger fee1) {}
 
+  /**
+   * @param fee0 The fee from calling flash for token0
+   * @param fee1 The fee from calling flash for token1
+   * @param data The data needed in the callback passed as FlashCallbackData from `initFlash`
+   * @notice implements the callback called from flash
+   * @dev fails if the flash is not profitable, meaning the amountOut from the flash is less than the amount borrowed
+   */
   @External
   public void convexusFlashCallback (
       BigInteger fee0,

@@ -14,25 +14,21 @@
  * limitations under the License.
  */
 
-package exchange.convexus.positionmgr;
+package exchange.convexus.core.interfaces.callback;
 
 import java.math.BigInteger;
 
-public class IncreaseLiquidityResult {
-    // The new liquidity amount as a result of the increase
-    public BigInteger liquidity;
-    // The amount of token0 to achieve resulting liquidity
-    public BigInteger amount0;
-    // The amount of token1 to achieve resulting liquidity
-    public BigInteger amount1;
-
-    public IncreaseLiquidityResult(
-        BigInteger liquidity, 
-        BigInteger amount0, 
-        BigInteger amount1
-    ) {
-        this.liquidity = liquidity;
-        this.amount0 = amount0;
-        this.amount1 = amount1;
-    }
+public interface IConvexusFlashCallback {
+  /**
+   * @param fee0 The fee from calling flash for token0
+   * @param fee1 The fee from calling flash for token1
+   * @param data The data needed in the callback passed as FlashCallbackData from `initFlash`
+   * @notice implements the callback called from flash
+   * @dev fails if the flash is not profitable, meaning the amountOut from the flash is less than the amount borrowed
+   */
+  public void convexusFlashCallback (
+    BigInteger fee0,
+    BigInteger fee1,
+    byte[] data
+  );
 }

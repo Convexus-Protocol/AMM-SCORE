@@ -23,6 +23,6 @@ public interface ITicks {
   // ================================================
   // Methods
   // ================================================
-    @External(readonly = true)
-    public Tick.Info ticks (int tick);
+  @External(readonly = true)
+  public Tick.Info ticks (int tick);
 }
