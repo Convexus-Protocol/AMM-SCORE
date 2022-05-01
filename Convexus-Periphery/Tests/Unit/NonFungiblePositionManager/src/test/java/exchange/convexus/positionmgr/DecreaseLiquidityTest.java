@@ -30,6 +30,7 @@ import exchange.convexus.test.ConvexusTest;
 import exchange.convexus.test.liquidity.ConvexusLiquidityUtils;
 import exchange.convexus.mocks.pool.ConvexusPoolMock;
 import exchange.convexus.utils.AssertUtils;
+import exchange.convexus.utils.IntUtils;
 import exchange.convexus.utils.ScoreSpy;
 import static exchange.convexus.test.nft.NFTUtils.decreaseLiquidity;
 import static exchange.convexus.test.nft.NFTUtils.mint;
@@ -108,13 +109,6 @@ public class DecreaseLiquidityTest extends NonFungiblePositionManagerTest {
 
     BigInteger balance0Before = (BigInteger) sicx.call("balanceOf", alice.getAddress());
     BigInteger poolBalance0Before = (BigInteger) sicx.call("balanceOf", pool.getAddress());
-    BigInteger depositedSicx = (BigInteger) nft.call("deposited", alice.getAddress(), sicx.getAddress());
-    BigInteger depositedUsdc = (BigInteger) nft.call("deposited", alice.getAddress(), usdc.getAddress());
-
-    score.Context.println("balance0Before = " + balance0Before);
-    score.Context.println("depositedSicx = " + depositedSicx);
-    score.Context.println("depositedUsdc = " + depositedUsdc);
-    score.Context.println("poolBalance0Before = " + poolBalance0Before);
 
     decreaseLiquidity (
       nft,
@@ -128,16 +122,43 @@ public class DecreaseLiquidityTest extends NonFungiblePositionManagerTest {
 
     var position = PositionInformation.fromMap(nft.call("positions", tokenId));
     assertEquals(BigInteger.valueOf(75), position.liquidity);
-    
+
+    nft.invoke(alice, "collect", new CollectParams(tokenId, alice.getAddress(), IntUtils.MAX_UINT128, IntUtils.MAX_UINT128));
+
     BigInteger balance0After = (BigInteger) sicx.call("balanceOf", alice.getAddress());
     BigInteger poolBalance0After = (BigInteger) sicx.call("balanceOf", pool.getAddress());
 
-    BigInteger depositedAfterSicx = (BigInteger) nft.call("deposited", alice.getAddress(), sicx.getAddress());
-    BigInteger depositedAfterUsdc = (BigInteger) nft.call("deposited", alice.getAddress(), usdc.getAddress());
-    score.Context.println("balance0After  = " + balance0After);
-    score.Context.println("depositedAfterSicx = " + depositedAfterSicx);
-    score.Context.println("depositedAfterUsdc = " + depositedAfterUsdc);
-    score.Context.println("poolBalance0After = " + poolBalance0After);
+    BigInteger amountWithdraw = BigInteger.valueOf(24);
+    assertEquals(amountWithdraw, balance0After.subtract(balance0Before));
+    assertEquals(amountWithdraw, poolBalance0Before.subtract(poolBalance0After));
+  }
+
+  @Test
+  void testCanDecreaseForAllTheLiquidity () {
+    BigInteger balance0Before = (BigInteger) sicx.call("balanceOf", alice.getAddress());
+    BigInteger poolBalance0Before = (BigInteger) sicx.call("balanceOf", pool.getAddress());
+
+    decreaseLiquidity (
+      nft,
+      alice,
+      tokenId,
+      BigInteger.valueOf(100),
+      ZERO,
+      ZERO,
+      now().add(ONE)
+    );
+    
+    var position = PositionInformation.fromMap(nft.call("positions", tokenId));
+    assertEquals(BigInteger.valueOf(0), position.liquidity);
+    
+    nft.invoke(alice, "collect", new CollectParams(tokenId, alice.getAddress(), IntUtils.MAX_UINT128, IntUtils.MAX_UINT128));
+
+    BigInteger balance0After = (BigInteger) sicx.call("balanceOf", alice.getAddress());
+    BigInteger poolBalance0After = (BigInteger) sicx.call("balanceOf", pool.getAddress());
+
+    BigInteger amountWithdraw = BigInteger.valueOf(99);
+    assertEquals(amountWithdraw, balance0After.subtract(balance0Before));
+    assertEquals(amountWithdraw, poolBalance0Before.subtract(poolBalance0After));
   }
 
   @Test
@@ -161,22 +182,6 @@ public class DecreaseLiquidityTest extends NonFungiblePositionManagerTest {
     var position = PositionInformation.fromMap(nft.call("positions", tokenId));
     assertEquals(BigInteger.valueOf(24), position.tokensOwed0);
     assertEquals(BigInteger.valueOf(24), position.tokensOwed1);
-  }
-
-  @Test
-  void testCanDecreaseForAllTheLiquidity () {
-    decreaseLiquidity (
-      nft,
-      alice,
-      tokenId,
-      BigInteger.valueOf(100),
-      ZERO,
-      ZERO,
-      now().add(ONE)
-    );
-    
-    var position = PositionInformation.fromMap(nft.call("positions", tokenId));
-    assertEquals(BigInteger.valueOf(0), position.liquidity);
   }
 
   @Test
