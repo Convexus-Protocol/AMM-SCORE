@@ -174,6 +174,9 @@ public class PairFlash
     PoolKey poolKey = new PoolKey(params.token0, params.token1, params.fee1);
     Address pool = PoolAddressLib.getPool(this.factory, poolKey);
 
+    Context.require(pool != null,
+      "initFlash: Pool doesn't exist");
+
     final Address thisAddress = Context.getAddress();
     final Address caller = Context.getCaller();
 

@@ -74,7 +74,7 @@ public class Quoter {
         Address tokenB,
         int fee
     ) {
-        return PoolAddressLib.getPool(factory, PoolAddressLib.getPoolKey(tokenA, tokenB, fee));
+        return PoolAddressLib.getPool(this.factory, PoolAddressLib.getPoolKey(tokenA, tokenB, fee));
     }
 
     @External(readonly = true)
@@ -230,6 +230,9 @@ public class Quoter {
         boolean zeroForOne = AddressUtils.compareTo(params.tokenIn, params.tokenOut) < 0;
         Address pool = getPool(params.tokenIn, params.tokenOut, params.fee);
 
+        Context.require(pool != null, 
+            "quoteExactInputSingle: Pool doesn't exist");
+
         var result = IConvexusPoolReadOnly.swap(this.readOnlyPool,
                 pool, 
                 Context.getAddress(), // ZERO_ADDRESS might cause issues with some tokens
@@ -310,6 +313,9 @@ public class Quoter {
         boolean zeroForOne = AddressUtils.compareTo(params.tokenIn, params.tokenOut) < 0;
         Address pool = getPool(params.tokenIn, params.tokenOut, params.fee);
 
+        Context.require(pool != null, 
+            "quoteExactOutputSingle: Pool doesn't exist");
+
         var result = IConvexusPoolReadOnly.swap(this.readOnlyPool,
             pool, 
             Context.getAddress(), // ZERO_ADDRESS might cause issues with some tokens
@@ -386,5 +392,15 @@ public class Quoter {
     @External(readonly = true)
     public String name() {
         return this.name;
+    }
+
+    @External(readonly = true)
+    public Address readOnlyPool () {
+        return this.readOnlyPool;
+    }
+
+    @External(readonly = true)
+    public Address factory () {
+        return this.factory;
     }
 }
