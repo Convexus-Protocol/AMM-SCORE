@@ -149,7 +149,7 @@ EOF
     "${filter}" > ${callsDir}/${actionName}.json
 
   deposited=$(unhex $(./run.py -e ${network} call ${pkg} ${actionName}))
-  echo "${tokenName} (${token}) deposited: ${deposited}"
+  info "${tokenName} (${token}) deposited: ${deposited} ${tokenSymbol}"
 }
 
 deposit_token "token0" $amount0
