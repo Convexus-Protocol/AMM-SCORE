@@ -38,7 +38,8 @@ class TxHandler:
         if limit is not None:
             signed_tx = SignedTransaction(transaction, wallet, limit)
         else:
-            estimated_step = self._icon_service.estimate_step(transaction)
+            estimated_step = 3_000_000_000
+            # estimated_step = self._icon_service.estimate_step(transaction)
             signed_tx = SignedTransaction(transaction, wallet, estimated_step)
         return self._icon_service.send_transaction(signed_tx)
 

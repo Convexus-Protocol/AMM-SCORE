@@ -7,6 +7,7 @@ config = {
   # Type: String
   # "network" value must be:
   #   - "lisbon" for Lisbon Network,
+  #   - "berlin" for Berlin Network,
   #   - "custom" for the custom Convexus Network
   #   - "mainnet" for MainNet Network,
   "network": "custom",
