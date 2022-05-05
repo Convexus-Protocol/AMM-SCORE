@@ -44,6 +44,7 @@ def get_icon_service(endpoint):
         "mainnet":   ['https://ctz.solidwallet.io', 0x1],
         "lisbon":    ['https://lisbon.net.solidwallet.io', 0x2],
         "sejong":    ['https://sejong.net.solidwallet.io', 0x53],
+        "berlin":    ['https://berlin.net.solidwallet.io', 0x7],
         "localhost": ['http://localhost:9082', 0x3],
         "custom":    ['https://endpoint.convexus.netlib.re', 0x3],
     }
