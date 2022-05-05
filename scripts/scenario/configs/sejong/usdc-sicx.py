@@ -1,7 +1,7 @@
 import json
 
-BNUSD = "cx5838cb516d6156a060f90e9a3de92381331ff024"
-ICX   = "cx0000000000000000000000000000000000000001"
+IUSDC = "cx599d58885e5b1736c934fca7e53e04c797ab05be"
+SICX  = "cx70806fdfa274fe12ab61f1f98c5a7a1409a0c108"
 
 config = {
   # Type: String
@@ -15,8 +15,8 @@ config = {
   "pool": {
     # Type: Address
     # token0 and token1 addresses
-    "token0": BNUSD,
-    "token1": ICX,
+    "token0": IUSDC,
+    "token1": SICX,
 
     # Type: Integer
     "fee": 3000

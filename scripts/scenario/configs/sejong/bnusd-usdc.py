@@ -14,9 +14,15 @@ config = {
 
   "pool": {
     # Type: Address
-    # token0 and token1 addresses
+    # token0 address
     "token0": BNUSD,
+    # Type: BigInteger
+    # Amount0 for initialization
+    "amount0": 10**18,
+
     "token1": IUSDC,
+
+    "amount1": 10**6,
 
     # Type: Integer
     "fee": 500

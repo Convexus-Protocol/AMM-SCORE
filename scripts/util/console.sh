@@ -40,6 +40,6 @@ function highlight {
 
 function success {
     echo -ne "\e[96m"
-    echo -e  "[🎉] ${1}"
+    echo -e  "[🎉] ${1}\n"
     echo -ne "\e[39m"
 }
