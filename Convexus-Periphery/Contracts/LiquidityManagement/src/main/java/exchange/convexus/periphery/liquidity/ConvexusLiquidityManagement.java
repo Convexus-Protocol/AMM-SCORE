@@ -185,8 +185,8 @@ public class ConvexusLiquidityManagement
     BigInteger amount = depositedUser.getOrDefault(token, ZERO);
 
     if (amount.compareTo(ZERO) > 0) {
-      IIRC2ICX.transfer(token, caller, amount, "withdraw");
       depositedUser.set(token, ZERO);
+      IIRC2ICX.transfer(token, caller, amount, "withdraw");
     }
   }
 
