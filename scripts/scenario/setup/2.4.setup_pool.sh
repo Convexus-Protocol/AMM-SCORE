@@ -28,6 +28,8 @@ poolConfig=$(python ${configsDir}/${poolId}.py)
 network=$(echo ${poolConfig} | jq -r .network)
 token0=$(echo ${poolConfig} | jq -r .pool.token0)
 token1=$(echo ${poolConfig} | jq -r .pool.token1)
+amount0=$(echo ${poolConfig} | jq -r .pool.amount0)
+amount1=$(echo ${poolConfig} | jq -r .pool.amount1)
 fee=$(echo ${poolConfig} | jq -r .pool.fee)
 
 # Factory Package information
@@ -77,7 +79,7 @@ echo '{}' | jq \
 # Initialize the Pool (1:1 price)
 info "Initialize the Pool (1:1 price)..."
 actionName="initialize"
-sqrtPriceX96="0x1000000000000000000000000"
+sqrtPriceX96=$(python -c "import math; print(hex(int(math.sqrt(${amount1}/${amount0})*2**96)))")
 
 filter=$(cat <<EOF
 {
