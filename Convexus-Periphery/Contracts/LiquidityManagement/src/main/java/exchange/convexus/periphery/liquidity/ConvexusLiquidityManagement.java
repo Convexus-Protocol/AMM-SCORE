@@ -194,8 +194,7 @@ public class ConvexusLiquidityManagement
   // Checks
   // ================================================
   private void checkEnoughDeposited (Address address, Address token, BigInteger amount) {
-    var depositedUser = this.deposited.at(address);
-    BigInteger userBalance = depositedUser.getOrDefault(token, ZERO);
+    var userBalance = this.deposited(address, token);
     // Context.println("[Callee][checkEnoughDeposited][" + IIRC2ICX.symbol(token) + "] " + userBalance + " / " + amount);
     Context.require(userBalance.compareTo(amount) >= 0,
       "checkEnoughDeposited: user didn't deposit enough funds");
@@ -205,6 +204,6 @@ public class ConvexusLiquidityManagement
   // Public variable getters
   // ================================================
   public BigInteger deposited (Address user, Address token) {
-    return this.deposited.at(user).get(token);
+    return this.deposited.at(user).getOrDefault(token, ZERO);
   }
 }
