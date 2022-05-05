@@ -121,6 +121,9 @@ public class ConvexusLiquidityManagement
     Address pool = PoolAddressLib.getPool(this.factory, poolKey);
     Context.require(pool != null, "addLiquidity: pool doesn't exist");
     
+    deduct(params.token0, params.amount0Desired);
+    deduct(params.token1, params.amount1Desired);
+
     // compute the liquidity amount
     BigInteger sqrtPriceX96 = IConvexusPool.slot0(pool).sqrtPriceX96;
     BigInteger sqrtRatioAX96 = TickMath.getSqrtRatioAtTick(params.tickLower);
@@ -147,12 +150,24 @@ public class ConvexusLiquidityManagement
     );
 
     Context.require(
-      amounts.amount0.compareTo(params.amount0Min) >= 0
+        amounts.amount0.compareTo(params.amount0Min) >= 0
     &&  amounts.amount1.compareTo(params.amount1Min) >= 0,
       "addLiquidity: Price slippage check"
     );
 
     return new AddLiquidityResult (liquidity, amounts.amount0, amounts.amount1, pool);
+  }
+
+  private void deduct (Address token, BigInteger amount) {
+    final Address caller = Context.getCaller();
+
+    var depositedUser = this.deposited.at(caller);
+    BigInteger deposited = depositedUser.getOrDefault(token, ZERO);
+    
+    Context.require(deposited.compareTo(amount) >= 0, 
+      "deduct: Not enough deposited");
+
+    depositedUser.set(token, deposited.subtract(amount));
   }
 
   /**
@@ -172,7 +187,6 @@ public class ConvexusLiquidityManagement
     var depositedUser = this.deposited.at(caller);
     BigInteger oldBalance = depositedUser.getOrDefault(tokenIn, ZERO);
     depositedUser.set(tokenIn, oldBalance.add(amountIn));
-    // Context.println("LM: deposit(" + caller + ")(" + IIRC2ICX.symbol(tokenIn) + ") = " + this.deposited.at(caller).get(tokenIn));
   }
 
   /**
