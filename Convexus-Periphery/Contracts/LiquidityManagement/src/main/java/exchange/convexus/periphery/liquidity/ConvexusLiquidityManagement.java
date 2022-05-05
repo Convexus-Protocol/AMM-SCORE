@@ -120,9 +120,6 @@ public class ConvexusLiquidityManagement
 
     Address pool = PoolAddressLib.getPool(this.factory, poolKey);
     Context.require(pool != null, "addLiquidity: pool doesn't exist");
-    
-    deduct(params.token0, params.amount0Desired);
-    deduct(params.token1, params.amount1Desired);
 
     // compute the liquidity amount
     BigInteger sqrtPriceX96 = IConvexusPool.slot0(pool).sqrtPriceX96;
@@ -156,18 +153,6 @@ public class ConvexusLiquidityManagement
     );
 
     return new AddLiquidityResult (liquidity, amounts.amount0, amounts.amount1, pool);
-  }
-
-  private void deduct (Address token, BigInteger amount) {
-    final Address caller = Context.getCaller();
-
-    var depositedUser = this.deposited.at(caller);
-    BigInteger deposited = depositedUser.getOrDefault(token, ZERO);
-    
-    Context.require(deposited.compareTo(amount) >= 0, 
-      "deduct: Not enough deposited");
-
-    depositedUser.set(token, deposited.subtract(amount));
   }
 
   /**
