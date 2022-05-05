@@ -13,26 +13,61 @@ endpoint=$1
 echo " -- [Network: ${endpoint}] -- "
 
 echo "--- Core Layer ---"
-echo "Factory             : "$(getAddress "core/factory" ${endpoint})
-echo "SICX/USDC Pool      : "$(getAddress "core/pools/custom-sicx-usdc/pool" ${endpoint})
-echo "USDC Token          : "$(getAddress "core/pools/custom-sicx-usdc/token0" ${endpoint})
-echo "SICX Token          : "$(getAddress "core/pools/custom-sicx-usdc/token1" ${endpoint})
-echo "Swap Router         : "$(getAddress "periphery/swaprouter" ${endpoint})
-echo "Position Descriptor : "$(getAddress "periphery/positiondescriptor" ${endpoint})
-echo "Position Manager    : "$(getAddress "periphery/positionmgr" ${endpoint})
-echo "Pool ReadOnly       : "$(getAddress $(getReadOnlyPool) ${endpoint})
-echo "Quoter              : "$(getAddress $(getQuoter) ${endpoint})
+echo "Factory                : "$(getAddress "core/factory" ${endpoint})
+
+if [ ${endpoint} == "custom" ]; then
+echo "SICX/USDC Pool         : "$(getAddress "core/pools/custom/sicx-usdc/pool" ${endpoint})
+
+echo "--- Tokens ---"
+echo "USDC Token             : "$(getAddress "core/pools/custom/sicx-usdc/token0" ${endpoint})
+echo "SICX Token             : "$(getAddress "core/pools/custom/sicx-usdc/token1" ${endpoint})
+elif [ ${endpoint} == "sejong" ] ; then
+echo "BNUSD/USDC Pool        : "$(getAddress "core/pools/sejong/bnusd-usdc/pool" ${endpoint})
+echo "ICX/BNUSD Pool         : "$(getAddress "core/pools/sejong/icx-bnusd/pool" ${endpoint})
+echo "ICX/USDC Pool          : "$(getAddress "core/pools/sejong/icx-usdc/pool" ${endpoint})
+echo "SICX/BNUSD Pool        : "$(getAddress "core/pools/sejong/sicx-bnusd/pool" ${endpoint})
+
+echo "--- Periphery Layer ---"
+echo "Swap Router            : "$(getAddress "periphery/swaprouter" ${endpoint})
+echo "Position Descriptor    : "$(getAddress "periphery/positiondescriptor" ${endpoint})
+echo "Position Manager       : "$(getAddress "periphery/positionmgr" ${endpoint})
+echo "Pool ReadOnly          : "$(getAddress $(getReadOnlyPool) ${endpoint})
+echo "Quoter                 : "$(getAddress $(getQuoter) ${endpoint})
+
+echo "--- Tokens ---"
+echo "BNUSD Token            : "$(getAddress "core/pools/sejong/bnusd-usdc/token0" ${endpoint})
+echo "USDC Token             : "$(getAddress "core/pools/sejong/bnusd-usdc/token1" ${endpoint})
+echo "SICX Token             : "$(getAddress "core/pools/sejong/sicx-bnusd/token1" ${endpoint})
+fi
 
 echo "=========================================================="
 
 echo "export const DEFAULT_BOOKMARK = {"
-echo "  \"$(getAddress "core/factory" ${endpoint})\": \"Factory\","
-echo "  \"$(getAddress "core/pools/custom-sicx-usdc/pool" ${endpoint})\": \"SICX/USDC Pool\","
-echo "  \"$(getAddress "core/pools/custom-sicx-usdc/token0" ${endpoint})\": \"USDC Token\","
-echo "  \"$(getAddress "core/pools/custom-sicx-usdc/token1" ${endpoint})\": \"SICX Token\","
-echo "  \"$(getAddress "periphery/swaprouter" ${endpoint})\": \"Swap Router\","
-echo "  \"$(getAddress "periphery/positiondescriptor" ${endpoint})\": \"Position Descriptor\","
-echo "  \"$(getAddress "periphery/positionmgr" ${endpoint})\": \"Position Manager\","
-echo "  \"$(getAddress $(getReadOnlyPool) ${endpoint})\": \"Pool ReadOnly\","
-echo "  \"$(getAddress $(getQuoter) ${endpoint})\": \"Quoter\","
+echo "  \"$(getAddress "core/factory" ${endpoint})\": \"[CORE] Factory\","
+
+if [ ${endpoint} == "custom" ]; then
+  echo "  \"$(getAddress "core/pools/custom/sicx-usdc/pool" ${endpoint})\": \"[CORE] SICX/USDC Pool\","
+elif [ ${endpoint} == "sejong" ] ; then
+  echo "  \"$(getAddress "core/pools/sejong/bnusd-usdc/pool" ${endpoint})\": \"[CORE] BNUSD/USDC Pool\","
+  echo "  \"$(getAddress "core/pools/sejong/icx-bnusd/pool" ${endpoint})\": \"[CORE] ICX/BNUSD Pool\","
+  echo "  \"$(getAddress "core/pools/sejong/icx-usdc/pool" ${endpoint})\": \"[CORE] ICX/USDC Pool\","
+  echo "  \"$(getAddress "core/pools/sejong/sicx-bnusd/pool" ${endpoint})\": \"[CORE] SICX/BNUSD Pool\","
+fi
+
+echo "  \"$(getAddress "periphery/swaprouter" ${endpoint})\": \"[PERIPH] Swap Router\","
+echo "  \"$(getAddress "periphery/positiondescriptor" ${endpoint})\": \"[PERIPH] Position Descriptor\","
+echo "  \"$(getAddress "periphery/positionmgr" ${endpoint})\": \"[PERIPH] Position Manager\","
+echo "  \"$(getAddress $(getReadOnlyPool) ${endpoint})\": \"[PERIPH] Pool ReadOnly\","
+echo "  \"$(getAddress $(getQuoter) ${endpoint})\": \"[PERIPH] Quoter\","
+
+if [ ${endpoint} == "custom" ]; then
+  echo "  \"$(getAddress "core/pools/custom/sicx-usdc/token0" ${endpoint})\": \"[TOKENS] USDC\","
+  echo "  \"$(getAddress "core/pools/custom/sicx-usdc/token1" ${endpoint})\": \"[TOKENS] SICX\","
+elif [ ${endpoint} == "sejong" ] ; then
+  echo "  \"$(getAddress "core/pools/sejong/bnusd-usdc/token0" ${endpoint})\": \"[TOKENS] BNUSD\","
+  echo "  \"$(getAddress "core/pools/sejong/bnusd-usdc/token1" ${endpoint})\": \"[TOKENS] USDC\","
+  echo "  \"$(getAddress "core/pools/sejong/sicx-bnusd/token1" ${endpoint})\": \"[TOKENS] SICX\","
+fi
+
+
 echo "}"
