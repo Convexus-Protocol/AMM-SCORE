@@ -17,6 +17,7 @@
 package exchange.convexus.positionmgr;
 
 import static java.math.BigInteger.ONE;
+import static java.math.BigInteger.TWO;
 import static java.math.BigInteger.ZERO;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -148,5 +149,59 @@ public class MintTest extends NonFungiblePositionManagerTest {
     assertEquals(position.tokensOwed1, BigInteger.valueOf(0));
     assertEquals(position.feeGrowthInside0LastX128, BigInteger.valueOf(0));
     assertEquals(position.feeGrowthInside1LastX128, BigInteger.valueOf(0));
+  }
+  
+
+  @Test
+  void createsTwoTokens () {
+    ConvexusTest.createAndInitializePoolIfNecessary(ConvexusPoolMock.class, alice, factory, sicx.getAddress(), usdc.getAddress(), FEE_AMOUNTS[MEDIUM], encodePriceSqrt(ONE, ONE), tickSpacing);
+
+    final BigInteger fifteen = BigInteger.valueOf(15);
+
+    // Mint 1
+    ConvexusLiquidityUtils.deposit(alice, nft.getAddress(), sicx.score, fifteen);
+    ConvexusLiquidityUtils.deposit(alice, nft.getAddress(), usdc.score, fifteen);
+
+    mint (
+      nft,
+      alice,
+      sicx.getAddress(),
+      usdc.getAddress(),
+      FEE_AMOUNTS[MEDIUM],
+      getMinTick(TICK_SPACINGS[MEDIUM]),
+      getMaxTick(TICK_SPACINGS[MEDIUM]),
+      fifteen,
+      fifteen,
+      ZERO,
+      ZERO,
+      alice.getAddress(),
+      now().add(BigInteger.TEN)
+    );
+    
+    // Mint 2
+    ConvexusLiquidityUtils.deposit(alice, nft.getAddress(), sicx.score, fifteen);
+    ConvexusLiquidityUtils.deposit(alice, nft.getAddress(), usdc.score, fifteen);
+
+    mint (
+      nft,
+      alice,
+      sicx.getAddress(),
+      usdc.getAddress(),
+      FEE_AMOUNTS[MEDIUM],
+      getMinTick(TICK_SPACINGS[MEDIUM]),
+      getMaxTick(TICK_SPACINGS[MEDIUM]),
+      fifteen,
+      fifteen,
+      ZERO,
+      ZERO,
+      alice.getAddress(),
+      now().add(BigInteger.TEN)
+    );
+
+    assertEquals(nft.call("balanceOf", alice.getAddress()), TWO);
+    assertEquals(nft.call("tokenOfOwnerByIndex", alice.getAddress(), ONE), TWO);
+
+    assertEquals(ZERO, nft.call("deposited", alice.getAddress(), sicx.getAddress()));
+    assertEquals(ZERO, nft.call("deposited", alice.getAddress(), usdc.getAddress()));
   }
 }
