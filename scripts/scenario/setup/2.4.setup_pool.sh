@@ -8,6 +8,7 @@ source ./scripts/util/get_address.sh
 source ./scripts/util/dir.sh
 source ./scripts/util/console.sh
 source ./scripts/util/hex.sh
+source ./scripts/util/env.sh
 
 source ./scripts/convexus/pkg.sh
 
@@ -88,7 +89,7 @@ filter=$(cat <<EOF
 EOF
 )
 
-echo '{}' | jq \
+jq -n \
   --arg sqrtPriceX96 $sqrtPriceX96 \
   "${filter}" > ${poolCallsDir}/${actionName}.json
 
