@@ -95,10 +95,10 @@ Everytime you want to use the Convexus build & deploy system, please do `source 
 
 ```bash
 $ # Run this in the root folder of the project
-$ # We specify "lisbon" as an argument here, which means the contracts
-$ # will be deployed on Lisbon. You can set it to "custom" too for the
+$ # We specify "berlin" as an argument here, which means the contracts
+$ # will be deployed on the Berlin Network. You can set it to "custom" too for the
 $ # custom Convexus network
-$ ./scripts/scenario/1.deploy_core_factory.sh lisbon
+$ ./scripts/scenario/1.deploy_core_factory.sh berlin
 [...]
 # This should end with the following message
 [🎉] Convexus Core Pool Factory contract has been successfully setup!
@@ -136,7 +136,7 @@ The process for deploying a custom bond contract is straightforward.
 
 ```bash
 $ # We only need the network name
-$ ./scripts/scenario/3.deploy_periphery.sh lisbon
+$ ./scripts/scenario/3.deploy_periphery.sh berlin
 [...]
 # This should end with the following message
 [🎉] All Periphery Contracts have been deployed successfully!
