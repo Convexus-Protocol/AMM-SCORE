@@ -19,7 +19,7 @@ These features make Convexus a flexible and efficient automated market maker:
 - LPs can significantly increase their exposure to preferred assets and reduce their downside risk.
 - LPs can also sell one asset for another by adding liquidity to a price range entirely above or below the market price, similar to a limit order on an exchange, while also earning the trade fees for that trade.
 
-See our introduction [Medium](https://convexus.medium.com/convexus-cbf2db4ce9e7) article for more information.
+See our introduction [Medium](https://convexus.medium.com/convexus-cbf2db4ce9e7) article for more information, and the [technical documentation](https://dev.convexus.net) if you need to build on Convexus.
 
 # 🏗️ Build
 
