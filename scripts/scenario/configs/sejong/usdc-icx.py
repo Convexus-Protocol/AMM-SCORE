@@ -1,7 +1,16 @@
 import json
 
-IUSDC = "cx599d58885e5b1736c934fca7e53e04c797ab05be"
-ICX   = "cx0000000000000000000000000000000000000001"
+IUSDC = {
+  "address": "cx599d58885e5b1736c934fca7e53e04c797ab05be",
+  "amount": int(0.60 * 10**6)
+}
+
+ICX = {
+  "address": "cx0000000000000000000000000000000000000001",
+  "amount": 10**18
+}
+
+token0, token1 = sorted([IUSDC, ICX], key=lambda token: token['address'])
 
 config = {
   # Type: String
@@ -14,9 +23,18 @@ config = {
 
   "pool": {
     # Type: Address
-    # token0 and token1 addresses
-    "token0": IUSDC,
-    "token1": ICX,
+    # token0 address
+    "token0": token0['address'],
+    # Type: BigInteger
+    # Amount0 for initialization
+    "amount0": token0['amount'],
+
+    # Type: Address
+    # token1 address
+    "token1": token1['address'],
+    # Type: BigInteger
+    # Amount1 for initialization
+    "amount1": token1['amount'],
 
     # Type: Integer
     "fee": 3000

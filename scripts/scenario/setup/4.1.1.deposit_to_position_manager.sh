@@ -54,6 +54,11 @@ symbol () {
     tokenPkg=$(getToken1Pkg ${poolId})
   fi
 
+  if [ ${token} == "cx0000000000000000000000000000000000000001" ]; then
+    echo "ICX"
+    return;
+  fi
+
   tokenCallsDir=$(getCallsDir ${tokenPkg} ${network})
   actionName="symbol"
 

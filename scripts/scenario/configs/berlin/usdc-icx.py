@@ -1,16 +1,16 @@
 import json
 
-IUSDC = {
-  "address": "cx599d58885e5b1736c934fca7e53e04c797ab05be",
-  "amount": int(0.60 * 10**6)
+USDC = {
+  "address": "cx7a5be2907bc1f4d6fae0462df08e7a21972d7347",
+  "amount": int(0.60 * 10**18)
 }
 
-SICX = {
-  "address": "cx70806fdfa274fe12ab61f1f98c5a7a1409a0c108",
+ICX = {
+  "address": "cx0000000000000000000000000000000000000001",
   "amount": 10**18
 }
 
-token0, token1 = sorted([IUSDC, SICX], key=lambda token: token['address'])
+token0, token1 = sorted([USDC, ICX], key=lambda token: token['address'])
 
 config = {
   # Type: String
@@ -19,7 +19,7 @@ config = {
   #   - "berlin" for Berlin Network,
   #   - "custom" for the custom Convexus Network
   #   - "mainnet" for MainNet Network,
-  "network": "sejong",
+  "network": "berlin",
 
   "pool": {
     # Type: Address
