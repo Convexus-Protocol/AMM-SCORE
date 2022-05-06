@@ -110,7 +110,7 @@ For deploying pools, we will need to create a new configuration file, that will 
 
 These configuration files are located in [`./scripts/scenario/configs/`](./scripts/scenario/configs/).
 
-They will be named like that : `${bondId}.py`. A `bondId` is an arbitrary name that will represents the bond being deployed. This name must be unique for all bonds accross all networks. You can find an example of a config file [here](scripts/scenario/configs/custom-sicx-usdc.py). 
+They will be named like that : `${bondId}.py`. A `bondId` is an arbitrary name that will represents the bond being deployed. This name must be unique for all bonds accross all networks. You can find an example of a config file [here](scripts/scenario/configs/berlin/bnusd-usdc.py). 
 
 That file contain a `config` dict variable that you can modify depending of your needs.
 
@@ -124,7 +124,7 @@ Once you've changed these values, you can deploy the pool by doing so:
 $ # Run this in the root folder of the project
 $ # We specify "custom-sicx-usdc" as an argument here, because we've named our config
 $ # file "custom-sicx-usdc.py", as we want a Bond ID = custom-sicx-usdc
-$ ./scripts/scenario/2.deploy_core_pool.sh custom-sicx-usdc
+$ ./scripts/scenario/2.deploy_core_pool.sh berlin/bnusd-usdc
 [...]
 # This should end with the following message
 [🎉] Pool successfully initialized!
