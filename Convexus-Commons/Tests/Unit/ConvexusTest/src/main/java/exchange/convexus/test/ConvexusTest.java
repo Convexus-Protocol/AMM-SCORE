@@ -231,16 +231,15 @@ public class ConvexusTest extends TestBase {
         score.setInstance(spy);
         return new ScoreSpy<Sicx>(score, spy);
     }
-    
+
     public ScoreSpy<Usdc> deploy_usdc () throws Exception {
-        Score score = sm.deploy(owner, Usdc.class, "USDC", "USDC", 18);
+        Score score = sm.deploy(owner, Usdc.class, "USDC", "USDC", 6);
 
         var spy = (Usdc) spy(score.getInstance());
         score.setInstance(spy);
         return new ScoreSpy<Usdc>(score, spy);
     }
-    
-    
+
     public ScoreSpy<Baln> deploy_baln () throws Exception {
         Score score = sm.deploy(owner, Baln.class, "BALN", "BALN", 18);
 
