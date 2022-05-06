@@ -438,11 +438,15 @@ public abstract class ConvexusPool
 
     if (amount0.compareTo(ZERO) > 0) {
       BigInteger expected = balance0Before.add(amount0);
-      Context.require(expected.compareTo(balance0()) <= 0, "mint: M0");
+      BigInteger balance0 = balance0();
+      Context.require(expected.compareTo(balance0) <= 0, 
+        "mint: callback didn't send enough of token0, expected " + expected + ", got " + balance0);
     }
     if (amount1.compareTo(ZERO) > 0) {
       BigInteger expected = balance1Before.add(amount1);
-      Context.require(expected.compareTo(balance1()) <= 0, "mint: M1");
+      BigInteger balance1 = balance1();
+      Context.require(expected.compareTo(balance1()) <= 0, 
+        "mint: callback didn't send enough of token1, expected " + expected + ", got " + balance1);
     }
 
     this.Mint(recipient, tickLower, tickUpper, caller, amount, amount0, amount1);
