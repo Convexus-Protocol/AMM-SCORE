@@ -48,11 +48,11 @@ public class ConvexusPoolInitializer {
      *  
      */
     public ConvexusPoolInitializer(
-        Address _factory
+        Address factory
     ) {
         // final Address caller = Context.getCaller();
         this.name = "Convexus Pool Initializer";
-        this.factory = _factory;
+        this.factory = factory;
     }
 
     @External
