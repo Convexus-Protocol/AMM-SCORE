@@ -40,4 +40,8 @@ ${setupDir}/3.4.deploy_readonly_pool.sh ${network}
 info "Deploying the Quoter..."
 ${setupDir}/3.5.deploy_quoter.sh ${network}
 
+# Deploy Quoter
+info "Deploying the Pool Initializer..."
+${setupDir}/3.6.deploy_pool_initializer.sh ${network}
+
 success "All Periphery Contracts have been deployed successfully!"

@@ -35,6 +35,11 @@ getQuoter() {
   echo "periphery/quoter"
 }
 
+# Pool Initializer
+getPoolInitializerPkg() {
+  echo "periphery/poolinitializer"
+}
+
 # NonfungibleTokenPositionDescriptor
 getNonfungibleTokenPositionDescriptorPkg() {
   echo "periphery/positiondescriptor"
