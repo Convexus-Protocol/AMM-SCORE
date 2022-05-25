@@ -25,6 +25,7 @@ import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
 import exchange.convexus.librairies.TickMath;
+import exchange.convexus.periphery.interfaces.callback.IConvexusLiquidityManagement;
 import exchange.convexus.periphery.librairies.CallbackValidation;
 import exchange.convexus.periphery.librairies.Path;
 import exchange.convexus.periphery.librairies.PeripheryPayments;
@@ -33,7 +34,6 @@ import exchange.convexus.periphery.liquidity.ConvexusLiquidityManagement;
 import exchange.convexus.pool.IConvexusPool;
 import exchange.convexus.pool.PairAmounts;
 import exchange.convexus.pool.PoolData;
-import exchange.convexus.core.interfaces.callback.IConvexusSwapCallback;
 import exchange.convexus.interfaces.irc2.IIRC2ICX;
 import exchange.convexus.utils.AddressUtils;
 import exchange.convexus.utils.BytesUtils;
@@ -57,7 +57,7 @@ import scorex.io.StringReader;
  * @notice Router for stateless execution of swaps against Convexus
  */
 public class SwapRouter 
-  implements IConvexusSwapCallback
+  implements IConvexusLiquidityManagement
 {
   // ================================================
   // Consts
@@ -533,7 +533,7 @@ public class SwapRouter
       // "pay" is coming from the Pool
       case "pay": {
         // Accept the incoming token transfer
-        this.liquidityMgr.deposit(_from, token, _value);
+        deposit(_from, token, _value);
         break;
       }
 
@@ -553,9 +553,24 @@ public class SwapRouter
     this.liquidityMgr.withdraw(token);
   }
 
+  // @External - this method is external through tokenFallback
+  public void deposit(Address caller, Address tokenIn, BigInteger amountIn) {
+    this.liquidityMgr.deposit(caller, tokenIn, amountIn);
+  }
+
   @External(readonly = true)
   public BigInteger deposited(Address user, Address token) {
     return this.liquidityMgr.deposited(user, token);
+  }
+
+  @External(readonly = true)
+  public int depositedTokensSize(Address user) {
+    return this.liquidityMgr.depositedTokensSize(user);
+  }
+
+  @External(readonly = true)
+  public Address depositedToken(Address user, int index) {
+    return this.liquidityMgr.depositedToken(user, index);
   }
 
   // ================================================
