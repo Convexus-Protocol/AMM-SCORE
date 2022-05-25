@@ -8,10 +8,11 @@ dependencies {
     implementation project(':Convexus-Commons:Tokens:Interfaces:irc2icx')
     
     implementation project(':Convexus-Core:Structs:Pool')
-    implementation project(':Convexus-Core:Interfaces:Callback')
     implementation project(':Convexus-Core:Score-Interfaces:Pool')
     
     implementation project(':Convexus-Periphery:Librairies')
+    implementation project(':Convexus-Periphery:Structs:LiquidityManagement')
+    implementation project(':Convexus-Periphery:Interfaces:ConvexusLiquidityManagement')
 }
 
 optimizedJar {
