@@ -20,7 +20,6 @@ import static java.math.BigInteger.ZERO;
 
 import java.math.BigInteger;
 import exchange.convexus.core.interfaces.callback.IConvexusFlashCallback;
-import exchange.convexus.core.interfaces.callback.IConvexusMintCallback;
 import exchange.convexus.interfaces.irc2.IIRC2ICX;
 import static exchange.convexus.utils.TimeUtils.now;
 import score.Address;
@@ -36,6 +35,7 @@ import scorex.io.StringReader;
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
+import exchange.convexus.periphery.interfaces.callback.IConvexusLiquidityManagement;
 import exchange.convexus.periphery.librairies.CallbackValidation;
 import exchange.convexus.periphery.librairies.PeripheryPayments;
 import exchange.convexus.periphery.librairies.PoolAddressLib;
@@ -52,7 +52,7 @@ import exchange.convexus.utils.ICX;
  * @notice An example contract using the Convexus flash function
  */
 public class PairFlash 
-  implements IConvexusMintCallback,
+  implements IConvexusLiquidityManagement,
              IConvexusFlashCallback
 {
   // ================================================
@@ -266,7 +266,7 @@ public class PairFlash
       case "pay": 
       {
         // Accept the incoming token transfer
-        this.liquidityMgr.deposit(_from, token, _value);
+        deposit(_from, token, _value);
         break;
       }
 
@@ -275,9 +275,24 @@ public class PairFlash
     }
   }
 
+  // @External - this method is external through tokenFallback
+  public void deposit(Address caller, Address tokenIn, BigInteger amountIn) {
+    this.liquidityMgr.deposit(caller, tokenIn, amountIn);
+  }
+
   @External(readonly = true)
   public BigInteger deposited(Address user, Address token) {
     return this.liquidityMgr.deposited(user, token);
+  }
+
+  @External(readonly = true)
+  public int depositedTokensSize(Address user) {
+    return this.liquidityMgr.depositedTokensSize(user);
+  }
+
+  @External(readonly = true)
+  public Address depositedToken(Address user, int index) {
+    return this.liquidityMgr.depositedToken(user, index);
   }
 
   // ================================================
