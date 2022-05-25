@@ -19,6 +19,7 @@ package exchange.convexus.periphery.liquidity;
 import exchange.convexus.interfaces.irc2.IIRC2ICX;
 import exchange.convexus.librairies.TickMath;
 import exchange.convexus.periphery.interfaces.callback.IConvexusLiquidityManagement;
+import exchange.convexus.periphery.interfaces.callback.IConvexusLiquidityManagementMint;
 import exchange.convexus.periphery.librairies.CallbackValidation;
 import exchange.convexus.periphery.librairies.LiquidityAmounts;
 import exchange.convexus.periphery.librairies.PeripheryPayments;
@@ -37,7 +38,8 @@ import static java.math.BigInteger.ZERO;
 import java.math.BigInteger;
 
 public class ConvexusLiquidityManagement 
-  implements IConvexusLiquidityManagement
+  implements IConvexusLiquidityManagement,
+             IConvexusLiquidityManagementMint
 {
   // ================================================
   // Consts

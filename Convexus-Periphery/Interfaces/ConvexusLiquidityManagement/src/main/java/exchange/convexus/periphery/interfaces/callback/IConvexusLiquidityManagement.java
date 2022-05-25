@@ -17,27 +17,10 @@
 package exchange.convexus.periphery.interfaces.callback;
 
 import java.math.BigInteger;
-import exchange.convexus.core.interfaces.callback.IConvexusMintCallback;
 import score.Address;
 
-public interface IConvexusLiquidityManagement 
-  extends IConvexusMintCallback
+public interface IConvexusLiquidityManagement
 {
-  /**
-   * @notice Called to `Context.getCaller()` after minting liquidity to a position from ConvexusPool#mint.
-   * @dev In the implementation you must pay the pool tokens owed for the minted liquidity.
-   * The caller of this method must be checked to be a ConvexusPool deployed by the canonical ConvexusFactory.
-   * @param amount0Owed The amount of token0 due to the pool for the minted liquidity
-   * @param amount1Owed The amount of token1 due to the pool for the minted liquidity
-   * @param data Any data passed through by the caller via the mint call
-   */
-  // @External
-  public void convexusMintCallback (
-    BigInteger amount0Owed,
-    BigInteger amount1Owed,
-    byte[] data
-  );
-  
   /**
    * @notice Add funds to the liquidity manager
    */
