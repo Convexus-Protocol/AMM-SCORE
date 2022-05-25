@@ -35,7 +35,7 @@ public class EnumerableSet<V> {
         return entries.size();
     }
 
-    public V at(int index) {
+    public V get(int index) {
         return entries.get(index);
     }
 
