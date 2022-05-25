@@ -24,6 +24,7 @@ import java.math.BigInteger;
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
+import exchange.convexus.core.interfaces.callback.IConvexusMintCallback;
 import exchange.convexus.core.pool.contracts.models.Positions;
 import exchange.convexus.librairies.FixedPoint128;
 import exchange.convexus.librairies.FullMath;
@@ -64,7 +65,8 @@ import exchange.convexus.utils.TimeUtils;
 // @title NFT positions
 // @notice Wraps Convexus positions in the IRC non-fungible token interface
 public class NonFungiblePositionManager extends IRC721Enumerable
-  implements IConvexusLiquidityManagement
+  implements IConvexusLiquidityManagement,
+             IConvexusMintCallback
 {
   // ================================================
   // Consts

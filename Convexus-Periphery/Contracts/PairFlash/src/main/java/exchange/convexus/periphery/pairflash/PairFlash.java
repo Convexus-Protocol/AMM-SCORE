@@ -36,7 +36,7 @@ import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
 import exchange.convexus.periphery.interfaces.callback.IConvexusLiquidityManagement;
-import exchange.convexus.periphery.interfaces.callback.IConvexusLiquidityManagementMint;
+import exchange.convexus.periphery.interfaces.callback.IConvexusLiquidityManagementAddLiquidity;
 import exchange.convexus.periphery.librairies.CallbackValidation;
 import exchange.convexus.periphery.librairies.PeripheryPayments;
 import exchange.convexus.periphery.librairies.PoolAddressLib;
@@ -54,7 +54,7 @@ import exchange.convexus.utils.ICX;
  */
 public class PairFlash 
   implements IConvexusLiquidityManagement,
-             IConvexusLiquidityManagementMint,
+             IConvexusLiquidityManagementAddLiquidity,
              IConvexusFlashCallback
 {
   // ================================================

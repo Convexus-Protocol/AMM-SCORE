@@ -35,7 +35,7 @@ import static exchange.convexus.utils.TimeUtils.now;
 
 import exchange.convexus.interfaces.irc2.IIRC2ICX;
 import exchange.convexus.periphery.interfaces.callback.IConvexusLiquidityManagement;
-import exchange.convexus.periphery.interfaces.callback.IConvexusLiquidityManagementMint;
+import exchange.convexus.periphery.interfaces.callback.IConvexusLiquidityManagementAddLiquidity;
 import exchange.convexus.periphery.liquidity.AddLiquidityParams;
 import exchange.convexus.periphery.liquidity.AddLiquidityResult;
 import exchange.convexus.periphery.liquidity.ConvexusLiquidityManagement;
@@ -51,7 +51,7 @@ import com.eclipsesource.json.JsonObject;
  */
 public class Swap 
     implements IConvexusLiquidityManagement,
-               IConvexusLiquidityManagementMint
+               IConvexusLiquidityManagementAddLiquidity
 {
     // ================================================
     // Consts

@@ -21,7 +21,7 @@ import exchange.convexus.core.interfaces.callback.IConvexusMintCallback;
 import exchange.convexus.periphery.liquidity.AddLiquidityParams;
 import exchange.convexus.periphery.liquidity.AddLiquidityResult;
 
-public interface IConvexusLiquidityManagementMint 
+public interface IConvexusLiquidityManagementAddLiquidity 
   extends IConvexusMintCallback
 {
   /**
