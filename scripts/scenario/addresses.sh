@@ -60,6 +60,7 @@ elif [ ${endpoint} == "sejong" ] ; then
   echo "  \"$(getAddress "core/pools/sejong/bnusd-usdc/pool" ${endpoint})\": \"[CORE] BNUSD/USDC Pool\","
   echo "  \"$(getAddress "core/pools/sejong/usdc-icx/pool" ${endpoint})\": \"[CORE] ICX/USDC Pool\","
   echo "  \"$(getAddress "core/pools/sejong/usdc-sicx/pool" ${endpoint})\": \"[CORE] SICX/USDC Pool\","
+  echo "  \"$(getAddress "core/pools/sejong/bnusd-sicx/pool" ${endpoint})\": \"[CORE] BNUSD/SICX Pool\","
 elif [ ${endpoint} == "berlin" ] ; then
   echo "  \"$(getAddress "core/pools/berlin/bnusd-usdc/pool" ${endpoint})\": \"[CORE] BNUSD/USDC Pool\","
   echo "  \"$(getAddress "core/pools/berlin/usdc-icx/pool" ${endpoint})\": \"[CORE] ICX/USDC Pool\","
