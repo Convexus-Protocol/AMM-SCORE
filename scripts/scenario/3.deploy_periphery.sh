@@ -40,7 +40,7 @@ ${setupDir}/3.4.deploy_readonly_pool.sh ${network}
 info "Deploying the Quoter..."
 ${setupDir}/3.5.deploy_quoter.sh ${network}
 
-# Deploy Quoter
+# Deploy Pool Initializer
 info "Deploying the Pool Initializer..."
 ${setupDir}/3.6.deploy_pool_initializer.sh ${network}
 
