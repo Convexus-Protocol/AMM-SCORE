@@ -26,15 +26,15 @@ import score.Context;
 import score.annotation.External;
 import score.annotation.Optional;
 import score.annotation.Payable;
-import scorex.io.Reader;
-import scorex.io.StringReader;
 import exchange.convexus.utils.BytesUtils;
 import exchange.convexus.utils.ICX;
+import exchange.convexus.utils.JSONUtils;
 import exchange.convexus.utils.ReentrancyLock;
 import exchange.convexus.utils.StringUtils;
 import static exchange.convexus.utils.TimeUtils.now;
 
 import exchange.convexus.interfaces.irc2.IIRC2ICX;
+import exchange.convexus.periphery.interfaces.callback.IConvexusLiquidityManagement;
 import exchange.convexus.periphery.liquidity.AddLiquidityParams;
 import exchange.convexus.periphery.liquidity.AddLiquidityResult;
 import exchange.convexus.periphery.liquidity.ConvexusLiquidityManagement;
@@ -42,15 +42,15 @@ import exchange.convexus.periphery.router.ExactInputParams;
 import exchange.convexus.periphery.router.ExactInputSingleParams;
 import exchange.convexus.periphery.router.ExactOutputParams;
 import exchange.convexus.periphery.router.ExactOutputSingleParams;
-import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonObject;
-import com.eclipsesource.json.JsonValue;
 
 /**
  * @title Swap contract implementation
  * @notice An example contract using the Convexus swap function
  */
-public class Swap {
+public class Swap 
+    implements IConvexusLiquidityManagement
+{
 
     // ================================================
     // Consts
@@ -276,9 +276,7 @@ public class Swap {
   
     @External
     public void tokenFallback (Address _from, BigInteger _value, @Optional byte[] _data) throws Exception {
-        Reader reader = new StringReader(new String(_data));
-        JsonValue input = Json.parse(reader);
-        JsonObject root = input.asObject();
+        JsonObject root = JSONUtils.parse(_data);
         String method = root.get("method").asString();
         Address token = Context.getCaller();
 
@@ -317,7 +315,7 @@ public class Swap {
             case "deposit": 
             {
                 // Accept the incoming token transfer
-                this.liquidityMgr.deposit(_from, token, _value);
+                deposit(_from, token, _value);
                 break;
             }
 
@@ -363,9 +361,24 @@ public class Swap {
         this.liquidityMgr.withdraw(token);
     }
 
+    // @External - this method is external through tokenFallback
+    public void deposit(Address caller, Address tokenIn, BigInteger amountIn) {
+        this.liquidityMgr.deposit(caller, tokenIn, amountIn);
+    }
+
     @External(readonly = true)
     public BigInteger deposited(Address user, Address token) {
         return this.liquidityMgr.deposited(user, token);
+    }
+
+    @External(readonly = true)
+    public int depositedTokensSize(Address user) {
+        return this.liquidityMgr.depositedTokensSize(user);
+    }
+
+    @External(readonly = true)
+    public Address depositedToken(Address user, int index) {
+        return this.liquidityMgr.depositedToken(user, index);
     }
 
     // ================================================
