@@ -73,6 +73,10 @@ include (
   ':Convexus-Periphery:Contracts:Staker',
 
   // Interfaces
+  ':Convexus-Periphery:Interfaces:ConvexusLiquidityManagement',
+
+
+  // Score-Interfaces
   ':Convexus-Periphery:Score-Interfaces:ConvexusPoolReadOnly',
   ':Convexus-Periphery:Score-Interfaces:NonfungibleTokenPositionDescriptor',
   ':Convexus-Periphery:Score-Interfaces:NonFungiblePositionManager',
@@ -83,6 +87,7 @@ include (
   // Structs
   ':Convexus-Periphery:Structs:CXS',
   ':Convexus-Periphery:Structs:NonFungiblePositionManager',
+  ':Convexus-Periphery:Structs:LiquidityManagement',
   ':Convexus-Periphery:Structs:Staker',
   ':Convexus-Periphery:Structs:Governor',
   ':Convexus-Periphery:Structs:SwapRouter',

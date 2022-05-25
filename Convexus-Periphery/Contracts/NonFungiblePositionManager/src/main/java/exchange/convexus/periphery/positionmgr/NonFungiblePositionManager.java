@@ -24,7 +24,6 @@ import java.math.BigInteger;
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
-import exchange.convexus.core.interfaces.callback.IConvexusMintCallback;
 import exchange.convexus.core.pool.contracts.models.Positions;
 import exchange.convexus.librairies.FixedPoint128;
 import exchange.convexus.librairies.FullMath;
@@ -42,6 +41,7 @@ import scorex.io.Reader;
 import scorex.io.StringReader;
 
 import static exchange.convexus.utils.IntUtils.uint128;
+import exchange.convexus.periphery.interfaces.callback.IConvexusLiquidityManagement;
 import exchange.convexus.periphery.librairies.PoolAddressLib;
 import exchange.convexus.periphery.liquidity.AddLiquidityParams;
 import exchange.convexus.periphery.liquidity.ConvexusLiquidityManagement;
@@ -64,7 +64,7 @@ import exchange.convexus.utils.TimeUtils;
 // @title NFT positions
 // @notice Wraps Convexus positions in the IRC non-fungible token interface
 public class NonFungiblePositionManager extends IRC721Enumerable
-  implements IConvexusMintCallback
+  implements IConvexusLiquidityManagement
 {
   // ================================================
   // Consts
@@ -524,7 +524,7 @@ public class NonFungiblePositionManager extends IRC721Enumerable
     BigInteger amount1Owed,
     byte[] data
   ) {
-    Context.println("[Callback] paying " + amount0Owed + " / " + amount1Owed + " to " + Context.call(Context.getCaller(), "name"));
+    // Context.println("[Callback] paying " + amount0Owed + " / " + amount1Owed + " to " + Context.call(Context.getCaller(), "name"));
     this.liquidityMgr.convexusMintCallback(amount0Owed, amount1Owed, data);
   }
 
@@ -559,7 +559,7 @@ public class NonFungiblePositionManager extends IRC721Enumerable
        * @notice Add IRC2 funds to the liquidity manager
        */
       case "deposit": {
-        this.liquidityMgr.deposit(_from, token, _value);
+        deposit(_from, token, _value);
         break;
       }
 
@@ -568,9 +568,24 @@ public class NonFungiblePositionManager extends IRC721Enumerable
     }
   }
 
+  // @External - this method is external through tokenFallback
+  public void deposit(Address caller, Address tokenIn, BigInteger amountIn) {
+    this.liquidityMgr.deposit(caller, tokenIn, amountIn);
+  }
+
   @External(readonly = true)
   public BigInteger deposited(Address user, Address token) {
     return this.liquidityMgr.deposited(user, token);
+  }
+
+  @External(readonly = true)
+  public int depositedTokensSize(Address user) {
+    return this.liquidityMgr.depositedTokensSize(user);
+  }
+
+  @External(readonly = true)
+  public Address depositedToken(Address user, int index) {
+    return this.liquidityMgr.depositedToken(user, index);
   }
 
   // ================================================

@@ -16,29 +16,28 @@
 
 package exchange.convexus.periphery.liquidity;
 
-import exchange.convexus.core.interfaces.callback.IConvexusMintCallback;
 import exchange.convexus.interfaces.irc2.IIRC2ICX;
 import exchange.convexus.librairies.TickMath;
+import exchange.convexus.periphery.interfaces.callback.IConvexusLiquidityManagement;
 import exchange.convexus.periphery.librairies.CallbackValidation;
 import exchange.convexus.periphery.librairies.LiquidityAmounts;
 import exchange.convexus.periphery.librairies.PeripheryPayments;
 import exchange.convexus.periphery.librairies.PoolAddressLib;
 import score.Address;
-import score.BranchDB;
 import score.ByteArrayObjectWriter;
 import score.Context;
-import score.DictDB;
 import score.ObjectReader;
 import exchange.convexus.pool.IConvexusPool;
 import exchange.convexus.pool.MintCallbackData;
 import exchange.convexus.pool.PairAmounts;
 import exchange.convexus.pool.PoolAddress.PoolKey;
+import exchange.convexus.utils.EnumerableMap;
 import static java.math.BigInteger.ZERO;
 
 import java.math.BigInteger;
 
 public class ConvexusLiquidityManagement 
-  implements IConvexusMintCallback
+  implements IConvexusLiquidityManagement
 {
   // ================================================
   // Consts
@@ -47,13 +46,15 @@ public class ConvexusLiquidityManagement
   private static final String NAME = "ConvexusLiquidityManagement";
 
   // address of the Convexus factory
-  public final Address factory;
+  private final Address factory;
 
   // ================================================
   // DB Variables
   // ================================================
   // User => Token => Amount
-  private final BranchDB<Address, DictDB<Address, BigInteger>> deposited = Context.newBranchDB(NAME + "_deposited", BigInteger.class);
+  private EnumerableMap<Address, BigInteger> deposited (Address user) {
+    return new EnumerableMap<>(NAME + "_deposited_" + user, Address.class, BigInteger.class);
+  }
 
   // ================================================
   // Event Logs
@@ -103,7 +104,7 @@ public class ConvexusLiquidityManagement
     checkEnoughDeposited(payer, token, owed);
     
     // Remove funds from deposited
-    var depositedUser = this.deposited.at(payer);
+    var depositedUser = this.deposited(payer);
     BigInteger oldBalance = depositedUser.getOrDefault(token, ZERO);
     depositedUser.set(token, oldBalance.subtract(owed));
     
@@ -169,7 +170,7 @@ public class ConvexusLiquidityManagement
       "deposit: Deposit amount cannot be less or equal to 0");
 
     // --- OK from here ---
-    var depositedUser = this.deposited.at(caller);
+    var depositedUser = this.deposited(caller);
     BigInteger oldBalance = depositedUser.getOrDefault(tokenIn, ZERO);
     depositedUser.set(tokenIn, oldBalance.add(amountIn));
   }
@@ -177,10 +178,11 @@ public class ConvexusLiquidityManagement
   /**
    * @notice Remove funds from the liquidity manager
    */
+  // @External
   public void withdraw (Address token) {
     final Address caller = Context.getCaller();
 
-    var depositedUser = this.deposited.at(caller);
+    var depositedUser = this.deposited(caller);
     BigInteger amount = depositedUser.getOrDefault(token, ZERO);
 
     if (amount.compareTo(ZERO) > 0) {
@@ -202,7 +204,18 @@ public class ConvexusLiquidityManagement
   // ================================================
   // Public variable getters
   // ================================================
+  // @External(readonly = true)
   public BigInteger deposited (Address user, Address token) {
-    return this.deposited.at(user).getOrDefault(token, ZERO);
+    return this.deposited(user).getOrDefault(token, ZERO);
+  }
+
+  // @External(readonly = true)
+  public int depositedTokensSize (Address user) {
+    return this.deposited(user).size();
+  }
+
+  // @External(readonly = true)
+  public Address depositedToken (Address user, int index) {
+    return this.deposited(user).getKey(index);
   }
 }
