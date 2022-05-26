@@ -531,7 +531,9 @@ public class NonFungiblePositionManager extends IRC721Enumerable
   }
 
   /**
-   * @notice Remove funds from the liquidity manager
+   * @notice Remove funds from the liquidity manager previously deposited by `Context.getCaller`
+   * 
+   * @param token The token address to withdraw
    */
   @External
   public void withdraw (Address token) {
@@ -575,6 +577,7 @@ public class NonFungiblePositionManager extends IRC721Enumerable
     this.liquidityMgr.deposit(caller, tokenIn, amountIn);
   }
 
+  // ReadOnly methods
   @External(readonly = true)
   public BigInteger deposited(Address user, Address token) {
     return this.liquidityMgr.deposited(user, token);

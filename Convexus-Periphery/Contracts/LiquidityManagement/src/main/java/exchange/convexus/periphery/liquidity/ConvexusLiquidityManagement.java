@@ -206,16 +206,33 @@ public class ConvexusLiquidityManagement
   // ================================================
   // Public variable getters
   // ================================================
+  /**
+   * Returns the amount of tokens previously deposited for a given user and token
+   * 
+   * @param user A user address who made a deposit
+   * @param token A token address
+   */
   // @External(readonly = true)
   public BigInteger deposited (Address user, Address token) {
     return this.deposited(user).getOrDefault(token, ZERO);
   }
 
+  /**
+   * Returns the size of the token list deposited
+   * 
+   * @param user A user address who made a deposit
+   */
   // @External(readonly = true)
   public int depositedTokensSize (Address user) {
     return this.deposited(user).size();
   }
 
+  /**
+   * Returns the token address in the list given an index
+   * 
+   * @param user A user address who made a deposit
+   * @param index The deposited token list index
+   */
   // @External(readonly = true)
   public Address depositedToken (Address user, int index) {
     return this.deposited(user).getKey(index);
