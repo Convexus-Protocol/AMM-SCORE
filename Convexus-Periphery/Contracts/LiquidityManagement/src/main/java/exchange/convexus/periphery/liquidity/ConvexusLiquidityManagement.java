@@ -55,7 +55,7 @@ public class ConvexusLiquidityManagement
   // DB Variables
   // ================================================
   // User => Token => Amount
-  private EnumerableMap<Address, BigInteger> deposited (Address user) {
+  private EnumerableMap<Address, BigInteger> depositedMap (Address user) {
     return new EnumerableMap<>(NAME + "_deposited_" + user, Address.class, BigInteger.class);
   }
 
@@ -107,9 +107,15 @@ public class ConvexusLiquidityManagement
     checkEnoughDeposited(payer, token, owed);
     
     // Remove funds from deposited
-    var depositedUser = this.deposited(payer);
+    var depositedUser = this.depositedMap(payer);
     BigInteger oldBalance = depositedUser.getOrDefault(token, ZERO);
-    depositedUser.set(token, oldBalance.subtract(owed));
+    if (oldBalance.equals(owed)) {
+      // All funds were payed
+      depositedUser.remove(token);
+    } else {
+      // Only a portion of the deposit funds were payed
+      depositedUser.set(token, oldBalance.subtract(owed));
+    }
     
     // Actually transfer the tokens
     PeripheryPayments.pay(token, caller, owed);
@@ -180,7 +186,7 @@ public class ConvexusLiquidityManagement
       "deposit: Deposit amount cannot be less or equal to 0");
 
     // --- OK from here ---
-    var depositedUser = this.deposited(caller);
+    var depositedUser = this.depositedMap(caller);
     BigInteger oldBalance = depositedUser.getOrDefault(tokenIn, ZERO);
     depositedUser.set(tokenIn, oldBalance.add(amountIn));
   }
@@ -192,11 +198,11 @@ public class ConvexusLiquidityManagement
   public void withdraw (Address token) {
     final Address caller = Context.getCaller();
 
-    var depositedUser = this.deposited(caller);
+    var depositedUser = this.depositedMap(caller);
     BigInteger amount = depositedUser.getOrDefault(token, ZERO);
 
     if (amount.compareTo(ZERO) > 0) {
-      depositedUser.set(token, ZERO);
+      depositedUser.remove(token);
       IIRC2ICX.transfer(token, caller, amount, "withdraw");
     }
   }
@@ -222,7 +228,7 @@ public class ConvexusLiquidityManagement
    */
   // @External(readonly = true)
   public BigInteger deposited (Address user, Address token) {
-    return this.deposited(user).getOrDefault(token, ZERO);
+    return this.depositedMap(user).getOrDefault(token, ZERO);
   }
 
   /**
@@ -232,7 +238,7 @@ public class ConvexusLiquidityManagement
    */
   // @External(readonly = true)
   public int depositedTokensSize (Address user) {
-    return this.deposited(user).size();
+    return this.depositedMap(user).size();
   }
 
   /**
@@ -243,6 +249,6 @@ public class ConvexusLiquidityManagement
    */
   // @External(readonly = true)
   public Address depositedToken (Address user, int index) {
-    return this.deposited(user).getKey(index);
+    return this.depositedMap(user).getKey(index);
   }
 }
