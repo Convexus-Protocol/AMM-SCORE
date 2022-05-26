@@ -128,7 +128,7 @@ public class FeesAccountingTest extends NonFungiblePositionManagerTest {
     reset(sicx.spy);
     reset(usdc.spy);
     collect(alice, tokenId1, alice.getAddress(), MAX_UINT128, MAX_UINT128);
-    verify(sicx.spy).Transfer(pool, alice.getAddress(), BigInteger.valueOf(2501), "{\"method\": \"pay\"}".getBytes());
+    verify(sicx.spy).Transfer(pool, alice.getAddress(), BigInteger.valueOf(2501), "{\"method\": \"deposit\"}".getBytes());
     verifyNoInteractions(usdc.spy);
     BigInteger after = (BigInteger) sicx.call("balanceOf", alice.getAddress());
     assertEquals(after.subtract(before), BigInteger.valueOf(2501));
@@ -137,7 +137,7 @@ public class FeesAccountingTest extends NonFungiblePositionManagerTest {
     reset(sicx.spy);
     reset(usdc.spy);
     collect(alice, tokenId2, alice.getAddress(), MAX_UINT128, MAX_UINT128);
-    verify(sicx.spy).Transfer(pool, alice.getAddress(), BigInteger.valueOf(7503), "{\"method\": \"pay\"}".getBytes());
+    verify(sicx.spy).Transfer(pool, alice.getAddress(), BigInteger.valueOf(7503), "{\"method\": \"deposit\"}".getBytes());
     verifyNoInteractions(usdc.spy);
     after = (BigInteger) sicx.call("balanceOf", alice.getAddress());
     assertEquals(after.subtract(before), BigInteger.valueOf(7503));

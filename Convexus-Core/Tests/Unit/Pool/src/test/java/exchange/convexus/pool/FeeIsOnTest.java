@@ -66,7 +66,7 @@ public class FeeIsOnTest extends ConvexusPoolTest {
     ConvexusLiquidityUtils.deposit(alice, callee.getAddress(), sicx.score, new BigInteger("5981737760509663"));
     reset(sicx.spy);
     callee.invoke(alice, "mint", pool.getAddress(), alice.getAddress(), 0, 120, TEN.pow(18));
-    verify(sicx.spy).Transfer(callee.getAddress(), pool.getAddress(), new BigInteger ("5981737760509663"), "{\"method\": \"pay\"}".getBytes());
+    verify(sicx.spy).Transfer(callee.getAddress(), pool.getAddress(), new BigInteger ("5981737760509663"), "{\"method\": \"deposit\"}".getBytes());
 
     // somebody takes the limit order
     swapExact1For0(expandTo18Decimals(2), bob);
@@ -89,7 +89,7 @@ public class FeeIsOnTest extends ConvexusPoolTest {
       // roughly 0.25% despite other liquidity
       // 6017734268818165 + 15089604485501
       new BigInteger("6032823873303666"), 
-      "{\"method\": \"pay\"}".getBytes());
+      "{\"method\": \"deposit\"}".getBytes());
 
     assertTrue(Slot0.fromMap(pool.call("slot0")).tick >= 120);
   }
@@ -100,7 +100,7 @@ public class FeeIsOnTest extends ConvexusPoolTest {
 
     reset(usdc.spy);
     callee.invoke(alice, "mint", pool.getAddress(), alice.getAddress(), -120, 0, TEN.pow(18));
-    verify(usdc.spy).Transfer(callee.getAddress(), pool.getAddress(), new BigInteger("5981737760509663"), "{\"method\": \"pay\"}".getBytes());
+    verify(usdc.spy).Transfer(callee.getAddress(), pool.getAddress(), new BigInteger("5981737760509663"), "{\"method\": \"deposit\"}".getBytes());
 
     // somebody takes the limit order
     swapExact0For1(TEN.pow(18).multiply(TWO), bob);
@@ -122,7 +122,7 @@ public class FeeIsOnTest extends ConvexusPoolTest {
       // roughly 0.25% despite other liquidity
       // 6017734268818165 + 15089604485501
       new BigInteger("6032823873303666"), 
-      "{\"method\": \"pay\"}".getBytes());
+      "{\"method\": \"deposit\"}".getBytes());
       
     assertTrue(Slot0.fromMap(pool.call("slot0")).tick < -120);
   }

@@ -32,6 +32,6 @@ public class PeripheryPayments {
     Address recipient,
     BigInteger value
   ) {
-    IIRC2ICX.transfer(token, recipient, value, "pay");
+    IIRC2ICX.transfer(token, recipient, value, "deposit");
   }
 }

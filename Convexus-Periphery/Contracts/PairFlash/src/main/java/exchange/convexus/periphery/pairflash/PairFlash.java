@@ -248,12 +248,6 @@ public class PairFlash
   }
 
   @External
-  @Payable
-  public void payIcx () {
-    this.liquidityMgr.depositIcx();
-  }
-
-  @External
   public void tokenFallback (Address _from, BigInteger _value, @Optional byte[] _data) throws Exception {
     Reader reader = new StringReader(new String(_data));
     JsonValue input = Json.parse(reader);
@@ -264,7 +258,6 @@ public class PairFlash
     switch (method)
     {
       case "deposit": 
-      case "pay": 
       {
         // Accept the incoming token transfer
         deposit(_from, token, _value);

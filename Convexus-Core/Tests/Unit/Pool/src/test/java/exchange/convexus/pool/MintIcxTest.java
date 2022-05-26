@@ -432,7 +432,7 @@ public class MintIcxTest extends ConvexusPoolTest {
 
     callee.invoke(alice, "mint", pool.getAddress(), alice.getAddress(), minTick + tickSpacing, maxTick - tickSpacing, BigInteger.valueOf(100));
     
-    verify(usdc.spy).Transfer(callee.getAddress(), pool.getAddress(), BigInteger.valueOf(32), "{\"method\": \"pay\"}".getBytes());
+    verify(usdc.spy).Transfer(callee.getAddress(), pool.getAddress(), BigInteger.valueOf(32), "{\"method\": \"deposit\"}".getBytes());
 
     assertEquals(pool.getAccount().getBalance(), BigInteger.valueOf(9996 + 317));
     assertEquals(usdc.score.call("balanceOf", pool.getAddress()), BigInteger.valueOf(1000 + 32));
@@ -474,7 +474,7 @@ public class MintIcxTest extends ConvexusPoolTest {
 
     callee.invoke(alice, "mint", pool.getAddress(), alice.getAddress(), minTick, maxTick, BigInteger.valueOf(10000));
     
-    verify(usdc.spy).Transfer(callee.getAddress(), pool.getAddress(), BigInteger.valueOf(3163), "{\"method\": \"pay\"}".getBytes());
+    verify(usdc.spy).Transfer(callee.getAddress(), pool.getAddress(), BigInteger.valueOf(3163), "{\"method\": \"deposit\"}".getBytes());
 
     assertEquals(pool.getAccount().getBalance(), BigInteger.valueOf(9996 + 31623));
     assertEquals(usdc.score.call("balanceOf", pool.getAddress()), BigInteger.valueOf(1000 + 3163));
@@ -535,7 +535,7 @@ public class MintIcxTest extends ConvexusPoolTest {
     callee.invoke(alice, "mint", pool.getAddress(), alice.getAddress(), -46080, -23040, BigInteger.valueOf(10000));
 
     verifyNoInteractions(sicx.spy);
-    verify(usdc.spy).Transfer(callee.getAddress(), pool.getAddress(), BigInteger.valueOf(2162), "{\"method\": \"pay\"}".getBytes());
+    verify(usdc.spy).Transfer(callee.getAddress(), pool.getAddress(), BigInteger.valueOf(2162), "{\"method\": \"deposit\"}".getBytes());
 
     assertEquals(BigInteger.valueOf(9996), pool.getAccount().getBalance());
     assertEquals(BigInteger.valueOf(1000 + 2162), usdc.call("balanceOf", pool.getAddress()));
@@ -563,7 +563,7 @@ public class MintIcxTest extends ConvexusPoolTest {
     callee.invoke(alice, "mint", pool.getAddress(), alice.getAddress(), minTick, -23040, BigInteger.valueOf(10000));
 
     verifyNoInteractions(sicx.spy);
-    verify(usdc.spy).Transfer(callee.getAddress(), pool.getAddress(), BigInteger.valueOf(3161), "{\"method\": \"pay\"}".getBytes());
+    verify(usdc.spy).Transfer(callee.getAddress(), pool.getAddress(), BigInteger.valueOf(3161), "{\"method\": \"deposit\"}".getBytes());
 
     assertEquals(BigInteger.valueOf(9996), pool.getAccount().getBalance());
     assertEquals(BigInteger.valueOf(1000 + 3161), usdc.call("balanceOf", pool.getAddress()));

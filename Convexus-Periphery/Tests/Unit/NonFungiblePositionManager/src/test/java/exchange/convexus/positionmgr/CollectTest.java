@@ -132,7 +132,7 @@ public class CollectTest extends NonFungiblePositionManagerTest {
       IntUtils.MAX_UINT128
     );
 
-    verify(sicx.spy).Transfer(poolAddress, alice.getAddress(), BigInteger.valueOf(49), "{\"method\": \"pay\"}".getBytes());
-    verify(usdc.spy).Transfer(poolAddress, alice.getAddress(), BigInteger.valueOf(49), "{\"method\": \"pay\"}".getBytes());
+    verify(sicx.spy).Transfer(poolAddress, alice.getAddress(), BigInteger.valueOf(49), "{\"method\": \"deposit\"}".getBytes());
+    verify(usdc.spy).Transfer(poolAddress, alice.getAddress(), BigInteger.valueOf(49), "{\"method\": \"deposit\"}".getBytes());
   }
 }

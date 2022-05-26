@@ -91,7 +91,7 @@ public class TickTransitionTest extends ConvexusPoolTest {
     reset(sicx.spy);
     reset(usdc.spy);
     swapExact0For1(THREE, alice);
-    verify(sicx.spy).Transfer(callee.getAddress(), pool.getAddress(), THREE, "{\"method\": \"pay\"}".getBytes());
+    verify(sicx.spy).Transfer(callee.getAddress(), pool.getAddress(), THREE, "{\"method\": \"deposit\"}".getBytes());
     verifyNoInteractions(usdc.spy);
 
     slot0 = Slot0.fromMap(pool.call("slot0"));

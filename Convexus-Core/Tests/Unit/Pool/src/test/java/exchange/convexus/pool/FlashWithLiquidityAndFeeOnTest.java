@@ -94,7 +94,7 @@ public class FlashWithLiquidityAndFeeOnTest extends ConvexusPoolTest {
     reset(sicx.spy);
     reset(usdc.spy);
     flash(alice, "0", "0", AddressUtils.ZERO_ADDRESS, "567", "0");
-    verify(sicx.spy).Transfer(callee.getAddress(), pool.getAddress(), new BigInteger("567"), "{\"method\": \"pay\"}".getBytes());
+    verify(sicx.spy).Transfer(callee.getAddress(), pool.getAddress(), new BigInteger("567"), "{\"method\": \"deposit\"}".getBytes());
     verify(usdc.spy, times(2)).balanceOf(pool.getAddress());
 
     var fees = ProtocolFees.fromMap(pool.call("protocolFees"));
@@ -110,7 +110,7 @@ public class FlashWithLiquidityAndFeeOnTest extends ConvexusPoolTest {
     reset(sicx.spy);
     reset(usdc.spy);
     flash(alice, "0", "0", AddressUtils.ZERO_ADDRESS, "0", "678");
-    verify(usdc.spy).Transfer(callee.getAddress(), pool.getAddress(), new BigInteger("678"), "{\"method\": \"pay\"}".getBytes());
+    verify(usdc.spy).Transfer(callee.getAddress(), pool.getAddress(), new BigInteger("678"), "{\"method\": \"deposit\"}".getBytes());
     verify(sicx.spy, times(2)).balanceOf(pool.getAddress());
 
     var fees = ProtocolFees.fromMap(pool.call("protocolFees"));
@@ -126,8 +126,8 @@ public class FlashWithLiquidityAndFeeOnTest extends ConvexusPoolTest {
     reset(sicx.spy);
     reset(usdc.spy);
     flash(alice, "0", "0", bob, "789", "1234");
-    verify(sicx.spy).Transfer(callee.getAddress(), pool.getAddress(), new BigInteger("789"), "{\"method\": \"pay\"}".getBytes());
-    verify(usdc.spy).Transfer(callee.getAddress(), pool.getAddress(), new BigInteger("1234"), "{\"method\": \"pay\"}".getBytes());
+    verify(sicx.spy).Transfer(callee.getAddress(), pool.getAddress(), new BigInteger("789"), "{\"method\": \"deposit\"}".getBytes());
+    verify(usdc.spy).Transfer(callee.getAddress(), pool.getAddress(), new BigInteger("1234"), "{\"method\": \"deposit\"}".getBytes());
     
     var fees = ProtocolFees.fromMap(pool.call("protocolFees"));
     assertEquals(fees.token0, new BigInteger("131"));

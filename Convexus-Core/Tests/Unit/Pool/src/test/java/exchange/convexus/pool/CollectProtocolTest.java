@@ -87,7 +87,7 @@ public class CollectProtocolTest extends ConvexusPoolTest {
     reset(sicx.spy);
     reset(usdc.spy);
     collectProtocolGetFeesOwed(owner, alice);
-    verify(sicx.spy).Transfer(pool.getAddress(), alice.getAddress(), new BigInteger ("83333333333332"), "{\"method\": \"pay\"}".getBytes());
+    verify(sicx.spy).Transfer(pool.getAddress(), alice.getAddress(), new BigInteger ("83333333333332"), "{\"method\": \"deposit\"}".getBytes());
     verifyNoInteractions(usdc.spy);
   }
 
@@ -102,8 +102,8 @@ public class CollectProtocolTest extends ConvexusPoolTest {
     reset(usdc.spy);
     collectProtocolGetFeesOwed(owner, alice);
     // more token0 fees because it's 1/5th the swap fees
-    verify(sicx.spy).Transfer(pool.getAddress(), alice.getAddress(), new BigInteger ("62499999999999"), "{\"method\": \"pay\"}".getBytes());
+    verify(sicx.spy).Transfer(pool.getAddress(), alice.getAddress(), new BigInteger ("62499999999999"), "{\"method\": \"deposit\"}".getBytes());
     // less token1 fees because it's 1/8th the swap fees
-    verify(usdc.spy).Transfer(pool.getAddress(), alice.getAddress(), new BigInteger ("99999999999998"), "{\"method\": \"pay\"}".getBytes());
+    verify(usdc.spy).Transfer(pool.getAddress(), alice.getAddress(), new BigInteger ("99999999999998"), "{\"method\": \"deposit\"}".getBytes());
   }
 }

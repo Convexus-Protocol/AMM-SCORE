@@ -237,7 +237,7 @@ public class MintInitializedTest extends ConvexusPoolTest {
 
     callee.invoke(alice, "mint", pool.getAddress(), alice.getAddress(), -22980, 0, BigInteger.valueOf(10000));
 
-    verify(sicx.spy).Transfer(callee.getAddress(), pool.getAddress(), BigInteger.valueOf(21549), "{\"method\": \"pay\"}".getBytes());
+    verify(sicx.spy).Transfer(callee.getAddress(), pool.getAddress(), BigInteger.valueOf(21549), "{\"method\": \"deposit\"}".getBytes());
     verifyNoInteractions(usdc.spy);
     
     assertEquals(BigInteger.valueOf(9996 + 21549), sicx.call("balanceOf", pool.getAddress()));
@@ -264,7 +264,7 @@ public class MintInitializedTest extends ConvexusPoolTest {
     reset(sicx.spy);
     reset(usdc.spy);
     callee.invoke(alice, "mint", pool.getAddress(), alice.getAddress(), -22980, maxTick, BigInteger.valueOf(10000));
-    verify(sicx.spy).Transfer(callee.getAddress(), pool.getAddress(), BigInteger.valueOf(31549), "{\"method\": \"pay\"}".getBytes());
+    verify(sicx.spy).Transfer(callee.getAddress(), pool.getAddress(), BigInteger.valueOf(31549), "{\"method\": \"deposit\"}".getBytes());
 
     assertEquals(BigInteger.valueOf(9996 + 31549), sicx.call("balanceOf", pool.getAddress()));
     assertEquals(BigInteger.valueOf(1000), usdc.call("balanceOf", pool.getAddress()));
@@ -416,8 +416,8 @@ public class MintInitializedTest extends ConvexusPoolTest {
 
     callee.invoke(alice, "mint", pool.getAddress(), alice.getAddress(), minTick + tickSpacing, maxTick - tickSpacing, BigInteger.valueOf(100));
     
-    verify(sicx.spy).Transfer(callee.getAddress(), pool.getAddress(), BigInteger.valueOf(317), "{\"method\": \"pay\"}".getBytes());
-    verify(usdc.spy).Transfer(callee.getAddress(), pool.getAddress(), BigInteger.valueOf(32), "{\"method\": \"pay\"}".getBytes());
+    verify(sicx.spy).Transfer(callee.getAddress(), pool.getAddress(), BigInteger.valueOf(317), "{\"method\": \"deposit\"}".getBytes());
+    verify(usdc.spy).Transfer(callee.getAddress(), pool.getAddress(), BigInteger.valueOf(32), "{\"method\": \"deposit\"}".getBytes());
 
     assertEquals(sicx.score.call("balanceOf", pool.getAddress()), BigInteger.valueOf(9996 + 317));
     assertEquals(usdc.score.call("balanceOf", pool.getAddress()), BigInteger.valueOf(1000 + 32));
@@ -459,8 +459,8 @@ public class MintInitializedTest extends ConvexusPoolTest {
 
     callee.invoke(alice, "mint", pool.getAddress(), alice.getAddress(), minTick, maxTick, BigInteger.valueOf(10000));
     
-    verify(sicx.spy).Transfer(callee.getAddress(), pool.getAddress(), BigInteger.valueOf(31623), "{\"method\": \"pay\"}".getBytes());
-    verify(usdc.spy).Transfer(callee.getAddress(), pool.getAddress(), BigInteger.valueOf(3163), "{\"method\": \"pay\"}".getBytes());
+    verify(sicx.spy).Transfer(callee.getAddress(), pool.getAddress(), BigInteger.valueOf(31623), "{\"method\": \"deposit\"}".getBytes());
+    verify(usdc.spy).Transfer(callee.getAddress(), pool.getAddress(), BigInteger.valueOf(3163), "{\"method\": \"deposit\"}".getBytes());
 
     assertEquals(sicx.score.call("balanceOf", pool.getAddress()), BigInteger.valueOf(9996 + 31623));
     assertEquals(usdc.score.call("balanceOf", pool.getAddress()), BigInteger.valueOf(1000 + 3163));
@@ -521,7 +521,7 @@ public class MintInitializedTest extends ConvexusPoolTest {
     callee.invoke(alice, "mint", pool.getAddress(), alice.getAddress(), -46080, -23040, BigInteger.valueOf(10000));
 
     verifyNoInteractions(sicx.spy);
-    verify(usdc.spy).Transfer(callee.getAddress(), pool.getAddress(), BigInteger.valueOf(2162), "{\"method\": \"pay\"}".getBytes());
+    verify(usdc.spy).Transfer(callee.getAddress(), pool.getAddress(), BigInteger.valueOf(2162), "{\"method\": \"deposit\"}".getBytes());
 
     assertEquals(BigInteger.valueOf(9996), sicx.call("balanceOf", pool.getAddress()));
     assertEquals(BigInteger.valueOf(1000 + 2162), usdc.call("balanceOf", pool.getAddress()));
@@ -549,7 +549,7 @@ public class MintInitializedTest extends ConvexusPoolTest {
     callee.invoke(alice, "mint", pool.getAddress(), alice.getAddress(), minTick, -23040, BigInteger.valueOf(10000));
 
     verifyNoInteractions(sicx.spy);
-    verify(usdc.spy).Transfer(callee.getAddress(), pool.getAddress(), BigInteger.valueOf(3161), "{\"method\": \"pay\"}".getBytes());
+    verify(usdc.spy).Transfer(callee.getAddress(), pool.getAddress(), BigInteger.valueOf(3161), "{\"method\": \"deposit\"}".getBytes());
 
     assertEquals(BigInteger.valueOf(9996), sicx.call("balanceOf", pool.getAddress()));
     assertEquals(BigInteger.valueOf(1000 + 3161), usdc.call("balanceOf", pool.getAddress()));

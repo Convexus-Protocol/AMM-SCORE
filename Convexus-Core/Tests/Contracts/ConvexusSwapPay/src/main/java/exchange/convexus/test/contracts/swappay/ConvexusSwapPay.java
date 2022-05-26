@@ -99,7 +99,7 @@ public class ConvexusSwapPay
     depositedUser.set(token, oldBalance.subtract(owed));
 
     // Actually transfer the tokens
-    IIRC2ICX.transfer(token, destination, owed, "pay");
+    IIRC2ICX.transfer(token, destination, owed, "deposit");
   }
 
   // @External - this method is external through tokenFallback

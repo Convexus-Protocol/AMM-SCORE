@@ -982,9 +982,9 @@ public abstract class ConvexusPool
 
   @External
   @Payable
-  public void payIcx () {
+  public void depositIcx () {
     Context.require(Context.getCaller().isContract(), 
-      "tokenFallback: Pool shouldn't need to receive ICX from EOA");
+      "depositIcx: Pool shouldn't need to receive ICX from EOA");
   }
 
   @External
@@ -1096,7 +1096,7 @@ public abstract class ConvexusPool
   // Private methods
   // ================================================
   private void pay (Address token, Address recipient, BigInteger amount) {
-    IIRC2ICX.transfer(token, recipient, amount, "pay");
+    IIRC2ICX.transfer(token, recipient, amount, "deposit");
   }
 
   /**

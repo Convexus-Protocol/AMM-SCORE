@@ -490,13 +490,6 @@ public class SwapRouter
 
   @External
   @Payable
-  public void payIcx () {
-    // "payIcx" is coming from the Pool
-    this.liquidityMgr.depositIcx();
-  }
-
-  @External
-  @Payable
   public void depositIcx () {
     this.liquidityMgr.depositIcx();
   }
@@ -535,8 +528,8 @@ public class SwapRouter
         break;
       }
 
-      // "pay" is coming from the Pool
-      case "pay": {
+      // "deposit" is coming from the Pool
+      case "deposit": {
         // Accept the incoming token transfer
         deposit(_from, token, _value);
         break;
