@@ -271,8 +271,7 @@ public class Swap
     @External
     @Payable
     public void depositIcx () {
-        // Accept the incoming ICX transfer
-        this.liquidityMgr.deposit(Context.getCaller(), ICX.getAddress(), Context.getValue());
+        this.liquidityMgr.depositIcx();
     }
   
     @External

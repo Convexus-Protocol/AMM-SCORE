@@ -59,7 +59,6 @@ import exchange.convexus.positionmgr.MintParams;
 import exchange.convexus.positionmgr.MintResult;
 import exchange.convexus.positionmgr.NFTPosition;
 import exchange.convexus.positionmgr.PositionInformation;
-import exchange.convexus.utils.ICX;
 import exchange.convexus.utils.TimeUtils;
 
 // @title NFT positions
@@ -546,7 +545,7 @@ public class NonFungiblePositionManager extends IRC721Enumerable
   @External
   @Payable
   public void depositIcx () {
-    this.liquidityMgr.deposit(Context.getCaller(), ICX.getAddress(), Context.getValue());
+    this.liquidityMgr.depositIcx();
   }
   
   @External

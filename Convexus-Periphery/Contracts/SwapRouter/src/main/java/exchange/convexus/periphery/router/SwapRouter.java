@@ -492,8 +492,13 @@ public class SwapRouter
   @Payable
   public void payIcx () {
     // "payIcx" is coming from the Pool
-    // Accept the incoming ICX transfer
-    this.liquidityMgr.deposit(Context.getCaller(), ICX.getAddress(), Context.getValue());
+    this.liquidityMgr.depositIcx();
+  }
+
+  @External
+  @Payable
+  public void depositIcx () {
+    this.liquidityMgr.depositIcx();
   }
   
   @External

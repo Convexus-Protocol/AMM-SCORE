@@ -46,7 +46,6 @@ import exchange.convexus.periphery.liquidity.ConvexusLiquidityManagement;
 import exchange.convexus.periphery.router.ExactInputSingleParams;
 import exchange.convexus.pool.IConvexusPool;
 import exchange.convexus.pool.PoolAddress.PoolKey;
-import exchange.convexus.utils.ICX;
 
 /**
  * @title Flash contract implementation
@@ -245,13 +244,13 @@ public class PairFlash
   @External
   @Payable
   public void depositIcx () {
-    this.liquidityMgr.deposit(Context.getCaller(), ICX.getAddress(), Context.getValue());
+    this.liquidityMgr.depositIcx();
   }
 
   @External
   @Payable
   public void payIcx () {
-    this.liquidityMgr.deposit(Context.getCaller(), ICX.getAddress(), Context.getValue());
+    this.liquidityMgr.depositIcx();
   }
 
   @External
