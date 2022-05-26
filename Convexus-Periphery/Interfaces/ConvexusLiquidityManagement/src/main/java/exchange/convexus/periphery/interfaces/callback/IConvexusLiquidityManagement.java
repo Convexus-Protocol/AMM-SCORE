@@ -22,7 +22,7 @@ import score.Address;
 public interface IConvexusLiquidityManagement
 {
   /**
-   * @notice Add funds to the liquidity manager
+   * @notice Add IRC2 funds to the liquidity manager
    */
   // @External - this method is external through tokenFallback
   public void deposit (
@@ -30,6 +30,14 @@ public interface IConvexusLiquidityManagement
     Address tokenIn, 
     BigInteger amountIn
   );
+
+  
+  /**
+   * @notice Add ICX funds to the liquidity manager
+   */
+  // @External
+  // @Payable
+  public void depositIcx ();
   
   /**
    * @notice Remove funds from the liquidity manager

@@ -33,6 +33,7 @@ import exchange.convexus.pool.MintCallbackData;
 import exchange.convexus.pool.PairAmounts;
 import exchange.convexus.pool.PoolAddress.PoolKey;
 import exchange.convexus.utils.EnumerableMap;
+import exchange.convexus.utils.ICX;
 import static java.math.BigInteger.ZERO;
 
 import java.math.BigInteger;
@@ -156,6 +157,13 @@ public class ConvexusLiquidityManagement
     );
 
     return new AddLiquidityResult (liquidity, amounts.amount0, amounts.amount1, pool);
+  }
+
+  
+  // @External
+  // @Payable
+  public void depositIcx () {
+    deposit(Context.getCaller(), ICX.getAddress(), Context.getValue());
   }
 
   /**
