@@ -115,7 +115,7 @@ public class TreasuryVester {
             this.lastUpdate.set(now);
         }
 
-        IIRC2.transfer(this.cxs, this.recipient.get(), amount, JSONUtils.method("pay"));
+        IIRC2.transfer(this.cxs, this.recipient.get(), amount, JSONUtils.method("deposit"));
     }
 
     // ================================================
