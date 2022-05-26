@@ -13,6 +13,8 @@ dependencies {
     
     implementation project(':Convexus-Periphery:Structs:SwapRouter')
     implementation project(':Convexus-Periphery:Structs:PairFlash')
+    
+    implementation project(':Convexus-Periphery:Interfaces:ConvexusLiquidityManagement')
 
     implementation project(':Convexus-Periphery:Librairies')
     implementation project(':Convexus-Periphery:Contracts:SwapRouter')

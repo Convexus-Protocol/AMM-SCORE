@@ -36,6 +36,7 @@ dependencies {
     // Periphery
     testImplementation project(':Convexus-Periphery:Librairies')
     testImplementation project(':Convexus-Periphery:Structs:NonFungiblePositionManager')
+    testImplementation project(':Convexus-Periphery:Interfaces:ConvexusLiquidityManagement')
 
     testImplementation project(':Convexus-Periphery:Contracts:NonFungiblePositionManager')
     testImplementation project(':Convexus-Periphery:Contracts:NonfungibleTokenPositionDescriptor')

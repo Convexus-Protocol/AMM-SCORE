@@ -20,12 +20,14 @@ dependencies {
     // Core
     testImplementation project(':Convexus-Core:Structs:Pool')
     testImplementation project(':Convexus-Core:Structs:Factory')
+    testImplementation project(':Convexus-Core:Interfaces:Callback')
 
     testImplementation project(':Convexus-Core:Tests:Mocks:Factory')
     
     // Periphery
     testImplementation project(':Convexus-Periphery:Structs:NonFungiblePositionManager')
     testImplementation project(':Convexus-Periphery:Structs:Staker')
+    testImplementation project(':Convexus-Periphery:Interfaces:ConvexusLiquidityManagement')
 
     testImplementation project(':Convexus-Periphery:Contracts:Staker')
     testImplementation project(':Convexus-Periphery:Contracts:NonFungiblePositionManager')

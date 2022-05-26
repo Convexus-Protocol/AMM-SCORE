@@ -10,6 +10,8 @@ dependencies {
 
     implementation project(':Convexus-Periphery:Structs:SwapRouter')
     
+    implementation project(':Convexus-Periphery:Interfaces:ConvexusLiquidityManagement')
+    
     implementation project(':Convexus-Periphery:Contracts:SwapRouter')
     implementation project(':Convexus-Periphery:Contracts:LiquidityManagement')
 }

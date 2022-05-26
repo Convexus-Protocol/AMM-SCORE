@@ -27,4 +27,6 @@ dependencies {
     implementation project(':Convexus-Periphery:Contracts:NonFungiblePositionManager')
     // Structs
     implementation project(':Convexus-Periphery:Structs:NonFungiblePositionManager')
+    // Interfaces
+    implementation project(':Convexus-Periphery:Interfaces:ConvexusLiquidityManagement')
 }
