@@ -30,6 +30,11 @@ getReadOnlyPool() {
   echo "periphery/readonlypool"
 }
 
+# Staker
+getStaker() {
+  echo "periphery/staker"
+}
+
 # Quoter
 getQuoter() {
   echo "periphery/quoter"

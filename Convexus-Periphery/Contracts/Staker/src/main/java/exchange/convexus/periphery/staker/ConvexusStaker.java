@@ -71,7 +71,7 @@ public class ConvexusStaker implements IRC721Receiver {
     // Convexus Factory
     private final Address factory;
     // The nonfungible position manager with which this staking contract is compatible
-    private final Address nonfungiblePositionManager;
+    private final Address nonFungiblePositionManager;
     // The max duration of an incentive in seconds
     private final BigInteger maxIncentiveStartLeadTime;
     // The max amount of seconds into the future the incentive startTime can be set
@@ -153,22 +153,22 @@ public class ConvexusStaker implements IRC721Receiver {
     // ================================================
     /**
      * Contract constructor
-     * @param _factory The Convexus factory
-     * @param _nonfungiblePositionManager the NFT position manager contract address
-     * @param _maxIncentiveStartLeadTime the max duration of an incentive in seconds
-     * @param _maxIncentiveDuration the max amount of seconds into the future the incentive startTime can be set
+     * @param factory The Convexus factory
+     * @param nonFungiblePositionManager the NFT position manager contract address
+     * @param maxIncentiveStartLeadTime the max duration of an incentive in seconds
+     * @param maxIncentiveDuration the max amount of seconds into the future the incentive startTime can be set
      */
     public ConvexusStaker (
-        Address _factory,
-        Address _nonfungiblePositionManager,
-        BigInteger _maxIncentiveStartLeadTime,
-        BigInteger _maxIncentiveDuration
+        Address factory,
+        Address nonFungiblePositionManager,
+        BigInteger maxIncentiveStartLeadTime,
+        BigInteger maxIncentiveDuration
     ) {
         this.name = "Convexus Staker";
-        this.factory = _factory;
-        this.nonfungiblePositionManager = _nonfungiblePositionManager;
-        this.maxIncentiveStartLeadTime = _maxIncentiveStartLeadTime;
-        this.maxIncentiveDuration = _maxIncentiveDuration;
+        this.factory = factory;
+        this.nonFungiblePositionManager = nonFungiblePositionManager;
+        this.maxIncentiveStartLeadTime = maxIncentiveStartLeadTime;
+        this.maxIncentiveDuration = maxIncentiveDuration;
     }
 
     /**
@@ -244,10 +244,10 @@ public class ConvexusStaker implements IRC721Receiver {
      */
     @External
     public void onIRC721Received (Address caller, Address from, BigInteger tokenId, byte[] data) {
-        Context.require(Context.getCaller().equals(this.nonfungiblePositionManager),
+        Context.require(Context.getCaller().equals(this.nonFungiblePositionManager),
             "onIRC721Received: not a Convexus NFT");
         
-        PositionInformation position = INonFungiblePositionManager.positions(this.nonfungiblePositionManager, tokenId);
+        PositionInformation position = INonFungiblePositionManager.positions(this.nonFungiblePositionManager, tokenId);
         var deposit = new Deposit(from, ZERO, position.tickLower, position.tickUpper);
         this.deposits.set(tokenId, deposit);
 
@@ -268,12 +268,17 @@ public class ConvexusStaker implements IRC721Receiver {
     /// @param to The new owner of the deposit
     @External
     public void transferDeposit(BigInteger tokenId, Address to) {
-        Context.require(!to.equals(ZERO_ADDRESS), "transferDeposit: invalid transfer recipient");
-        Address owner = deposits.get(tokenId).owner;
-        Context.require(owner.equals(Context.getCaller()), "transferDeposit: can only be called by deposit owner");
-        var deposit = deposits.get(tokenId);
+        // Access control
+        Context.require(!to.equals(ZERO_ADDRESS), 
+            "transferDeposit: invalid transfer recipient");
+        Address owner = this.deposits.get(tokenId).owner;
+        Context.require(owner.equals(Context.getCaller()), 
+            "transferDeposit: can only be called by deposit owner");
+
+        // OK
+        var deposit = this.deposits.get(tokenId);
         deposit.owner = to;
-        deposits.set(tokenId, deposit);
+        this.deposits.set(tokenId, deposit);
         this.DepositTransferred(tokenId, owner, to);
     }
 
@@ -306,7 +311,7 @@ public class ConvexusStaker implements IRC721Receiver {
         this.deposits.set(tokenId, null);
         this.DepositTransferred(tokenId, deposit.owner, ZERO_ADDRESS);
 
-        IIRC721.safeTransferFrom(this.nonfungiblePositionManager, thisAddress, to, tokenId, data);
+        IIRC721.safeTransferFrom(this.nonFungiblePositionManager, thisAddress, to, tokenId, data);
     }
 
     /// @notice Stakes a Convexus LP token
@@ -472,7 +477,7 @@ public class ConvexusStaker implements IRC721Receiver {
             "stakeToken: token already staked"
         );
 
-        var nftPos = NFTPositionInfo.getPositionInfo(factory, nonfungiblePositionManager, tokenId);
+        var nftPos = NFTPositionInfo.getPositionInfo(factory, nonFungiblePositionManager, tokenId);
         Address pool = nftPos.pool;
         int tickLower = nftPos.tickLower;
         int tickUpper = nftPos.tickUpper;
@@ -563,7 +568,7 @@ public class ConvexusStaker implements IRC721Receiver {
 
     @External(readonly = true)
     public Address nonfungiblePositionManager() {
-        return this.nonfungiblePositionManager;
+        return this.nonFungiblePositionManager;
     }
 
     @External(readonly = true)

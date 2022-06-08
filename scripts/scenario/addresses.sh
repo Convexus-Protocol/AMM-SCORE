@@ -47,6 +47,7 @@ echo "Position Descriptor    : "$(getAddress "periphery/positiondescriptor" ${en
 echo "Position Manager       : "$(getAddress "periphery/positionmgr" ${endpoint})
 echo "Pool ReadOnly          : "$(getAddress $(getReadOnlyPool) ${endpoint})
 echo "Quoter                 : "$(getAddress $(getQuoter) ${endpoint})
+echo "Staker                 : "$(getAddress $(getStaker) ${endpoint})
 echo "Pool Initializer       : "$(getAddress $(getPoolInitializerPkg) ${endpoint})
 
 echo "=========================================================="

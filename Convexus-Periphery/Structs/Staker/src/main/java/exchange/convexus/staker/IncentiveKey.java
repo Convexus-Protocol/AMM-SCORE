@@ -49,6 +49,8 @@ public class IncentiveKey {
         this.refundee = refundee; 
     }
 
+    public IncentiveKey () {}
+
     public static IncentiveKey readObject (ObjectReader r) {
         return new IncentiveKey(
             r.readAddress(), // rewardToken 
