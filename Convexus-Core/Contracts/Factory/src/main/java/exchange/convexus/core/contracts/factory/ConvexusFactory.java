@@ -103,6 +103,7 @@ public class ConvexusFactory implements IConvexusPoolDeployer {
         final Address caller = Context.getCaller();
         this.name = "Convexus Factory";
 
+        // Default values during deployment
         if (this.owner.get() == null) {
             this.owner.set(caller);
             this.OwnerChanged(AddressUtils.ZERO_ADDRESS, caller);
@@ -126,6 +127,9 @@ public class ConvexusFactory implements IConvexusPoolDeployer {
 
     /**
      * @notice Creates a pool for the given two tokens and fee
+     * 
+     * Access: Everyone
+     * 
      * @param tokenA One of the two tokens in the desired pool
      * @param tokenB The other of the two tokens in the desired pool
      * @param fee The desired fee for the pool
@@ -140,12 +144,14 @@ public class ConvexusFactory implements IConvexusPoolDeployer {
         Address tokenB,
         int fee
     ) {
+        // Checks
         Context.require(!tokenA.equals(tokenB),
             "createPool: tokenA must be different from tokenB");
 
         Address token0 = tokenA;
         Address token1 = tokenB;
 
+        // Make sure tokens addresses are ordered
         if (AddressUtils.compareTo(tokenA, tokenB) >= 0) {
             token0 = tokenB;
             token1 = tokenA;
@@ -161,6 +167,7 @@ public class ConvexusFactory implements IConvexusPoolDeployer {
         Context.require(getPool.at(token0).at(token1).get(fee) == null, 
             "createPool: pool already exists");
 
+        // OK
         Address pool = this.poolDeployer.deploy (
             this.poolContract.get(), 
             Context.getAddress(), 
@@ -180,6 +187,9 @@ public class ConvexusFactory implements IConvexusPoolDeployer {
 
     /**
      * @notice Updates the owner of the factory
+     * 
+     * Access: Owner
+     * 
      * @dev Must be called by the current owner
      * @param _owner The new owner of the factory
      */
@@ -187,8 +197,10 @@ public class ConvexusFactory implements IConvexusPoolDeployer {
     public void setOwner (
         Address _owner
     ) {
+        // Access control
         checkOwner();
 
+        // OK
         Address currentOwner = this.owner.get();
         this.OwnerChanged(currentOwner, _owner);
         this.owner.set(_owner);
@@ -196,6 +208,9 @@ public class ConvexusFactory implements IConvexusPoolDeployer {
 
     /**
      * @notice Enables a fee amount with the given tickSpacing
+     * 
+     * Access: Owner
+     * 
      * @dev Fee amounts may never be removed once enabled
      * @param fee The fee amount to enable, denominated in hundredths of a bip (i.e. 1e-6)
      * @param tickSpacing The spacing between ticks to be enforced for all pools created with the given fee amount
@@ -205,10 +220,12 @@ public class ConvexusFactory implements IConvexusPoolDeployer {
         int fee, 
         int tickSpacing
     ) {
+        // Access control
         checkOwner();
 
-        Context.require(fee < 1000000, 
-            "enableFeeAmount: fee needs to be lower than 1000000");
+        // Checks
+        Context.require(fee < 1_000_000, 
+            "enableFeeAmount: fee needs to be lower than 1,000,000");
 
         // tick spacing is capped at 16384 to prevent the situation where tickSpacing is so large that
         // TickBitmap#nextInitializedTickWithinOneWord overflows int24 container from a valid tick
@@ -219,6 +236,7 @@ public class ConvexusFactory implements IConvexusPoolDeployer {
         Context.require(this.feeAmountTickSpacing.get(fee) == 0,
             "enableFeeAmount: fee amount is already enabled");
 
+        // OK
         this.feeAmountTickSpacing.set(fee, tickSpacing);
         this.FeeAmountEnabled(fee, tickSpacing);
     }
