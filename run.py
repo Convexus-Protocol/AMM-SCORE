@@ -15,6 +15,9 @@ class Command:
     def __init__(self) -> None:
         parser = argparse.ArgumentParser()
         parser.add_argument('-e', '--endpoint', type=str, default='gochain', help='target endpoint for connection')
+        parser.add_argument('-k', '--keystore', type=str, help='keystore path')
+        parser.add_argument('-p', '--keystore_password', type=str, help='keystore password')
+
         subparsers = parser.add_subparsers(title='Available commands', dest='command')
         subparsers.required = True
 
@@ -39,17 +42,26 @@ class Command:
         getattr(self, args.command)(args)
 
     @staticmethod
-    def get_keystore_path(network):
-        return f"scripts/config/keystores/{network}/operator.icx"
+    def get_keystore_path(keystore, network):
+        if not keystore:
+            return f"scripts/config/keystores/{network}/operator.icx"
+        else:
+            return keystore
 
     @staticmethod
-    def get_keystore_password(network):
-        target_path = f"scripts/config/keystores/{network}/operator.pwd"
+    def get_keystore_password(password, keystore, network):
+        if not password:
+            if not keystore:
+                keystore = f"scripts/config/keystores/{network}/operator.icx"
 
-        if exists(target_path):
-            return open(target_path, "r").read()
+            target_path = keystore.replace('.icx', '.pwd')
+
+            if exists(target_path):
+                return open(target_path, "r").read()
+            else:
+                return getpass.getpass(prompt=f'Enter the keystore password ({keystore}): ')
         else:
-            return getpass.getpass(prompt='Enter the keystore password: ')
+            return password
 
     @staticmethod
     def optimizedJar(args):
@@ -65,8 +77,8 @@ class Command:
     def deploy(args):
         print(f" -------------------- Deploying {args.package} ... -------------------- ")
         Command.optimizedJar(args)
-        keystore_path = Command.get_keystore_path(args.endpoint)
-        keystore_password = Command.get_keystore_password(args.endpoint)
+        keystore_path = Command.get_keystore_path(args.keystore, args.endpoint)
+        keystore_password = Command.get_keystore_password(args.keystore_password, args.keystore, args.endpoint)
         config = Config(args.endpoint, keystore_path, keystore_password)
         deploy(config, args.package)
 
@@ -74,23 +86,23 @@ class Command:
     def update(args):
         print(f" -------------------- Updating {args.package} ... -------------------- ")
         Command.optimizedJar(args)
-        keystore_path = Command.get_keystore_path(args.endpoint)
-        keystore_password = Command.get_keystore_password(args.endpoint)
+        keystore_path = Command.get_keystore_path(args.keystore, args.endpoint)
+        keystore_password = Command.get_keystore_password(args.keystore_password, args.keystore, args.endpoint)
         config = Config(args.endpoint, keystore_path, keystore_password)
         update(config, args.package)
 
     @staticmethod
     def invoke(args):
         print(f" -------------------- Invoking {args.package} ... -------------------- ")
-        keystore_path = Command.get_keystore_path(args.endpoint)
-        keystore_password = Command.get_keystore_password(args.endpoint)
+        keystore_path = Command.get_keystore_path(args.keystore, args.endpoint)
+        keystore_password = Command.get_keystore_password(args.keystore_password, args.keystore, args.endpoint)
         config = Config(args.endpoint, keystore_path, keystore_password)
         invoke(config, args.package, args.params)
 
     @staticmethod
     def call(args):
-        keystore_path = Command.get_keystore_path(args.endpoint)
-        keystore_password = Command.get_keystore_password(args.endpoint)
+        keystore_path = Command.get_keystore_path(args.keystore, args.endpoint)
+        keystore_password = Command.get_keystore_password(args.keystore_password, args.keystore, args.endpoint)
         config = Config(args.endpoint, keystore_path, keystore_password)
         print(call(config, args.package, args.params))
 
