@@ -1329,6 +1329,11 @@ public abstract class ConvexusPool
     return this.settings;
   }
 
+  @External(readonly = true)
+  public boolean poolLock() {
+    return this.poolLock.get();
+  }
+
   /**
    * The 0th storage slot in the pool stores many values, and is exposed as a single method to save steps when accessed externally.
    */
