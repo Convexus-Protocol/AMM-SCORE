@@ -81,7 +81,7 @@ public class MintInitializedTest extends ConvexusPoolTest {
     callee.invoke(alice, "mint", pool.getAddress(), alice.getAddress(), minTick, maxTick, BigInteger.valueOf(3161));
     return start;
   }
-  
+
   @Test
   void testTickLowerGreaterThanTickUpper () {
     AssertUtils.assertThrowsMessage(AssertionError.class, () -> 

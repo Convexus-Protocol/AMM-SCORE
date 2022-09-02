@@ -55,7 +55,6 @@ import exchange.convexus.pool.StepComputations;
 import exchange.convexus.pool.SwapCache;
 import exchange.convexus.pool.SwapState;
 import exchange.convexus.pool.Tick;
-import exchange.convexus.utils.ReentrancyLock;
 import exchange.convexus.utils.TimeUtils;
 import score.Address;
 import score.Context;
@@ -101,9 +100,6 @@ public abstract class ConvexusPool
 
   // The amounts of token0 and token1 that are owed to the protocol
   protected final VarDB<BigInteger> liquidity = Context.newVarDB(NAME + "_liquidity", BigInteger.class);
-
-  // Whether the pool is locked
-  protected final ReentrancyLock poolLock = new ReentrancyLock(NAME + "_poolLock");
 
   // Implements IObservations
   // Returns data about a specific observation index
@@ -313,11 +309,6 @@ public abstract class ConvexusPool
     if (this.protocolFees.get() == null) {
       this.protocolFees.set(new ProtocolFees(ZERO, ZERO));
     }
-
-    // pool is locked by default, need to initialize to unlock
-    if (this.poolLock.get() == null) {
-      this.poolLock.lock(true);
-    }
   }
 
   /**
@@ -331,7 +322,7 @@ public abstract class ConvexusPool
    */
   @External
   public void increaseObservationCardinalityNext (int observationCardinalityNext) {
-    poolLock.lock(true);
+    this.unlock(false);
 
     Slot0 _slot0 = this.slot0.get();
     int observationCardinalityNextOld = _slot0.observationCardinalityNext;
@@ -344,7 +335,25 @@ public abstract class ConvexusPool
       this.IncreaseObservationCardinalityNext(observationCardinalityNextOld, observationCardinalityNextNew);
     }
 
-    poolLock.lock(false);
+    this.unlock(true);
+  }
+
+  /**
+   * Enable or disable the lock
+   * @param state Lock state
+   */
+  public void unlock (boolean state) {
+    // Check current unlock state
+    var slot0 = this.slot0.get();
+    Context.require(slot0 != null, 
+      "unlock: pool isn't initialized yet"); 
+    boolean unlock_state = slot0.unlocked;
+    Context.require(state != unlock_state, 
+        "unlock: wrong lock state: " + unlock_state);
+
+    // OK
+    slot0.unlocked = state;
+    this.slot0.set(slot0);
   }
 
   /**
@@ -371,11 +380,10 @@ public abstract class ConvexusPool
       0,
       result.cardinality,
       result.cardinalityNext,
-      0
+      0,
+      // Unlock the pool
+      true
     ));
-
-    // Unlock the pool
-    this.poolLock.lock(false);
 
     this.Initialized(sqrtPriceX96, tick);
   }
@@ -404,7 +412,7 @@ public abstract class ConvexusPool
     BigInteger amount,
     byte[] data
   ) {
-    this.poolLock.lock(true);
+    this.unlock(false);
 
     final Address caller = Context.getCaller();
 
@@ -451,7 +459,7 @@ public abstract class ConvexusPool
 
     this.Mint(recipient, tickLower, tickUpper, caller, amount, amount0, amount1);
 
-    this.poolLock.lock(false);
+    this.unlock(true);
     return new PairAmounts(amount0, amount1);
   }
 
@@ -480,7 +488,7 @@ public abstract class ConvexusPool
     BigInteger amount0Requested,
     BigInteger amount1Requested
   ) {
-    this.poolLock.lock(true);
+    this.unlock(false);
 
     final Address caller = Context.getCaller();
     BigInteger amount0;
@@ -506,7 +514,7 @@ public abstract class ConvexusPool
 
     this.Collect(caller, tickLower, tickUpper, recipient, amount0, amount1);
 
-    this.poolLock.lock(false);
+    this.unlock(true);
     return new PairAmounts(amount0, amount1);
   }
 
@@ -529,7 +537,7 @@ public abstract class ConvexusPool
     int tickUpper,
     BigInteger amount
   ) {
-    this.poolLock.lock(true);
+    this.unlock(false);
     final Address caller = Context.getCaller();
 
     var result = _modifyPosition(new ModifyPositionParams(
@@ -552,7 +560,7 @@ public abstract class ConvexusPool
 
     this.Burn(caller, tickLower, tickUpper, amount, amount0, amount1);
 
-    this.poolLock.lock(false);
+    this.unlock(true);
     return new PairAmounts(amount0, amount1);
   }
 
@@ -578,7 +586,7 @@ public abstract class ConvexusPool
     BigInteger sqrtPriceLimitX96,
     byte[] data
   ) {
-    this.poolLock.lock(true);
+    this.unlock(false);
     final Address caller = Context.getCaller();
 
     Context.require(!amountSpecified.equals(ZERO),
@@ -801,7 +809,7 @@ public abstract class ConvexusPool
     }
 
     this.Swap(caller, recipient, amount0, amount1, state.sqrtPriceX96, state.liquidity, state.tick);
-    this.poolLock.lock(false);
+    this.unlock(true);
 
     return new PairAmounts(amount0, amount1);
   }
@@ -826,7 +834,7 @@ public abstract class ConvexusPool
     BigInteger amount1,
     byte[] data
   ) {
-    this.poolLock.lock(true);
+    this.unlock(false);
     final Address caller = Context.getCaller();
 
     BigInteger _liquidity = this.liquidity.get();
@@ -887,7 +895,7 @@ public abstract class ConvexusPool
 
     this.Flash(caller, recipient, amount0, amount1, paid0, paid1);
   
-    this.poolLock.lock(false);
+    this.unlock(true);
   }
 
   /**
@@ -903,7 +911,7 @@ public abstract class ConvexusPool
     int feeProtocol0,
     int feeProtocol1
   ) {
-    this.poolLock.lock(true);
+    this.unlock(false);
 
     // Access control
     this.checkCallerIsFactoryOwner();
@@ -923,7 +931,7 @@ public abstract class ConvexusPool
 
     this.SetFeeProtocol(feeProtocolOld % 16, feeProtocolOld >> 4, feeProtocol0, feeProtocol1);
 
-    this.poolLock.lock(false);
+    this.unlock(true);
   }
 
   /**
@@ -943,7 +951,7 @@ public abstract class ConvexusPool
     BigInteger amount0Requested,
     BigInteger amount1Requested
   ) {
-    this.poolLock.lock(true);
+    this.unlock(false);
 
     // Access control
     this.checkCallerIsFactoryOwner();
@@ -976,7 +984,7 @@ public abstract class ConvexusPool
 
     this.CollectProtocol(caller, recipient, amount0, amount1);
     
-    this.poolLock.lock(false);
+    this.unlock(true);
     return new PairAmounts(amount0, amount1);
   }
 
@@ -1327,11 +1335,6 @@ public abstract class ConvexusPool
   @External(readonly = true)
   public PoolSettings settings() {
     return this.settings;
-  }
-
-  @External(readonly = true)
-  public boolean poolLock() {
-    return this.poolLock.get();
   }
 
   /**

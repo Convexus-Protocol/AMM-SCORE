@@ -59,7 +59,7 @@ public class IncreaseObservationCardinalityNextTest extends ConvexusPoolTest {
   void testOnlyAfterInitialize() {
     AssertUtils.assertThrowsMessage(AssertionError.class, () ->
       pool.invoke(alice, "increaseObservationCardinalityNext", 2), 
-      "ReentrancyLock: wrong lock state: true");
+      "unlock: pool isn't initialized yet");
   }
   
   @Test

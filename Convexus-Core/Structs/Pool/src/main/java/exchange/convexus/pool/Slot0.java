@@ -18,7 +18,6 @@ package exchange.convexus.pool;
 
 import java.math.BigInteger;
 import java.util.Map;
-
 import score.ObjectReader;
 import score.ObjectWriter;
 
@@ -39,14 +38,17 @@ public class Slot0 {
     // Encoded as two 4 bit values, where the protocol fee of token1 is shifted 4 bits and the protocol fee of token0
     // is the lower 4 bits. Used as the denominator of a fraction of the swap fee, e.g. 4 means 1/4th of the swap fee.
     public int feeProtocol;
+    // Whether the pool is locked
+    public boolean unlocked;
 
-    public static void writeObject(ObjectWriter w, Slot0 obj) {
+    public static void writeObject (ObjectWriter w, Slot0 obj) {
         w.write(obj.sqrtPriceX96);
         w.write(obj.tick);
         w.write(obj.observationIndex);
         w.write(obj.observationCardinality);
         w.write(obj.observationCardinalityNext);
         w.write(obj.feeProtocol);
+        w.write(obj.unlocked);
     }
 
     public static Slot0 readObject(ObjectReader r) {
@@ -56,7 +58,8 @@ public class Slot0 {
             r.readInt(), // observationIndex
             r.readInt(), // observationCardinality
             r.readInt(), // observationCardinalityNext
-            r.readInt()  // feeProtocol
+            r.readInt(), // feeProtocol
+            r.readBoolean() // unlocked
         );
     }
 
@@ -69,7 +72,8 @@ public class Slot0 {
             ((BigInteger) map.get("observationIndex")).intValue(),
             ((BigInteger) map.get("observationCardinality")).intValue(),
             ((BigInteger) map.get("observationCardinalityNext")).intValue(),
-            ((BigInteger) map.get("feeProtocol")).intValue()
+            ((BigInteger) map.get("feeProtocol")).intValue(),
+            (Boolean) map.get("unlocked")
         );
     }
 
@@ -79,7 +83,8 @@ public class Slot0 {
         int observationIndex,
         int observationCardinality,
         int observationCardinalityNext,
-        int feeProtocol
+        int feeProtocol,
+        boolean unlocked
     ) {
         this.sqrtPriceX96 = sqrtPriceX96;
         this.tick = tick;
@@ -87,6 +92,7 @@ public class Slot0 {
         this.observationCardinality = observationCardinality;
         this.observationCardinalityNext = observationCardinalityNext;
         this.feeProtocol = feeProtocol;
+        this.unlocked = unlocked;
     }
 
     public Slot0 () {}

@@ -57,7 +57,7 @@ public class MintUnitializedTest extends ConvexusPoolTest {
   void testNotInitialized() {
     AssertUtils.assertThrowsMessage(AssertionError.class, () ->
       callee.invoke(alice, "mint", pool.getAddress(), alice.getAddress(), -tickSpacing, tickSpacing, ONE),
-      "ReentrancyLock: wrong lock state: true");
+      "unlock: pool isn't initialized yet");
   }
 
   @Test

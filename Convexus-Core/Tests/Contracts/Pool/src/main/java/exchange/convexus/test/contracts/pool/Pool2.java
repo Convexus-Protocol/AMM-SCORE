@@ -374,7 +374,8 @@ abstract class ConvexusPool2
             0,
             result.cardinality,
             result.cardinalityNext,
-            0
+            0,
+            true
         ));
 
         // Unlock the pool

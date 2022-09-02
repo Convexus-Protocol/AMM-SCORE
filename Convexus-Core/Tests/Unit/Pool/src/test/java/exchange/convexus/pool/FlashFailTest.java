@@ -55,15 +55,15 @@ public class FlashFailTest extends ConvexusPoolTest {
   void testFailsIfNotInitialized () {
     AssertUtils.assertThrowsMessage(AssertionError.class, () ->
       flash(alice, "100", "200", bob, "0", "0"), 
-      "ReentrancyLock: wrong lock state: true");
+      "unlock: pool isn't initialized yet");
 
     AssertUtils.assertThrowsMessage(AssertionError.class, () ->
       flash(alice, "100", "0", bob, "0", "0"), 
-      "ReentrancyLock: wrong lock state: true");
+      "unlock: pool isn't initialized yet");
 
     AssertUtils.assertThrowsMessage(AssertionError.class, () ->
       flash(alice, "0", "200", bob, "0", "0"), 
-      "ReentrancyLock: wrong lock state: true");
+      "unlock: pool isn't initialized yet");
   }
 
   @Test
