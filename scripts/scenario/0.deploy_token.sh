@@ -9,14 +9,16 @@ source ./scripts/util/dir.sh
 source ./scripts/util/console.sh
 source ./scripts/util/hex.sh
 
-if [ "$#" -ne "3" ] ; then
-  error "Usage: $0 <network> <name> <symbol>"
+if [ "$#" -ne "5" ] ; then
+  error "Usage: $0 <network> <name> <symbol> <decimals> <initial supply>"
   exit 1
 fi
 
 network=$1
 name=$2
 symbol=$3
+decimals=$4
+initialSupply=$5
 
 # Start
 deployName="${name} (${symbol}) Token"
@@ -40,8 +42,8 @@ info "Cleaning..."
 # Deploy on ICON network
 _name=$name
 _symbol=$symbol
-_decimals=$(hex 18)
-_initialSupply=$(hex 1000000)
+_decimals=$(hex ${decimals})
+_initialSupply=$(hex ${initialSupply})
 
 filter=$(cat <<EOF
 {
