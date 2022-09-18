@@ -16,6 +16,7 @@
 
 package exchange.convexus.core.contracts.factory;
 
+import java.math.BigInteger;
 import exchange.convexus.core.contracts.factory.models.ConvexusPoolDeployer;
 import exchange.convexus.core.interfaces.pooldeployer.IConvexusPoolDeployer;
 import exchange.convexus.factory.Parameters;
@@ -299,8 +300,8 @@ public class ConvexusFactory implements IConvexusPoolDeployer {
      * Get the deployed pools list size
      */
     @External(readonly = true)
-    public int poolsSize() {
-        return this.pools.size();
+    public BigInteger poolsSize() {
+        return BigInteger.valueOf(this.pools.size());
     }
 
     /**
