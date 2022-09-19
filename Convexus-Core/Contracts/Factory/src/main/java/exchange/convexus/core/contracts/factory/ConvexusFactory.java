@@ -54,7 +54,7 @@ public class ConvexusFactory implements IConvexusPoolDeployer {
     protected final DictDB<Integer, Integer> feeAmountTickSpacing = Context.newDictDB(NAME + "_feeAmountTickSpacing", Integer.class);
     protected final BranchDB<Address, BranchDB<Address, DictDB<Integer, Address>>> getPool = Context.newBranchDB(NAME + "_getPool", Address.class);
     protected final VarDB<byte[]> poolContract = Context.newVarDB(NAME + "_poolContract", byte[].class);
-    protected final EnumerableSet<Address> pools = new EnumerableSet<Address>(NAME + "_pools", Address.class);
+    protected final EnumerableSet<Address> poolsSet = new EnumerableSet<Address>(NAME + "_poolsSet", Address.class);
 
     // Implements IConvexusPoolDeployer
     private final ConvexusPoolDeployer poolDeployer;
@@ -189,7 +189,7 @@ public class ConvexusFactory implements IConvexusPoolDeployer {
         // populate mapping in the reverse direction, deliberate choice to avoid the cost of comparing addresses
         this.getPool.at(token1).at(token0).set(fee, pool);
         // Add to the global pool list
-        this.pools.add(pool);
+        this.poolsSet.add(pool);
 
         this.PoolCreated(token0, token1, fee, tickSpacing, pool);
 
@@ -341,7 +341,7 @@ public class ConvexusFactory implements IConvexusPoolDeployer {
      */
     @External(readonly = true)
     public BigInteger poolsSize() {
-        return BigInteger.valueOf(this.pools.length());
+        return BigInteger.valueOf(this.poolsSet.length());
     }
 
     /**
@@ -353,7 +353,7 @@ public class ConvexusFactory implements IConvexusPoolDeployer {
     public Address pools (
         int index
     ) {
-        return this.pools.get(index);
+        return this.poolsSet.get(index);
     }
 
     /**
@@ -365,7 +365,7 @@ public class ConvexusFactory implements IConvexusPoolDeployer {
     public boolean poolExists (
         Address pool
     ) {
-        return this.pools.contains(pool);
+        return this.poolsSet.contains(pool);
     }
 
     /**

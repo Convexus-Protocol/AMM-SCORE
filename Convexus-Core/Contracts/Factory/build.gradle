@@ -4,6 +4,7 @@ dependencies {
     
     implementation project(':Convexus-Core:Structs:Factory')
     implementation project(':Convexus-Core:Interfaces:ConvexusPoolDeployer')
+    implementation project(':Convexus-Core:Score-Interfaces:Pool')
 }
 
 optimizedJar {
