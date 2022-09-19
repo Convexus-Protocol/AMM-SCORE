@@ -2,7 +2,6 @@
 
 set -e
 
-source ./venv/bin/activate
 
 source ./scripts/util/get_address.sh
 source ./scripts/util/dir.sh
@@ -71,7 +70,7 @@ EOF
   jq -n \
     "${filter}" > ${tokenCallsDir}/${actionName}.json
   
-  echo $(./run.py -e ${network} call ${tokenPkg} ${actionName})
+  echo $(python run.py -e ${network} call ${tokenPkg} ${actionName})
 }
 
 deposit_token () {
@@ -106,7 +105,7 @@ EOF
       --arg value $value \
       "${filter}" > ${callsDir}/${actionName}.json
 
-    ./run.py -e ${network} invoke ${pkg} ${actionName}
+    python run.py -e ${network} invoke ${pkg} ${actionName}
   else
     tokenCallsDir=$(getCallsDir ${tokenPkg} ${network})
     _to=$posmgr
@@ -130,7 +129,7 @@ EOF
       --arg _data $_data \
       "${filter}" > ${tokenCallsDir}/${actionName}.json
     
-    ./run.py -e ${network} invoke ${tokenPkg} ${actionName}
+    python run.py -e ${network} invoke ${tokenPkg} ${actionName}
   fi
 
   # Get token deposited
@@ -153,7 +152,7 @@ EOF
     --arg token $token \
     "${filter}" > ${callsDir}/${actionName}.json
 
-  deposited=$(unhex $(./run.py -e ${network} call ${pkg} ${actionName}))
+  deposited=$(unhex $(python run.py -e ${network} call ${pkg} ${actionName}))
   info "${tokenName} (${token}) deposited: ${deposited} ${tokenSymbol}"
 }
 
@@ -209,6 +208,6 @@ jq -n \
   --arg deadline $deadline \
   "${filter}" > ${callsDir}/${actionName}.json
 
-./run.py -e ${network} invoke ${pkg} ${actionName}
+python run.py -e ${network} invoke ${pkg} ${actionName}
 
 success "Position successfully minted!"

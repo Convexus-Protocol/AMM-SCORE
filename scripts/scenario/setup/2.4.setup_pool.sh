@@ -2,7 +2,6 @@
 
 set -e
 
-source ./venv/bin/activate
 
 source ./scripts/util/get_address.sh
 source ./scripts/util/dir.sh
@@ -67,7 +66,7 @@ jq -n \
   --arg fee $fee \
   "${filter}" > ${callsDir}/${actionName}.json
 
-pool=$(./run.py -e ${network} call ${pkg} ${actionName})
+pool=$(python run.py -e ${network} call ${pkg} ${actionName})
 
 # Configure the deploy addresses
 echo '{}' | jq \
@@ -97,6 +96,6 @@ jq -n \
   --arg sqrtPriceX96 $sqrtPriceX96 \
   "${filter}" > ${poolCallsDir}/${actionName}.json
 
-./run.py -e ${network} invoke ${poolPkg} ${actionName}
+python run.py -e ${network} invoke ${poolPkg} ${actionName}
 
 success "Pool successfully initialized!"

@@ -2,7 +2,6 @@
 
 set -e
 
-source ./venv/bin/activate
 
 source ./scripts/util/get_address.sh
 source ./scripts/util/dir.sh

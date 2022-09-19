@@ -2,7 +2,6 @@
 
 set -e
 
-source ./venv/bin/activate
 
 source ./scripts/util/get_address.sh
 source ./scripts/util/dir.sh
@@ -67,7 +66,7 @@ jq -n \
   --arg _value $_value \
   "${filter}" > ${token0CallsDir}/${actionName}.json
 
-./run.py -e ${network} invoke ${token0Pkg} ${actionName}
+python run.py -e ${network} invoke ${token0Pkg} ${actionName}
 
 # Send token1
 info "Sending token1 to Robi..."
@@ -92,4 +91,4 @@ jq -n \
   --arg _value $_value \
   "${filter}" > ${token1CallsDir}/${actionName}.json
 
-./run.py -e ${network} invoke ${token1Pkg} ${actionName}
+python run.py -e ${network} invoke ${token1Pkg} ${actionName}

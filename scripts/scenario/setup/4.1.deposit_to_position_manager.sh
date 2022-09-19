@@ -2,7 +2,6 @@
 
 set -e
 
-source ./venv/bin/activate
 
 source ./scripts/util/get_address.sh
 source ./scripts/util/dir.sh
@@ -69,7 +68,7 @@ jq -n \
   --arg _data $_data \
   "${filter}" > ${token0CallsDir}/${actionName}.json
 
-./run.py -e ${network} invoke ${token0Pkg} ${actionName}
+python run.py -e ${network} invoke ${token0Pkg} ${actionName}
 
 # Get token0 deposited
 actionName="deposited"
@@ -91,7 +90,7 @@ jq -n \
   --arg token $token \
   "${filter}" > ${callsDir}/${actionName}.json
 
-deposited0=$(unhex $(./run.py -e ${network} call ${pkg} ${actionName}))
+deposited0=$(unhex $(python run.py -e ${network} call ${pkg} ${actionName}))
 echo "USDC Deposited: ${deposited0}"
 
 # Deposit token1
@@ -122,7 +121,7 @@ jq -n \
   --arg _data $_data \
   "${filter}" > ${token1CallsDir}/${actionName}.json
 
-./run.py -e ${network} invoke ${token1Pkg} ${actionName}
+python run.py -e ${network} invoke ${token1Pkg} ${actionName}
 
 # Get token1 deposited
 actionName="deposited"
@@ -144,7 +143,7 @@ jq -n \
   --arg token $token \
   "${filter}" > ${callsDir}/${actionName}.json
 
-deposited1=$(unhex $(./run.py -e ${network} call ${pkg} ${actionName}))
+deposited1=$(unhex $(python run.py -e ${network} call ${pkg} ${actionName}))
 echo "USDC Deposited: ${deposited1}"
 
 # Mint the position
@@ -196,6 +195,6 @@ jq -n \
   --arg deadline $deadline \
   "${filter}" > ${callsDir}/${actionName}.json
 
-./run.py -e ${network} invoke ${pkg} ${actionName}
+python run.py -e ${network} invoke ${pkg} ${actionName}
 
 success "Position successfully minted!"

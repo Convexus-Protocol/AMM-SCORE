@@ -2,7 +2,6 @@
 
 set -e
 
-source ./venv/bin/activate
 
 source ./scripts/util/get_address.sh
 source ./scripts/util/dir.sh
@@ -31,4 +30,4 @@ EOF
 jq -n \
   "${filter}" > ${tokenCallsDir}/${actionName}.json
 
-echo $(./run.py -e ${network} call ${tokenPkg} ${actionName})
+echo $(python run.py -e ${network} call ${tokenPkg} ${actionName})

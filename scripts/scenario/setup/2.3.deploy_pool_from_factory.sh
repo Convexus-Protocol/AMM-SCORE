@@ -2,7 +2,6 @@
 
 set -e
 
-source ./venv/bin/activate
 
 source ./scripts/util/get_address.sh
 source ./scripts/util/dir.sh
@@ -61,6 +60,6 @@ jq -n \
   --arg fee $fee \
   "${filter}" > ${callsDir}/${actionName}.json
 
-./run.py -e ${network} invoke ${pkg} ${actionName}
+python run.py -e ${network} invoke ${pkg} ${actionName}
 
 success "Pool successfully deployed!"

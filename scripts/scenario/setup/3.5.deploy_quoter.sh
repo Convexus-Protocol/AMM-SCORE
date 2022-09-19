@@ -2,7 +2,6 @@
 
 set -e
 
-source ./venv/bin/activate
 
 source ./scripts/util/get_address.sh
 source ./scripts/util/dir.sh
@@ -54,6 +53,6 @@ jq -n \
   --arg readOnlyPool $readOnlyPool \
   "${filter}" > ${deployDir}/params.json
 
-./run.py -e ${network} deploy ${pkg}
+python run.py -e ${network} deploy ${pkg}
 
 success "${deployName} contract has been successfully deployed!"
