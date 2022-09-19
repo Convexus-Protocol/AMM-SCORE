@@ -22,8 +22,8 @@ import exchange.convexus.core.interfaces.pooldeployer.IConvexusPoolDeployer;
 import exchange.convexus.factory.Parameters;
 import exchange.convexus.pool.IConvexusPool;
 import exchange.convexus.utils.AddressUtils;
+import exchange.convexus.utils.EnumerableSet;
 import score.Address;
-import score.ArrayDB;
 import score.BranchDB;
 import score.Context;
 import score.DictDB;
@@ -54,7 +54,7 @@ public class ConvexusFactory implements IConvexusPoolDeployer {
     protected final DictDB<Integer, Integer> feeAmountTickSpacing = Context.newDictDB(NAME + "_feeAmountTickSpacing", Integer.class);
     protected final BranchDB<Address, BranchDB<Address, DictDB<Integer, Address>>> getPool = Context.newBranchDB(NAME + "_getPool", Address.class);
     protected final VarDB<byte[]> poolContract = Context.newVarDB(NAME + "_poolContract", byte[].class);
-    protected final ArrayDB<Address> pools = Context.newArrayDB(NAME + "_pools", Address.class);
+    protected final EnumerableSet<Address> pools = new EnumerableSet<Address>(NAME + "_pools", Address.class);
 
     // Implements IConvexusPoolDeployer
     private final ConvexusPoolDeployer poolDeployer;
@@ -197,11 +197,11 @@ public class ConvexusFactory implements IConvexusPoolDeployer {
     }
 
     /**
-     * @notice Update an existing pool contract
+     * @notice Update an existing pool contract given a pool address
      * 
      * Access: Owner
      * 
-     * @param pool A pool address
+     * @param pool An existing pool address
      */
     @External
     public void updatePool (
@@ -341,7 +341,7 @@ public class ConvexusFactory implements IConvexusPoolDeployer {
      */
     @External(readonly = true)
     public BigInteger poolsSize() {
-        return BigInteger.valueOf(this.pools.size());
+        return BigInteger.valueOf(this.pools.length());
     }
 
     /**
@@ -354,6 +354,18 @@ public class ConvexusFactory implements IConvexusPoolDeployer {
         int index
     ) {
         return this.pools.get(index);
+    }
+
+    /**
+     * Check if the pool exists in the Factory
+     * @param pool A pool address
+     * @return True if exists, false otherwise
+     */
+    @External(readonly = true)
+    public boolean poolExists (
+        Address pool
+    ) {
+        return this.pools.contains(pool);
     }
 
     /**
