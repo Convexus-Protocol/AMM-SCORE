@@ -20,6 +20,7 @@ import java.math.BigInteger;
 import exchange.convexus.core.contracts.factory.models.ConvexusPoolDeployer;
 import exchange.convexus.core.interfaces.pooldeployer.IConvexusPoolDeployer;
 import exchange.convexus.factory.Parameters;
+import exchange.convexus.pool.IConvexusPool;
 import exchange.convexus.utils.AddressUtils;
 import score.Address;
 import score.ArrayDB;
@@ -85,6 +86,15 @@ public class ConvexusFactory implements IConvexusPoolDeployer {
 
     @EventLog(indexed = 3)
     public void PoolCreated(
+        Address token0, 
+        Address token1, 
+        int fee, 
+        int tickSpacing, 
+        Address pool
+    ) {}
+
+    @EventLog(indexed = 3)
+    public void PoolUpdated(
         Address token0, 
         Address token1, 
         int fee, 
@@ -184,6 +194,36 @@ public class ConvexusFactory implements IConvexusPoolDeployer {
         this.PoolCreated(token0, token1, fee, tickSpacing, pool);
 
         return pool;
+    }
+
+    /**
+     * @notice Update an existing pool contract
+     * 
+     * Access: Owner
+     * 
+     * @param pool A pool address
+     */
+    @External
+    public void updatePool (
+        Address pool
+    ) {
+        // Access control
+        checkOwner();
+
+        // OK
+        Address token0 = IConvexusPool.token0(pool);
+        Address token1 = IConvexusPool.token1(pool);
+        int fee = IConvexusPool.fee(pool);
+        int tickSpacing = IConvexusPool.tickSpacing(pool);
+
+        this.poolDeployer.update (
+            pool,
+            this.poolContract.get(),
+            Context.getAddress(),
+            token0, token1, fee, tickSpacing
+        );
+
+        this.PoolUpdated(token0, token1, fee, tickSpacing, pool);
     }
 
     /**

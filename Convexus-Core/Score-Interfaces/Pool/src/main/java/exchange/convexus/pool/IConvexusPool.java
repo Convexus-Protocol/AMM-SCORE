@@ -163,6 +163,10 @@ public class IConvexusPool {
     return (BigInteger) Context.call(pool, "liquidity");
   }
 
+  public static int fee (Address pool) {
+    return ((BigInteger) Context.call(pool, "fee")).intValue();
+  }
+
   public static BigInteger feeGrowthGlobal0X128 (Address pool) {
     return (BigInteger) Context.call(pool, "feeGrowthGlobal0X128");
   }

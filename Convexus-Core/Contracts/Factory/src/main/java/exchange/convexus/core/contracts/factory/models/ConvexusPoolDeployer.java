@@ -45,6 +45,24 @@ public class ConvexusPoolDeployer {
     return pool;
   }
 
+  public void update (
+    Address pool, 
+    byte[] contractBytes, 
+    Address factory, 
+    Address token0, 
+    Address token1, 
+    int fee, 
+    int tickSpacing
+  ) {
+    this.parameters.set(new Parameters(factory, token0, token1, fee, tickSpacing));
+    
+    Address result = Context.deploy(pool, contractBytes);
+    Context.require(result.equals(pool), 
+      NAME + "::update: invalid pool address");
+
+    this.parameters.set(null);
+  }
+
   @External(readonly = true)
   public Parameters parameters () {
     return this.parameters.get();
