@@ -91,7 +91,7 @@ public class MintTest extends NonFungiblePositionManagerTest {
   void failsIfCannotTransfer () {
     ConvexusTest.createAndInitializePoolIfNecessary(ConvexusPoolMock.class, alice, factory, sicx.getAddress(), usdc.getAddress(), FEE_AMOUNTS[MEDIUM], encodePriceSqrt(ONE, ONE), tickSpacing);
     
-    AssertUtils.assertThrowsMessage(AssertionError.class, () -> 
+    AssertUtils.assertThrowsStartsWithMessage(AssertionError.class, () -> 
       mint (
         nft,
         alice,
@@ -107,7 +107,7 @@ public class MintTest extends NonFungiblePositionManagerTest {
         alice.getAddress(),
         now()
       ),
-      "checkEnoughDeposited: user didn't deposit enough funds");
+      "ConvexusLiquidityManagement::checkEnoughDeposited: user didn't deposit enough funds");
   }
 
   @Test

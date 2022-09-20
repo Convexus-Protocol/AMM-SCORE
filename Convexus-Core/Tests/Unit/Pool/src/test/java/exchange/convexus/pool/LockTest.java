@@ -58,6 +58,6 @@ public class LockTest extends ConvexusPoolTest {
     // the tests happens in the SCORE
     AssertUtils.assertThrowsMessage(AssertionError.class, 
       () -> reentrantCallee.invoke(alice, "swapToReenter", pool.getAddress()), 
-      "convexusSwapCallback: Unable to reenter");
+      "ConvexusReentrantCallee::convexusSwapCallback: Unable to reenter");
   }
 }

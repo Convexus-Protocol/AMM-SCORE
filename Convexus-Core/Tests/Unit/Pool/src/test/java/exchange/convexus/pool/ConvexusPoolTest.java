@@ -59,6 +59,7 @@ public class ConvexusPoolTest extends ConvexusTest {
   ScoreSpy<ConvexusSwapPay> underpay;
 
   void setup_tokens () throws Exception {
+    ICX.ADDRESS = Address.fromString("cx0000000000000000000000000000000000000001");
     sicx = deploy_sicx();
     usdc = deploy_usdc();
     

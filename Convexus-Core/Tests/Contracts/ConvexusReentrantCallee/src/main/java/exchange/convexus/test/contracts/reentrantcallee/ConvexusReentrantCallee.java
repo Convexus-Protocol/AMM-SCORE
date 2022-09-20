@@ -46,7 +46,7 @@ public class ConvexusReentrantCallee
   // ================================================
   // Contract class name
   private static final String NAME = "ConvexusReentrantCallee";
-  private static final String expectedReason = "ReentrancyLock: wrong lock state: true";
+  private static final String expectedReason = "ConvexusPool::unlock: wrong lock state: false";
 
   // ================================================
   // DB Variables
@@ -107,7 +107,8 @@ public class ConvexusReentrantCallee
       Context.require(e.getMessage().equals(expectedReason));
     }
     
-    Context.require(false, "convexusSwapCallback: Unable to reenter");
+    Context.require(false, 
+      NAME + "::convexusSwapCallback: Unable to reenter");
   }
 
   // @External - this method is external through tokenFallback

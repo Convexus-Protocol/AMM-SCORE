@@ -63,8 +63,8 @@ public class MintUnitializedTest extends ConvexusPoolTest {
   @Test
   void testNoDeposit() {
     pool.invoke(alice, "initialize", encodePriceSqrt(ONE, ONE));
-    AssertUtils.assertThrowsMessage(AssertionError.class, () -> 
+    AssertUtils.assertThrowsStartsWithMessage(AssertionError.class, () -> 
       callee.invoke(alice, "mint", pool.getAddress(), alice.getAddress(), minTick, maxTick, BigInteger.valueOf(3161)), 
-      "checkEnoughDeposited: user didn't deposit enough funds");
+      "ConvexusPoolCallee::checkEnoughDeposited: user didn't deposit enough funds");
   }
 }

@@ -67,6 +67,7 @@ public class SwapRouterTest extends ConvexusTest {
   BigInteger liquidity = BigInteger.valueOf(1000000);
 
   void setup_tokens () throws Exception {
+    ICX.ADDRESS = Address.fromString("cx0000000000000000000000000000000000000001");
     sicx = deploy_sicx();
     usdc = deploy_usdc();
     baln = deploy_baln();

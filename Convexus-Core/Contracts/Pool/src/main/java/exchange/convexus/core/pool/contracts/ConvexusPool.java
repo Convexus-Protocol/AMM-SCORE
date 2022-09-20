@@ -349,7 +349,7 @@ public abstract class ConvexusPool
       "unlock: pool isn't initialized yet"); 
     boolean unlock_state = slot0.unlocked;
     Context.require(state != unlock_state, 
-        "unlock: wrong lock state: " + unlock_state);
+        NAME + "::unlock: wrong lock state: " + unlock_state);
 
     // OK
     slot0.unlocked = state;

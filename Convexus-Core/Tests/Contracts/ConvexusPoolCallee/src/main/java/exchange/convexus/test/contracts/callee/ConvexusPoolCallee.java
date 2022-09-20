@@ -364,9 +364,8 @@ public class ConvexusPoolCallee
   private void checkEnoughDeposited (Address address, Address token, BigInteger amount) {
     var depositedUser = this.deposited.at(address);
     BigInteger userBalance = depositedUser.getOrDefault(token, ZERO);
-    Context.println("[Callee][checkEnoughDeposited][" + IIRC2ICX.symbol(token) + "][" + address + "] " + userBalance + " / " + amount);
+    // Context.println("[Callee][checkEnoughDeposited][" + IIRC2ICX.symbol(token) + "][" + address + "] " + userBalance + " / " + amount);
     Context.require(userBalance.compareTo(amount) >= 0,
-        // "checkEnoughDeposited: user didn't deposit enough funds - " + userBalance + "/" + amount);
-        "checkEnoughDeposited: user didn't deposit enough funds");
+      NAME + "::checkEnoughDeposited: user didn't deposit enough funds (" + userBalance + " / " + amount + ")");
   }
 }

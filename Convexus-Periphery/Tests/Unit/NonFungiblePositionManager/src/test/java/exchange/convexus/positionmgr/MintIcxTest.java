@@ -90,7 +90,7 @@ public class MintIcxTest extends NonFungiblePositionManagerTest {
   void failsIfCannotTransfer () {
     ConvexusTest.createAndInitializePoolIfNecessary(ConvexusPoolMock.class, alice, factory, ICX.getAddress(), usdc.getAddress(), FEE_AMOUNTS[MEDIUM], encodePriceSqrt(ONE, ONE), tickSpacing);
     
-    AssertUtils.assertThrowsMessage(AssertionError.class, () -> 
+    AssertUtils.assertThrowsStartsWithMessage(AssertionError.class, () -> 
       mint (
         nft,
         alice,
@@ -106,7 +106,7 @@ public class MintIcxTest extends NonFungiblePositionManagerTest {
         alice.getAddress(),
         now()
       ),
-      "checkEnoughDeposited: user didn't deposit enough funds");
+      "ConvexusLiquidityManagement::checkEnoughDeposited: user didn't deposit enough funds");
   }
 
   @Test
@@ -138,8 +138,8 @@ public class MintIcxTest extends NonFungiblePositionManagerTest {
     assertEquals(nft.call("tokenOfOwnerByIndex", bob.getAddress(), ZERO), ONE);
 
     var position = PositionInformation.fromMap(nft.call("positions", ONE));
-    assertEquals(position.token0, ICX.getAddress());
-    assertEquals(position.token1, usdc.getAddress());
+    assertEquals(position.token0, usdc.getAddress());
+    assertEquals(position.token1, ICX.getAddress());
     assertEquals(position.fee, FEE_AMOUNTS[MEDIUM]);
     assertEquals(position.tickLower, getMinTick(TICK_SPACINGS[MEDIUM]));
     assertEquals(position.tickUpper, getMaxTick(TICK_SPACINGS[MEDIUM]));

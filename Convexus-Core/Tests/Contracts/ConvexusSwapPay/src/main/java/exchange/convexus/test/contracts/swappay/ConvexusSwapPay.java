@@ -161,7 +161,6 @@ public class ConvexusSwapPay
     BigInteger userBalance = depositedUser.getOrDefault(token, ZERO);
     // Context.println("[Callee][checkEnoughDeposited][" + IIRC2ICX.symbol(token) + "] " + userBalance + " / " + amount);
     Context.require(userBalance.compareTo(amount) >= 0,
-        // "checkEnoughDeposited: user didn't deposit enough funds - " + userBalance + "/" + amount);
-        "checkEnoughDeposited: user didn't deposit enough funds");
+      NAME + "::checkEnoughDeposited: user didn't deposit enough funds (" + userBalance + " / " + amount + ")");
   }
 }

@@ -22,7 +22,7 @@ import score.Address;
 import score.Context;
 
 public class ICX {
-  private static final Address ADDRESS = Address.fromString("cx1111111111111111111111111111111111111111");
+  public static Address ADDRESS = Address.fromString("cx1111111111111111111111111111111111111111");
   private static final int DECIMALS = 18;
   private static final String SYMBOL = "ICX";
 

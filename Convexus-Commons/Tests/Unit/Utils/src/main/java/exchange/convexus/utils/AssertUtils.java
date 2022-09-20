@@ -18,7 +18,7 @@ package exchange.convexus.utils;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.function.Executable;
 
 public class AssertUtils {
@@ -26,5 +26,11 @@ public class AssertUtils {
     assertEquals(
       message,
       assertThrows(expectedType, executable).getMessage());
+  }
+  
+  public static <T extends Throwable> void assertThrowsStartsWithMessage (Class<T> expectedType, Executable executable, String message) {
+    var receivedMessage = assertThrows(expectedType, executable).getMessage();
+    score.Context.println("receivedMessage=" + receivedMessage);
+    assertTrue(receivedMessage.startsWith(message));
   }
 }
