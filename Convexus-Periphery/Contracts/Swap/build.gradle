@@ -9,6 +9,7 @@ dependencies {
     implementation project(':Convexus-Core:Interfaces:Callback')
 
     implementation project(':Convexus-Periphery:Structs:SwapRouter')
+    implementation project(':Convexus-Periphery:Structs:LiquidityManagement')
     
     implementation project(':Convexus-Periphery:Interfaces:ConvexusLiquidityManagement')
     
