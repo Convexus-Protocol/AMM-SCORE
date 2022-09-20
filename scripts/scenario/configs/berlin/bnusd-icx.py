@@ -1,8 +1,8 @@
 import json
 
-USDC = {
-  "address": "cx7a5be2907bc1f4d6fae0462df08e7a21972d7347",
-  "amount": int(0.60 * 10**18)
+BNUSD = {
+  "address": "cxd57fe1c5e63385f412b814634102609e8a987e3a",
+  "amount": int(0.60 * 10**6)
 }
 
 ICX = {
@@ -10,7 +10,7 @@ ICX = {
   "amount": 10**18
 }
 
-token0, token1 = sorted([USDC, ICX], key=lambda token: token['address'])
+token0, token1 = sorted([BNUSD, ICX], key=lambda token: token['address'])
 
 config = {
   # Type: String
