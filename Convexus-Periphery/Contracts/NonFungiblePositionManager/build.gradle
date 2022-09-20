@@ -15,6 +15,7 @@ dependencies {
 
     implementation project(':Convexus-Periphery:Librairies')
     implementation project(':Convexus-Periphery:Interfaces:ConvexusLiquidityManagement')
+    implementation project(':Convexus-Periphery:Structs:LiquidityManagement')
     implementation project(':Convexus-Periphery:Structs:NonFungiblePositionManager')
     implementation project(':Convexus-Periphery:Score-Interfaces:NonfungibleTokenPositionDescriptor')
     
@@ -23,6 +24,7 @@ dependencies {
 
 optimizedJar {
     mainClassName = 'exchange.convexus.periphery.positionmgr.NonFungiblePositionManager'
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     from {
         configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
     }

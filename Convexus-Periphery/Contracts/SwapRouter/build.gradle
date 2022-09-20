@@ -22,6 +22,7 @@ dependencies {
 
 optimizedJar {
     mainClassName = 'exchange.convexus.periphery.router.SwapRouter'
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     from {
         configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
     }

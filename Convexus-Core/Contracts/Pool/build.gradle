@@ -24,6 +24,7 @@ dependencies {
 
 optimizedJar {
     mainClassName = 'exchange.convexus.core.pool.contracts.ConvexusPoolFactored'
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     from {
         configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
     }
