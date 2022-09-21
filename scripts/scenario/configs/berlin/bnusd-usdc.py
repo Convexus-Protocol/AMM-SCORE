@@ -1,13 +1,13 @@
 import json
 
 BNUSD = {
-  "address": "cxd57fe1c5e63385f412b814634102609e8a987e3a",
+  "address": "cx196276887ec398a1fb41b335f9260fbb300c684b",
   "amount": 10**18
 }
 
 USDC = {
-  "address": "cx7a5be2907bc1f4d6fae0462df08e7a21972d7347",
-  "amount": 10**18
+  "address": "cxa818e190782c7bc64c1ec12512c7f8f3171fc8cf",
+  "amount": 10**6
 }
 
 token0, token1 = sorted([BNUSD, USDC], key=lambda token: token['address'])

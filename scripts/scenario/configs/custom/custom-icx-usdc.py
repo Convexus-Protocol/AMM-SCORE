@@ -1,7 +1,14 @@
 import json
 
-IUSDC = "cxf01b7f8f5250e037c5108bd2f3946b7bad934ac8"
-ICX   = "cx0000000000000000000000000000000000000001"
+IUSDC = {
+  "address": "cxf01b7f8f5250e037c5108bd2f3946b7bad934ac8",
+  "amount": int(0.60 * 10**6)
+}
+
+ICX = {
+  "address": "cx1111111111111111111111111111111111111111",
+  "amount": 10**18
+}
 
 config = {
   # Type: String

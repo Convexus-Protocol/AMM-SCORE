@@ -37,7 +37,7 @@ deployDir=$(getDeployDir ${pkg} ${network})
 callsDir=$(getCallsDir ${pkg} ${network})
 
 # Get the Pool address
-actionName="getPool"
+actionName="getPool-${token0}-${token1}"
 fee=$(hex ${fee})
 filter=$(cat <<EOF
 {

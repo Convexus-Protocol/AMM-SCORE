@@ -46,7 +46,7 @@ poolDeployDir=$(getDeployDir ${poolPkg} ${network})
 poolCallsDir=$(getCallsDir ${poolPkg} ${network})
 
 # Get the Pool address
-actionName="getPool"
+actionName="getPool-${token0}-${token1}"
 fee=$(hex ${fee})
 filter=$(cat <<EOF
 {
@@ -77,7 +77,7 @@ echo '{}' | jq \
 
 # Initialize the Pool (1:1 price)
 info "Initialize the Pool ..."
-actionName="initialize"
+actionName="initialize-${pool}"
 sqrtPriceX96=$(python -c "import math; print(hex(int(math.sqrt(${amount1}/${amount0})*2**96)))")
 price=$(python -c "print(${sqrtPriceX96}**2 / 2**192)")
 info "Price token0:token1 = ${price}"

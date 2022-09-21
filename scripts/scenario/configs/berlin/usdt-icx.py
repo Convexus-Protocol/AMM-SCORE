@@ -1,12 +1,12 @@
 import json
 
 USDT = {
-  "address": "cx16dcf3e6a0e7fce4a8624a82d55f4efe4426444c",
+  "address": "cxa2895912e90f92e17c6df7e382c04745c7b6a9ce",
   "amount": int(0.60 * 10**6)
 }
 
 ICX = {
-  "address": "cx0000000000000000000000000000000000000001",
+  "address": "cx1111111111111111111111111111111111111111",
   "amount": 10**18
 }
 

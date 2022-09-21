@@ -1,8 +1,8 @@
 import json
 
 USDC = {
-  "address": "cx7a5be2907bc1f4d6fae0462df08e7a21972d7347",
-  "amount": int(0.60 * 10**18)
+  "address": "cxa818e190782c7bc64c1ec12512c7f8f3171fc8cf",
+  "amount": int(0.60 * 10**6)
 }
 
 ICX = {

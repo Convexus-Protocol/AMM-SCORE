@@ -40,7 +40,7 @@ info "Creating the pool..."
 tokenA=$token0
 tokenB=$token1
 fee=$(hex ${fee})
-actionName="createPool"
+actionName="createPool-${tokenA}-${tokenB}"
 
 filter=$(cat <<EOF
 {

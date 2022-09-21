@@ -53,7 +53,7 @@ symbol () {
     tokenPkg=$(getToken1Pkg ${poolId})
   fi
 
-  if [ ${token} == "cx0000000000000000000000000000000000000001" ]; then
+  if [ ${token} == "cx1111111111111111111111111111111111111111" ]; then
     echo "ICX"
     return;
   fi
@@ -90,7 +90,7 @@ deposit_token () {
   info "Depositing ${amount} ${tokenSymbol}..."
   actionName="deposit_${tokenName}"
 
-  if [ ${token} == "cx0000000000000000000000000000000000000001" ]; then
+  if [ ${token} == "cx1111111111111111111111111111111111111111" ]; then
     value=$(hex ${amount})
     to=$posmgr
 

@@ -1,8 +1,8 @@
 import json
 
 BNUSD = {
-  "address": "cxd57fe1c5e63385f412b814634102609e8a987e3a",
-  "amount": int(0.60 * 10**6)
+  "address": "cx196276887ec398a1fb41b335f9260fbb300c684b",
+  "amount": int(0.60 * 10**18)
 }
 
 ICX = {

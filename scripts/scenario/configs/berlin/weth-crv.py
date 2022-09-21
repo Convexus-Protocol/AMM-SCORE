@@ -1,12 +1,12 @@
 import json
 
 WETH = {
-  "address": "cx01377f9854bd10d4de01e244f74d39c5d553c51d",
+  "address": "cx1126c5dc7115daea7f55d6b6cf0eb63adeb3529f",
   "amount": int(1 * 10**18)
 }
 
 CRV = {
-  "address": "cx0a9cd8e1c3de89a59f34841c3538db36b09d1f3b",
+  "address": "cxc8373f6f2654a9c8b689059aef58aefb9f878e12",
   "amount": int(1364 * 10**18)
 }
 
