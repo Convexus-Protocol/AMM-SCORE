@@ -293,7 +293,7 @@ public abstract class ConvexusPool
       parameters.fee,
       parameters.tickSpacing,
       TickLib.tickSpacingToMaxLiquidityPerTick(parameters.tickSpacing),
-      "Convexus Pool (" + IIRC2ICX.symbol(parameters.token0) + " / " + IIRC2ICX.symbol(parameters.token1) + ")"
+      "Convexus Pool (" + IIRC2ICX.symbol(parameters.token0) + " / " + IIRC2ICX.symbol(parameters.token1) + " " + ((float) parameters.fee / 10000) + "%)"
     );
 
     // Default values
