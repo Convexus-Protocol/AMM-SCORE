@@ -1394,13 +1394,13 @@ abstract class ConvexusPool1
   }
   
   @External(readonly = true)
-  public BigInteger ticksKeysSize () {
-    return this.ticks.size();
+  public BigInteger ticksInitializedSize () {
+    return BigInteger.valueOf(this.ticks.initializedSize());
   }
-  
+
   @External(readonly = true)
-  public BigInteger ticksKeys (int index) {
-    return this.ticks.getKey(index);
+  public BigInteger ticksInitialized (int index) {
+    return BigInteger.valueOf(this.ticks.initialized(index));
   }
 
   // --- Position --- 

@@ -16,6 +16,7 @@
 
 package exchange.convexus.core.interfaces.ticks;
 
+import java.math.BigInteger;
 import exchange.convexus.pool.Tick;
 import score.annotation.External;
 
@@ -25,4 +26,10 @@ public interface ITicks {
   // ================================================
   @External(readonly = true)
   public Tick.Info ticks (int tick);
+  
+  @External(readonly = true)
+  public BigInteger ticksInitializedSize ();
+
+  @External(readonly = true)
+  public BigInteger ticksInitialized (int index);
 }

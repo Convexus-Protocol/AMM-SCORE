@@ -1381,21 +1381,35 @@ public abstract class ConvexusPool
   }
   
   // Implements Interfaces
+  // --- Ticks --- 
   @External(readonly = true)
   public Tick.Info ticks (int tick) {
     return this.ticks.get(tick);
   }
 
   @External(readonly = true)
+  public BigInteger ticksInitializedSize () {
+    return BigInteger.valueOf(this.ticks.initializedSize());
+  }
+
+  @External(readonly = true)
+  public BigInteger ticksInitialized (int index) {
+    return BigInteger.valueOf(this.ticks.initialized(index));
+  }
+
+  // --- Position --- 
+  @External(readonly = true)
   public Position.Info positions (byte[] key) {
     return this.positions.get(key);
   }
 
+  // --- Observations --- 
   @External(readonly = true)
   public Oracle.Observation observations (int index) {
     return this.observations.get(index);
   }
 
+  // --- TickBitmap --- 
   @External(readonly = true)
   public BigInteger tickBitmap (int index) {
     return this.tickBitmap.get(index);

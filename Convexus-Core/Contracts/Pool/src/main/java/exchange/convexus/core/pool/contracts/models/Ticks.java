@@ -21,8 +21,9 @@ import static java.math.BigInteger.ZERO;
 import java.math.BigInteger;
 import exchange.convexus.core.librairies.LiquidityMath;
 import exchange.convexus.pool.Tick;
+import exchange.convexus.utils.EnumerableMap;
+import exchange.convexus.utils.EnumerableSet;
 import score.Context;
-import score.DictDB;
 
 public class Ticks {
   // ================================================
@@ -30,12 +31,13 @@ public class Ticks {
   // ================================================
   // Class name
   private static final String NAME = "TicksDB";
-  
+
   // ================================================
   // DB Variables
   // ================================================
   // Look up information about a specific tick in the pool
-  private final DictDB<Integer, Tick.Info> ticks = Context.newDictDB(NAME + "_ticks", Tick.Info.class);
+  private final EnumerableMap<Integer, Tick.Info> ticks = new EnumerableMap<>(NAME + "_ticks", Integer.class, Tick.Info.class);
+  private final EnumerableSet<Integer> initialized = new EnumerableSet<>(NAME + "_initialized", Integer.class);
 
   // ================================================
   // Methods
@@ -45,8 +47,22 @@ public class Ticks {
     return result == null ? Tick.Info.empty() : result;
   }
 
+  public int initializedSize () {
+    return this.initialized.length();
+  }
+
+  public int initialized (int index) {
+    return this.initialized.get(index);
+  }
+
   private void set (int key, Tick.Info value) {
     this.ticks.set(key, value);
+    if (value != null && value.initialized) {
+      this.initialized.add(key);
+    } else {
+      // either deleted or uninitialized
+      this.initialized.remove(key);
+    }
   }
 
   /**
