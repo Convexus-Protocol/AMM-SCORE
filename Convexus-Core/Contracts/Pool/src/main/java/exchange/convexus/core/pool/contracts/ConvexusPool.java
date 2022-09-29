@@ -42,6 +42,7 @@ import exchange.convexus.librairies.FullMath;
 import exchange.convexus.librairies.TickMath;
 import exchange.convexus.pool.ModifyPositionParams;
 import exchange.convexus.pool.ModifyPositionResult;
+import exchange.convexus.pool.NextInitializedTickWithinOneWordResult;
 import exchange.convexus.pool.ObserveResult;
 import exchange.convexus.pool.Oracle;
 import exchange.convexus.pool.PairAmounts;
@@ -1413,5 +1414,18 @@ public abstract class ConvexusPool
   @External(readonly = true)
   public BigInteger tickBitmap (int index) {
     return this.tickBitmap.get(index);
+  }
+  
+  @External(readonly = true)
+  public NextInitializedTickWithinOneWordResult nextInitializedTickWithinOneWord (
+    int tick, 
+    int tickSpacing, 
+    boolean zeroForOne
+  ) {
+    return tickBitmap.nextInitializedTickWithinOneWord(
+      tick,
+      tickSpacing,
+      zeroForOne
+    );
   }
 }

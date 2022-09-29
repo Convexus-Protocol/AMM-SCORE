@@ -22,6 +22,7 @@ import static java.math.BigInteger.ZERO;
 
 import java.math.BigInteger;
 import exchange.convexus.core.librairies.BitMath;
+import exchange.convexus.pool.NextInitializedTickWithinOneWordResult;
 import exchange.convexus.utils.IntUtils;
 import score.Context;
 import score.DictDB;
@@ -91,19 +92,6 @@ public class TickBitmap {
       BigInteger packedTick = this.get(wordPos);
 
       this.tickBitmap.set(wordPos, packedTick.xor(mask));
-  }
-
-  public class NextInitializedTickWithinOneWordResult {
-    public int tickNext;
-    public boolean initialized;
-
-    public NextInitializedTickWithinOneWordResult (
-      int tickNext,
-      boolean initialized
-    ) {
-      this.tickNext = tickNext;
-      this.initialized = initialized;
-    }
   }
 
   public NextInitializedTickWithinOneWordResult nextInitializedTickWithinOneWord (

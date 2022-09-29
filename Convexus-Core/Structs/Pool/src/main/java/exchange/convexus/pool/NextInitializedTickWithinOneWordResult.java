@@ -14,24 +14,19 @@
  * limitations under the License.
  */
 
-package exchange.convexus.core.interfaces.tickbitmap;
+package exchange.convexus.pool;
 
-import java.math.BigInteger;
-import exchange.convexus.pool.NextInitializedTickWithinOneWordResult;
-import score.annotation.External;
+public class NextInitializedTickWithinOneWordResult {
+  public int tickNext;
+  public boolean initialized;
 
-public interface ITickBitmap {
+  public NextInitializedTickWithinOneWordResult () {}
 
-  // ================================================
-  // Methods
-  // ================================================
-  @External(readonly = true)
-  public BigInteger tickBitmap (int index);
-
-  @External(readonly = true)
-  public NextInitializedTickWithinOneWordResult nextInitializedTickWithinOneWord (
-    int tick, 
-    int tickSpacing, 
-    boolean zeroForOne
-  );
+  public NextInitializedTickWithinOneWordResult (
+    int tickNext,
+    boolean initialized
+  ) {
+    this.tickNext = tickNext;
+    this.initialized = initialized;
+  }
 }
