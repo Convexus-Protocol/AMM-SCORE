@@ -30,7 +30,6 @@ public class AssertUtils {
   
   public static <T extends Throwable> void assertThrowsStartsWithMessage (Class<T> expectedType, Executable executable, String message) {
     var receivedMessage = assertThrows(expectedType, executable).getMessage();
-    score.Context.println("receivedMessage=" + receivedMessage);
     assertTrue(receivedMessage.startsWith(message));
   }
 }
