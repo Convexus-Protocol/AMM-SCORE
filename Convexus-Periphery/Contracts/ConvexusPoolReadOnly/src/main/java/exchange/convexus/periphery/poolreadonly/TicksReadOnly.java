@@ -42,7 +42,7 @@ public class TicksReadOnly {
 
   public Tick.Info get (int key) {
     var result = IConvexusPool.ticks(this.pool, key);
-    return result == null ? Tick.Info.empty() : result;
+    return result == null ? Tick.Info.empty(key) : result;
   }
 
   /**

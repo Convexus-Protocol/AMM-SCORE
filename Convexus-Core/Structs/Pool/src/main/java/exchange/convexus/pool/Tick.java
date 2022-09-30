@@ -25,6 +25,9 @@ import score.ObjectWriter;
 
 public class Tick {
   public static class Info {
+    // the tick index
+    public Integer index;
+
     // the total position liquidity that references this tick
     public BigInteger liquidityGross;
 
@@ -55,6 +58,7 @@ public class Tick {
     public boolean initialized;
 
     public Info (
+      Integer index,
       BigInteger liquidityGross,
       BigInteger liquidityNet,
       BigInteger feeGrowthOutside0X128,
@@ -64,6 +68,7 @@ public class Tick {
       BigInteger secondsOutside,
       boolean initialized
     ) {
+        this.index = index;
         this.liquidityGross = liquidityGross;
         this.liquidityNet = liquidityNet;
         this.feeGrowthOutside0X128 = feeGrowthOutside0X128;
@@ -75,6 +80,7 @@ public class Tick {
     }
   
     public static void writeObject(ObjectWriter w, Info obj) {
+      w.write(obj.index);
       w.write(obj.liquidityGross);
       w.write(obj.liquidityNet);
       w.write(obj.feeGrowthOutside0X128);
@@ -87,6 +93,7 @@ public class Tick {
 
     public static Info readObject(ObjectReader r) {
       return new Info(
+        r.readInt(), // index
         r.readBigInteger(), // liquidityGross
         r.readBigInteger(), // liquidityNet
         r.readBigInteger(), // feeGrowthOutside0X128
@@ -102,6 +109,7 @@ public class Tick {
       @SuppressWarnings("unchecked")
       Map<String,Object> map = (Map<String,Object>) call;
       return new Info(
+        ((BigInteger) map.get("index")).intValueExact(), 
         (BigInteger) map.get("liquidityGross"), 
         (BigInteger) map.get("liquidityNet"), 
         (BigInteger) map.get("feeGrowthOutside0X128"), 
@@ -113,8 +121,8 @@ public class Tick {
       );
     }
 
-    public static Info empty() {
-      return new Tick.Info(ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, false);
+    public static Info empty(int index) {
+      return new Tick.Info(index, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, false);
     }
   }
 }

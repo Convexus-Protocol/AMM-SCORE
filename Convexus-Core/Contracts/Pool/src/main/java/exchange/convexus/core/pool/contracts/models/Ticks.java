@@ -44,7 +44,7 @@ public class Ticks {
   // ================================================
   public Tick.Info get (int key) {
     var result = this.ticks.get(key);
-    return result == null ? Tick.Info.empty() : result;
+    return result == null ? Tick.Info.empty(key) : result;
   }
 
   public int initializedSize () {
