@@ -55,10 +55,11 @@ public class ExactOutputParams implements IRC2ICXParam {
 
     public JsonObject toJson() {
         return Json.object()
+          .add("params", Json.object()
             .add("path", StringUtils.byteArrayToHex(this.path))
             .add("recipient", this.recipient.toString())
             .add("deadline", this.deadline.toString())
-            .add("amountOut", this.amountOut.toString());
+            .add("amountOut", this.amountOut.toString()));
     }
 
     @Override

@@ -69,12 +69,14 @@ public class ExactInputSingleParams implements IRC2ICXParam {
 
     public JsonObject toJson() {
         return Json.object()
-            .add("tokenOut", tokenOut.toString())
-            .add("fee", Integer.toString(fee))
-            .add("recipient", recipient.toString())
-            .add("deadline", deadline.toString())
-            .add("amountOutMinimum", amountOutMinimum.toString())
-            .add("sqrtPriceLimitX96", sqrtPriceLimitX96.toString());
+            .add("params", Json.object()
+                .add("tokenOut", tokenOut.toString())
+                .add("fee", Integer.toString(fee))
+                .add("recipient", recipient.toString())
+                .add("deadline", deadline.toString())
+                .add("amountOutMinimum", amountOutMinimum.toString())
+                .add("sqrtPriceLimitX96", sqrtPriceLimitX96.toString())
+            );
     }
 
     @Override

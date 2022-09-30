@@ -59,10 +59,11 @@ public class ExactInputParams implements IRC2ICXParam {
 
     public JsonObject toJson() {
         return Json.object()
+          .add("params", Json.object()
             .add("path", StringUtils.byteArrayToHex(this.path))
             .add("recipient", this.recipient.toString())
             .add("deadline", this.deadline.toString())
-            .add("amountOutMinimum", this.amountOutMinimum.toString());
+            .add("amountOutMinimum", this.amountOutMinimum.toString()));
     }
 
     @Override
