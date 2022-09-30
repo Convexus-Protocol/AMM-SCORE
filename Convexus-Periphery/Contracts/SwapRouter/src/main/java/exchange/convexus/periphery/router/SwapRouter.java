@@ -505,25 +505,25 @@ public class SwapRouter
     switch (method)
     {
       case "exactInputSingle": {
-        JsonObject params = root.get("params").asObject();
+        JsonObject params = root.get("params").asObject().get("params").asObject();
         exactInputSingle(_from, token, _value, ExactInputSingleParams.fromJson(params));
         break;
       }
 
       case "exactOutputSingle": {
-        JsonObject params = root.get("params").asObject();
+        JsonObject params = root.get("params").asObject().get("params").asObject();
         exactOutputSingle(_from, token, _value, ExactOutputSingleParams.fromJson(params));
         break;
       }
 
       case "exactInput": {
-        JsonObject params = root.get("params").asObject();
+        JsonObject params = root.get("params").asObject().get("params").asObject();
         exactInput(_from, token, _value, ExactInputParams.fromJson(params));
         break;
       }
 
       case "exactOutput": {
-        JsonObject params = root.get("params").asObject();
+        JsonObject params = root.get("params").asObject().get("params").asObject();
         exactOutput(_from, token, _value, ExactOutputParams.fromJson(params));
         break;
       }
