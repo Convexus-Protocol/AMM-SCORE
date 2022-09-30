@@ -1398,6 +1398,15 @@ public abstract class ConvexusPool
     return BigInteger.valueOf(this.ticks.initialized(index));
   }
 
+  @External(readonly = true)
+  public Tick.Info[] ticksInitializedRange (int start, int end) {
+    Tick.Info[] result = new Tick.Info[end-start];
+    for (int i = start, j = 0; i < end; i++, j++) {
+      result[j] = this.ticks.get(this.ticks.initialized(i));
+    }
+    return result;
+  }
+
   // --- Position --- 
   @External(readonly = true)
   public Position.Info positions (byte[] key) {
