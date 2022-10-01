@@ -21,11 +21,11 @@ import exchange.convexus.cxs.ICXS;
 import exchange.convexus.governor.MethodCall;
 import exchange.convexus.periphery.timelock.Timelock;
 import exchange.convexus.timelock.ITimelock;
+import exchange.convexus.utils.EnumerableMap;
 import exchange.convexus.utils.MathUtils;
 import exchange.convexus.utils.TimeUtils;
 import score.Address;
 import score.Context;
-import score.DictDB;
 import score.VarDB;
 import score.annotation.EventLog;
 import score.annotation.External;
@@ -61,10 +61,10 @@ public class ConvexusGovernor {
     private final VarDB<BigInteger> proposalCount = Context.newVarDB(NAME + "_proposalCount", BigInteger.class);
 
     /// The official record of all proposals ever proposed
-    private final DictDB<BigInteger, Proposal> proposals = Context.newDictDB(NAME + "_proposals", Proposal.class);
+    private final EnumerableMap<BigInteger, Proposal> proposals = new EnumerableMap<>(NAME + "_proposals", BigInteger.class, Proposal.class);
 
     /// The latest proposal for each proposer
-    private final DictDB<Address, BigInteger> latestProposalIds = Context.newDictDB(NAME + "_latestProposalIds", BigInteger.class);
+    private final EnumerableMap<Address, BigInteger> latestProposalIds = new EnumerableMap<>(NAME + "_latestProposalIds", Address.class, BigInteger.class);
 
     // ================================================
     // Event Logs
@@ -305,6 +305,37 @@ public class ConvexusGovernor {
     public String name() {
         return this.name;
     }
+
+    @External(readonly = true)
+    public int proposalsSize() {
+        return this.proposals.size();
+    }
+
+    @External(readonly = true)
+    public BigInteger proposalsKey(int index) {
+        return this.proposals.getKey(index);
+    }
+
+    @External(readonly = true)
+    public Proposal proposals (BigInteger key) {
+        return this.proposals.get(key);
+    }
+
+    @External(readonly = true)
+    public int latestProposalIdsSize() {
+        return this.latestProposalIds.size();
+    }
+
+    @External(readonly = true)
+    public Address latestProposalIdsKey(int index) {
+        return this.latestProposalIds.getKey(index);
+    }
+
+    @External(readonly = true)
+    public BigInteger latestProposalIds (Address key) {
+        return this.latestProposalIds.get(key);
+    }
+
 
     /// The number of votes in support of a proposal required in order for a quorum to be reached and for a vote to succeed
     @External(readonly = true)

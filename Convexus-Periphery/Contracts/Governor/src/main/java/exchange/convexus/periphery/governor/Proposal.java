@@ -28,39 +28,41 @@ public class Proposal {
     private static final String NAME = "ConvexusProposal";
 
     /// @notice Unique id for looking up a proposal
-    BigInteger id;
+    public BigInteger id;
 
     /// @notice Creator of the proposal
-    Address proposer;
+    public Address proposer;
 
     /// @notice The timestamp that the proposal will be available for execution, set once the vote succeeds
-    BigInteger eta;
+    public BigInteger eta;
 
     // Methods to be called
-    MethodCall[] calls;
+    public MethodCall[] calls;
     
     /// @notice The block at which voting begins: holders must delegate their votes prior to this block
-    long startBlock;
+    public long startBlock;
 
     /// @notice The block at which voting ends: votes must be cast prior to this block
-    long endBlock;
+    public long endBlock;
 
     /// @notice Current number of votes in favor of this proposal
-    BigInteger forVotes;
+    public BigInteger forVotes;
 
     /// @notice Current number of votes in opposition to this proposal
-    BigInteger againstVotes;
+    public BigInteger againstVotes;
 
     /// @notice Flag marking whether the proposal has been canceled
-    boolean canceled;
+    public boolean canceled;
 
     /// @notice Flag marking whether the proposal has been executed
-    boolean executed;
+    public boolean executed;
 
     /// @notice Receipts of ballots for the entire set of voters
     public final VarDB<Receipt> receipts (Address voter) {
         return Context.newVarDB(NAME + "_receipts_" + this.id + "_" + voter.toString(), Receipt.class);
     }
+
+    public Proposal () {}
 
     public Proposal (
         BigInteger id,
