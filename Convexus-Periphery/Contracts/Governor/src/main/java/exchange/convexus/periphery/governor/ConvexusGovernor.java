@@ -45,10 +45,14 @@ public class ConvexusGovernor {
     private final String name;
 
     /// The address of the Convexus Protocol Timelock
-    private Address timelock;
+    private final Address timelock;
 
     /// The address of the Convexus governance token
-    private Address cxs;
+    private final Address cxs;
+
+    private static final long VOTING_PERIOD = 3600 / 2 * 24 * 3; 
+    private static final long VOTING_DELAY = 1; 
+    private static final long PROPOSAL_MAX_OPERATIONS = 100; 
 
     // ================================================
     // DB Variables
@@ -120,25 +124,25 @@ public class ConvexusGovernor {
         final Address caller = Context.getCaller();
 
         Context.require(ICXS.getPriorVotes(this.cxs, caller, Context.getBlockHeight() - 1).compareTo(proposalThreshold()) > 0,
-            "ConvexusGovernor::propose: proposer votes below proposal threshold");
+            NAME + "::propose: proposer votes below proposal threshold");
         
         Context.require(calls.length != 0,
-            "ConvexusGovernor::propose: must provide actions");
+            NAME + "::propose: must provide actions");
     
-        Context.require(calls.length <= proposalMaxOperations(),
-            "ConvexusGovernor::propose: too many actions");
+        Context.require(calls.length <= PROPOSAL_MAX_OPERATIONS,
+            NAME + "::propose: too many actions");
         
         BigInteger latestProposalId = this.latestProposalIds.get(caller);
         if (latestProposalId != null) {
             ProposalState proposersLatestProposalState = this.state(latestProposalId);
             Context.require(proposersLatestProposalState != ProposalState.Active, 
-                "ConvexusGovernor::propose: one live proposal per proposer, found an already active proposal");
+                NAME + "::propose: one live proposal per proposer, found an already active proposal");
             Context.require(proposersLatestProposalState != ProposalState.Pending, 
-                "ConvexusGovernor::propose: one live proposal per proposer, found an already active proposal");
+                NAME + "::propose: one live proposal per proposer, found an already active proposal");
         }
 
-        long startBlock = Context.getBlockHeight() + votingDelay();
-        long endBlock = startBlock + votingPeriod();
+        long startBlock = Context.getBlockHeight() + VOTING_DELAY;
+        long endBlock = startBlock + VOTING_PERIOD;
 
         // proposalCount++
         BigInteger proposalCount = this.proposalCount.get();
@@ -168,7 +172,7 @@ public class ConvexusGovernor {
     @External
     public void queue (BigInteger proposalId) {
         Context.require(state(proposalId) == ProposalState.Succeeded,
-            "GovernorConvexus::queue: proposal can only be queued if it is succeeded");
+            NAME + "::queue: proposal can only be queued if it is succeeded");
         
         Proposal proposal = this.proposals.get(proposalId);
         BigInteger eta = TimeUtils.now().add(ITimelock.delay(timelock));
@@ -183,7 +187,7 @@ public class ConvexusGovernor {
     private void _queueOrRevert(MethodCall call, BigInteger eta) {
         byte[] hash = Timelock.getHash(call, eta);
         Context.require(ITimelock.queuedTransactions(this.timelock, hash),
-            "GovernorConvexus::_queueOrRevert: proposal action already queued at eta");
+            NAME + "::_queueOrRevert: proposal action already queued at eta");
         
         ITimelock.queueTransaction(this.timelock, call, eta);
     }
@@ -191,7 +195,7 @@ public class ConvexusGovernor {
     @External
     public void execute (BigInteger proposalId) {
         Context.require(state(proposalId) == ProposalState.Queued, 
-            "GovernorConvexus::execute: proposal can only be executed if it is queued");
+            NAME + "::execute: proposal can only be executed if it is queued");
         
         Proposal proposal = this.proposals.get(proposalId);
         proposal.executed = true;
@@ -207,11 +211,11 @@ public class ConvexusGovernor {
     @External
     public void cancel (BigInteger proposalId) {
         Context.require(this.state(proposalId) == ProposalState.Executed,
-           "GovernorConvexus::cancel: cannot cancel executed proposal");
+           NAME + "::cancel: cannot cancel executed proposal");
         
         Proposal proposal = this.proposals.get(proposalId);
         Context.require(ICXS.getPriorVotes(this.cxs, proposal.proposer, Context.getBlockHeight() - 1).compareTo(proposalThreshold()) < 0,
-            "ConvexusGovernor::cancel: proposer above threshold");
+            NAME + "::cancel: proposer above threshold");
         
         proposal.canceled = true;
         this.proposals.set(proposalId, proposal);
@@ -236,7 +240,7 @@ public class ConvexusGovernor {
     private ProposalState state(BigInteger proposalId) {
         Context.require(proposalCount.get().compareTo(proposalId) >= 0 
                      && proposalId.compareTo(BigInteger.ZERO) > 0,
-            "ConvexusGovernor::state: invalid proposal id");
+            NAME + "::state: invalid proposal id");
         
         long blockNumber = Context.getBlockHeight();
 
@@ -268,13 +272,13 @@ public class ConvexusGovernor {
 
     private void _castVote(Address voter, BigInteger proposalId, boolean support) {
         Context.require(state(proposalId) == ProposalState.Active, 
-            "ConvexusGovernor::_castVote: voting is closed");
+            NAME + "::_castVote: voting is closed");
 
         Proposal proposal = this.proposals.get(proposalId);
         Receipt receipt = proposal.receipts(voter).get();
 
         Context.require(receipt.hasVoted == false,
-            "ConvexusGovernor::_castVote: voter already voted");
+            NAME + "::_castVote: voter already voted");
         
         BigInteger votes = ICXS.getPriorVotes(this.cxs, voter, proposal.startBlock);
 
@@ -316,19 +320,19 @@ public class ConvexusGovernor {
 
     /// The maximum number of actions that can be included in a proposal
     @External(readonly = true)
-    public long proposalMaxOperations() {
-        return 100; // 100 actions
+    public BigInteger proposalMaxOperations() {
+        return BigInteger.valueOf(PROPOSAL_MAX_OPERATIONS); // 100 actions
     }
 
     /// The delay before voting on a proposal may take place, once proposed
     @External(readonly = true)
-    public long votingDelay() {
-        return 1; // 1 block
+    public BigInteger votingDelay() {
+        return BigInteger.valueOf(VOTING_DELAY); // 1 block
     }
 
     /// The duration of voting on a proposal, in blocks
     @External(readonly = true)
-    public long votingPeriod() {
-        return 3600 / 2 * 24 * 3;  // ~3 days in blocks (assuming 2s blocks)
+    public BigInteger votingPeriod() {
+        return BigInteger.valueOf(VOTING_PERIOD);  // ~3 days in blocks (assuming 2s blocks)
     }
 }

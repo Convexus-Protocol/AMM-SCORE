@@ -28,4 +28,6 @@ public class Receipt {
 
     /// @notice The number of votes the voter had, which were cast
     BigInteger votes;
+
+    public Receipt () {}
 }

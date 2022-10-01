@@ -35,6 +35,8 @@ public class MethodCall {
   /// @notice params to be used
   public MethodParam[] params;
 
+  public MethodCall () {}
+
   public MethodCall (
     Address target,
     BigInteger value,
