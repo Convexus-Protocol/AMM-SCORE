@@ -47,7 +47,6 @@ include (
   // Integration tests
   ':Convexus-Core:Tests:Integration:Score',
   ':Convexus-Core:Tests:Integration:Factory',
-  ':Convexus-Core:Tests:Integration:Pool',
 
   // --------------------------
   // --- Convexus Periphery ---
