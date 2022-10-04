@@ -39,6 +39,7 @@ public class ConvexusFactoryScore extends Score {
 
     public static ConvexusFactoryScore mustDeploy(TransactionHandler txHandler, Wallet wallet)
             throws IOException, TransactionFailureException, ResultTimeoutException {
+        
         LOG.infoEntering("deploy", "ConvexusFactory");
         RpcObject params = new RpcObject.Builder()
                 .build();

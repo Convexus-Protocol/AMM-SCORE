@@ -118,7 +118,7 @@ public class TransactionHandler {
             return iconService.estimateStep(transaction).execute();
         } catch (RpcError e) {
             LOG.info("estimateStep failed(" + e.getCode() + ", " + e.getMessage() + "); use default steps.");
-            return Constants.DEFAULT_STEPS.multiply(BigInteger.TWO);
+            return Constants.DEFAULT_STEPS;
         }
     }
 
