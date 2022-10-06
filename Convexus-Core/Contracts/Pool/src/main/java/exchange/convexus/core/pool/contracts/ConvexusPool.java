@@ -276,6 +276,22 @@ public abstract class ConvexusPool
     BigInteger amount1
   ) {}
 
+  /**
+   * @notice Emitted whenever a tick is modified in the Ticks DB
+   * @param index See {@code Tick.Info} for information about the parameters
+   */
+  @EventLog(indexed = 1)
+  public void TickUpdate (
+    int index,
+    BigInteger liquidityGross,
+    BigInteger liquidityNet,
+    BigInteger feeGrowthOutside0X128,
+    BigInteger feeGrowthOutside1X128,
+    BigInteger tickCumulativeOutside,
+    BigInteger secondsPerLiquidityOutsideX128,
+    BigInteger secondsOutside,
+    boolean initialized
+  ) {}
 
   // ================================================
   // Methods
@@ -706,7 +722,7 @@ public abstract class ConvexusPool
             cache.secondsPerLiquidityCumulativeX128 = result.secondsPerLiquidityCumulativeX128;
             cache.computedLatestObservation = true;
           }
-          BigInteger liquidityNet = ticks.cross(
+          Tick.Info info = ticks.cross(
             step.tickNext,
             (zeroForOne ? state.feeGrowthGlobalX128 : this.feeGrowthGlobal0X128.get()),
             (zeroForOne ? this.feeGrowthGlobal1X128.get() : state.feeGrowthGlobalX128),
@@ -714,6 +730,9 @@ public abstract class ConvexusPool
             cache.tickCumulative,
             cache.blockTimestamp
           );
+          BigInteger liquidityNet = info.liquidityNet;
+          this.onTickUpdate(step.tickNext, info);
+
           // if we're moving leftward, we interpret liquidityNet as the opposite sign
           // safe because liquidityNet cannot be type(int128).min
           if (zeroForOne) liquidityNet = liquidityNet.negate();
@@ -1146,7 +1165,7 @@ public abstract class ConvexusPool
       BigInteger tickCumulative = result.tickCumulative;
       BigInteger secondsPerLiquidityCumulativeX128 = result.secondsPerLiquidityCumulativeX128;
 
-      flippedLower = ticks.update(
+      Ticks.UpdateResult resultLower  = ticks.update(
         tickLower,
         tick,
         liquidityDelta,
@@ -1158,8 +1177,10 @@ public abstract class ConvexusPool
         false,
         this.settings.maxLiquidityPerTick
       );
+      flippedLower = resultLower.flipped;
+      this.onTickUpdate(tickLower, resultLower.info);
       
-      flippedUpper = ticks.update(
+      Ticks.UpdateResult resultUpper = ticks.update(
         tickUpper,
         tick,
         liquidityDelta,
@@ -1171,6 +1192,8 @@ public abstract class ConvexusPool
         true,
         this.settings.maxLiquidityPerTick
       );
+      flippedUpper = resultUpper.flipped;
+      this.onTickUpdate(tickUpper, resultUpper.info);
       
       if (flippedLower) {
         this.tickBitmap.flipTick(tickLower, this.settings.tickSpacing);
@@ -1190,14 +1213,38 @@ public abstract class ConvexusPool
     if (liquidityDelta.compareTo(ZERO) < 0) {
       if (flippedLower) {
         this.ticks.clear(tickLower);
+        this.onTickUpdate(tickLower, null);
       }
       if (flippedUpper) {
         this.ticks.clear(tickUpper);
+        this.onTickUpdate(tickUpper, null);
       }
     }
 
     this.positions.set(positionKey, position);
     return new PositionStorage(position, positionKey);
+  }
+
+  private void onTickUpdate (int index, Tick.Info info) {
+    BigInteger liquidityGross = info != null ? info.liquidityGross : ZERO;
+    BigInteger liquidityNet = info != null ? info.liquidityNet : ZERO;
+    BigInteger feeGrowthOutside0X128 = info != null ? info.feeGrowthOutside0X128 : ZERO;
+    BigInteger feeGrowthOutside1X128 = info != null ? info.feeGrowthOutside1X128 : ZERO;
+    BigInteger tickCumulativeOutside = info != null ? info.tickCumulativeOutside : ZERO;
+    BigInteger secondsPerLiquidityOutsideX128 = info != null ? info.secondsPerLiquidityOutsideX128 : ZERO;
+    BigInteger secondsOutside = info != null ? info.secondsOutside : ZERO;
+    boolean initialized = info != null ? info.initialized : false;
+
+    this.TickUpdate (index, 
+      liquidityGross,
+      liquidityNet,
+      feeGrowthOutside0X128,
+      feeGrowthOutside1X128,
+      tickCumulativeOutside,
+      secondsPerLiquidityOutsideX128,
+      secondsOutside,
+      initialized
+    );
   }
 
   /**

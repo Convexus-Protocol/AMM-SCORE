@@ -21,6 +21,7 @@ import static java.math.BigInteger.ZERO;
 import java.math.BigInteger;
 import exchange.convexus.core.librairies.LiquidityMath;
 import exchange.convexus.pool.Tick;
+import exchange.convexus.pool.Tick.Info;
 import exchange.convexus.utils.EnumerableMap;
 import exchange.convexus.utils.EnumerableSet;
 import score.Context;
@@ -65,6 +66,15 @@ public class Ticks {
     }
   }
 
+  public class UpdateResult {
+    public Tick.Info info;
+    public boolean flipped;
+    public UpdateResult(Info info, boolean flipped) {
+      this.info = info;
+      this.flipped = flipped;
+    }
+  } 
+
   /**
    * @notice Updates a tick and returns true if the tick was flipped from initialized to uninitialized, or vice versa
    * @param self The mapping containing all tick information for initialized ticks
@@ -80,7 +90,7 @@ public class Ticks {
    * @param maxLiquidity The maximum liquidity allocation for a single tick
    * @return flipped Whether the tick was flipped from initialized to uninitialized, or vice versa
    */
-  public boolean update (
+  public UpdateResult update (
       int tick,
       int tickCurrent,
       BigInteger liquidityDelta,
@@ -121,7 +131,7 @@ public class Ticks {
           : info.liquidityNet.add(liquidityDelta);
 
       this.set(tick, info);
-      return flipped;
+      return new UpdateResult(info, flipped);
   }
   
   public class GetFeeGrowthInsideResult {
@@ -192,7 +202,7 @@ public class Ticks {
    * @param time The current block.timestamp
    * @return liquidityNet The amount of liquidity added (subtracted) when tick is crossed from left to right (right to left)
    */
-  public BigInteger cross (
+  public Tick.Info cross (
     int tick, 
     BigInteger feeGrowthGlobal0X128, 
     BigInteger feeGrowthGlobal1X128, 
@@ -207,6 +217,6 @@ public class Ticks {
     info.tickCumulativeOutside = tickCumulative.subtract(info.tickCumulativeOutside);
     info.secondsOutside = time.subtract(info.secondsOutside);
     this.set(tick, info);
-    return info.liquidityNet;
+    return info;
   }
 }
