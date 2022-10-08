@@ -45,7 +45,7 @@ public class StringUtils {
             "hexToByteArray: invalid hexstring length");
         
         if (hexstring.startsWith("0x")) {
-            hexstring = hexstring.replace("0x", ""); 
+            hexstring = hexstring.substring(2);
         }
 
         int len = hexstring.length();
