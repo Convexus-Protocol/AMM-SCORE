@@ -34,10 +34,6 @@ public class CallbackValidation {
     return verifyCallback (factory, PoolAddressLib.getPoolKey(tokenA, tokenB, fee));
   }
 
-  private static String name (Address address) {
-    return (String) Context.call(address, "name");
-  }
-
   /**
    * @notice Returns the address of a valid Convexus Pool
    * @param factory The contract address of the Convexus factory
@@ -46,7 +42,7 @@ public class CallbackValidation {
    */
   public static Address verifyCallback (Address factory, PoolKey poolKey) {
     Address pool = PoolAddressLib.getPool(factory, poolKey);
-    Context.require(Context.getCaller().equals(pool), "verifyCallback: failed (" + name(Context.getCaller()) + " / " + name(pool) + ")");
+    Context.require(Context.getCaller().equals(pool), "verifyCallback: failed");
     return pool;
   }
 }
