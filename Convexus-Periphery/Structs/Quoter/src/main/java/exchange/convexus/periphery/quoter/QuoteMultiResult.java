@@ -20,18 +20,18 @@ import java.math.BigInteger;
 
 public class QuoteMultiResult {
     // The amount of the last token that would be received
-    public BigInteger amount;
+    public BigInteger amountOut;
     // List of the sqrt price after the swap for each pool in the path
     public BigInteger[] sqrtPriceX96AfterList;
     // List of the initialized ticks that the swap crossed for each pool in the path
     public int[] initializedTicksCrossedList;
 
     public QuoteMultiResult(
-        BigInteger amount,
+        BigInteger amountOut,
         BigInteger[] sqrtPriceX96AfterList,
         int[] initializedTicksCrossedList
     ) {
-        this.amount = amount;
+        this.amountOut = amountOut;
         this.sqrtPriceX96AfterList = sqrtPriceX96AfterList;
         this.initializedTicksCrossedList = initializedTicksCrossedList;
     }
