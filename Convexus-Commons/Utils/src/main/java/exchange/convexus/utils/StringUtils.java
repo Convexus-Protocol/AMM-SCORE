@@ -43,15 +43,17 @@ public class StringUtils {
         /* hexstring must be an even-length string. */
         Context.require(hexstring.length() % 2 == 0,
             "hexToByteArray: invalid hexstring length");
+        
+        if (hexstring.startsWith("0x")) {
+            hexstring = hexstring.replace("0x", ""); 
+        }
 
         int len = hexstring.length();
         byte[] data = new byte[len / 2];
 
-        int start = hexstring.startsWith("0x") ? 2 : 0;
-
         for (int i = 0; i < len; i += 2) {
-            int c1 = Character.digit(hexstring.charAt(i+start), 16) << 4;
-            int c2 = Character.digit(hexstring.charAt(i+start+1), 16);
+                int c1 = Character.digit(hexstring.charAt(i), 16) << 4;
+            int c2 = Character.digit(hexstring.charAt(i+1), 16);
 
             if (c1 == -1 || c2 == -1) {
                 Context.revert("hexToByteArray: invalid hexstring character at pos " + i);
