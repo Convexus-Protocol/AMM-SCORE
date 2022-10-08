@@ -146,6 +146,20 @@ public abstract class ConvexusPool
     int tick
   ) {}
   
+  
+  /**
+   * @notice Emitted whenever pool intrinsics are updated
+   * @param sqrtPriceX96 The sqrt price of the pool, as a Q64.96
+   * @param tick The current tick of the pool, i.e. log base 1.0001 of the starting price of the pool
+   * @param liquidity The current liquidity of the pool
+   */
+  @EventLog
+  public void PoolIntrinsicsUpdate (
+    BigInteger sqrtPriceX96,
+    int tick,
+    BigInteger liquidity
+  ) {}
+  
   /**
    * @notice Emitted when liquidity is minted for a given position
    * @param sender The address that minted the liquidity
@@ -316,6 +330,7 @@ public abstract class ConvexusPool
     // Default values
     if (this.liquidity.get() == null) {
       this.liquidity.set(ZERO);
+      this.PoolIntrinsicsUpdate(ZERO, 0, ZERO);
     }
     if (this.feeGrowthGlobal0X128.get() == null) {
       this.feeGrowthGlobal0X128.set(ZERO);
@@ -403,6 +418,7 @@ public abstract class ConvexusPool
     ));
 
     this.Initialized(sqrtPriceX96, tick);
+    this.PoolIntrinsicsUpdate(sqrtPriceX96, tick, ZERO);
   }
 
   /**
@@ -773,7 +789,7 @@ public abstract class ConvexusPool
 
     // update liquidity if it changed
     if (cache.liquidityStart != state.liquidity) {
-      liquidity.set(state.liquidity);
+      this.liquidity.set(state.liquidity);
     }
 
     // update fee growth global and, if necessary, protocol fees
@@ -828,6 +844,7 @@ public abstract class ConvexusPool
         "swap: the callback didn't charge the payment (2)");
     }
 
+    this.PoolIntrinsicsUpdate(state.sqrtPriceX96, state.tick, state.liquidity);
     this.Swap(caller, recipient, amount0, amount1, state.sqrtPriceX96, state.liquidity, state.tick);
     this.unlock(true);
 
@@ -1308,7 +1325,9 @@ public abstract class ConvexusPool
           params.liquidityDelta
         );
 
-        this.liquidity.set(LiquidityMath.addDelta(liquidityBefore, params.liquidityDelta));
+        BigInteger newLiquidity = LiquidityMath.addDelta(liquidityBefore, params.liquidityDelta);
+        this.liquidity.set(newLiquidity);
+        this.PoolIntrinsicsUpdate(_slot0.sqrtPriceX96, _slot0.tick, newLiquidity);
       } else {
         // current tick is above the passed range; liquidity can only become in range by crossing from right to
         // left, when we'll need _more_ token1 (it's becoming more valuable) so user must provide it
