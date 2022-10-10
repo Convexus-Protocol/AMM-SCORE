@@ -30,16 +30,14 @@ public class Position {
 
     // fee growth per unit of liquidity as of the last update to liquidity or fees owed
     public BigInteger feeGrowthInside0LastX128;
-
     public BigInteger feeGrowthInside1LastX128;
 
     // the fees owed to the position owner in token0/token1
     public BigInteger tokensOwed0;
-
     public BigInteger tokensOwed1;
 
     public Info (
-      BigInteger liquidity ,
+      BigInteger liquidity,
       BigInteger feeGrowthInside0LastX128, 
       BigInteger feeGrowthInside1LastX128,
       BigInteger tokensOwed0,

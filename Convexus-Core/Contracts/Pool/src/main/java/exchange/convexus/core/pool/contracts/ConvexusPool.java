@@ -524,15 +524,13 @@ public abstract class ConvexusPool
     this.unlock(false);
 
     final Address caller = Context.getCaller();
-    BigInteger amount0;
-    BigInteger amount1;
 
     // we don't need to checkTicks here, because invalid positions will never have non-zero tokensOwed{0,1}
     byte[] key = Positions.getKey(caller, tickLower, tickUpper);
     Position.Info position = this.positions.get(key);
 
-    amount0 = amount0Requested.compareTo(position.tokensOwed0) > 0 ? position.tokensOwed0 : amount0Requested;
-    amount1 = amount1Requested.compareTo(position.tokensOwed1) > 0 ? position.tokensOwed1 : amount1Requested;
+    BigInteger amount0 = amount0Requested.compareTo(position.tokensOwed0) > 0 ? position.tokensOwed0 : amount0Requested;
+    BigInteger amount1 = amount1Requested.compareTo(position.tokensOwed1) > 0 ? position.tokensOwed1 : amount1Requested;
 
     if (amount0.compareTo(ZERO) > 0) {
       position.tokensOwed0 = position.tokensOwed0.subtract(amount0);
