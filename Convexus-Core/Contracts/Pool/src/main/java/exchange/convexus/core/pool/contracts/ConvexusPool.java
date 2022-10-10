@@ -1180,7 +1180,7 @@ public abstract class ConvexusPool
       BigInteger tickCumulative = result.tickCumulative;
       BigInteger secondsPerLiquidityCumulativeX128 = result.secondsPerLiquidityCumulativeX128;
 
-      Ticks.UpdateResult resultLower  = ticks.update(
+      Ticks.UpdateResult resultLower  = this.ticks.update(
         tickLower,
         tick,
         liquidityDelta,
@@ -1195,7 +1195,7 @@ public abstract class ConvexusPool
       flippedLower = resultLower.flipped;
       this.onTickUpdate(tickLower, resultLower.info);
       
-      Ticks.UpdateResult resultUpper = ticks.update(
+      Ticks.UpdateResult resultUpper = this.ticks.update(
         tickUpper,
         tick,
         liquidityDelta,
