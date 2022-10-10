@@ -182,4 +182,8 @@ public class IConvexusPool {
   public static Observation observations (Address pool, int index) {
     return Observation.fromMap(Context.call(pool, "observations", index));
   }
+
+  public static BigInteger maxLiquidityPerTick (Address pool) {
+    return (BigInteger) Context.call(pool, "maxLiquidityPerTick");
+  }
 }
