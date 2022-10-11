@@ -76,6 +76,6 @@ public class GetOwedFeesTest extends PoolReadOnlyTest {
     @SuppressWarnings("unchecked")
     Map<String, BigInteger> owed = (Map<String, BigInteger>) poolReadonly.call("getOwedFees", alice.getAddress(), pool.getAddress(), tickLower, tickUpper);
     
-    assertEquals((BigInteger) owed.get("amount0"), new BigInteger("6035841794200767"));
+    assertEquals((BigInteger) owed.get("amount0"), new BigInteger("18107525382602"));
   }
 }

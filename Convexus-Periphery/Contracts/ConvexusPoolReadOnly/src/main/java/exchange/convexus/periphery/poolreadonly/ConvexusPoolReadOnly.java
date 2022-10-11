@@ -30,6 +30,10 @@ import exchange.convexus.librairies.FixedPoint128;
 import exchange.convexus.librairies.FullMath;
 import exchange.convexus.librairies.TickMath;
 import exchange.convexus.periphery.poolreadonly.cache.VarDBCache;
+import exchange.convexus.periphery.poolreadonly.poolcache.ObservationsCache;
+import exchange.convexus.periphery.poolreadonly.poolcache.PositionsCache;
+import exchange.convexus.periphery.poolreadonly.poolcache.TickBitmapCache;
+import exchange.convexus.periphery.poolreadonly.poolcache.TicksCache;
 import exchange.convexus.pool.IConvexusPool;
 import exchange.convexus.pool.ModifyPositionParams;
 import exchange.convexus.pool.ModifyPositionResult;
@@ -328,9 +332,9 @@ public class ConvexusPoolReadOnly
       return IConvexusPool.liquidity(target);
     }
   }
+
   @External(readonly = true)
   public PairAmounts getOwedFeesNFT (
-    Address user,
     Address nftManager,
     Address factory,
     BigInteger tokenId
@@ -339,7 +343,7 @@ public class ConvexusPoolReadOnly
     Address pool = IConvexusFactory.getPool(factory, tokenPos.token0, tokenPos.token1, tokenPos.fee);
     
     return getOwedFees (
-      user, 
+      nftManager, 
       pool, 
       tokenPos.tickLower, 
       tokenPos.tickUpper
@@ -589,7 +593,7 @@ public class ConvexusPoolReadOnly
 
     // Simulate nonFungiblePositionManager burn of the whole liquidity
     if (liquidity.compareTo(ZERO) > 0) {
-      contract.burn(user, tickLower, tickUpper, liquidity);
+      contract.burn(user, tickLower, tickUpper, ZERO);
     }
 
     return contract.collect(user, tickLower, tickUpper, IntUtils.MAX_UINT256, IntUtils.MAX_UINT256);

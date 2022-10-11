@@ -15,7 +15,7 @@
  */
 
 
-package exchange.convexus.periphery.poolreadonly;
+package exchange.convexus.periphery.poolreadonly.poolcache;
 
 import exchange.convexus.pool.IConvexusPool;
 import exchange.convexus.pool.Position;
@@ -34,7 +34,7 @@ class PositionsDB extends DictDBCache<byte[], Position.Info> {
   }
 }
 
-class PositionsCache {
+public class PositionsCache {
   // ================================================
   // Consts
   // ================================================

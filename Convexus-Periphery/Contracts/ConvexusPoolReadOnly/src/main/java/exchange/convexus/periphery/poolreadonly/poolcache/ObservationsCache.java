@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package exchange.convexus.periphery.poolreadonly;
+package exchange.convexus.periphery.poolreadonly.poolcache;
 
 import static java.math.BigInteger.ONE;
 import static java.math.BigInteger.ZERO;
