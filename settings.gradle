@@ -103,6 +103,7 @@ include (
   ':Convexus-Periphery:Tests:Unit:Governor',
   ':Convexus-Periphery:Tests:Unit:TickLens',
   ':Convexus-Periphery:Tests:Unit:Quoter',
+  ':Convexus-Periphery:Tests:Unit:PoolReadOnly',
   ':Convexus-Periphery:Tests:Unit:PairFlash',
   ':Convexus-Periphery:Tests:Unit:Swap',
   ':Convexus-Periphery:Tests:Unit:CXS',
