@@ -1,5 +1,7 @@
 dependencies {
     compileOnly 'foundation.icon:javaee-api:0.9.0'
+    implementation 'foundation.icon:javaee-scorex:0.5.2'
+    implementation 'com.github.sink772:minimal-json:0.9.6'
     
     testImplementation 'org.mockito:mockito-inline:3.11.0'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.0'
@@ -8,16 +10,18 @@ dependencies {
     testImplementation project(':Test-Framework:unittest')
 
     testImplementation project(':Convexus-Commons:Utils')
-    implementation project(':Convexus-Commons:Tokens:Contracts:irc2')
+    testImplementation project(':Convexus-Commons:Tokens:Contracts:irc2')
     testImplementation project(':Convexus-Commons:Tests:Unit:Utils')
     testImplementation project(':Convexus-Commons:Tests:Unit:ConvexusTest')
-    testImplementation project(':Convexus-Core:Tests:Contracts:Pool')
-    testImplementation project(':Convexus-Core:Tests:Utils:Factory')
-    testImplementation project(':Convexus-Periphery:Tests:Utils:SwapRouter')
     testImplementation project(':Convexus-Commons:Tests:Contracts:Tokens')
+    testImplementation project(':Convexus-Core:Tests:Contracts:Pool')
+    testImplementation project(':Convexus-Core:Tests:Contracts:ConvexusPoolCallee')
+    testImplementation project(':Convexus-Core:Tests:Utils:Factory')
     testImplementation project(':Convexus-Core:Tests:Utils:ConvexusLiquidity')
+    testImplementation project(':Convexus-Periphery:Tests:Utils:SwapRouter')
     testImplementation project(':Convexus-Periphery:Tests:Utils:NFTPosition')
 
+    testImplementation project(':Convexus-Core:Contracts:Pool')
     testImplementation project(':Convexus-Core:Structs:Pool')
     testImplementation project(':Convexus-Core:Structs:Factory')
     
