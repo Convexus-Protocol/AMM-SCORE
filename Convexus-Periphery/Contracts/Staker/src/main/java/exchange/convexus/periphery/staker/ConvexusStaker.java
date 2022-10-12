@@ -292,13 +292,13 @@ public class ConvexusStaker implements IRC721Receiver {
         Address to,
         byte[] data
     ) {
-        final Address thisAddress = Context.getAddress();
+        final Address stakerAddress = Context.getAddress();
         final Address caller = Context.getCaller();
 
-        Context.require(!to.equals(thisAddress), 
+        Context.require(!to.equals(stakerAddress), 
             "withdrawToken: cannot withdraw to staker");
 
-        Deposit deposit = deposits.get(tokenId);
+        Deposit deposit = this.deposits.get(tokenId);
         Context.require(deposit != null,
             "withdrawToken: invalid token ID");
 
@@ -311,7 +311,7 @@ public class ConvexusStaker implements IRC721Receiver {
         this.deposits.set(tokenId, null);
         this.DepositTransferred(tokenId, deposit.owner, ZERO_ADDRESS);
 
-        IIRC721.safeTransferFrom(this.nonFungiblePositionManager, thisAddress, to, tokenId, data);
+        IIRC721.safeTransferFrom(this.nonFungiblePositionManager, stakerAddress, to, tokenId, data);
     }
 
     /// @notice Stakes a Convexus LP token
@@ -320,7 +320,7 @@ public class ConvexusStaker implements IRC721Receiver {
     @External
     public void stakeToken(IncentiveKey key, BigInteger tokenId) {
         final Address caller = Context.getCaller();
-        Context.require(deposits.get(tokenId).owner.equals(caller),
+        Context.require(this.deposits.get(tokenId).owner.equals(caller),
             "stakeToken: only owner can stake token");
 
         _stakeToken(key, tokenId);
@@ -331,7 +331,7 @@ public class ConvexusStaker implements IRC721Receiver {
     /// @param tokenId The ID of the token to unstake
     @External
     public void unstakeToken (IncentiveKey key, BigInteger tokenId) {
-        Deposit deposit = deposits.get(tokenId);
+        Deposit deposit = this.deposits.get(tokenId);
         final BigInteger now = now();
         final Address caller = Context.getCaller();
 
@@ -353,9 +353,9 @@ public class ConvexusStaker implements IRC721Receiver {
         Incentive incentive = incentives.get(incentiveId);
 
         deposit.numberOfStakes = deposit.numberOfStakes.subtract(ONE);
-        deposits.set(tokenId, deposit);
+        this.deposits.set(tokenId, deposit);
         incentive.numberOfStakes = incentive.numberOfStakes.subtract(ONE);
-        incentives.set(incentiveId, incentive);
+        this.incentives.set(incentiveId, incentive);
 
         SnapshotCumulativesInsideResult snapshot = IConvexusPool.snapshotCumulativesInside(key.pool, deposit.tickLower, deposit.tickUpper);
         BigInteger secondsPerLiquidityInsideX128 = snapshot.secondsPerLiquidityInsideX128;
@@ -379,10 +379,10 @@ public class ConvexusStaker implements IRC721Receiver {
         incentive.totalSecondsClaimedX128 = incentive.totalSecondsClaimedX128.add(secondsInsideX128);
         // reward is never greater than total reward unclaimed
         incentive.totalRewardUnclaimed = incentive.totalRewardUnclaimed.subtract(rewardAmount);
-        incentives.set(incentiveId, incentive);
+        this.incentives.set(incentiveId, incentive);
 
         // this only overflows if a token has a total supply greater than type(uint256).max
-        var rewardToken = rewards.at(key.rewardToken);
+        var rewardToken = this.rewards.at(key.rewardToken);
         rewardToken.set(deposit.owner, rewardToken.getOrDefault(deposit.owner, ZERO).add(rewardAmount));
 
         Stake stake = _stakes.at(tokenId).get(incentiveId);
@@ -391,7 +391,7 @@ public class ConvexusStaker implements IRC721Receiver {
         if (liquidity.compareTo(MAX_UINT96) >= 0) {
             stake.liquidityIfOverflow = ZERO;
         }
-        _stakes.at(tokenId).set(incentiveId, stake);
+        this._stakes.at(tokenId).set(incentiveId, stake);
 
         this.TokenUnstaked(tokenId, incentiveId);
     }
@@ -408,14 +408,14 @@ public class ConvexusStaker implements IRC721Receiver {
         BigInteger amountRequested
     ) {
         final Address caller = Context.getCaller();
-        BigInteger reward = rewards.at(rewardToken).getOrDefault(caller, ZERO);
+        BigInteger reward = this.rewards.at(rewardToken).getOrDefault(caller, ZERO);
 
         if (!amountRequested.equals(ZERO) 
         &&  amountRequested.compareTo(reward) < 0) {
             reward = amountRequested;
         }
 
-        var rewardTokenDict = rewards.at(rewardToken);
+        var rewardTokenDict = this.rewards.at(rewardToken);
         rewardTokenDict.set(caller, rewardTokenDict.get(caller).subtract(reward));
         IIRC2ICX.transfer(rewardToken, to, reward, "claimReward");
 
@@ -440,8 +440,8 @@ public class ConvexusStaker implements IRC721Receiver {
         Context.require(liquidity.compareTo(ZERO) > 0, 
             "getRewardInfo: stake does not exist");
 
-        Deposit deposit = deposits.get(tokenId);
-        Incentive incentive = incentives.get(incentiveId);
+        Deposit deposit = this.deposits.get(tokenId);
+        Incentive incentive = this.incentives.get(incentiveId);
 
         SnapshotCumulativesInsideResult snapshot = IConvexusPool.snapshotCumulativesInside(key.pool, deposit.tickLower, deposit.tickUpper);
         BigInteger secondsPerLiquidityInsideX128 = snapshot.secondsPerLiquidityInsideX128;
@@ -468,16 +468,21 @@ public class ConvexusStaker implements IRC721Receiver {
             "stakeToken: incentive ended");
 
         byte[] incentiveId = IncentiveId.compute(key);
-        var incentive = incentives.getOrDefault(incentiveId, Incentive.empty());
+        var incentive = this.incentives.getOrDefault(incentiveId, Incentive.empty());
 
         Context.require(incentive.totalRewardUnclaimed.compareTo(ZERO) > 0,
              "stakeToken: non-existent incentive"
         );
-        Context.require(_stakes.at(tokenId).getOrDefault(incentiveId, Stake.empty()).liquidityNoOverflow.equals(ZERO),
+        Context.require(this._stakes.at(tokenId).getOrDefault(incentiveId, Stake.empty()).liquidityNoOverflow.equals(ZERO),
             "stakeToken: token already staked"
         );
 
-        var nftPos = NFTPositionInfo.getPositionInfo(factory, nonFungiblePositionManager, tokenId);
+        var nftPos = NFTPositionInfo.getPositionInfo(
+            this.factory, 
+            this.nonFungiblePositionManager, 
+            tokenId
+        );
+
         Address pool = nftPos.pool;
         int tickLower = nftPos.tickLower;
         int tickUpper = nftPos.tickUpper;
@@ -488,11 +493,11 @@ public class ConvexusStaker implements IRC721Receiver {
         Context.require(liquidity.compareTo(ZERO) > 0, 
             "stakeToken: cannot stake token with 0 liquidity");
 
-        var deposit = deposits.get(tokenId);
+        var deposit = this.deposits.get(tokenId);
         deposit.numberOfStakes = deposit.numberOfStakes.add(ONE);
-        deposits.set(tokenId, deposit);
+        this.deposits.set(tokenId, deposit);
         incentive.numberOfStakes = incentive.numberOfStakes.add(ONE);
-        incentives.set(incentiveId, incentive);
+        this.incentives.set(incentiveId, incentive);
 
         SnapshotCumulativesInsideResult snapshot = IConvexusPool.snapshotCumulativesInside(key.pool, tickLower, tickUpper);
         BigInteger secondsPerLiquidityInsideX128 = snapshot.secondsPerLiquidityInsideX128;
@@ -583,17 +588,17 @@ public class ConvexusStaker implements IRC721Receiver {
 
     @External(readonly = true)
     public Incentive incentives (byte[] key) {
-        return incentives.get(key);
+        return this.incentives.get(key);
     }
 
     @External(readonly = true)
     public Deposit deposits (BigInteger tokenId) {
-        return deposits.get(tokenId);
+        return this.deposits.get(tokenId);
     }
 
     @External(readonly = true)
     public BigInteger rewards (Address rewardToken, Address owner) {
-        return rewards.at(rewardToken).getOrDefault(owner, ZERO);
+        return this.rewards.at(rewardToken).getOrDefault(owner, ZERO);
     }
 
     /**
