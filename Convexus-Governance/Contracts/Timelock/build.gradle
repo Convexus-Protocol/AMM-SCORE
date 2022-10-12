@@ -1,0 +1,21 @@
+dependencies {
+    compileOnly 'foundation.icon:javaee-api:0.9.0'
+    implementation 'foundation.icon:javaee-scorex:0.5.2'
+
+    implementation project(':Convexus-Commons:Utils')
+    implementation project(':Convexus-Commons:Tokens:Interfaces:irc2')
+
+    implementation project(':Convexus-Governance:Structs:Governor')
+}
+
+optimizedJar {
+    mainClassName = 'exchange.convexus.periphery.timelock.Timelock'
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}
+
+test {
+    useJUnitPlatform()
+}

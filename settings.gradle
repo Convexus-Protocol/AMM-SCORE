@@ -60,15 +60,11 @@ include (
   ':Convexus-Periphery:Contracts:NonFungiblePositionManager',
   ':Convexus-Periphery:Contracts:NonfungibleTokenPositionDescriptor',
   ':Convexus-Periphery:Contracts:PoolInitializer',
-  ':Convexus-Periphery:Contracts:Governor',
-  ':Convexus-Periphery:Contracts:Timelock',
-  ':Convexus-Periphery:Contracts:TreasuryVester',
   ':Convexus-Periphery:Contracts:TickLens',
   ':Convexus-Periphery:Contracts:Quoter',
   ':Convexus-Periphery:Contracts:ConvexusPoolReadOnly',
   ':Convexus-Periphery:Contracts:PairFlash',
   ':Convexus-Periphery:Contracts:Swap',
-  ':Convexus-Periphery:Contracts:CXS',
   ':Convexus-Periphery:Contracts:Staker',
 
   // Interfaces
@@ -79,16 +75,12 @@ include (
   ':Convexus-Periphery:Score-Interfaces:ConvexusPoolReadOnly',
   ':Convexus-Periphery:Score-Interfaces:NonfungibleTokenPositionDescriptor',
   ':Convexus-Periphery:Score-Interfaces:NonFungiblePositionManager',
-  ':Convexus-Periphery:Score-Interfaces:Timelock',
-  ':Convexus-Periphery:Score-Interfaces:CXS',
   ':Convexus-Periphery:Score-Interfaces:ConvexusPoolCalleeReadOnly',
 
   // Structs
-  ':Convexus-Periphery:Structs:CXS',
   ':Convexus-Periphery:Structs:NonFungiblePositionManager',
   ':Convexus-Periphery:Structs:LiquidityManagement',
   ':Convexus-Periphery:Structs:Staker',
-  ':Convexus-Periphery:Structs:Governor',
   ':Convexus-Periphery:Structs:SwapRouter',
   ':Convexus-Periphery:Structs:PairFlash',
   ':Convexus-Periphery:Structs:ConvexusPoolReadOnly',
@@ -100,13 +92,11 @@ include (
   ':Convexus-Periphery:Tests:Unit:NonFungiblePositionManager',
   ':Convexus-Periphery:Tests:Unit:NonfungibleTokenPositionDescriptor',
   ':Convexus-Periphery:Tests:Unit:PoolInitializer',
-  ':Convexus-Periphery:Tests:Unit:Governor',
   ':Convexus-Periphery:Tests:Unit:TickLens',
   ':Convexus-Periphery:Tests:Unit:Quoter',
   ':Convexus-Periphery:Tests:Unit:PoolReadOnly',
   ':Convexus-Periphery:Tests:Unit:PairFlash',
   ':Convexus-Periphery:Tests:Unit:Swap',
-  ':Convexus-Periphery:Tests:Unit:CXS',
   ':Convexus-Periphery:Tests:Unit:Staker',
   ':Convexus-Periphery:Tests:Unit:Clients',
   ':Convexus-Periphery:Tests:Unit:Librairies',
@@ -119,6 +109,28 @@ include (
   ':Convexus-Periphery:Tests:Utils:Staker',
   ':Convexus-Periphery:Tests:Utils:NFTPosition',
 
+  // ---------------------------
+  // --- Convexus Governance ---
+  // ---------------------------
+  // Contracts
+  ':Convexus-Governance:Contracts:CXS',
+  ':Convexus-Governance:Contracts:Governor',
+  ':Convexus-Governance:Contracts:Timelock',
+  ':Convexus-Governance:Contracts:TreasuryVester',
+
+  // Score-Interfaces
+  ':Convexus-Governance:Score-Interfaces:CXS',
+  ':Convexus-Governance:Score-Interfaces:Timelock',
+
+  // Structs
+  ':Convexus-Governance:Structs:CXS',
+  ':Convexus-Governance:Structs:Governor',
+
+  // Unit tests
+  ':Convexus-Governance:Tests:Unit:Clients',
+  ':Convexus-Governance:Tests:Unit:Governor',
+  ':Convexus-Governance:Tests:Unit:CXS',
+  
   // -----------------------
   // --- Convexus Common ---
   // -----------------------
@@ -132,10 +144,7 @@ include (
   ':Convexus-Commons:Tests:Integration',
   // Test contracts
   ':Convexus-Commons:Tests:Contracts:Tokens',
-  
-  // -----------------------
-  // --- Tokens Common ---
-  // -----------------------
+  // Tokens
   ':Convexus-Commons:Tokens:Contracts:irc2',
   ':Convexus-Commons:Tokens:Contracts:irc721',
   ':Convexus-Commons:Tokens:Interfaces:irc2',
