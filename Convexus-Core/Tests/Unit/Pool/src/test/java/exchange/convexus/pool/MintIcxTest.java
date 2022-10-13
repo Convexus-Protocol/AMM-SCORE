@@ -519,7 +519,7 @@ public class MintIcxTest extends ConvexusPoolTest {
     ConvexusLiquidityUtils.deposit(alice, callee.getAddress(), usdc.score, new BigInteger("32"));
     callee.invoke(alice, "mint", pool.getAddress(), alice.getAddress(), minTick, maxTick, BigInteger.valueOf(100));
     
-    observation = Oracle.Observation.fromMap(pool.call("observations", 0));
+    observation = Oracle.Observation.fromMap(pool.call("observations", 1));
     expected = new Oracle.Observation(start.add(TWO), BigInteger.valueOf(-23028), new BigInteger("107650226801941937191829992860413859"), true);
     assertObservationEquals(expected, observation);
   }

@@ -245,7 +245,6 @@ public class ObservationsCache {
 
   /**
    * @notice Prepares the oracle array to store up to `next` observations
-   * @param self The stored oracle array
    * @param current The current next cardinality of the oracle array
    * @param next The proposed next cardinality which will be populated in the oracle array
    * @return next The next cardinality which will be populated in the oracle array
