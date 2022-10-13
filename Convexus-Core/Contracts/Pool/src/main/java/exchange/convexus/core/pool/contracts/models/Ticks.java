@@ -77,7 +77,6 @@ public class Ticks {
 
   /**
    * @notice Updates a tick and returns true if the tick was flipped from initialized to uninitialized, or vice versa
-   * @param self The mapping containing all tick information for initialized ticks
    * @param tick The tick that will be updated
    * @param tickCurrent The current tick
    * @param liquidityDelta A new amount of liquidity to be added (subtracted) when tick is crossed from left to right (right to left)
@@ -185,7 +184,6 @@ public class Ticks {
 
   /**
    * @notice Clears tick data
-   * @param self The mapping containing all initialized tick information for initialized ticks
    * @param tick The tick that will be cleared
    */
   public void clear(int tick) {

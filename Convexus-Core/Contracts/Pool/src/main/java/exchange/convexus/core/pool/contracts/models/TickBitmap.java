@@ -72,7 +72,6 @@ public class TickBitmap {
 
   /**
    * @notice Flips the initialized state for a given tick from false to true, or vice versa
-   * @param self The mapping in which to flip the tick
    * @param tick The tick to flip
    * @param tickSpacing The spacing between usable ticks
    */

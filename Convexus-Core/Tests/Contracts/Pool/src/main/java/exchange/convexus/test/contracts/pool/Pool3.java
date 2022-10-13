@@ -767,8 +767,8 @@ abstract class ConvexusPool3
       Slot0 _slot0 = this.slot0.get();
       _slot0.sqrtPriceX96 = state.sqrtPriceX96;
       _slot0.tick = state.tick;
-      _slot0.observationIndex = result.indexUpdated;
-      _slot0.observationCardinality = result.cardinalityUpdated;
+      _slot0.observationIndex = result.observationIndex;
+      _slot0.observationCardinality = result.observationCardinality;
       this.slot0.set(_slot0);
     } else {
       // otherwise just update the price
@@ -1299,8 +1299,8 @@ abstract class ConvexusPool3
           _slot0.observationCardinalityNext
         );
 
-        _slot0.observationIndex = writeResult.indexUpdated;
-        _slot0.observationCardinality = writeResult.cardinalityUpdated;
+        _slot0.observationIndex = writeResult.observationIndex;
+        _slot0.observationCardinality = writeResult.observationCardinality;
         this.slot0.set(_slot0);
 
         amount0 = SqrtPriceMath.getAmount0Delta(
