@@ -25,9 +25,11 @@ import exchange.convexus.pool.BeforeAfterObservation;
 import exchange.convexus.pool.InitializeResult;
 import exchange.convexus.pool.ObserveResult;
 import exchange.convexus.pool.Oracle;
+import exchange.convexus.pool.Oracle.Observation;
 import exchange.convexus.utils.MathUtils;
 import score.Context;
 import score.DictDB;
+import score.VarDB;
 
 public class Observations {
   // ================================================
@@ -42,12 +44,25 @@ public class Observations {
   // ================================================
   // Returns data about a specific observation index
   private final DictDB<Integer, Oracle.Observation> observations = Context.newDictDB(NAME + "_observations", Oracle.Observation.class);
+  private final VarDB<Integer> oldestIndex = Context.newVarDB(NAME + "_oldestIndex", Integer.class);
 
   // ================================================
   // Methods
   // ================================================
   public Oracle.Observation get (int index) {
     return this.observations.getOrDefault(index, Oracle.Observation.empty());
+  }
+
+  private void setOldestIndex (int currentIndex, int cardinality) {
+    Integer oldestIndex = this.oldestIndex.get();
+    if (oldestIndex == null) {
+      // Not initialized, oldest = current index
+      this.oldestIndex.set(currentIndex);
+    }
+    else if (oldestIndex == currentIndex) {
+      // new oldest = next one to the previous one
+      this.oldestIndex.set((currentIndex + 1) % cardinality);
+    }
   }
 
   public void set (int index, Oracle.Observation observation) {
@@ -69,6 +84,7 @@ public class Observations {
   public InitializeResult initialize (BigInteger time) {
     Oracle.Observation observation = new Oracle.Observation(time, ZERO, ZERO, true);
     this.set(0, observation);
+    this.setOldestIndex(0, 1);
     return new InitializeResult(1, 1);
   }
 
@@ -227,7 +243,6 @@ public class Observations {
 
   /**
    * @notice Prepares the oracle array to store up to `next` observations
-   * @param self The stored oracle array
    * @param current The current next cardinality of the oracle array
    * @param next The proposed next cardinality which will be populated in the oracle array
    * @return next The next cardinality which will be populated in the oracle array
@@ -246,17 +261,18 @@ public class Observations {
         Oracle.Observation observation = this.get(i);
          observation.blockTimestamp = ONE;
          this.set(i, observation);
+         this.setOldestIndex(i, next);
       }
 
       return next;
   }
   
   public class WriteResult {
-    public int indexUpdated;
-    public int cardinalityUpdated;
-    public WriteResult (int indexUpdated, int cardinalityUpdated) {
-      this.indexUpdated = indexUpdated;
-      this.cardinalityUpdated = cardinalityUpdated;
+    public int observationIndex;
+    public int observationCardinality;
+    public WriteResult (int observationIndex, int observationCardinality) {
+      this.observationIndex = observationIndex;
+      this.observationCardinality = observationCardinality;
     }
   }
 
@@ -283,7 +299,12 @@ public class Observations {
 
     int indexUpdated = (index + 1) % cardinalityUpdated;
     this.set(indexUpdated, OracleLib.transform(last, blockTimestamp, tick, liquidity));
+    this.setOldestIndex(indexUpdated, cardinalityUpdated);
 
     return new WriteResult(indexUpdated, cardinalityUpdated);
+  }
+
+  public Observation getOldest () {
+    return this.get(this.oldestIndex.getOrDefault(0));
   }
 }

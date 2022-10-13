@@ -358,7 +358,7 @@ public abstract class ConvexusPool
 
     Slot0 _slot0 = this.slot0.get();
     int observationCardinalityNextOld = _slot0.observationCardinalityNext;
-    int observationCardinalityNextNew = observations.grow(observationCardinalityNextOld, observationCardinalityNext);
+    int observationCardinalityNextNew = this.observations.grow(observationCardinalityNextOld, observationCardinalityNext);
 
     _slot0.observationCardinalityNext = observationCardinalityNextNew;
     this.slot0.set(_slot0);
@@ -416,6 +416,9 @@ public abstract class ConvexusPool
       // Unlock the pool
       true
     ));
+
+    // Set observations at 1024 by default
+    this.increaseObservationCardinalityNext(1024);
 
     this.Initialized(sqrtPriceX96, tick);
     this.PoolIntrinsicsUpdate(sqrtPriceX96, tick, ZERO);
@@ -762,9 +765,10 @@ public abstract class ConvexusPool
     }
 
     // update tick and write an oracle entry if the tick change
+    Slot0 _slot0 = this.slot0.get();
     if (state.tick != slot0Start.tick) {
       var result =
-        observations.write(
+        this.observations.write(
           slot0Start.observationIndex,
           cache.blockTimestamp,
           slot0Start.tick,
@@ -772,18 +776,15 @@ public abstract class ConvexusPool
           slot0Start.observationCardinality,
           slot0Start.observationCardinalityNext
         );
-      Slot0 _slot0 = this.slot0.get();
       _slot0.sqrtPriceX96 = state.sqrtPriceX96;
       _slot0.tick = state.tick;
-      _slot0.observationIndex = result.indexUpdated;
-      _slot0.observationCardinality = result.cardinalityUpdated;
-      this.slot0.set(_slot0);
+      _slot0.observationIndex = result.observationIndex;
+      _slot0.observationCardinality = result.observationCardinality;
     } else {
       // otherwise just update the price
-      Slot0 _slot0 = this.slot0.get();
       _slot0.sqrtPriceX96 = state.sqrtPriceX96;
-      this.slot0.set(_slot0);
     }
+    this.slot0.set(_slot0);
 
     // update liquidity if it changed
     if (cache.liquidityStart != state.liquidity) {
@@ -1125,7 +1126,7 @@ public abstract class ConvexusPool
   @External(readonly = true)
   public ObserveResult observe (BigInteger[] secondsAgos) {
     Slot0 _slot0 = this.slot0.get();
-    return observations.observe(
+    return this.observations.observe(
       TimeUtils.now(), 
       secondsAgos, 
       _slot0.tick, 
@@ -1308,8 +1309,8 @@ public abstract class ConvexusPool
           _slot0.observationCardinalityNext
         );
 
-        _slot0.observationIndex = writeResult.indexUpdated;
-        _slot0.observationCardinality = writeResult.cardinalityUpdated;
+        _slot0.observationIndex = writeResult.observationIndex;
+        _slot0.observationCardinality = writeResult.observationCardinality;
         this.slot0.set(_slot0);
 
         amount0 = SqrtPriceMath.getAmount0Delta(
@@ -1481,6 +1482,11 @@ public abstract class ConvexusPool
   @External(readonly = true)
   public Oracle.Observation observations (int index) {
     return this.observations.get(index);
+  }
+ 
+  @External(readonly = true)
+  public Oracle.Observation oldestObservation () {
+    return this.observations.getOldest();
   }
 
   // --- TickBitmap --- 
