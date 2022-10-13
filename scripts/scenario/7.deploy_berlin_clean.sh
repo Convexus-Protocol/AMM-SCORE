@@ -8,5 +8,6 @@
 ./scripts/scenario/2.deploy_core_pool.sh berlin/usdc-sicx &
 ./scripts/scenario/2.deploy_core_pool.sh berlin/usdt-icx &
 ./scripts/scenario/2.deploy_core_pool.sh berlin/weth-crv &
+./scripts/scenario/2.deploy_core_pool.sh berlin/weth-sicx &
 
 ./scripts/scenario/3.deploy_periphery.sh berlin
