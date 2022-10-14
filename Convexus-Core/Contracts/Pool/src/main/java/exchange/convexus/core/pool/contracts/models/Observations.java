@@ -115,7 +115,7 @@ public class Observations {
     while (true) {
       i = (l + r) / 2;
 
-      beforeOrAt = this.get((i + 1) % cardinality);
+      beforeOrAt = this.get(i % cardinality);
 
       // we've landed on an uninitialized tick, keep searching higher (more recently)
       if (!beforeOrAt.initialized) {
@@ -157,7 +157,7 @@ public class Observations {
     if (lte(time, beforeOrAt.blockTimestamp, target)) {
       if (beforeOrAt.blockTimestamp.equals(target)) {
         // if newest observation equals target, we're in the same block, so we can ignore atOrAfter
-        Oracle.Observation atOrAfter = new Oracle.Observation(ZERO, ZERO, ZERO, false);
+        Oracle.Observation atOrAfter = Oracle.Observation.empty();
         return new BeforeAfterObservation(beforeOrAt, atOrAfter);
       } else {
         // otherwise, we need to transform
