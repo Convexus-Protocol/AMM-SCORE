@@ -22,7 +22,7 @@ deployName="Convexus Staker"
 info "Setting up ${deployName}..."
 
 # Package information
-pkg=$(getStaker)
+pkg=$(getStakerPkg)
 javaPkg=":Convexus-Periphery:Contracts:Staker"
 build="optimized"
 

@@ -26,17 +26,17 @@ getNonFungiblePositionManagerPkg() {
 }
 
 # ReadOnlyPool
-getReadOnlyPool() {
+getReadOnlyPoolPkg() {
   echo "periphery/readonlypool"
 }
 
 # Staker
-getStaker() {
+getStakerPkg() {
   echo "periphery/staker"
 }
 
 # Quoter
-getQuoter() {
+getQuoterPkg() {
   echo "periphery/quoter"
 }
 

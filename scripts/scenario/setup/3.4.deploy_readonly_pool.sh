@@ -21,7 +21,7 @@ deployName="Convexus ReadOnly Pool"
 info "Setting up ${deployName}..."
 
 # Package information
-pkg=$(getReadOnlyPool)
+pkg=$(getReadOnlyPoolPkg)
 javaPkg=":Convexus-Periphery:Contracts:ConvexusPoolReadOnly"
 build="optimized"
 

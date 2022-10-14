@@ -21,7 +21,7 @@ deployName="Convexus Quoter"
 info "Setting up ${deployName}..."
 
 # Package information
-pkg=$(getQuoter)
+pkg=$(getQuoterPkg)
 javaPkg=":Convexus-Periphery:Contracts:Quoter"
 build="optimized"
 
@@ -37,7 +37,7 @@ info "Cleaning..."
 
 # Deploy on ICON network
 factoryPkg=$(getFactoryPkg)
-readOnlyPoolPkg=$(getReadOnlyPool)
+readOnlyPoolPkg=$(getReadOnlyPoolPkg)
 factory=$(getAddress ${factoryPkg} ${network})
 readOnlyPool=$(getAddress ${readOnlyPoolPkg} ${network})
 filter=$(cat <<EOF
