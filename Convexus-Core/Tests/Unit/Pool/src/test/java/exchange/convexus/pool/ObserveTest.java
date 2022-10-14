@@ -102,4 +102,35 @@ public class ObserveTest extends ConvexusPoolTest {
     // -27156 = -4452*4 + -1558*6
     assertEquals(BigInteger.valueOf(-27156), observation.tickCumulatives[0]);
   }
+
+  @Test
+  void testCurrentTickAccumulatorAfterTwoSwapsMultipleSecondsAgo () {
+    swapExact0For1(TEN.pow(18).divide(TWO), alice);
+    var slot0 = Slot0.fromMap(pool.call("slot0"));
+    assertEquals(-4452, slot0.tick);
+    
+    sleep(3600);
+
+    swapExact1For0(TEN.pow(18).divide(BigInteger.valueOf(4)), alice);
+    slot0 = Slot0.fromMap(pool.call("slot0"));
+    assertEquals(-1558, slot0.tick);
+
+    sleep(3600);
+    
+    BigInteger[] secondsAgos = {
+      ZERO, 
+      BigInteger.valueOf(4000),
+    };
+
+    var observation = ObserveResult.fromMap(pool.call("observe", new Object[] {secondsAgos}));
+    
+    // for (int i = 1; i < observation.tickCumulatives.length; i++) {
+    //   BigInteger curSecondsAgo = secondsAgos[i];
+    //   BigInteger tickCumulativesDelta = observation.tickCumulatives[i].subtract(observation.tickCumulatives[0]);
+    //   BigInteger arithmeticMeanTick = tickCumulativesDelta.divide(curSecondsAgo);
+    // }
+    
+    // -21636000 = -4452*3600 + -1558*3600
+    assertEquals(BigInteger.valueOf(-21636000), observation.tickCumulatives[0]);
+  }
 }

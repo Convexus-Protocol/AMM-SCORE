@@ -81,6 +81,9 @@ public abstract class ConvexusPool
   // Contract class name
   public static final String NAME = "ConvexusPool";
 
+  // Observations default cardinality
+  public static final int DEFAULT_OBSERVATIONS_CARDINALITY = 1024;
+
   // Pool settings
   private final PoolSettings settings;
 
@@ -418,7 +421,7 @@ public abstract class ConvexusPool
     ));
 
     // Set observations at 1024 by default
-    this.increaseObservationCardinalityNext(1024);
+    this.increaseObservationCardinalityNext(DEFAULT_OBSERVATIONS_CARDINALITY);
 
     this.Initialized(sqrtPriceX96, tick);
     this.PoolIntrinsicsUpdate(sqrtPriceX96, tick, ZERO);
@@ -1135,7 +1138,7 @@ public abstract class ConvexusPool
       _slot0.observationCardinality
     );
   }
-
+  
   // ================================================
   // Private methods
   // ================================================
