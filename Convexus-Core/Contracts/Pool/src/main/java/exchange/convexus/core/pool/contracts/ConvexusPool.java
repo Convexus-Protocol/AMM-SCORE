@@ -333,7 +333,6 @@ public abstract class ConvexusPool
     // Default values
     if (this.liquidity.get() == null) {
       this.liquidity.set(ZERO);
-      this.PoolIntrinsicsUpdate(ZERO, 0, ZERO);
     }
     if (this.feeGrowthGlobal0X128.get() == null) {
       this.feeGrowthGlobal0X128.set(ZERO);
