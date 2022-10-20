@@ -17,7 +17,7 @@
 package exchange.convexus.periphery.ticklens;
 
 import java.math.BigInteger;
-
+import java.util.List;
 import exchange.convexus.pool.IConvexusPool;
 import exchange.convexus.pool.Tick;
 import score.Address;
@@ -48,7 +48,7 @@ public class TickLens {
     }
 
     @External(readonly = true)
-    public PopulatedTick[] getPopulatedTicksInWord (Address pool, int tickBitmapIndex) {
+    public List<PopulatedTick> getPopulatedTicksInWord (Address pool, int tickBitmapIndex) {
 
         // fetch bitmap
         BigInteger bitmap = IConvexusPool.tickBitmap(pool, tickBitmapIndex);
@@ -77,7 +77,7 @@ public class TickLens {
             }
         }
         
-        return populatedTicks;
+        return List.of(populatedTicks);
     }
 
     // ================================================

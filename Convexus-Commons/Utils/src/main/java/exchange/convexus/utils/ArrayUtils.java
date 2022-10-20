@@ -17,7 +17,7 @@
 package exchange.convexus.utils;
 
 import java.math.BigInteger;
-
+import java.util.List;
 import score.Address;
 
 public class ArrayUtils {
@@ -70,5 +70,14 @@ public class ArrayUtils {
             }
         }
         return false;
+    }
+
+    public static BigInteger[] fromList (List<BigInteger> list) {
+        final int size = list.size();
+        BigInteger[] result = new BigInteger[size];
+        for (int i = 0; i < size; i++) {
+            result[i] = list.get(i);
+        }
+        return result;
     }
 }

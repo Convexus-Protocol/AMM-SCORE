@@ -17,6 +17,7 @@
 package exchange.convexus.periphery.governor;
 
 import java.math.BigInteger;
+import java.util.List;
 import exchange.convexus.cxs.ICXS;
 import exchange.convexus.governor.MethodCall;
 import exchange.convexus.periphery.timelock.Timelock;
@@ -228,8 +229,8 @@ public class ConvexusGovernor {
     }
 
     @External(readonly = true)
-    public MethodCall[] getActions (BigInteger proposalId) {
-        return this.proposals.get(proposalId).calls;
+    public List<MethodCall> getActions (BigInteger proposalId) {
+        return List.of(this.proposals.get(proposalId).calls);
     }
 
     @External(readonly = true)

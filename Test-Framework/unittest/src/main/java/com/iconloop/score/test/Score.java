@@ -19,12 +19,13 @@ package com.iconloop.score.test;
 import score.Address;
 import score.Context;
 import score.struct.Property;
-
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigInteger;
+import java.util.Arrays;
 import java.util.EmptyStackException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Score extends TestBase {
@@ -63,14 +64,14 @@ public class Score extends TestBase {
         return call(null, true, BigInteger.ZERO, method, params);
     }
 
-    public void invoke(Account from, String method, Object... params) {
-        sm.getBlock().increase();
-        call(from, false, BigInteger.ZERO, method, params);
-    }
-
     public void invoke(Account from, BigInteger value, String method, Object... params) {
         sm.getBlock().increase();
         call(from, false, value, method, params);
+    }
+
+    public void invoke(Account from, String method, Object... params) {
+        sm.getBlock().increase();
+        call(from, false, BigInteger.ZERO, method, params);
     }
 
     private Object getReturnValue (Object returnValue) throws IllegalAccessException {
@@ -110,7 +111,8 @@ public class Score extends TestBase {
         if (returnType.isArray()) {
             int arrayLength = Array.getLength(returnValue);
             if (arrayLength == 0) {
-                return new Object[] {};
+                var itemType = returnValue.getClass().getComponentType();
+                return Array.newInstance(itemType, 0);
             }
 
             var firstItem = getReturnValue(Array.get(returnValue, 0));
@@ -120,9 +122,22 @@ public class Score extends TestBase {
                 // Decide what to do with each array item, recursive call it
                 returnArray[i] = getReturnValue(Array.get(returnValue, i));
             }
-            return returnArray;
+            // Return type is List
+            return Arrays.asList(returnArray);
         }
 
+        // Is it a Map ?
+        if (returnValue instanceof Map<?,?>) {
+            // Return as is
+            return returnValue;   
+           }
+
+        // Is it a List ?
+        if (returnValue instanceof List<?>) {
+            // Return as is
+            return returnValue;   
+           }
+      
         // Only remaining possibility : it's a user class that needs to be converted to Map
         Map<String, Object> returnMap = new HashMap<String, Object>();
         for (var field : returnType.getDeclaredFields()) {

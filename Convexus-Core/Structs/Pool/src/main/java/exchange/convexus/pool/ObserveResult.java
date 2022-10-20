@@ -17,7 +17,9 @@
 package exchange.convexus.pool;
 
 import java.math.BigInteger;
+import java.util.List;
 import java.util.Map;
+import exchange.convexus.utils.ArrayUtils;
 
 public class ObserveResult {
   // Cumulative tick values as of each `secondsAgos` from the current block timestamp
@@ -30,12 +32,15 @@ public class ObserveResult {
     this.secondsPerLiquidityCumulativeX128s = secondsPerLiquidityCumulativeX128s;
   }
 
+  @SuppressWarnings("unchecked")
   public static ObserveResult fromMap (Object call) {
-    @SuppressWarnings("unchecked")
     Map<String,Object> map = (Map<String,Object>) call;
+    var tickCumulatives = (List<BigInteger>) map.get("tickCumulatives");
+    var secondsPerLiquidityCumulativeX128s = (List<BigInteger>) map.get("secondsPerLiquidityCumulativeX128s");
+    
     return new ObserveResult (
-      (BigInteger[]) map.get("tickCumulatives"), 
-      (BigInteger[]) map.get("secondsPerLiquidityCumulativeX128s")
+      ArrayUtils.fromList(tickCumulatives), 
+      ArrayUtils.fromList(secondsPerLiquidityCumulativeX128s)
     );
   }
 }
