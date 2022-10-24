@@ -1,0 +1,21 @@
+dependencies {
+    compileOnly 'foundation.icon:javaee-api:0.9.0'
+    
+    implementation project(':Convexus-Commons:Utils')
+    implementation project(':Convexus-Commons:Librairies')
+
+    implementation project(':Convexus-Core:Score-Interfaces:Pool')
+    implementation project(':Convexus-Core:Structs:Pool')
+}
+
+optimizedJar {
+    mainClassName = 'exchange.convexus.periphery.ticklens.TickLens'
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}
+
+test {
+    useJUnitPlatform()
+}

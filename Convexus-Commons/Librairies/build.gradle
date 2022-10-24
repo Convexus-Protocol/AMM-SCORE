@@ -1,0 +1,7 @@
+dependencies {
+    compileOnly 'foundation.icon:javaee-api:0.9.0'
+    implementation project(':Convexus-Commons:Utils')
+
+    implementation project(':Convexus-Core:Structs:Pool')
+    implementation project(':Convexus-Core:Score-Interfaces:Factory')
+}

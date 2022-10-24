@@ -1,0 +1,12 @@
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
+}
+dependencies {
+    compileOnly 'foundation.icon:javaee-api:0.9.0'
+    implementation 'foundation.icon:javaee-scorex:0.5.2'
+    implementation 'com.github.sink772:minimal-json:0.9.6'
+
+    implementation project(':Convexus-Commons:Utils')
+}

@@ -1,0 +1,22 @@
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
+}
+dependencies {
+    compileOnly 'foundation.icon:javaee-api:0.9.0'
+    implementation 'org.mockito:mockito-inline:3.11.0'
+    implementation 'org.junit.jupiter:junit-jupiter-api:5.9.0'
+    runtimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.0'
+
+    implementation 'com.github.sink772:minimal-json:0.9.6'
+    implementation project(':Test-Framework:unittest')
+
+    implementation project(':Convexus-Commons:Tokens:Contracts:irc2')
+    implementation project(':Convexus-Commons:Tests:Unit:Utils')
+    implementation project(':Convexus-Commons:Utils')
+
+    implementation project(':Convexus-Periphery:Structs:Quoter')
+
+    implementation project(':Convexus-Periphery:Contracts:Quoter')
+}

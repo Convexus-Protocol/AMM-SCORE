@@ -1,0 +1,3 @@
+dependencies {
+    compileOnly 'foundation.icon:javaee-api:0.9.0'
+}

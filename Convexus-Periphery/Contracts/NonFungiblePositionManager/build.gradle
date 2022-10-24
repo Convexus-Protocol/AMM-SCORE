@@ -1,0 +1,31 @@
+dependencies {
+    compileOnly 'foundation.icon:javaee-api:0.9.0'
+    implementation 'foundation.icon:javaee-scorex:0.5.2'
+    implementation 'com.github.sink772:minimal-json:0.9.6'
+    
+    implementation project(':Convexus-Commons:Utils')
+    implementation project(':Convexus-Commons:Librairies')
+    implementation project(':Convexus-Commons:Tokens:Contracts:irc2')
+    implementation project(':Convexus-Commons:Tokens:Contracts:irc721')
+
+    implementation project(':Convexus-Core:Contracts:Pool')
+    implementation project(':Convexus-Core:Structs:Pool')
+    implementation project(':Convexus-Core:Interfaces:Callback')
+    implementation project(':Convexus-Core:Score-Interfaces:Pool')
+
+    implementation project(':Convexus-Periphery:Librairies')
+    implementation project(':Convexus-Periphery:Interfaces:ConvexusLiquidityManagement')
+    implementation project(':Convexus-Periphery:Structs:LiquidityManagement')
+    implementation project(':Convexus-Periphery:Structs:NonFungiblePositionManager')
+    implementation project(':Convexus-Periphery:Score-Interfaces:NonfungibleTokenPositionDescriptor')
+    
+    implementation project(':Convexus-Periphery:Contracts:LiquidityManagement')
+}
+
+optimizedJar {
+    mainClassName = 'exchange.convexus.periphery.positionmgr.NonFungiblePositionManager'
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}

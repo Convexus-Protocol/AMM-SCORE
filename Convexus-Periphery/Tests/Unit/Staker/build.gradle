@@ -1,0 +1,39 @@
+dependencies {
+    compileOnly 'foundation.icon:javaee-api:0.9.0'
+    
+    testImplementation 'org.mockito:mockito-inline:3.11.0'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.0'
+
+    testImplementation project(':Test-Framework:unittest')
+    testImplementation project(':Convexus-Commons:Tokens:Contracts:irc721')
+    testImplementation project(':Convexus-Commons:Utils')
+    testImplementation project(':Convexus-Commons:Tests:Unit:Utils')
+    testImplementation project(':Convexus-Commons:Tests:Unit:ConvexusTest')
+    testImplementation project(':Convexus-Core:Tests:Utils:ConvexusLiquidity')
+    testImplementation project(':Convexus-Periphery:Tests:Utils:Staker')
+    testImplementation project(':Convexus-Core:Tests:Contracts:Pool')
+    testImplementation project(':Convexus-Core:Tests:Utils:Factory')
+    testImplementation project(':Convexus-Periphery:Tests:Utils:NFTPosition')
+    testImplementation project(':Convexus-Commons:Tests:Contracts:Tokens')
+
+    // Core
+    testImplementation project(':Convexus-Core:Structs:Pool')
+    testImplementation project(':Convexus-Core:Structs:Factory')
+    testImplementation project(':Convexus-Core:Interfaces:Callback')
+
+    testImplementation project(':Convexus-Core:Tests:Mocks:Factory')
+    
+    // Periphery
+    testImplementation project(':Convexus-Periphery:Structs:NonFungiblePositionManager')
+    testImplementation project(':Convexus-Periphery:Structs:Staker')
+    testImplementation project(':Convexus-Periphery:Interfaces:ConvexusLiquidityManagement')
+
+    testImplementation project(':Convexus-Periphery:Contracts:Staker')
+    testImplementation project(':Convexus-Periphery:Contracts:NonFungiblePositionManager')
+    testImplementation project(':Convexus-Periphery:Contracts:NonfungibleTokenPositionDescriptor')
+}
+
+test {
+    useJUnitPlatform()
+}
