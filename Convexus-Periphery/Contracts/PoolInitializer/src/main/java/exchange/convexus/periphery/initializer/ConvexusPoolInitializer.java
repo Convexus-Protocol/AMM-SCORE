@@ -42,6 +42,8 @@ public class ConvexusPoolInitializer {
     // Contract name
     private final String name;
     private final Address factory;
+    private final Address positionManager;
+    ;
 
     // ================================================
     // Methods
@@ -51,11 +53,12 @@ public class ConvexusPoolInitializer {
      *  
      */
     public ConvexusPoolInitializer(
-        Address factory
+        Address factory,
+        Address positionManager
     ) {
-        // final Address caller = Context.getCaller();
         this.name = "Convexus Pool Initializer";
         this.factory = factory;
+        this.positionManager = positionManager;
     }
 
     @External
@@ -94,13 +97,10 @@ public class ConvexusPoolInitializer {
         int fee,
         BigInteger sqrtPriceX96,
         // For the position minting
-        Address positionManager,
         int tickLower,
         int tickUpper,
         BigInteger amount0Desired,
         BigInteger amount1Desired,
-        BigInteger amount0Min,
-        BigInteger amount1Min,
         Address recipient,
         BigInteger deadline
     ) {
@@ -114,12 +114,12 @@ public class ConvexusPoolInitializer {
             tickUpper,
             amount0Desired,
             amount1Desired,
-            amount0Min,
-            amount1Min,
+            BigInteger.ZERO,
+            BigInteger.ZERO,
             recipient,
             deadline
         );
-        MintResult mintResult = INonFungiblePositionManager.mint(positionManager, params);
+        MintResult mintResult = INonFungiblePositionManager.mint(this.positionManager, params);
 
         return new CreatePoolAndMintResult(pool, mintResult);
     }
