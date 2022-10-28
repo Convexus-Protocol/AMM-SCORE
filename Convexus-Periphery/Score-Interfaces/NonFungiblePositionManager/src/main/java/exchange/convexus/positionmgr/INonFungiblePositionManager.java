@@ -37,4 +37,13 @@ public class INonFungiblePositionManager {
   public static Address factory (Address positionManager) {
     return (Address) Context.call(positionManager, "factory");
   }
+
+  public static MintResult mint (
+    Address positionManager, 
+    MintParams params
+  ) {
+    return MintResult.fromMap(
+      Context.call(positionManager, "mint", params)
+    );
+  }
 }

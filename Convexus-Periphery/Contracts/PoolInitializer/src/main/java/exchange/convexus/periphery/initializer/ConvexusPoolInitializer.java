@@ -24,6 +24,9 @@ import java.math.BigInteger;
 import exchange.convexus.core.factory.IConvexusFactory;
 import exchange.convexus.pool.IConvexusPool;
 import exchange.convexus.pool.Slot0;
+import exchange.convexus.positionmgr.INonFungiblePositionManager;
+import exchange.convexus.positionmgr.MintParams;
+import exchange.convexus.positionmgr.MintResult;
 import score.Address;
 import score.Context;
 import score.annotation.External;
@@ -78,6 +81,47 @@ public class ConvexusPoolInitializer {
         }
 
         return pool;
+    }
+
+    /**
+     * Group PoolInitializer::createAndInitializePoolIfNecessary + NFTManager::mint calls
+     */
+    @External
+    public CreatePoolAndMintResult createAndInitializePoolIfNecessaryAndMintPosition (
+        // For the pool creation+initialization
+        Address token0,
+        Address token1,
+        int fee,
+        BigInteger sqrtPriceX96,
+        // For the position minting
+        Address positionManager,
+        int tickLower,
+        int tickUpper,
+        BigInteger amount0Desired,
+        BigInteger amount1Desired,
+        BigInteger amount0Min,
+        BigInteger amount1Min,
+        Address recipient,
+        BigInteger deadline
+    ) {
+        Address pool = createAndInitializePoolIfNecessary(token0, token1, fee, sqrtPriceX96);
+
+        MintParams params = new MintParams(
+            token0, 
+            token1, 
+            fee, 
+            tickLower, 
+            tickUpper,
+            amount0Desired,
+            amount1Desired,
+            amount0Min,
+            amount1Min,
+            recipient,
+            deadline
+        );
+        MintResult mintResult = INonFungiblePositionManager.mint(positionManager, params);
+
+        return new CreatePoolAndMintResult(pool, mintResult);
     }
 
     // ================================================

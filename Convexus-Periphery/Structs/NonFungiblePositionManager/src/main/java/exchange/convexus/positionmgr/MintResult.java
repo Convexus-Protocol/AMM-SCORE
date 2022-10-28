@@ -17,6 +17,7 @@
 package exchange.convexus.positionmgr;
 
 import java.math.BigInteger;
+import java.util.Map;
 
 public class MintResult {
   // The ID of the token that represents the minted position
@@ -28,7 +29,7 @@ public class MintResult {
   // The amount of token1
   public BigInteger amount1;
   
-  public MintResult(
+  public MintResult (
     BigInteger tokenId, 
     BigInteger liquidity, 
     BigInteger amount0, 
@@ -37,5 +38,16 @@ public class MintResult {
       this.liquidity = liquidity;
       this.amount0 = amount0;
       this.amount1 = amount1;
+  }
+
+  public static MintResult fromMap (Object call) {
+    @SuppressWarnings("unchecked")
+    Map<String,Object> map = (Map<String,Object>) call;
+    return new MintResult (
+      (BigInteger) map.get("tokenId"),
+      (BigInteger) map.get("liquidity"),
+      (BigInteger) map.get("amount0"),
+      (BigInteger) map.get("amount1")
+    );
   }
 }

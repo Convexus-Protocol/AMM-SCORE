@@ -6,6 +6,9 @@ dependencies {
     implementation project(':Convexus-Core:Structs:Pool')
     implementation project(':Convexus-Core:Score-Interfaces:Pool')
     implementation project(':Convexus-Core:Score-Interfaces:Factory')
+    
+    implementation project(':Convexus-Periphery:Structs:NonFungiblePositionManager')
+    implementation project(':Convexus-Periphery:Score-Interfaces:NonFungiblePositionManager')
 }
 
 optimizedJar {

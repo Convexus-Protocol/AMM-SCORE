@@ -44,5 +44,31 @@ public class MintParams {
     // The unix time after which a mint will fail, to protect against long-pending transactions and wild swings in prices
     public BigInteger deadline;
 
+    public MintParams (
+        Address token0, 
+        Address token1, 
+        int fee, 
+        int tickLower, 
+        int tickUpper,
+        BigInteger amount0Desired,
+        BigInteger amount1Desired,
+        BigInteger amount0Min,
+        BigInteger amount1Min,
+        Address recipient,
+        BigInteger deadline
+    ) {
+        this.token0 = token0;
+        this.token1 = token1;
+        this.fee = fee;
+        this.tickLower = tickLower;
+        this.tickUpper = tickUpper;
+        this.amount0Desired = amount0Desired;
+        this.amount1Desired = amount1Desired;
+        this.amount0Min = amount0Min;
+        this.amount1Min = amount1Min;
+        this.recipient = recipient;
+        this.deadline = deadline;
+    }
+
     public MintParams() {}
 }
