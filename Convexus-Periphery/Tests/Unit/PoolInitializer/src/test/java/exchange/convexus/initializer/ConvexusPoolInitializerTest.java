@@ -18,6 +18,9 @@ package exchange.convexus.initializer;
 
 import exchange.convexus.mocks.factory.ConvexusFactoryMock;
 import exchange.convexus.periphery.initializer.ConvexusPoolInitializer;
+import exchange.convexus.periphery.positiondescriptor.NonfungibleTokenPositionDescriptor;
+import exchange.convexus.periphery.positionmgr.NonFungiblePositionManager;
+import exchange.convexus.periphery.router.SwapRouter;
 import exchange.convexus.test.ConvexusTest;
 import exchange.convexus.utils.ScoreSpy;
 
@@ -25,9 +28,19 @@ public class ConvexusPoolInitializerTest extends ConvexusTest {
 
   ScoreSpy<ConvexusPoolInitializer> initializer;
   ScoreSpy<ConvexusFactoryMock> factory;
+  ScoreSpy<NonFungiblePositionManager> nft;
+  ScoreSpy<SwapRouter> router;
+  ScoreSpy<NonfungibleTokenPositionDescriptor> positiondescriptor;
+
+  void setup_nft () throws Exception {
+    factory = deploy_factory();
+    router = deploy_router(factory.getAddress());
+    positiondescriptor = deploy_positiondescriptor();
+    nft = deploy_nft(factory.getAddress(), positiondescriptor.getAddress());
+  }
 
   void setup_initializer () throws Exception {
     factory = deploy_factory();
-    initializer = deploy_initializer(factory.getAddress());
+    initializer = deploy_initializer(factory.getAddress(), nft.getAddress());
   }
 }

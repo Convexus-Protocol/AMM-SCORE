@@ -15,7 +15,10 @@ dependencies {
 
     testImplementation project(':Convexus-Core:Tests:Mocks:Factory')
     
+    testImplementation project(':Convexus-Periphery:Contracts:NonFungiblePositionManager')
+    testImplementation project(':Convexus-Periphery:Contracts:NonfungibleTokenPositionDescriptor')
     testImplementation project(':Convexus-Periphery:Contracts:PoolInitializer')
+    testImplementation project(':Convexus-Periphery:Contracts:SwapRouter')
 
     
 }

@@ -131,8 +131,8 @@ public class ConvexusTest extends TestBase {
         return new ScoreSpy<SwapRouter>(score, spy);
     }
     
-    public ScoreSpy<ConvexusPoolInitializer> deploy_initializer (Address factory) throws Exception {
-        Score score = sm.deploy(owner, ConvexusPoolInitializer.class, factory);
+    public ScoreSpy<ConvexusPoolInitializer> deploy_initializer (Address factory, Address nft) throws Exception {
+        Score score = sm.deploy(owner, ConvexusPoolInitializer.class, factory, nft);
 
         var spy = (ConvexusPoolInitializer) spy(score.getInstance());
         score.setInstance(spy);

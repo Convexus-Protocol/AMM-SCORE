@@ -17,7 +17,7 @@
 package exchange.convexus.positionmgr;
 
 import java.math.BigInteger;
-
+import java.util.Map;
 import score.Address;
 
 public class MintParams {
@@ -71,4 +71,20 @@ public class MintParams {
     }
 
     public MintParams() {}
+
+    public Map<String, ?> toMap() {
+        return Map.ofEntries(
+            Map.entry("token0", this.token0),
+            Map.entry("token1", this.token1),
+            Map.entry("fee", this.fee),
+            Map.entry("tickLower", this.tickLower),
+            Map.entry("tickUpper", this.tickUpper),
+            Map.entry("amount0Desired", this.amount0Desired),
+            Map.entry("amount1Desired", this.amount1Desired),
+            Map.entry("amount0Min", this.amount0Min),
+            Map.entry("amount1Min", this.amount1Min),
+            Map.entry("recipient", this.recipient),
+            Map.entry("deadline", this.deadline)
+        );
+    }
 }

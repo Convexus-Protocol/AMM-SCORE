@@ -43,7 +43,7 @@ public class INonFungiblePositionManager {
     MintParams params
   ) {
     return MintResult.fromMap(
-      Context.call(positionManager, "mint", params)
+      Context.call(positionManager, "mint", params.toMap())
     );
   }
 }

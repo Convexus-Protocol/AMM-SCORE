@@ -72,7 +72,7 @@ public class NonFungiblePositionManagerTest extends ConvexusTest {
   }
 
   void setup_initializer () throws Exception {
-    initializer = deploy_initializer(factory.getAddress());
+    initializer = deploy_initializer(factory.getAddress(), nft.getAddress());
   }
 
   void setup_nft () throws Exception {

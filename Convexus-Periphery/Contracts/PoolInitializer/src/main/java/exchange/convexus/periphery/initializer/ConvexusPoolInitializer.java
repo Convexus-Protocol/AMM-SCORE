@@ -17,7 +17,6 @@
 package exchange.convexus.periphery.initializer;
 
 import exchange.convexus.utils.AddressUtils;
-
 import static java.math.BigInteger.ZERO;
 
 import java.math.BigInteger;
@@ -25,7 +24,7 @@ import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
 import exchange.convexus.core.factory.IConvexusFactory;
-import exchange.convexus.core.interfaces.callback.IConvexusMintCallback;
+import exchange.convexus.interfaces.irc2.IIRC2ICX;
 import exchange.convexus.periphery.interfaces.callback.IConvexusLiquidityManagement;
 import exchange.convexus.periphery.liquidity.ConvexusLiquidityManagement;
 import exchange.convexus.pool.IConvexusPool;
@@ -45,12 +44,14 @@ import scorex.io.StringReader;
  * @title Creates and initializes Convexus Pools
  */
 public class ConvexusPoolInitializer
-  implements IConvexusLiquidityManagement,
-             IConvexusMintCallback
+  implements IConvexusLiquidityManagement
  {
   // ================================================
   // Consts
   // ================================================
+  // Contract class name
+  public static final String NAME = "ConvexusPoolInitializer";
+
   // Contract name
   private final String name;
   private final Address factory;
@@ -83,7 +84,7 @@ public class ConvexusPoolInitializer
     BigInteger sqrtPriceX96
   ) {
     Context.require(AddressUtils.compareTo(token0, token1) < 0, 
-        "createAndInitializePoolIfNecessary: token0 < token1");
+        NAME + "::createAndInitializePoolIfNecessary: token0 < token1");
 
     Address pool = IConvexusFactory.getPool(factory, token0, token1, fee);
 
@@ -113,26 +114,45 @@ public class ConvexusPoolInitializer
     // For the position minting
     int tickLower,
     int tickUpper,
-    BigInteger amount0Desired,
-    BigInteger amount1Desired,
+    BigInteger amount0,
+    BigInteger amount1,
     Address recipient,
     BigInteger deadline
   ) {
+    final Address caller = Context.getCaller();
+
+    // Check if user deposited enough funds
+    final BigInteger deposited0 = this.deposited(caller, token0);
+    final BigInteger deposited1 = this.deposited(caller, token1);
+    
+    Context.require(deposited0.compareTo(amount0) >= 0,
+      NAME + "::createAndInitializePoolIfNecessaryAndMintPosition: not enough deposited 0");
+    
+    Context.require(deposited1.compareTo(amount1) >= 0,
+      NAME + "::createAndInitializePoolIfNecessaryAndMintPosition: not enough deposited 1");
+    
+    // Create Pool
     Address pool = createAndInitializePoolIfNecessary(token0, token1, fee, sqrtPriceX96);
 
+    // Transfer funds to Position Manager
+    IIRC2ICX.transfer(token0, this.positionManager, deposited0, "deposit");
+    IIRC2ICX.transfer(token1, this.positionManager, deposited1, "deposit");
+
+    // Mint position
     MintParams params = new MintParams(
       token0, 
       token1, 
       fee, 
       tickLower, 
       tickUpper,
-      amount0Desired,
-      amount1Desired,
+      amount0,
+      amount1,
       BigInteger.ZERO,
       BigInteger.ZERO,
       recipient,
       deadline
     );
+  
     MintResult mintResult = INonFungiblePositionManager.mint(this.positionManager, params);
 
     return new CreatePoolAndMintResult(pool, mintResult);
@@ -149,24 +169,6 @@ public class ConvexusPoolInitializer
   // ================================================
   // Implements LiquidityManager
   // ================================================
-  /**
-   * @notice Called to `Context.getCaller()` after minting liquidity to a position from ConvexusPool#mint.
-   * @dev In the implementation you must pay the pool tokens owed for the minted liquidity.
-   * The caller of this method must be checked to be a ConvexusPool deployed by the canonical ConvexusFactory.
-   * @param amount0Owed The amount of token0 due to the pool for the minted liquidity
-   * @param amount1Owed The amount of token1 due to the pool for the minted liquidity
-   * @param data Any data passed through by the caller via the mint call
-   */
-  @External
-  public void convexusMintCallback (
-    BigInteger amount0Owed,
-    BigInteger amount1Owed,
-    byte[] data
-  ) {
-    // Context.println("[Callback] paying " + amount0Owed + " / " + amount1Owed + " to " + Context.call(Context.getCaller(), "name"));
-    this.liquidityMgr.convexusMintCallback(amount0Owed, amount1Owed, data);
-  }
-
   /**
    * @notice Remove funds from the liquidity manager previously deposited by `Context.getCaller`
    * 
