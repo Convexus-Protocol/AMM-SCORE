@@ -51,7 +51,7 @@ public class ConvexusFactoryTest extends TestBase {
 
     @BeforeAll
     static void setup() throws Exception {
-        Env.Chain chain = new Env.Chain(7, operator, "https://berlin.net.solidwallet.io");
+        Env.Chain chain = new Env.Chain(7, operator, "https://lisbon.net.solidwallet.io");
         IconService iconService = new IconService(new HttpProvider(chain.getEndpointURL(3)));
         txHandler = new TransactionHandler(iconService, chain);
     }

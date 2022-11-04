@@ -23,7 +23,7 @@ j=$(cat << EOF
   "pools": [
     {
       "name": "ICX/USDC",
-      "address": "$(getAddress core/pools/berlin/usdc-icx/pool ${endpoint})",
+      "address": "$(getAddress core/pools/lisbon/usdc-icx/pool ${endpoint})",
       "token0": "cx1111111111111111111111111111111111111111",
       "token1": "$(getAddress tokens/USDC-token ${endpoint})"
     }
