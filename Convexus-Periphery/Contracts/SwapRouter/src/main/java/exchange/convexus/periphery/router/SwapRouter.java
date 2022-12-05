@@ -551,6 +551,14 @@ public class SwapRouter
     this.liquidityMgr.withdraw(token);
   }
 
+  /**
+   * @notice Remove all funds from the liquidity manager previously deposited by `Context.getCaller`
+   */
+  @External
+  public void withdraw_all () {
+    this.liquidityMgr.withdraw_all();
+  }
+
   // @External - this method is external through tokenFallback
   public void deposit(Address caller, Address tokenIn, BigInteger amountIn) {
     this.liquidityMgr.deposit(caller, tokenIn, amountIn);

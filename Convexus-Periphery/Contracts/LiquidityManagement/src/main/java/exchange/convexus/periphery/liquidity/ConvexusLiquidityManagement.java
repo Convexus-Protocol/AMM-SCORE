@@ -215,8 +215,9 @@ public class ConvexusLiquidityManagement
     final Address caller = Context.getCaller();
 
     var depositedUser = this.depositedMap(caller);
+    int size = depositedUser.size();
 
-    while (depositedUser.size() > 0) {
+    for (int i = 0; i < size; i++) {
       Address token = depositedUser.getKey(0);
       BigInteger amount = depositedUser.getOrDefault(token, ZERO);
       depositedUser.remove(token);

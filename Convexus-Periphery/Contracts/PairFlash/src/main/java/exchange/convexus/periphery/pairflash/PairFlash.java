@@ -239,6 +239,14 @@ public class PairFlash
   }
 
   /**
+   * @notice Remove all funds from the liquidity manager previously deposited by `Context.getCaller`
+   */
+  @External
+  public void withdraw_all () {
+    this.liquidityMgr.withdraw_all();
+  }
+
+  /**
    * @notice Accept the incoming ICX transfer
    */
   @External

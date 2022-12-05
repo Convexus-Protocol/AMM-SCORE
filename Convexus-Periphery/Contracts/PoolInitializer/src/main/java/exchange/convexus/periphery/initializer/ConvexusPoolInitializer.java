@@ -180,6 +180,14 @@ public class ConvexusPoolInitializer
   }
 
   /**
+   * @notice Remove all funds from the liquidity manager previously deposited by `Context.getCaller`
+   */
+  @External
+  public void withdraw_all () {
+    this.liquidityMgr.withdraw_all();
+  }
+
+  /**
    * @notice Add ICX funds to the liquidity manager
    */
   @External

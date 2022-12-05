@@ -43,6 +43,11 @@ public interface IConvexusLiquidityManagement
    * @notice Remove funds from the liquidity manager
    */
   public void withdraw (Address token);
+  
+  /**
+   * @notice Remove all funds from the liquidity manager
+   */
+  public void withdraw_all ();
 
   
   // ================================================
