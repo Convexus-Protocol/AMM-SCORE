@@ -200,10 +200,30 @@ public class ConvexusLiquidityManagement
 
     var depositedUser = this.depositedMap(caller);
     BigInteger amount = depositedUser.getOrDefault(token, ZERO);
+    depositedUser.remove(token);
 
     if (amount.compareTo(ZERO) > 0) {
-      depositedUser.remove(token);
       IIRC2ICX.transfer(token, caller, amount, "withdraw");
+    }
+  }
+
+  /**
+   * @notice Remove all funds from the liquidity manager
+   */
+  // @External
+  public void withdraw_all () {
+    final Address caller = Context.getCaller();
+
+    var depositedUser = this.depositedMap(caller);
+
+    while (depositedUser.size() > 0) {
+      Address token = depositedUser.getKey(0);
+      BigInteger amount = depositedUser.getOrDefault(token, ZERO);
+      depositedUser.remove(token);
+  
+      if (amount.compareTo(ZERO) > 0) {
+        IIRC2ICX.transfer(token, caller, amount, "withdraw");
+      }
     }
   }
 
