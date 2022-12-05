@@ -1,7 +1,7 @@
 import json
 
 USDC = {
-  "address": "cxa818e190782c7bc64c1ec12512c7f8f3171fc8cf",
+  "address": "cx71698bfaa0fc2c8929c226c52611ba033eaafc76",
   "amount": int(0.60 * 10**6)
 }
 

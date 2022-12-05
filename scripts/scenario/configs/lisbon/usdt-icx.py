@@ -1,7 +1,7 @@
 import json
 
 USDT = {
-  "address": "cxa2895912e90f92e17c6df7e382c04745c7b6a9ce",
+  "address": "cx1727da573c78098f1b7cd6e01ae11a3da935d2e1",
   "amount": int(0.60 * 10**6)
 }
 

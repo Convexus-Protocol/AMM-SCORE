@@ -36,17 +36,19 @@ info "Cleaning..."
 ./gradlew "${javaPkg}:clean" > /dev/null
 
 # Deploy on ICON network
-factoryPkg=$(getFactoryPkg)
-factory=$(getAddress ${factoryPkg} ${network})
+factory=$(getAddress $(getFactoryPkg) ${network})
+positionManager=$(getAddress $(getNonFungiblePositionManagerPkg) ${network})
 filter=$(cat <<EOF
 {
-  factory: \$factory
+  factory: \$factory,
+  positionManager: \$positionManager
 }
 EOF
 )
 
 jq -n \
   --arg factory $factory \
+  --arg positionManager $positionManager \
   "${filter}" > ${deployDir}/params.json
 
 python run.py -e ${network} deploy ${pkg}

@@ -1,7 +1,7 @@
 import json
 
 BNUSD = {
-  "address": "cx196276887ec398a1fb41b335f9260fbb300c684b",
+  "address": "cx43f9902890ce7ff01a4cda809337bdadc5dcf849",
   "amount": int(0.60 * 10**18)
 }
 

@@ -1,12 +1,12 @@
 import json
 
 WETH = {
-  "address": "cx1126c5dc7115daea7f55d6b6cf0eb63adeb3529f",
+  "address": "cxb9d8730b23a6fa319bdfa3d5162606c2039c5156",
   "amount": int(1 * 10**18)
 }
 
 SICX = {
-  "address": "cx79ada8b605380c84507d42534080ada30c77602c",
+  "address": "cxbe96f040991bf22cc2df7d96ce757768ecd9860d",
   "amount": int(50 * 10**18)
 }
 

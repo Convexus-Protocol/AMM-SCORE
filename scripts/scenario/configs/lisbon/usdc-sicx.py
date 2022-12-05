@@ -1,12 +1,12 @@
 import json
 
 USDC = {
-  "address": "cxa818e190782c7bc64c1ec12512c7f8f3171fc8cf",
+  "address": "cx71698bfaa0fc2c8929c226c52611ba033eaafc76",
   "amount": int(0.60 * 10**6)
 }
 
 SICX = {
-  "address": "cx79ada8b605380c84507d42534080ada30c77602c",
+  "address": "cxbe96f040991bf22cc2df7d96ce757768ecd9860d",
   "amount": 10**18
 }
 

@@ -1,12 +1,12 @@
 import json
 
 BNUSD = {
-  "address": "cx196276887ec398a1fb41b335f9260fbb300c684b",
+  "address": "cx43f9902890ce7ff01a4cda809337bdadc5dcf849",
   "amount": 10**18
 }
 
 USDC = {
-  "address": "cxa818e190782c7bc64c1ec12512c7f8f3171fc8cf",
+  "address": "cx71698bfaa0fc2c8929c226c52611ba033eaafc76",
   "amount": 10**6
 }
 
